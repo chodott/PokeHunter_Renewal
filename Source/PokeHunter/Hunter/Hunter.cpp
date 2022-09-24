@@ -5,6 +5,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components\SphereComponent.h"
+#include "Components\CapsuleComponent.h"
+#include "PokeHunter/Npc/Npc.h"
 
 // Sets default values
 AHunter::AHunter()
@@ -22,6 +25,14 @@ AHunter::AHunter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	//상호작용 범위(구)
+	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
+	InteractionSphere->SetupAttachment(GetRootComponent());
+	InteractionSphere->SetSphereRadius(100.f);
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
+	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
 
 	//컨트롤러 회전 시 회전 x
 	bUseControllerRotationYaw = false;
@@ -95,5 +106,44 @@ void AHunter::MoveRight(float Val)
 
 void AHunter::RMBDown()
 {
+	if (CurrentNpc) CurrentNpc->interact_Implementation();
+}
 
+void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("OverlapBegin"));
+	if (CurrentNpc == nullptr)
+	{
+		if (OtherActor->GetClass()->ImplementsInterface(UNpcInterface::StaticClass()))
+		{
+			CurrentNpc = Cast<ANpc>(OtherActor);
+		}
+	}
+}
+
+void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->GetClass()->ImplementsInterface(UNpcInterface::StaticClass()))
+	{
+		if (CurrentNpc == Cast<ANpc>(OtherActor))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("OverlapEnd"));
+			CurrentNpc = NULL;
+		}
+		else return;
+	}
+
+	if (CurrentNpc == nullptr)
+	{
+		TArray<AActor*> OverlappedActors;
+		GetCapsuleComponent()->GetOverlappingActors(OverlappedActors);
+		for (int32 i = 0; i < OverlappedActors.Num(); ++i)
+		{
+			if (OverlappedActors[i]->GetClass()->ImplementsInterface(UNpcInterface::StaticClass()))
+			{
+				CurrentNpc = Cast<ANpc>(OverlappedActors[i]);
+				break;
+			}
+		}
+	}
 }

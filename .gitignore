@@ -78,7 +78,6 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 
 #Asset
-*.uasset
 *.umap
 
 ### UnrealEngine Patch ###

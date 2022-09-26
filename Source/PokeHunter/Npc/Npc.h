@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "NpcInterface.h"
+#include "PokeHunter/Hunter/Hunter.h"
 #include "Npc.generated.h"
 
 
@@ -29,6 +30,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
 		class UBoxComponent* CollisionBox;
 
+	//Ä«¸Þ¶ó
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+		class USpringArmComponent* CameraBoom;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+		class UCameraComponent* FollowCamera;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -37,6 +44,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void interact_Implementation() override;
+	virtual void interact_Implementation(AHunter* Hunter) override;
 
+public:
+	class AHunter* Master;
+	bool bActive;
 };

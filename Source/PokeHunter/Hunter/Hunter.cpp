@@ -2,12 +2,17 @@
 
 
 #include "Hunter.h"
+#include "InventoryComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components\SphereComponent.h"
 #include "Components\CapsuleComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "PokeHunter/Npc/Npc.h"
+#include "PokeHunter/Partner/Partner.h"
+#include "PokeHunter/Item/Item.h"
+#include "PokeHunter/Item/ItemData.h"
 
 // Sets default values
 AHunter::AHunter()
@@ -26,10 +31,6 @@ AHunter::AHunter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	//상호작용 범위(구)
-	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
-	InteractionSphere->SetupAttachment(GetRootComponent());
-	InteractionSphere->SetSphereRadius(100.f);
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
@@ -38,12 +39,18 @@ AHunter::AHunter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
+
+	//인벤토리
+	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 }
 
 // Called when the game starts or when spawned
 void AHunter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//카메라, 컨트롤러
+	Controller->bFindCameraComponentWhenViewTarget = true;
 
 }
 
@@ -52,6 +59,7 @@ void AHunter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	
 }
 
 // Called to bind functionality to input
@@ -64,8 +72,7 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("PitchUp", this, &AHunter::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &AHunter::RMBDown);
-
-
+	PlayerInputComponent->BindAction("I_Key", IE_Pressed, this, &AHunter::OpenInventory);
 }
 
 void AHunter::AddControllerPitchInput(float Val)
@@ -106,12 +113,35 @@ void AHunter::MoveRight(float Val)
 
 void AHunter::RMBDown()
 {
-	if (CurrentNpc) CurrentNpc->interact_Implementation();
+	if (CurrentNpc)
+	{
+		CurrentNpc->interact_Implementation(this);
+	}
 }
+
+void AHunter::OpenInventory()
+{
+	if (InventoryUI == nullptr)
+	{
+		InventoryUI = CreateWidget(GetWorld(), InventoryUIClass, TEXT("Inventory"));
+		InventoryUI->AddToViewport();
+	}
+
+	else {
+		if (InventoryUI->IsInViewport())
+		{
+			InventoryUI->RemoveFromViewport();
+		}
+		else {
+			InventoryUI->AddToViewport();
+		}
+	}
+}
+
 
 void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OverlapBegin"));
+	if (OverlappedComp == GetCapsuleComponent()) UE_LOG(LogTemp, Warning, TEXT("OverlapBegin"));
 	if (CurrentNpc == nullptr)
 	{
 		if (OtherActor->GetClass()->ImplementsInterface(UNpcInterface::StaticClass()))

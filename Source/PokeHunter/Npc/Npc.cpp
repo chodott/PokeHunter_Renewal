@@ -4,6 +4,9 @@
 #include "Npc.h"
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "PokeHunter/Hunter/Hunter.h"
 
 // Sets default values
 ANpc::ANpc()
@@ -24,7 +27,14 @@ ANpc::ANpc()
 	InteractionSphere->SetupAttachment(GetRootComponent());
 	InteractionSphere->SetSphereRadius(100.f);
 
-	
+	//Ä«¸Þ¶ó
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(GetRootComponent());
+	CameraBoom->TargetOffset = FVector(10, 10, 25.0f);
+	CameraBoom->TargetArmLength = 100.f;
+
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
 }
 
@@ -40,7 +50,7 @@ void ANpc::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ANpc::interact_Implementation()
+void ANpc::interact_Implementation(AHunter* Hunter)
 {
 
 }

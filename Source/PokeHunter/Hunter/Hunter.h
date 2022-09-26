@@ -23,13 +23,26 @@ public:
 
 	//상호작용
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
-		class USphereComponent* InteractionSphere;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interacdtion")
 		class ANpc* CurrentNpc;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+public:
+
+	//인벤토리
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+		class UInventoryComponent* Inventory;
+
+	//UI
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+		TSubclassOf <UUserWidget> InventoryUIClass;
+	class UUserWidget* InventoryUI;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+		TSubclassOf <UUserWidget> StorageUIClass;
+	class UUserWidget* StorageUI;
+
 
 public:
 	// Called every frame
@@ -42,6 +55,8 @@ public:
 	void MoveRight(float Val);
 	void MoveForward(float Val);
 	void RMBDown();
+	void OpenInventory();
+
 
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

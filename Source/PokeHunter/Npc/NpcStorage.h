@@ -19,6 +19,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 		UStaticMeshComponent* SubStaticMesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+		class UInventoryComponent* Storage;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -27,11 +30,14 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void interact_Implementation() override;
+	virtual void interact_Implementation(AHunter* Hunter) override;
+	void OpenUI();
 
 public:
 	float currentAngle;
 	bool bActive;
+
+	FTimerHandle TimerHandle;
 
 };
 

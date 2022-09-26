@@ -4,6 +4,11 @@
 #include "NpcStorage.h"
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Blueprint/UserWidget.h"
+#include "PokeHunter/Item/Item.h"
+#include "PokeHunter/Hunter/InventoryComponent.h"
+#include "PokeHunter/Hunter/Hunter.h"
 
 // Sets default values
 ANpcStorage::ANpcStorage()
@@ -14,6 +19,12 @@ ANpcStorage::ANpcStorage()
 	//메쉬
 	SubStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SubStaticMesh"));
 	SubStaticMesh->SetupAttachment(StaticMesh);
+
+	//카메라
+	CameraBoom->bDoCollisionTest = false;
+
+	//인벤토리
+	Storage = CreateDefaultSubobject<UInventoryComponent>(TEXT("Storage"));
 
 
 }
@@ -46,10 +57,40 @@ void ANpcStorage::Tick(float DeltaTime)
 	}
 }
 
-void ANpcStorage::interact_Implementation()
+void ANpcStorage::interact_Implementation(AHunter* Hunter)
 {
-	if (bActive) bActive = 0;
-	else bActive = 1;
+	Master = Hunter;
+	if (bActive)
+	{
+		
+		
+		bActive = 0;
+		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(Master, 1.0f);
+		Master->StorageUI->RemoveFromViewport();
+		Master = NULL;
+
+	}
+	else
+	{
+		bActive = 1;
+		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(this, 1.0f);
+		GetWorldTimerManager().SetTimer(TimerHandle, this, &ANpcStorage::OpenUI, 1.0f, false, 1.0f);
+	}
 	SetActorTickEnabled(1);
-	UE_LOG(LogTemp, Warning, TEXT("Interact"))
+}
+
+void ANpcStorage::OpenUI()
+{
+	if (Master->StorageUI == nullptr)
+	{
+		Master->StorageUI = CreateWidget(GetWorld(), Master->StorageUIClass);
+	}
+	if (Master->StorageUI->IsInViewport())
+	{
+		Master->StorageUI->RemoveFromViewport();
+	}
+	else {
+		Master->StorageUI->AddToViewport();
+	}
+	GetWorldTimerManager().ClearTimer(TimerHandle);
 }

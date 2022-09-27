@@ -35,9 +35,6 @@ public:
 
 public:
 	float currentAngle;
-	bool bActive;
-
-	FTimerHandle TimerHandle;
 
 };
 

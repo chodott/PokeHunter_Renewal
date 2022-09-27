@@ -20,9 +20,6 @@ ANpcStorage::ANpcStorage()
 	SubStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SubStaticMesh"));
 	SubStaticMesh->SetupAttachment(StaticMesh);
 
-	//카메라
-	CameraBoom->bDoCollisionTest = false;
-
 	//인벤토리
 	Storage = CreateDefaultSubobject<UInventoryComponent>(TEXT("Storage"));
 
@@ -43,54 +40,41 @@ void ANpcStorage::Tick(float DeltaTime)
 
 	if (bActive)
 	{
-		//SubStaticMesh->AddRelativeRotation(FRotator(0, 0, -1.0f));
-		SubStaticMesh->AddLocalRotation(FRotator(0, 0, -5.0f));
-		float roll = SubStaticMesh->GetRelativeRotation().Roll;
-		if (roll <= -90.0f) SetActorTickEnabled(0);
-	}
-	else
-	{
 		SubStaticMesh->AddLocalRotation(FRotator(0, 0, 5.0f));
 		float roll = SubStaticMesh->GetRelativeRotation().Roll;
 		if (roll >= 15.0f) SetActorTickEnabled(0);
-
+	}
+	else
+	{
+		SubStaticMesh->AddLocalRotation(FRotator(0, 0, -5.0f));
+		float roll = SubStaticMesh->GetRelativeRotation().Roll;
+		if (roll <= -90.0f) SetActorTickEnabled(0);
 	}
 }
 
 void ANpcStorage::interact_Implementation(AHunter* Hunter)
 {
-	Master = Hunter;
-	if (bActive)
-	{
-		
-		
-		bActive = 0;
-		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(Master, 1.0f);
-		Master->StorageUI->RemoveFromViewport();
-		Master = NULL;
-
-	}
-	else
-	{
-		bActive = 1;
-		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(this, 1.0f);
-		GetWorldTimerManager().SetTimer(TimerHandle, this, &ANpcStorage::OpenUI, 1.0f, false, 1.0f);
-	}
+	
+	Super::interact_Implementation(Hunter);
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &ANpcStorage::OpenUI, 1.0f, false, 1.0f);
 	SetActorTickEnabled(1);
 }
 
 void ANpcStorage::OpenUI()
 {
-	if (Master->StorageUI == nullptr)
+	if (bActive) 
 	{
-		Master->StorageUI = CreateWidget(GetWorld(), Master->StorageUIClass);
+		bActive = 0;	
 	}
-	if (Master->StorageUI->IsInViewport())
+	else
 	{
-		Master->StorageUI->RemoveFromViewport();
-	}
-	else {
+		if (Master->StorageUI == nullptr)
+		{
+			Master->StorageUI = CreateWidget(GetWorld(), Master->StorageUIClass);
+		}
 		Master->StorageUI->AddToViewport();
+		bActive = 1;
 	}
+	Master->EnableInput(Cast<APlayerController>(Master->Controller));
 	GetWorldTimerManager().ClearTimer(TimerHandle);
 }

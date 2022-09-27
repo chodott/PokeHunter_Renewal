@@ -49,4 +49,5 @@ public:
 public:
 	class AHunter* Master;
 	bool bActive;
+	FTimerHandle TimerHandle;
 };

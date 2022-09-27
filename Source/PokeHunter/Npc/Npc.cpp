@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "PokeHunter/Hunter/Hunter.h"
 
@@ -32,6 +33,7 @@ ANpc::ANpc()
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetOffset = FVector(10, 10, 25.0f);
 	CameraBoom->TargetArmLength = 100.f;
+	CameraBoom->bDoCollisionTest = false;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
@@ -52,5 +54,16 @@ void ANpc::Tick(float DeltaTime)
 
 void ANpc::interact_Implementation(AHunter* Hunter)
 {
+	Master = Hunter;
+	if (bActive)
+	{
+		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(Hunter, 1.0f);
+		Master->StorageUI->RemoveFromViewport();
+	}
+	else
+	{
+		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(this, 1.0f);
+	}
+	Master->DisableInput(Cast<APlayerController>(Master->Controller));
 
 }

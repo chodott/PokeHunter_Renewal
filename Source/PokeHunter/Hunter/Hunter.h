@@ -54,6 +54,7 @@ public:
 	virtual void AddControllerYawInput(float Val);
 	void MoveRight(float Val);
 	void MoveForward(float Val);
+	UFUNCTION(BlueprintCallable)
 	void RMBDown();
 	void OpenInventory();
 

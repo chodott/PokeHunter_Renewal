@@ -31,28 +31,6 @@ void ANpcPartyManager::Tick(float DeltaTime)
 void ANpcPartyManager::interact_Implementation(AHunter* Hunter)
 {
 	Super::interact_Implementation(Hunter);
-	if (bActive)
-	{
-		GetWorldTimerManager().SetTimer(TimerHandle, this, &ANpcPartyManager::OpenUI, 1.0f, false, 1.0f);
-	}
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &ANpcPartyManager::OpenUI, 1.0f, false, 1.0f);
 
-}
-
-void ANpcPartyManager::OpenUI()
-{
-	if (bActive)
-	{
-		bActive = 0;
-	}
-	else
-	{
-		if (Master->StorageUI == nullptr)
-		{
-			Master->StorageUI = CreateWidget(GetWorld(), Master->StorageUIClass);
-		}
-		Master->StorageUI->AddToViewport();
-		bActive = 1;
-	}
-	Master->EnableInput(Cast<APlayerController>(Master->Controller));
-	GetWorldTimerManager().ClearTimer(TimerHandle);
 }

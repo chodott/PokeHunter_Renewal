@@ -31,10 +31,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void interact_Implementation(AHunter* Hunter) override;
-	void OpenUI();
-
-public:
-	float currentAngle;
 
 };
 

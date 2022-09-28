@@ -31,13 +31,15 @@ ANpc::ANpc()
 	//Ä«¸Þ¶ó
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
-	CameraBoom->TargetOffset = FVector(10, 10, 25.0f);
+	CameraBoom->TargetOffset = FVector(0, 0, 0.0f);
 	CameraBoom->TargetArmLength = 100.f;
+	CameraBoom->SetWorldRotation(FRotator(0, 0, 180.0f));
 	CameraBoom->bDoCollisionTest = false;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
+	//NpcUI = CreateWidget(GetWorld(), UIClass);
 }
 
 // Called when the game starts or when spawned
@@ -65,5 +67,23 @@ void ANpc::interact_Implementation(AHunter* Hunter)
 		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(this, 1.0f);
 	}
 	Master->DisableInput(Cast<APlayerController>(Master->Controller));
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &ANpc::OpenUI, 1.0f, false, 1.0f);
+}
+
+void ANpc::OpenUI()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandle);
+	if (bActive)
+	{
+		bActive = false;
+		Master->StorageUI = NULL;
+	}
+	else
+	{
+		Master->StorageUI = CreateWidget(Cast<APlayerController>(Master->Controller), UIClass);
+		Master->StorageUI->AddToViewport();
+		bActive = true;
+	}
+	Master->EnableInput(Cast<APlayerController>(Master->Controller));
 
 }

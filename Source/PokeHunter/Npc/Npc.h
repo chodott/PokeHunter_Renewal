@@ -36,6 +36,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 		class UCameraComponent* FollowCamera;
 
+	//UI
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<class UUserWidget> UIClass;
+	class UUserWidget* NpcUI;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -45,6 +50,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void interact_Implementation(AHunter* Hunter) override;
+	void OpenUI();
 
 public:
 	class AHunter* Master;

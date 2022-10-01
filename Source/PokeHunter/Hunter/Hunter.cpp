@@ -50,7 +50,7 @@ void AHunter::BeginPlay()
 	Super::BeginPlay();
 
 	//카메라, 컨트롤러
-	Controller->bFindCameraComponentWhenViewTarget = true;
+	// Controller->bFindCameraComponentWhenViewTarget = true;
 
 }
 
@@ -60,6 +60,18 @@ void AHunter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	
+}
+
+void AHunter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	ABLOG_S(Warning);
+}
+
+void AHunter::PossessedBy(AController* NewController)
+{
+	ABLOG_S(Warning);
+	Super::PossessedBy(NewController);
 }
 
 // Called to bind functionality to input

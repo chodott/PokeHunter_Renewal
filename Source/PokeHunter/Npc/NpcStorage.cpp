@@ -14,7 +14,6 @@
 ANpcStorage::ANpcStorage()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
 	//인벤토리
 	Storage = CreateDefaultSubobject<UInventoryComponent>(TEXT("Storage"));

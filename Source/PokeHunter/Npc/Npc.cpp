@@ -33,7 +33,7 @@ ANpc::ANpc()
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetOffset = FVector(0, 0, 0.0f);
 	CameraBoom->TargetArmLength = 100.f;
-	CameraBoom->SetWorldRotation(FRotator(0, 0, 180.0f));
+	CameraBoom->SetWorldRotation(FRotator(0, 180.0f, 0));
 	CameraBoom->bDoCollisionTest = false;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));

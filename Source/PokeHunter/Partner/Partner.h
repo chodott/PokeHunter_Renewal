@@ -16,9 +16,6 @@ public:
 	APartner();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
-		class AAIController* AIController;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 		class AHunter* Hunter;
 
 protected:
@@ -28,8 +25,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	FVector TargetPos;
+	bool bPosing;
 };

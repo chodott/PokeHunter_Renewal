@@ -2,6 +2,7 @@
 
 
 #include "PartnerController.h"
+#include "Partner.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "PokeHunter/Hunter/Hunter.h"
@@ -9,7 +10,10 @@
 APartnerController::APartnerController()
 {
 	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBObject(TEXT("BlackboardData'/Game/Partner/BB_Partner.BB_Partner'"));
-	if (BBObject.Succeeded()) BBPartner = BBObject.Object;
+	if (BBObject.Succeeded())
+	{
+		BBPartner = BBObject.Object;
+	}
 
 
 	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("BehaviorTree'/Game/Partner/BT_Partner.BT_Partner'"));

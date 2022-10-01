@@ -18,14 +18,6 @@ APartner::APartner()
 void APartner::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AHunter* Temp = Cast<AHunter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	if (Temp)
-	{
-		Hunter = Temp;
-		UE_LOG(LogTemp, Warning, TEXT("sibla"));
-	}
-	
 }
 
 // Called every frame

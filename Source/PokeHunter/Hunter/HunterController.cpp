@@ -12,4 +12,5 @@ void AHunterController::OnPossess(APawn* aPawn)
 {
 	ABLOG_S(Warning);
 	Super::Possess(aPawn);
+	
 }

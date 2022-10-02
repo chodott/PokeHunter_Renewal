@@ -10,7 +10,7 @@
 #include "Npc.h"
 #include "NpcPartnerManager.generated.h"
 
-#define PARTNER_GAP 100.f
+#define PARTNER_GAP 200.f
 /**
  * 
  */
@@ -35,11 +35,15 @@ public:
 	void SelectPartner();
 	UFUNCTION(BlueprintCallable)
 	void AddIndex(int Val);
+	UFUNCTION(BlueprintCallable)
+	void ChangePartner();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Partner")
 	TArray<TSubclassOf <class APartner>> PartnerClassArray;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Partner")
 	TArray<class APartner*> PartnerArray;
+	TArray<FVector>PositionArray;
 	FVector PosePos;
 	int CurrentIndex = 0;
 };

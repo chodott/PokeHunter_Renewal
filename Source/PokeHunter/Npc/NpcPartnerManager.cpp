@@ -2,8 +2,8 @@
 
 
 #include "NpcPartnerManager.h"
-#include "Partner/Partner.h"
-#include "Partner/PartnerController.h"
+#include "../Partner/Partner.h"
+#include "../Partner/PartnerController.h"
 
 ANpcPartnerManager::ANpcPartnerManager()
 {

@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Hunter.h"
 #include "InventoryComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -20,6 +19,21 @@ AHunter::AHunter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//  Mesh
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_HUNTER(TEXT("/Game/Hunter/Asset/YBot/Y_Bot.Y_Bot"));
+	if (SK_HUNTER.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_HUNTER.Object);
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
+	}
+
+	// Animation
+	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_HUNTER(TEXT("/Game/Hunter/Blueprint/BP_HunterAnimInstance"));
+	if (ANIM_HUNTER.Succeeded()) 
+	{
+		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		GetMesh()->SetAnimInstanceClass(ANIM_HUNTER.Class);
+	}
+
 	//카메라
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
@@ -30,7 +44,6 @@ AHunter::AHunter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
-
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
@@ -51,7 +64,6 @@ void AHunter::BeginPlay()
 
 	//카메라, 컨트롤러
 	// Controller->bFindCameraComponentWhenViewTarget = true;
-
 }
 
 // Called every frame
@@ -80,21 +92,12 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("MoveForward", this, &AHunter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AHunter::MoveRight);
-	PlayerInputComponent->BindAxis("Turn", this, &AHunter::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("PitchUp", this, &AHunter::AddControllerPitchInput);
+
+	PlayerInputComponent->BindAxis("Turn", this, &AHunter::Turn);		// X
+	PlayerInputComponent->BindAxis("LookUp", this, &AHunter::LookUp);	// Y
 
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &AHunter::RMBDown);
 	PlayerInputComponent->BindAction("I_Key", IE_Pressed, this, &AHunter::OpenInventory);
-}
-
-void AHunter::AddControllerPitchInput(float Val)
-{
-	APawn::AddControllerYawInput(Val);
-}
-
-void AHunter::AddControllerYawInput(float Val)
-{
-	APawn::AddControllerPitchInput(Val);
 }
 
 void AHunter::MoveForward(float Val)
@@ -121,6 +124,16 @@ void AHunter::MoveRight(float Val)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		AddMovementInput(Direction, Val);
 	}
+}
+
+void AHunter::Turn(float NewAxisValue)
+{
+	AddControllerYawInput(NewAxisValue);
+}
+
+void AHunter::LookUp(float NewAxisValue)
+{
+	AddControllerPitchInput(NewAxisValue);
 }
 
 void AHunter::RMBDown()

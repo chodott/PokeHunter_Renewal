@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "../PokeHunter.h"
 #include "Animation/AnimInstance.h"
 #include "HunterAnimInstance.generated.h"
 
@@ -15,6 +16,9 @@ class POKEHUNTER_API UHunterAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 	
 public:
+	UHunterAnimInstance();
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
 	virtual void NativeInitializeAnimation() override;
 
 	UFUNCTION(BlueprintCallable, Category = AnimationProperties)

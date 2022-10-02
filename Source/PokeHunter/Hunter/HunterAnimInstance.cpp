@@ -4,14 +4,29 @@
 #include "HunterAnimInstance.h"
 #include "Hunter.h"
 
+UHunterAnimInstance::UHunterAnimInstance()
+{
+	MovementSpeed = 0.0f;
+}
+
+void UHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+{
+	::UAnimInstance::NativeUpdateAnimation(DeltaSeconds);
+
+	auto Pawn = TryGetPawnOwner();
+	if (::IsValid(Pawn)) 
+	{
+		MovementSpeed = Pawn->GetVelocity().Size();
+	}
+}
+
 void UHunterAnimInstance::NativeInitializeAnimation()
 {
-	Super::UAnimInstance::NativeInitializeAnimation();
+	::UAnimInstance::NativeInitializeAnimation();
 
 	if (Hunter == nullptr)
 	{
 		Hunter = Cast<AHunter>(TryGetPawnOwner());
-
 	}
 }
 

@@ -4,6 +4,7 @@
 
 #include "..\PokeHunter.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/FloatingPawnMovement.h"
 #include "Hunter.generated.h"
 
 UCLASS()
@@ -52,17 +53,19 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual void AddControllerPitchInput(float Val);
-	virtual void AddControllerYawInput(float Val);
-	void MoveRight(float Val);
-	void MoveForward(float Val);
 	UFUNCTION(BlueprintCallable)
 	void RMBDown();
 	void OpenInventory();
-
 
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+private:
+	// Character Movement Input
+	void MoveForward(float Val);
+	void MoveRight(float Val);
+	void LookUp(float NewAxisValue);
+	void Turn(float NewAxisValue);
 };

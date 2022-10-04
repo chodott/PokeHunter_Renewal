@@ -24,6 +24,12 @@ void UInventoryComponent::BeginPlay()
 	
 }
 
+bool UInventoryComponent::AddItem(class UItemData* item)
+{
+	ItemArray.Add(item);
+	return true;
+}
+
 
 // Called every frame
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

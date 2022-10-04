@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "PokeHunter/Item/ItemData.h"
 #include "InventoryComponent.generated.h"
 
 
@@ -17,7 +18,7 @@ public:
 	UInventoryComponent();
 
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, Instanced, BlueprintReadOnly)
 	TArray<class UItemData*> ItemArray;
 
 protected:
@@ -27,4 +28,7 @@ protected:
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UFUNCTION()
+		bool AddItem(class UItemData* item);
 };

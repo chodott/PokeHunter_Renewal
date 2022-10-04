@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "PokeHunter/Item/Item.h"
+#include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Hunter/InventoryComponent.h"
 #include "PokeHunter/Hunter/Hunter.h"
 
@@ -24,6 +25,8 @@ void ANpcStorage::BeginPlay()
 {
 	Super::BeginPlay();
 	SetActorTickEnabled(0);
+
+
 }
 
 // Called every frame
@@ -37,5 +40,5 @@ void ANpcStorage::Tick(float DeltaTime)
 void ANpcStorage::interact_Implementation(AHunter* Hunter)
 {
 	Super::interact_Implementation(Hunter);
-	
+	Storage->AddItem(NewObject<UItemData>(this, UItemData::StaticClass()));
 }

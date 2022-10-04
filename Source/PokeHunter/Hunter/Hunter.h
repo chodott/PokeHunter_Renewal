@@ -38,11 +38,14 @@ public:
 
 	//UI
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-		TSubclassOf <UUserWidget> InventoryUIClass;
+	TSubclassOf <UUserWidget> InventoryUIClass;
 	class UUserWidget* InventoryUI;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-		TSubclassOf <UUserWidget> StorageUIClass;
+	TSubclassOf <UUserWidget> StorageUIClass;
 	class UUserWidget* StorageUI;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
+	class APartner* Partner;
 
 
 public:

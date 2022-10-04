@@ -37,6 +37,8 @@ public:
 	void AddIndex(int Val);
 	UFUNCTION(BlueprintCallable)
 	void ChangePartner();
+	UFUNCTION(BlueprintCallable)
+	void LeavePartner();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Partner")

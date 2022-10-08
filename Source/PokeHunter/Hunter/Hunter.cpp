@@ -47,7 +47,7 @@ AHunter::AHunter()
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
-
+	
 	//컨트롤러 회전 시 회전 x
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
@@ -63,7 +63,7 @@ void AHunter::BeginPlay()
 	Super::BeginPlay();
 
 	//카메라, 컨트롤러
-	// Controller->bFindCameraComponentWhenViewTarget = true;
+	Controller->bFindCameraComponentWhenViewTarget = true;
 }
 
 // Called every frame

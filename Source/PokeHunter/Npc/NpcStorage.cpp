@@ -40,5 +40,5 @@ void ANpcStorage::Tick(float DeltaTime)
 void ANpcStorage::interact_Implementation(AHunter* Hunter)
 {
 	Super::interact_Implementation(Hunter);
-	Storage->AddItem(NewObject<UItemData>(this, UItemData::StaticClass()));
+	// Storage->AddItem(NewObject<UItemData>(this, UItemData::StaticClass()));
 }

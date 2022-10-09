@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "NpcInterface.generated.h"
+#include "InteractInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UNpcInterface : public UInterface
+class UInteractInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class UNpcInterface : public UInterface
 /**
  * 
  */
-class POKEHUNTER_API INpcInterface
+class POKEHUNTER_API IInteractInterface
 {
 	GENERATED_BODY()
 

@@ -12,6 +12,7 @@
 #include "PokeHunter/Partner/Partner.h"
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Item/ItemData.h"
+#include "InteractActor.h"
 
 // Sets default values
 AHunter::AHunter()
@@ -138,9 +139,9 @@ void AHunter::LookUp(float NewAxisValue)
 
 void AHunter::RMBDown()
 {
-	if (CurrentNpc)
+	if (InteractingActor)
 	{
-		CurrentNpc->interact_Implementation(this);
+		InteractingActor->interact_Implementation(this);
 	}
 }
 
@@ -167,36 +168,36 @@ void AHunter::OpenInventory()
 void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OverlappedComp == GetCapsuleComponent()) UE_LOG(LogTemp, Warning, TEXT("OverlapBegin"));
-	if (CurrentNpc == nullptr)
+	if (InteractingActor == nullptr)
 	{
-		if (OtherActor->GetClass()->ImplementsInterface(UNpcInterface::StaticClass()))
+		if (OtherActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
 		{
-			CurrentNpc = Cast<ANpc>(OtherActor);
+			InteractingActor = Cast<ANpc>(OtherActor);
 		}
 	}
 }
 
 void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor->GetClass()->ImplementsInterface(UNpcInterface::StaticClass()))
+	if (OtherActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
 	{
-		if (CurrentNpc == Cast<ANpc>(OtherActor))
+		if (InteractingActor == Cast<ANpc>(OtherActor))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("OverlapEnd"));
-			CurrentNpc = NULL;
+			InteractingActor = NULL;
 		}
 		else return;
 	}
 
-	if (CurrentNpc == nullptr)
+	if (InteractingActor == nullptr)
 	{
 		TArray<AActor*> OverlappedActors;
 		GetCapsuleComponent()->GetOverlappingActors(OverlappedActors);
 		for (int32 i = 0; i < OverlappedActors.Num(); ++i)
 		{
-			if (OverlappedActors[i]->GetClass()->ImplementsInterface(UNpcInterface::StaticClass()))
+			if (OverlappedActors[i]->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
 			{
-				CurrentNpc = Cast<ANpc>(OverlappedActors[i]);
+				InteractingActor = Cast<ANpc>(OverlappedActors[i]);
 				break;
 			}
 		}

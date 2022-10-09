@@ -3,30 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InteractActor.h"
+#include "GameFramework/Actor.h"
 #include "InteractInterface.h"
-#include "Item.generated.h"
+#include "InteractActor.generated.h"
 
 UCLASS()
-class POKEHUNTER_API AItem : public AInteractActor
+class POKEHUNTER_API AInteractActor : public AActor, public IInteractInterface
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AItem();
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
-	class UStaticMeshComponent* StaticMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
-	class USphereComponent* CollisionSphere;
-	bool bActive;
-
+	AInteractActor();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 
 public:	
 	// Called every frame

@@ -2,12 +2,21 @@
 
 
 #include "Item.h"
+#include "Components/SphereComponent.h"
+#include "Hunter/Hunter.h"
 
 // Sets default values
 AItem::AItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	SetRootComponent(StaticMesh);
+
+	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
+	CollisionSphere->SetupAttachment(GetRootComponent());
+	CollisionSphere->InitSphereRadius(100.f);
 
 }
 
@@ -25,3 +34,8 @@ void AItem::Tick(float DeltaTime)
 
 }
 
+void AItem::interact_Implementation(AHunter* Hunter)
+{
+	//Hunter->CurrentNpc = this
+	this->Destroy();
+}

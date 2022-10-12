@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InteractActor.h"
+#include "GameFramework/Actor.h"
+#include "NpcInterface.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "Npc.generated.h"
 
 
 UCLASS()
-class POKEHUNTER_API ANpc : public AInteractActor
+class POKEHUNTER_API ANpc : public AActor, public INpcInterface
 {
 	GENERATED_BODY()
 	

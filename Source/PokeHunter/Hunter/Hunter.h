@@ -24,7 +24,7 @@ public:
 
 	//상호작용
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
-	class AInteractActor* InteractingActor;
+		class ANpc* CurrentNpc;
 
 protected:
 	// Called when the game starts or when spawned

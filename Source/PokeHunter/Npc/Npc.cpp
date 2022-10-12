@@ -54,7 +54,7 @@ void ANpc::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ANpc::interact_Implementation(AHunter* Hunter)
+void ANpc::Interact_Implementation(AHunter* Hunter)
 {
 	Master = Hunter;
 	if (bActive)

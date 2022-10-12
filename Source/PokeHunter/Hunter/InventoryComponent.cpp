@@ -24,10 +24,15 @@ void UInventoryComponent::BeginPlay()
 	
 }
 
-bool UInventoryComponent::AddItem(class UItemData* item)
+bool UInventoryComponent::AddItem(TSubclassOf<class UItemData> ItemDataClass)
 {
-	ItemArray.Add(item);
-	return true;
+	if (ItemDataClass != NULL)
+	{
+		UItemData* Temp = NewObject<UItemData>(this, ItemDataClass, TEXT("Data!!!"));
+		ItemArray.Add(Temp);
+		return true;
+	}
+	return false;
 }
 
 

@@ -22,6 +22,12 @@ void ANpcPartnerManager::BeginPlay()
 		PartnerArray.Add(temp);
 	}
 	PosePos = FVector(BaseLocation.X - 100, BaseLocation.Y, BaseLocation.Z);
+
+	/*static ConstructorHelpers::FObjectFinder<UUserWidget> TempUI(TEXT(""));
+	if(TempUI.Succeeded())
+	{
+		NpcUI = TempUI.Object;
+	}*/
 }
 
 void ANpcPartnerManager::Tick(float DeltaTime)
@@ -29,9 +35,9 @@ void ANpcPartnerManager::Tick(float DeltaTime)
 
 }
 
-void ANpcPartnerManager::interact_Implementation(AHunter* Hunter)
+void ANpcPartnerManager::Interact_Implementation(AHunter* Hunter)
 {
-	Super::interact_Implementation(Hunter);
+	ANpc::Interact_Implementation(Hunter);
 	
 
 }

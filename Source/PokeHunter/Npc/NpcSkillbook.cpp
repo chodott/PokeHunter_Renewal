@@ -25,9 +25,9 @@ void ANpcSkillbook::Tick(float DeltaTime)
 
 }
 
-void ANpcSkillbook::interact_Implementation(AHunter* Hunter)
+void ANpcSkillbook::Interact_Implementation(AHunter* Hunter)
 {
-	Super::interact_Implementation(Hunter);
+	ANpc::Interact_Implementation(Hunter);
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &ANpcSkillbook::OpenUI, 1.0f, false, 1.0f);
 
 }

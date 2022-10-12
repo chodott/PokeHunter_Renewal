@@ -21,10 +21,9 @@ public:
 		class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 		class UCameraComponent* FollowCamera;
-
-	//상호작용
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
-		class ANpc* CurrentNpc;
+	//인벤토리
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+		class UInventoryComponent* Inventory;
 
 protected:
 	// Called when the game starts or when spawned
@@ -32,9 +31,12 @@ protected:
 
 public:
 
-	//인벤토리
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-		class UInventoryComponent* Inventory;
+	//상호작용
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
+	class AInteractActor* InteractingActor;
+	//아이템
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	class AItem* CurItem;
 
 	//UI
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
@@ -46,6 +48,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
 	class APartner* Partner;
+	
 
 
 public:
@@ -56,6 +59,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void LMBDown();
 	UFUNCTION(BlueprintCallable)
 	void RMBDown();
 	void OpenInventory();
@@ -64,6 +68,8 @@ public:
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	bool bZoom;
 
 private:
 	// Character Movement Input

@@ -12,6 +12,7 @@
 #include "PokeHunter/Partner/Partner.h"
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Item/ItemData.h"
+#include "PokeHunter/Base/InteractActor.h"
 
 // Sets default values
 AHunter::AHunter()
@@ -45,8 +46,16 @@ AHunter::AHunter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
+	//Collision
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
+
+	//UI
+	static ConstructorHelpers::FClassFinder<UUserWidget>TempClass(TEXT("/Game/UI/WBP_InventoryList"));
+	if (TempClass.Succeeded())
+	{
+		InventoryUIClass = TempClass.Class;
+	}
 
 	//컨트롤러 회전 시 회전 x
 	bUseControllerRotationYaw = false;
@@ -96,6 +105,7 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("Turn", this, &AHunter::Turn);		// X
 	PlayerInputComponent->BindAxis("LookUp", this, &AHunter::LookUp);	// Y
 
+	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AHunter::LMBDown);
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &AHunter::RMBDown);
 	PlayerInputComponent->BindAction("I_Key", IE_Pressed, this, &AHunter::OpenInventory);
 }
@@ -136,11 +146,16 @@ void AHunter::LookUp(float NewAxisValue)
 	AddControllerPitchInput(NewAxisValue);
 }
 
+void AHunter::LMBDown()
+{
+	
+}
+
 void AHunter::RMBDown()
 {
-	if (CurrentNpc)
+	if (InteractingActor)
 	{
-		CurrentNpc->interact_Implementation(this);
+		InteractingActor->Interact_Implementation(this);
 	}
 }
 
@@ -150,15 +165,18 @@ void AHunter::OpenInventory()
 	{
 		InventoryUI = CreateWidget(GetWorld(), InventoryUIClass, TEXT("Inventory"));
 		InventoryUI->AddToViewport();
+		InventoryUI->Visibility = ESlateVisibility::Visible;
 	}
 
 	else {
 		if (InventoryUI->IsInViewport())
 		{
+			InventoryUI->Visibility = ESlateVisibility::Hidden;
 			InventoryUI->RemoveFromViewport();
 		}
 		else {
 			InventoryUI->AddToViewport();
+			InventoryUI->Visibility = ESlateVisibility::Visible;
 		}
 	}
 }
@@ -167,36 +185,36 @@ void AHunter::OpenInventory()
 void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OverlappedComp == GetCapsuleComponent()) UE_LOG(LogTemp, Warning, TEXT("OverlapBegin"));
-	if (CurrentNpc == nullptr)
+	if (InteractingActor == nullptr)
 	{
-		if (OtherActor->GetClass()->ImplementsInterface(UNpcInterface::StaticClass()))
+		if (OtherActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
 		{
-			CurrentNpc = Cast<ANpc>(OtherActor);
+			InteractingActor = Cast<AInteractActor>(OtherActor);
 		}
 	}
 }
 
 void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor->GetClass()->ImplementsInterface(UNpcInterface::StaticClass()))
+	if (OtherActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
 	{
-		if (CurrentNpc == Cast<ANpc>(OtherActor))
+		if (InteractingActor == Cast<AInteractActor>(OtherActor))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("OverlapEnd"));
-			CurrentNpc = NULL;
+			InteractingActor = NULL;
 		}
 		else return;
 	}
 
-	if (CurrentNpc == nullptr)
+	if (InteractingActor == nullptr)
 	{
 		TArray<AActor*> OverlappedActors;
 		GetCapsuleComponent()->GetOverlappingActors(OverlappedActors);
 		for (int32 i = 0; i < OverlappedActors.Num(); ++i)
 		{
-			if (OverlappedActors[i]->GetClass()->ImplementsInterface(UNpcInterface::StaticClass()))
+			if (OverlappedActors[i]->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
 			{
-				CurrentNpc = Cast<ANpc>(OverlappedActors[i]);
+				InteractingActor = Cast<AInteractActor>(OverlappedActors[i]);
 				break;
 			}
 		}

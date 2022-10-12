@@ -3,14 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "NpcInterface.h"
+#include "PokeHunter/Base/InteractActor.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "Npc.generated.h"
 
 
 UCLASS()
-class POKEHUNTER_API ANpc : public AActor, public INpcInterface
+class POKEHUNTER_API ANpc : public AInteractActor
 {
 	GENERATED_BODY()
 	
@@ -49,7 +48,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void interact_Implementation(AHunter* Hunter) override;
+	virtual void Interact_Implementation(AHunter* Hunter) override;
 	void OpenUI();
 
 public:

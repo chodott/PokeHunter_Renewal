@@ -20,6 +20,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Instanced, BlueprintReadOnly)
 	TArray<class UItemData*> ItemArray;
+	UPROPERTY(EditDefaultsOnly, Instanced, BlueprintReadOnly)
+	TArray<class UItemData*> QuickSlot;
 
 protected:
 	// Called when the game starts
@@ -30,5 +32,5 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-		bool AddItem(class UItemData* item);
+		bool AddItem(TSubclassOf<class UItemData> ItemDataClass);
 };

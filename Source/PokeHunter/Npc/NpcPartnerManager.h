@@ -29,7 +29,7 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void interact_Implementation(AHunter* Hunter) override;
+	virtual void Interact_Implementation(AHunter* Hunter) override;
 
 	UFUNCTION(BlueprintCallable)
 	void SelectPartner();

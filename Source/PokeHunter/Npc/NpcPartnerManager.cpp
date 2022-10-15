@@ -8,7 +8,11 @@
 ANpcPartnerManager::ANpcPartnerManager()
 {
 	CameraBoom->TargetArmLength = 300.f;
-
+	static ConstructorHelpers::FClassFinder<UUserWidget> TempUI(TEXT("/Game/UI/WBP_PartnerMangerUI"));
+	if (TempUI.Succeeded())
+	{
+		UIClass = TempUI.Class;
+	}
 }
 
 void ANpcPartnerManager::BeginPlay()
@@ -29,9 +33,9 @@ void ANpcPartnerManager::Tick(float DeltaTime)
 
 }
 
-void ANpcPartnerManager::interact_Implementation(AHunter* Hunter)
+void ANpcPartnerManager::Interact_Implementation(AHunter* Hunter)
 {
-	Super::interact_Implementation(Hunter);
+	ANpc::Interact_Implementation(Hunter);
 	
 
 }

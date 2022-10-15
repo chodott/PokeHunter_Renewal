@@ -27,9 +27,9 @@ void ANpcPartyManager::Tick(float DeltaTime)
 
 }
 
-void ANpcPartyManager::interact_Implementation(AHunter* Hunter)
+void ANpcPartyManager::Interact_Implementation(AHunter* Hunter)
 {
-	Super::interact_Implementation(Hunter);
+	ANpc::Interact_Implementation(Hunter);
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &ANpcPartyManager::OpenUI, 1.0f, false, 1.0f);
 
 }

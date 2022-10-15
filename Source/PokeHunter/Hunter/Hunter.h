@@ -7,6 +7,9 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Hunter.generated.h"
 
+//Dynamic 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicDele,float, Val);
+
 UCLASS()
 class POKEHUNTER_API AHunter : public ACharacter
 {
@@ -21,10 +24,9 @@ public:
 		class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 		class UCameraComponent* FollowCamera;
-
-	//상호작용
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
-		class ANpc* CurrentNpc;
+	//인벤토리
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+		class UInventoryComponent* Inventory;
 
 protected:
 	// Called when the game starts or when spawned
@@ -32,11 +34,24 @@ protected:
 
 public:
 
-	//인벤토리
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-		class UInventoryComponent* Inventory;
+	//상호작용
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
+	class AInteractActor* InteractingActor;
+
+	//퀵 슬롯
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
+	TMap<int32, class UItemData*> QuickSlotMap;
+	int CurQuickKey;
+
+	//아이템
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	class AItem* CurItem;
 
 	//UI
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf <UUserWidget> MainUIClass;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "UI")
+	class UUserWidget* MainUI;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf <UUserWidget> InventoryUIClass;
 	class UUserWidget* InventoryUI;
@@ -46,6 +61,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
 	class APartner* Partner;
+	
+
+	//Delegate
+	UPROPERTY(BlueprintAssignable)
+	FDynamicDele MouseWheelDelegate;
 
 
 public:
@@ -56,14 +76,21 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void LMBDown();
 	UFUNCTION(BlueprintCallable)
 	void RMBDown();
+	UFUNCTION(BlueprintCallable)
+	void WheelInput(float Val);
 	void OpenInventory();
 
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	UFUNCTION(BlueprintCallable)
+	class UItemData* GetQuickSlotItem();
+
+	bool bZoom;
 
 private:
 	// Character Movement Input

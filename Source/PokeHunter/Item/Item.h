@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "PokeHunter/Base/InteractActor.h"
 #include "Item.generated.h"
 
 UCLASS()
-class POKEHUNTER_API AItem : public AActor
+class POKEHUNTER_API AItem : public AInteractActor
 {
 	GENERATED_BODY()
 	
@@ -15,16 +15,17 @@ public:
 	// Sets default values for this actor's properties
 	AItem();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 Index;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 ItemNum;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 ItemCount;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString ItemName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTexture2D* Icon;
+	//Mesh
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	class UStaticMeshComponent* StaticMesh;
+
+	//Collision
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+	class USphereComponent* CollisionSphere;
+
+	//Data
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	TSubclassOf<class UItemData> ItemDataClass;
 
 protected:
 	// Called when the game starts or when spawned
@@ -33,7 +34,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	int32 getIndex();
+	virtual void Interact_Implementation(AHunter* Hunter) override;
 
 };

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "PokeHunter/Item/ItemData.h"
 #include "InventoryComponent.generated.h"
 
 
@@ -30,5 +29,5 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-		bool AddItem(class UItemData* item);
+		bool AddItem(TSubclassOf<class UItemData> ItemDataClass);
 };

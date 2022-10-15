@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Npc.h"
-#include "NpcInterface.h"
 #include "NpcStorage.generated.h"
 
 UCLASS()
@@ -30,7 +29,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void interact_Implementation(AHunter* Hunter) override;
+	virtual void Interact_Implementation(AHunter* Hunter) override;
 
 };
 

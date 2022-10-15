@@ -3,25 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Npc.h"
-#include "NpcDoor.generated.h"
+#include "GameFramework/Actor.h"
+#include "PokeHunter/Base/InteractInterface.h"
+#include "InteractActor.generated.h"
 
-/**
- * 
- */
 UCLASS()
-class POKEHUNTER_API ANpcDoor : public ANpc
+class POKEHUNTER_API AInteractActor : public AActor, public IInteractInterface
 {
 	GENERATED_BODY()
-public:
-
-	ANpcDoor();
+	
+public:	
+	// Sets default values for this actor's properties
+	AInteractActor();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
+public:	
+	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
 	virtual void Interact_Implementation(AHunter* Hunter) override;
+	class AHunter* Master;
 };

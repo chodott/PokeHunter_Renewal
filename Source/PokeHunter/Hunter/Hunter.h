@@ -7,6 +7,9 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Hunter.generated.h"
 
+//Dynamic 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicDele,float, Val);
+
 UCLASS()
 class POKEHUNTER_API AHunter : public ACharacter
 {
@@ -34,11 +37,21 @@ public:
 	//ªÛ»£¿€øÎ
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	class AInteractActor* InteractingActor;
+
+	//ƒ¸ ΩΩ∑‘
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
+	TMap<int32, class UItemData*> QuickSlotMap;
+	int CurQuickKey;
+
 	//æ∆¿Ã≈€
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	class AItem* CurItem;
 
 	//UI
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf <UUserWidget> MainUIClass;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "UI")
+	class UUserWidget* MainUI;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf <UUserWidget> InventoryUIClass;
 	class UUserWidget* InventoryUI;
@@ -49,6 +62,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
 	class APartner* Partner;
 	
+
+	//Delegate
+	UPROPERTY(BlueprintAssignable)
+	FDynamicDele MouseWheelDelegate;
 
 
 public:
@@ -62,12 +79,16 @@ public:
 	void LMBDown();
 	UFUNCTION(BlueprintCallable)
 	void RMBDown();
+	UFUNCTION(BlueprintCallable)
+	void WheelInput(float Val);
 	void OpenInventory();
 
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	UFUNCTION(BlueprintCallable)
+	class UItemData* GetQuickSlotItem();
 
 	bool bZoom;
 

@@ -8,7 +8,11 @@
 ANpcPartnerManager::ANpcPartnerManager()
 {
 	CameraBoom->TargetArmLength = 300.f;
-
+	static ConstructorHelpers::FClassFinder<UUserWidget> TempUI(TEXT("/Game/UI/WBP_PartnerMangerUI"));
+	if (TempUI.Succeeded())
+	{
+		UIClass = TempUI.Class;
+	}
 }
 
 void ANpcPartnerManager::BeginPlay()
@@ -22,12 +26,6 @@ void ANpcPartnerManager::BeginPlay()
 		PartnerArray.Add(temp);
 	}
 	PosePos = FVector(BaseLocation.X - 100, BaseLocation.Y, BaseLocation.Z);
-
-	/*static ConstructorHelpers::FObjectFinder<UUserWidget> TempUI(TEXT(""));
-	if(TempUI.Succeeded())
-	{
-		NpcUI = TempUI.Object;
-	}*/
 }
 
 void ANpcPartnerManager::Tick(float DeltaTime)

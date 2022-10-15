@@ -14,6 +14,8 @@
 #include "PokeHunter/Item/ItemData.h"
 #include "PokeHunter/Base/InteractActor.h"
 
+
+
 // Sets default values
 AHunter::AHunter()
 {
@@ -51,10 +53,16 @@ AHunter::AHunter()
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
 
 	//UI
-	static ConstructorHelpers::FClassFinder<UUserWidget>TempClass(TEXT("/Game/UI/WBP_InventoryList"));
-	if (TempClass.Succeeded())
+	static ConstructorHelpers::FClassFinder<UUserWidget>TempInvenClass(TEXT("/Game/UI/WBP_InventoryList"));
+	if (TempInvenClass.Succeeded())
 	{
-		InventoryUIClass = TempClass.Class;
+		InventoryUIClass = TempInvenClass.Class;
+	}
+	
+	static ConstructorHelpers::FClassFinder<UUserWidget>TempMainClass(TEXT("/Game/UI/WBP_MainUI"));
+	if (TempMainClass.Succeeded())
+	{
+		MainUIClass = TempMainClass.Class;
 	}
 
 	//컨트롤러 회전 시 회전 x
@@ -64,6 +72,8 @@ AHunter::AHunter()
 
 	//인벤토리
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+
+	
 }
 
 // Called when the game starts or when spawned
@@ -73,6 +83,13 @@ void AHunter::BeginPlay()
 
 	//카메라, 컨트롤러
 	// Controller->bFindCameraComponentWhenViewTarget = true;
+
+	//UI
+	MainUI = CreateWidget(GetWorld(), MainUIClass, TEXT("MainUI"));
+	MainUI->AddToViewport();
+
+	//Delegate
+	MouseWheelDelegate.AddDynamic(this, &AHunter::WheelInput);
 }
 
 // Called every frame
@@ -104,6 +121,8 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAxis("Turn", this, &AHunter::Turn);		// X
 	PlayerInputComponent->BindAxis("LookUp", this, &AHunter::LookUp);	// Y
+
+	PlayerInputComponent->BindAxis("MouseWheel", this, &AHunter::WheelInput);
 
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AHunter::LMBDown);
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &AHunter::RMBDown);
@@ -157,6 +176,13 @@ void AHunter::RMBDown()
 	{
 		InteractingActor->Interact_Implementation(this);
 	}
+}
+
+void AHunter::WheelInput(float Val)
+{
+	CurQuickKey += int(Val);
+	if (CurQuickKey < 0) CurQuickKey += 10;
+	else if (CurQuickKey > 9) CurQuickKey -= 10;
 }
 
 void AHunter::OpenInventory()
@@ -219,4 +245,9 @@ void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AAct
 			}
 		}
 	}
+}
+
+UItemData* AHunter::GetQuickSlotItem()
+{
+	return QuickSlotMap.FindRef(CurQuickKey);
 }

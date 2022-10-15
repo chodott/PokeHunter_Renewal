@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "PokeHunter/Item/ItemData.h"
 #include "InventoryComponent.generated.h"
 
 
@@ -20,8 +19,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Instanced, BlueprintReadOnly)
 	TArray<class UItemData*> ItemArray;
-	UPROPERTY(EditDefaultsOnly, Instanced, BlueprintReadOnly)
-	TArray<class UItemData*> QuickSlot;
 
 protected:
 	// Called when the game starts

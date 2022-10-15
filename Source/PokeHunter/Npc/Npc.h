@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "PokeHunter/Base/InteractActor.h"
 #include "PokeHunter/Hunter/Hunter.h"
+#include "Blueprint/UserWidget.h"
 #include "Npc.generated.h"
 
 
@@ -38,7 +39,6 @@ public:
 	//UI
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<class UUserWidget> UIClass;
-	class UUserWidget* NpcUI;
 
 protected:
 	// Called when the game starts or when spawned

@@ -2,6 +2,12 @@
 
 #include "HunterController.h"
 
+void AHunterController::BeginPlay()
+{
+	/*Super::BeginPlay();
+	SetInputMode(FInputModeGameAndUI());*/
+}
+
 void AHunterController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -13,4 +19,5 @@ void AHunterController::OnPossess(APawn* aPawn)
 	ABLOG_S(Warning);
 	Super::Possess(aPawn);
 	
+
 }

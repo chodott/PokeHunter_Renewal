@@ -53,6 +53,9 @@ AHunter::AHunter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 
+	// Character Rotation Movement
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+
 	//인벤토리
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 }
@@ -71,7 +74,7 @@ void AHunter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
+
 }
 
 void AHunter::PostInitializeComponents()
@@ -93,8 +96,8 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveForward", this, &AHunter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AHunter::MoveRight);
 
-	PlayerInputComponent->BindAxis("Turn", this, &AHunter::Turn);		// X
-	PlayerInputComponent->BindAxis("LookUp", this, &AHunter::LookUp);	// Y
+	PlayerInputComponent->BindAxis("Turn", this, &AHunter::AddControllerYawInput);		// X
+	PlayerInputComponent->BindAxis("LookUp", this, &AHunter::AddControllerPitchInput);	// Y
 
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &AHunter::RMBDown);
 	PlayerInputComponent->BindAction("I_Key", IE_Pressed, this, &AHunter::OpenInventory);

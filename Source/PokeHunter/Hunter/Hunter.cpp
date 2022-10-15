@@ -53,6 +53,9 @@ AHunter::AHunter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 
+	// Character Rotation Movement
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+
 	//인벤토리
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 }

@@ -20,6 +20,10 @@ UInventoryComponent::UInventoryComponent()
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	for (int i = 0; i < capacity; i++)
+	{
+		ItemArray.AddDefaulted();
+	}
 	// ...
 	
 }
@@ -33,6 +37,14 @@ bool UInventoryComponent::AddItem(TSubclassOf<class UItemData> ItemDataClass)
 		return true;
 	}
 	return false;
+}
+
+void UInventoryComponent::ChangeSlot(int TargetIndex, int GoalIndex)
+{
+	UItemData* Temp = ItemArray[GoalIndex];
+	ItemArray[GoalIndex] = ItemArray[TargetIndex];
+	ItemArray[TargetIndex] = ItemArray[GoalIndex];
+
 }
 
 

@@ -75,8 +75,11 @@ AHunter::AHunter()
 
 	//인벤토리
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	Inventory->capacity = 20;
 
-	
+	//Delegate
+	FMouseWheelDelegate.AddDynamic(this, &AHunter::ChangeQuickslot);
+
 }
 
 // Called when the game starts or when spawned
@@ -91,8 +94,6 @@ void AHunter::BeginPlay()
 	MainUI = CreateWidget(GetWorld(), MainUIClass, TEXT("MainUI"));
 	MainUI->AddToViewport();
 
-	//Delegate
-	MouseWheelDelegate.AddDynamic(this, &AHunter::WheelInput);
 }
 
 // Called every frame
@@ -106,12 +107,10 @@ void AHunter::Tick(float DeltaTime)
 void AHunter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	ABLOG_S(Warning);
 }
 
 void AHunter::PossessedBy(AController* NewController)
 {
-	ABLOG_S(Warning);
 	Super::PossessedBy(NewController);
 }
 
@@ -129,6 +128,7 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AHunter::LMBDown);
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &AHunter::RMBDown);
+	PlayerInputComponent->BindAction("RMB", IE_Released, this, &AHunter::RMBUp);
 	PlayerInputComponent->BindAction("I_Key", IE_Pressed, this, &AHunter::OpenInventory);
 }
 
@@ -170,7 +170,15 @@ void AHunter::LookUp(float NewAxisValue)
 
 void AHunter::LMBDown()
 {
-	
+	if (bZoom)
+	{
+		//공격
+	}
+	else 
+	{
+		//아이템 사용
+		//GetWorld()->SpawnActor<AItem>(QuickSlotMap[CurQuickKey]->ItemClass, GetActorLocation() ,GetControlRotation());
+	}
 }
 
 void AHunter::RMBDown()
@@ -178,10 +186,32 @@ void AHunter::RMBDown()
 	if (InteractingActor)
 	{
 		InteractingActor->Interact_Implementation(this);
+		return;
 	}
+
+	CameraBoom->TargetArmLength = 100;
+	bUseControllerRotationYaw = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	bZoom = true;
+}
+
+void AHunter::RMBUp()
+{
+	CameraBoom->TargetArmLength = 300;
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bZoom = false;
 }
 
 void AHunter::WheelInput(float Val)
+{
+	if (Val != 0.0f)
+	{
+		ChangeQuickslot(Val);
+	}
+}
+
+void AHunter::ChangeQuickslot(float Val)
 {
 	CurQuickKey += int(Val);
 	if (CurQuickKey < 0) CurQuickKey += 10;
@@ -193,18 +223,20 @@ void AHunter::OpenInventory()
 	if (InventoryUI == nullptr)
 	{
 		InventoryUI = CreateWidget(GetWorld(), InventoryUIClass, TEXT("Inventory"));
+		//InventoryUI->IsChildOf(MainUI);
 		InventoryUI->AddToViewport();
 		InventoryUI->Visibility = ESlateVisibility::Visible;
+		UE_LOG(LogTemp, Warning, TEXT("BACK"));
 	}
-
-	else {
-		if (InventoryUI->IsInViewport())
+	
+	else 
+	{
+		if (InventoryUI->Visibility == ESlateVisibility::Visible)
 		{
 			InventoryUI->Visibility = ESlateVisibility::Hidden;
-			InventoryUI->RemoveFromViewport();
 		}
-		else {
-			InventoryUI->AddToViewport();
+		else if(InventoryUI->Visibility == ESlateVisibility::Hidden)
+		{
 			InventoryUI->Visibility = ESlateVisibility::Visible;
 		}
 	}

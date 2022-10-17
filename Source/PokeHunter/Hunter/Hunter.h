@@ -8,7 +8,7 @@
 #include "Hunter.generated.h"
 
 //Dynamic 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicDele,float, Val);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicDele, float, val);
 
 UCLASS()
 class POKEHUNTER_API AHunter : public ACharacter
@@ -54,6 +54,7 @@ public:
 	class UUserWidget* MainUI;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf <UUserWidget> InventoryUIClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	class UUserWidget* InventoryUI;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf <UUserWidget> StorageUIClass;
@@ -65,7 +66,7 @@ public:
 
 	//Delegate
 	UPROPERTY(BlueprintAssignable)
-	FDynamicDele MouseWheelDelegate;
+	FDynamicDele FMouseWheelDelegate;
 
 
 public:
@@ -80,7 +81,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RMBDown();
 	UFUNCTION(BlueprintCallable)
+	void RMBUp();
+	UFUNCTION(BlueprintCallable)
 	void WheelInput(float Val);
+	UFUNCTION(BlueprintCallable)
+	void ChangeQuickslot(float Val);
 	void OpenInventory();
 
 	UFUNCTION()

@@ -16,9 +16,11 @@ public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
 
-
 	UPROPERTY(EditDefaultsOnly, Instanced, BlueprintReadOnly)
 	TArray<class UItemData*> ItemArray;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	int capacity;
 
 protected:
 	// Called when the game starts
@@ -29,5 +31,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-		bool AddItem(TSubclassOf<class UItemData> ItemDataClass);
+	bool AddItem(TSubclassOf<class UItemData> ItemDataClass);
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeSlot(int TargetIndex, int GoalIndex);
 };

@@ -8,6 +8,7 @@
 #include "Components\SphereComponent.h"
 #include "Components\CapsuleComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetTree.h"
 #include "PokeHunter/Npc/Npc.h"
 #include "PokeHunter/Partner/Partner.h"
 #include "PokeHunter/Item/Item.h"
@@ -185,7 +186,12 @@ void AHunter::LMBDown()
 	else 
 	{
 		//아이템 사용
-		//GetWorld()->SpawnActor<AItem>(QuickSlotMap[CurQuickKey]->ItemClass, GetActorLocation() ,GetControlRotation());
+		if (QuickSlotMap[CurQuickKey] != NULL)
+		{
+			GetWorld()->SpawnActor<AItem>(QuickSlotMap[CurQuickKey]->ItemClass, GetActorLocation(), GetControlRotation());
+			QuickSlotMap[CurQuickKey]->ItemCount--;
+			if (QuickSlotMap[CurQuickKey]->ItemCount == 0) QuickSlotMap[CurQuickKey] = NULL;
+		}
 	}
 }
 
@@ -241,11 +247,9 @@ void AHunter::OpenInventory()
 {
 	if (InventoryUI == nullptr)
 	{
-		InventoryUI = CreateWidget(GetWorld(), InventoryUIClass, TEXT("Inventory"));
-		//InventoryUI->IsChildOf(MainUI);
+		InventoryUI = MainUI->WidgetTree->ConstructWidget<UUserWidget>(InventoryUIClass, TEXT("Inventory"));
 		InventoryUI->AddToViewport();
 		InventoryUI->Visibility = ESlateVisibility::Visible;
-		UE_LOG(LogTemp, Warning, TEXT("BACK"));
 	}
 	
 	else 

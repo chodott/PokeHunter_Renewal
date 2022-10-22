@@ -42,7 +42,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
 	TMap<int32, class UItemData*> QuickSlotMap;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
-	int CurQuickKey;
+	int CurQuickKey = 0;
 
 	//æ∆¿Ã≈€
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")

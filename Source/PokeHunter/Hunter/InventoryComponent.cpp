@@ -3,6 +3,7 @@
 
 #include "InventoryComponent.h"
 #include "PokeHunter/Item/ItemData.h"
+#include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Npc//NpcStorage.h"
 #include "Hunter.h"
 
@@ -30,22 +31,32 @@ void UInventoryComponent::BeginPlay()
 	
 }
 
-bool UInventoryComponent::AddItem(TSubclassOf<class UItemData> ItemDataClass)
+bool UInventoryComponent::AddItem(const AItem* Item)
 {
-	if (ItemDataClass != NULL)
+	int NullNum = -1;
+	for (int i = 0; i < capacity; ++i)
 	{
-		for (int i = 0; i < capacity; ++i)
+		if (NullNum == -1 && ItemArray[i] == NULL) NullNum = i;
+		else if (ItemArray[i] != NULL)
 		{
-			if (ItemArray[i] == NULL)
+			if (ItemArray[i]->ItemName == Item->Name) //아이템이 겹칠 경우
 			{
-				UItemData* Temp = NewObject<UItemData>(this, ItemDataClass, TEXT("Data!!!"));
-				ItemArray[i] = Temp;
-				//ItemArray.Add(Temp);
+				ItemArray[i]->ItemCount++;
 				return true;
 			}
 		}
-		
 	}
+
+
+	if (NullNum != -1) //이미 존재하는 아이템이 없을 경우
+	{
+		auto ItemData = NewObject<UItemData>(this, UItemData::StaticClass(), TEXT("PLEASE"));
+		ItemData->SetItemData(Item);
+		ItemArray[NullNum] = ItemData;
+		return true;
+	}
+
+	//가방이 가득 찬 경우
 	return false;
 }
 
@@ -76,17 +87,20 @@ void UInventoryComponent::ChangeSlot(FName TargetName, int TargetIndex, FName Go
 	{
 		StorageNpc = Cast<ANpcStorage>(Hunter->InteractingActor);
 
-		if(StorageNpc) Temp = StorageNpc->Storage->ItemArray[TargetIndex];
+		if (StorageNpc)
+		{
+			Temp = StorageNpc->Storage->ItemArray[TargetIndex];
 
-		if (GoalName == "Inventory")
-		{
-			StorageNpc->Storage->ItemArray[TargetIndex] = ItemArray[GoalIndex];
-			ItemArray[GoalIndex] = Temp;
-		}
-		else
-		{
-			StorageNpc->Storage->ItemArray[TargetIndex] = StorageNpc->Storage->ItemArray[GoalIndex];
-			StorageNpc->Storage->ItemArray[GoalIndex] = Temp;
+			if (GoalName == "Inventory")
+			{
+				StorageNpc->Storage->ItemArray[TargetIndex] = ItemArray[GoalIndex];
+				ItemArray[GoalIndex] = Temp;
+			}
+			else
+			{
+				StorageNpc->Storage->ItemArray[TargetIndex] = StorageNpc->Storage->ItemArray[GoalIndex];
+				StorageNpc->Storage->ItemArray[GoalIndex] = Temp;
+			}
 		}
 	}
 

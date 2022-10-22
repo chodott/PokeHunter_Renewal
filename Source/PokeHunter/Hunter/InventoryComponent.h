@@ -35,7 +35,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	bool AddItem(TSubclassOf<class UItemData> ItemDataClass);
+	bool AddItem(const AItem* Item);
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex);

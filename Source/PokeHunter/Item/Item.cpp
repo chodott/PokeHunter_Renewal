@@ -23,14 +23,6 @@ AItem::AItem()
 	CollisionSphere->SetupAttachment(GetRootComponent());
 	CollisionSphere->SetSphereRadius(100.f);
 
-	//Data
-	static ConstructorHelpers::FClassFinder<UItemData>TempClass(TEXT("/Game/Item/Blueprint/BP_DefaultItemData"));
-	if (TempClass.Succeeded())
-	{
-		ItemDataClass = TempClass.Class;
-	}
-
-
 }
 
 // Called when the game starts or when spawned
@@ -49,6 +41,6 @@ void AItem::Tick(float DeltaTime)
 
 void AItem::Interact_Implementation(AHunter* Hunter)
 {
-	Hunter->Inventory->AddItem(ItemDataClass);
+	Hunter->Inventory->AddItem(this);
 	this->Destroy();
 }

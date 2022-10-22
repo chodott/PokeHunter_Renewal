@@ -23,9 +23,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
 	class USphereComponent* CollisionSphere;
 
-	//Data
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	TSubclassOf<class UItemData> ItemDataClass;
+	//Icon
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName Name;
 
 protected:
 	// Called when the game starts or when spawned

@@ -2,13 +2,20 @@
 
 
 #include "ItemData.h"
+#include "Item.h"
 
 UItemData::UItemData()
 {
-	Index = 0;
-	ItemNum = 0;
-	ItemCount = 0;
+	ItemCount = 1;
 	ItemName = "None";
-	Icon = NULL;
+	ItemIcon = NULL;
+	ItemClass = NULL;
 
+}
+
+void UItemData::SetItemData(const AItem* Item)
+{
+	ItemClass = Item->GetClass();
+	ItemIcon = Item->Icon;
+	ItemName = Item->Name;
 }

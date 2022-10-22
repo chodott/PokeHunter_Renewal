@@ -16,8 +16,12 @@ public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
 
-	UPROPERTY(EditDefaultsOnly, Instanced, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, Instanced, BlueprintReadOnly)
 	TArray<class UItemData*> ItemArray;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class AHunter* Hunter;
+
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	int capacity;
@@ -34,5 +38,7 @@ public:
 	bool AddItem(TSubclassOf<class UItemData> ItemDataClass);
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeSlot(int TargetIndex, int GoalIndex);
+	void ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex);
+
+
 };

@@ -76,6 +76,14 @@ AHunter::AHunter()
 	//ÀÎº¥Åä¸®
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	Inventory->capacity = 20;
+	Inventory->Hunter = this;
+
+	//Äü½½·Ô
+	for (int i = 0; i < 10; ++i)
+	{
+		QuickSlotMap.Add(i, NULL);
+	}
+	
 
 	//Delegate
 	FMouseWheelDelegate.AddDynamic(this, &AHunter::ChangeQuickslot);
@@ -218,6 +226,17 @@ void AHunter::ChangeQuickslot(float Val)
 	else if (CurQuickKey > 9) CurQuickKey -= 10;
 }
 
+void AHunter::SetQuickslot(class UItemData* TargetData, int Key)
+{
+	QuickSlotMap[Key] = TargetData;
+}
+
+UItemData* AHunter::GetQuickSlotItem()
+{
+	return QuickSlotMap.FindRef(CurQuickKey);
+}
+
+
 void AHunter::OpenInventory()
 {
 	if (InventoryUI == nullptr)
@@ -280,9 +299,4 @@ void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AAct
 			}
 		}
 	}
-}
-
-UItemData* AHunter::GetQuickSlotItem()
-{
-	return QuickSlotMap.FindRef(CurQuickKey);
 }

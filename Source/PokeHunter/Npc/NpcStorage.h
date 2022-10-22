@@ -18,8 +18,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 		UStaticMeshComponent* SubStaticMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
-		class UInventoryComponent* Storage;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item")
+	class UInventoryComponent* Storage;
 
 
 protected:

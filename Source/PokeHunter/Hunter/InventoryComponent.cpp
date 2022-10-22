@@ -3,6 +3,8 @@
 
 #include "InventoryComponent.h"
 #include "PokeHunter/Item/ItemData.h"
+#include "PokeHunter/Npc//NpcStorage.h"
+#include "Hunter.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -32,21 +34,63 @@ bool UInventoryComponent::AddItem(TSubclassOf<class UItemData> ItemDataClass)
 {
 	if (ItemDataClass != NULL)
 	{
-		UItemData* Temp = NewObject<UItemData>(this, ItemDataClass, TEXT("Data!!!"));
-		ItemArray.Add(Temp);
-		return true;
+		for (int i = 0; i < capacity; ++i)
+		{
+			if (ItemArray[i] == NULL)
+			{
+				UItemData* Temp = NewObject<UItemData>(this, ItemDataClass, TEXT("Data!!!"));
+				ItemArray[i] = Temp;
+				//ItemArray.Add(Temp);
+				return true;
+			}
+		}
+		
 	}
 	return false;
 }
 
-void UInventoryComponent::ChangeSlot(int TargetIndex, int GoalIndex)
+void UInventoryComponent::ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex)
 {
-	UItemData* Temp = ItemArray[GoalIndex];
-	ItemArray[GoalIndex] = ItemArray[TargetIndex];
-	ItemArray[TargetIndex] = ItemArray[GoalIndex];
+	UItemData* Temp = NULL;
+	ANpcStorage* StorageNpc;
+	if (TargetName == "Inventory")
+	{
+		Temp = ItemArray[TargetIndex];
+		if (GoalName == "Inventory")
+		{
+			ItemArray[TargetIndex] = ItemArray[GoalIndex];
+			ItemArray[GoalIndex] = Temp;
+		}
+		else 
+		{
+			StorageNpc = Cast<ANpcStorage>(Hunter->InteractingActor);
+			if (StorageNpc)
+			{
+				ItemArray[TargetIndex] = StorageNpc->Storage->ItemArray[GoalIndex];
+				StorageNpc->Storage->ItemArray[GoalIndex] = Temp;
+			}
+		}
+	}
+
+	else if (TargetName == "Storage")
+	{
+		StorageNpc = Cast<ANpcStorage>(Hunter->InteractingActor);
+
+		if(StorageNpc) Temp = StorageNpc->Storage->ItemArray[TargetIndex];
+
+		if (GoalName == "Inventory")
+		{
+			StorageNpc->Storage->ItemArray[TargetIndex] = ItemArray[GoalIndex];
+			ItemArray[GoalIndex] = Temp;
+		}
+		else
+		{
+			StorageNpc->Storage->ItemArray[TargetIndex] = StorageNpc->Storage->ItemArray[GoalIndex];
+			StorageNpc->Storage->ItemArray[GoalIndex] = Temp;
+		}
+	}
 
 }
-
 
 // Called every frame
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

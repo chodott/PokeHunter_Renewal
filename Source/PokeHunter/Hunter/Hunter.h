@@ -41,6 +41,7 @@ public:
 	//ƒ¸ ΩΩ∑‘
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
 	TMap<int32, class UItemData*> QuickSlotMap;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
 	int CurQuickKey;
 
 	//æ∆¿Ã≈€
@@ -86,6 +87,8 @@ public:
 	void WheelInput(float Val);
 	UFUNCTION(BlueprintCallable)
 	void ChangeQuickslot(float Val);
+	UFUNCTION(BlueprintCallable)
+	void SetQuickslot(class UItemData* TargetData, int Key);
 	void OpenInventory();
 
 	UFUNCTION()

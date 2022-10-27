@@ -82,12 +82,8 @@ AHunter::AHunter()
 	//퀵슬롯
 	for (int i = 0; i < 10; ++i)
 	{
-		QuickSlotMap.Add(i, NULL);
+		QuickSlotArray.AddDefaulted();
 	}
-	
-
-	//Delegate
-	FMouseWheelDelegate.AddDynamic(this, &AHunter::ChangeQuickslot);
 
 }
 
@@ -95,6 +91,10 @@ AHunter::AHunter()
 void AHunter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//Delegate
+	FIKeyDelegate.AddDynamic(this, &AHunter::OpenInventory);
+	FMouseWheelDelegate.AddDynamic(this, &AHunter::ChangeQuickslot);
 
 	//카메라, 컨트롤러
 	// Controller->bFindCameraComponentWhenViewTarget = true;
@@ -186,11 +186,17 @@ void AHunter::LMBDown()
 	else 
 	{
 		//아이템 사용
-		if (QuickSlotMap[CurQuickKey] != NULL)
+		if (QuickSlotArray[CurQuickKey] != NULL)
 		{
-			GetWorld()->SpawnActor<AItem>(QuickSlotMap[CurQuickKey]->ItemClass, GetActorLocation(), GetControlRotation());
-			QuickSlotMap[CurQuickKey]->ItemCount--;
-			if (QuickSlotMap[CurQuickKey]->ItemCount == 0) QuickSlotMap[CurQuickKey] = NULL;
+			GetWorld()->SpawnActor<AItem>(QuickSlotArray[CurQuickKey]->ItemClass, GetActorLocation(), GetControlRotation());
+			QuickSlotArray[CurQuickKey]->ItemCount--;
+			if (QuickSlotArray[CurQuickKey]->ItemCount == 0)
+			{
+				Inventory->ItemArray[QuickSlotArray[CurQuickKey]->ItemIndex] = NULL;
+				QuickSlotArray[CurQuickKey]->ConditionalBeginDestroy();
+				QuickSlotArray[CurQuickKey] = NULL;
+			}
+
 		}
 	}
 }
@@ -204,7 +210,8 @@ void AHunter::RMBDown()
 	}
 
 	CameraBoom->TargetArmLength = 100;
-	bUseControllerRotationYaw = true;
+	//bUseControllerRotationYaw = true;
+	//bUseControllerRotationPitch = true;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	bZoom = true;
 }
@@ -213,6 +220,7 @@ void AHunter::RMBUp()
 {
 	CameraBoom->TargetArmLength = 300;
 	bUseControllerRotationYaw = false;
+	bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bZoom = false;
 }
@@ -230,26 +238,24 @@ void AHunter::ChangeQuickslot(float Val)
 	CurQuickKey += int(Val);
 	if (CurQuickKey < 0) CurQuickKey += 10;
 	else if (CurQuickKey > 9) CurQuickKey -= 10;
+	if (FMouseWheelDelegate.IsBound()) FMouseWheelDelegate.Broadcast(Val);
 }
 
 void AHunter::SetQuickslot(class UItemData* TargetData, int Key)
 {
-	QuickSlotMap[Key] = TargetData;
+	QuickSlotArray[Key] = TargetData;
 }
-
-UItemData* AHunter::GetQuickSlotItem()
-{
-	return QuickSlotMap.FindRef(CurQuickKey);
-}
-
 
 void AHunter::OpenInventory()
 {
 	if (InventoryUI == nullptr)
 	{
-		InventoryUI = MainUI->WidgetTree->ConstructWidget<UUserWidget>(InventoryUIClass, TEXT("Inventory"));
-		InventoryUI->AddToViewport();
-		InventoryUI->Visibility = ESlateVisibility::Visible;
+
+
+		//InventoryUI = CreateWidget<UUserWidget>(GetWorld(), InventoryUIClass, TEXT("Inventory"));
+		//InventoryUI = MainUI->CreateWidgetInstance(*GetWorld(), InventoryUIClass, TEXT("Inventory"));
+		//InventoryUI->AddToViewport();
+		//InventoryUI->Visibility = ESlateVisibility::Visible;
 	}
 	
 	else 

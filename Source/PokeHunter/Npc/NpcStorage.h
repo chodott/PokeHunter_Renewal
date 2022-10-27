@@ -15,9 +15,6 @@ public:
 	// Sets default values for this actor's properties
 	ANpcStorage();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
-		UStaticMeshComponent* SubStaticMesh;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item")
 	class UInventoryComponent* Storage;
 

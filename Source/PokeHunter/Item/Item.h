@@ -15,14 +15,6 @@ public:
 	// Sets default values for this actor's properties
 	AItem();
 
-	//Mesh
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
-	class UStaticMeshComponent* StaticMesh;
-
-	//Collision
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
-	class USphereComponent* CollisionSphere;
-
 	//Icon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* Icon;

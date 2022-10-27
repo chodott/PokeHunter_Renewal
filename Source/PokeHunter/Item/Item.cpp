@@ -14,14 +14,7 @@ AItem::AItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//Mesh
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMesh->SetupAttachment(GetRootComponent());
-
-	//Collision
-	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
-	CollisionSphere->SetupAttachment(GetRootComponent());
-	CollisionSphere->SetSphereRadius(100.f);
+	
 
 }
 
@@ -41,6 +34,7 @@ void AItem::Tick(float DeltaTime)
 
 void AItem::Interact_Implementation(AHunter* Hunter)
 {
+	Master = Hunter;
 	Hunter->Inventory->AddItem(this);
 	this->Destroy();
 }

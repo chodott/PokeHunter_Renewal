@@ -15,18 +15,9 @@ ANpc::ANpc()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//충돌 박스
-	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
-	SetRootComponent(CollisionBox);
-
-	//메쉬
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMesh->SetupAttachment(GetRootComponent());
-
-	//상호작용 범위(구)
-	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
-	InteractionSphere->SetupAttachment(GetRootComponent());
-	InteractionSphere->SetSphereRadius(100.f);
+	////충돌 박스
+	//CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
+	//SetRootComponent(CollisionBox);
 
 	//카메라
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));

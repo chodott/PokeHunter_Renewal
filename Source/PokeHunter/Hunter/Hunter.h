@@ -8,7 +8,8 @@
 #include "Hunter.generated.h"
 
 //Dynamic 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicDele, float, val);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDynamicDele);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicDeleParam, float, val);
 
 UCLASS()
 class POKEHUNTER_API AHunter : public ACharacter
@@ -40,7 +41,7 @@ public:
 
 	//Äü ½½·Ô
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
-	TMap<int32, class UItemData*> QuickSlotMap;
+	TArray<UItemData*> QuickSlotArray;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
 	int CurQuickKey = 0;
 
@@ -66,8 +67,10 @@ public:
 	
 
 	//Delegate
-	UPROPERTY(BlueprintAssignable)
-	FDynamicDele FMouseWheelDelegate;
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
+	FDynamicDeleParam FMouseWheelDelegate;
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
+	FDynamicDele FIKeyDelegate;
 
 
 public:
@@ -89,14 +92,13 @@ public:
 	void ChangeQuickslot(float Val);
 	UFUNCTION(BlueprintCallable)
 	void SetQuickslot(class UItemData* TargetData, int Key);
+	UFUNCTION(BlueprintCallable)
 	void OpenInventory();
 
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	UFUNCTION(BlueprintCallable)
-	class UItemData* GetQuickSlotItem();
 
 	bool bZoom;
 

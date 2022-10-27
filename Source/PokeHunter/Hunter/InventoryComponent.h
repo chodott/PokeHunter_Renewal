@@ -36,6 +36,8 @@ public:
 
 	UFUNCTION()
 	bool AddItem(const AItem* Item);
+	UFUNCTION()
+	bool AddItemData(const TSubclassOf<class UItemData> DataClass, int32 Cnt);
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex);

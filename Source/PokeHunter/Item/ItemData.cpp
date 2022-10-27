@@ -13,9 +13,10 @@ UItemData::UItemData()
 
 }
 
-void UItemData::SetItemData(const AItem* Item)
+void UItemData::SetItemData(const AItem* Item, int Index)
 {
-	ItemClass = Item->GetClass();
+	ItemClass = Item->StaticClass();
 	ItemIcon = Item->Icon;
 	ItemName = Item->Name;
+	ItemIndex = Index;
 }

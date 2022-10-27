@@ -17,7 +17,8 @@ class POKEHUNTER_API UItemData : public UObject
 public:
 
 	UItemData();
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 ItemIndex;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 ItemCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -27,6 +28,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class AItem> ItemClass;
 
-	void SetItemData(const AItem* Item);
+	void SetItemData(const AItem* Item, int32 Index);
 
 };

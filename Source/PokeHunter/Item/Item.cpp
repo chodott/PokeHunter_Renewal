@@ -8,6 +8,7 @@
 #include "PokeHunter//Hunter/Hunter.h"
 #include "PokeHunter/Hunter/InventoryComponent.h"
 
+
 // Sets default values
 AItem::AItem()
 {

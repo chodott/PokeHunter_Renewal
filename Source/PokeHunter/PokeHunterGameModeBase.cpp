@@ -4,6 +4,7 @@
 #include "PokeHunterGameModeBase.h"
 #include "Hunter/Hunter.h"
 #include "Hunter/HunterController.h"
+#include "Item/ItemDatabase.h"
 
 APokeHunterGameModeBase::APokeHunterGameModeBase()
 {
@@ -17,3 +18,4 @@ void APokeHunterGameModeBase::PostLogin(APlayerController* NewPlayer)
 	Super::PostLogin(NewPlayer);
 	ABLOG(Warning, TEXT("PostLogin End"));
 }
+

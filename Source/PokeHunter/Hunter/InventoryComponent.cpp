@@ -47,14 +47,14 @@ bool UInventoryComponent::AddItem(const AItem* Item)
 		}
 	}
 
-
-	if (NullNum != -1) //이미 존재하는 아이템이 없을 경우
-	{
-		UItemData* ItemData = NewObject<UItemData>(this, UItemData::StaticClass(), TEXT("PLEASE"));
-		ItemData->SetItemData(Item, NullNum);
-		ItemArray[NullNum] = ItemData;
-		return true;
-	}
+	//사용한 아이템을 다시 인벤토리에 넣을 필요성이 있는가?
+	//if (NullNum != -1) //이미 존재하는 아이템이 없을 경우 
+	//{
+	//	UItemData* ItemData = NewObject<UItemData>(this, Item->::StaticClass(), TEXT("PLEASE"));
+	//	ItemData->SetItemData(Item, NullNum);
+	//	ItemArray[NullNum] = ItemData;
+	//	return true;
+	//}
 
 	//가방이 가득 찬 경우
 	return false;
@@ -78,7 +78,7 @@ bool UInventoryComponent::AddItemData(const TSubclassOf<class UItemData> DataCla
 
 	if (NullNum != -1)
 	{
-		UItemData* ItemData = NewObject<UItemData>(this, DataClass->StaticClass(), TEXT("PLEASE"));
+		UItemData* ItemData = NewObject<UItemData>(this, DataClass, TEXT("PLEASE"));
 		ItemArray[NullNum] = ItemData;
 		return true;
 	}

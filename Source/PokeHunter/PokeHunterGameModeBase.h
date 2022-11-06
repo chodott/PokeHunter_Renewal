@@ -18,4 +18,8 @@ class POKEHUNTER_API APokeHunterGameModeBase : public AGameModeBase
 
 public:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+	//Item Database
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Database")
+	class UItemDatabase* ItemDatabase;
 };

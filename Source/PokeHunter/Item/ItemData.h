@@ -15,19 +15,30 @@ class POKEHUNTER_API UItemData : public UObject
 	GENERATED_BODY()
 
 public:
-
 	UItemData();
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 ItemIndex;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 ItemCount;
+	int32 ItemCount;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FName ItemName;
+	FName ItemName;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTexture2D* ItemIcon;
+	UTexture2D* ItemIcon;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<class AItem> ItemClass;
+	TSubclassOf<class AItem> ItemClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bCombine;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<UItemData*, int> MaterialItemMap;
 
 	void SetItemData(const AItem* Item, int32 Index);
 
 };
+

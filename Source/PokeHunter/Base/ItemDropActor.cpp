@@ -44,7 +44,11 @@ void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 				//개수 정하기
 				int32 ItemCnt = FMath::RandRange(1, 5);
 				bool bAddSuccess = Master->Inventory->AddItemData(DataMap.Value, ItemCnt);
-				if (bAddSuccess) this->Destroy();
+				if (bAddSuccess) 
+				{ 
+					this->Destroy(); 
+					return;
+				}
 				else {
 					//습득 실패 - 창 띄우기
 					return;

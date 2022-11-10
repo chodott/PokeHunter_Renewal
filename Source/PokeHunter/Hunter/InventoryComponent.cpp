@@ -6,6 +6,7 @@
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Npc//NpcStorage.h"
 #include "Hunter.h"
+#include "PokeHunter/Item/ItemInfo.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -22,16 +23,19 @@ UInventoryComponent::UInventoryComponent()
 // Called when the game starts
 void UInventoryComponent::BeginPlay()
 {
+	//ì•„ì´í…œ ë°°ì—´(í´ë˜ìŠ¤) ì´ˆê¸°í™”
 	Super::BeginPlay();
 	for (int i = 0; i < capacity; i++)
 	{
+		//ì•„ì´í…œ class
 		ItemArray.AddDefaulted();
+		//ì•„ì´í…œ struct
+		InfoArray.AddDefaulted();
 	}
-	// ...
 	
 }
 
-bool UInventoryComponent::AddItem(const AItem* Item)
+bool UInventoryComponent::AddItem(const class AItem* Item)
 {
 	int NullNum = -1;
 	for (int i = 0; i < capacity; ++i)
@@ -39,7 +43,7 @@ bool UInventoryComponent::AddItem(const AItem* Item)
 		if (NullNum == -1 && ItemArray[i] == NULL) NullNum = i;
 		else if (ItemArray[i] != NULL)
 		{
-			if (ItemArray[i]->ItemName == Item->Name) //¾ÆÀÌÅÛÀÌ °ãÄ¥ °æ¿ì
+			if (ItemArray[i]->ItemName == Item->Name) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¥ ï¿½ï¿½ï¿½
 			{
 				ItemArray[i]->ItemCount++;
 				return true;
@@ -47,8 +51,8 @@ bool UInventoryComponent::AddItem(const AItem* Item)
 		}
 	}
 
-	//»ç¿ëÇÑ ¾ÆÀÌÅÛÀ» ´Ù½Ã ÀÎº¥Åä¸®¿¡ ³ÖÀ» ÇÊ¿ä¼ºÀÌ ÀÖ´Â°¡?
-	//if (NullNum != -1) //ÀÌ¹Ì Á¸ÀçÇÏ´Â ¾ÆÀÌÅÛÀÌ ¾øÀ» °æ¿ì 
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ä¼ºï¿½ï¿½ ï¿½Ö´Â°ï¿½?
+	//if (NullNum != -1) //ï¿½Ì¹ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ 
 	//{
 	//	UItemData* ItemData = NewObject<UItemData>(this, Item->::StaticClass(), TEXT("PLEASE"));
 	//	ItemData->SetItemData(Item, NullNum);
@@ -56,7 +60,7 @@ bool UInventoryComponent::AddItem(const AItem* Item)
 	//	return true;
 	//}
 
-	//°¡¹æÀÌ °¡µæ Âù °æ¿ì
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½
 	return false;
 }
 
@@ -68,7 +72,7 @@ bool UInventoryComponent::AddItemData(const TSubclassOf<class UItemData> DataCla
 		if (NullNum == -1 && ItemArray[i] == NULL) NullNum = i;
 		else if (ItemArray[i] != NULL)
 		{
-			if (ItemArray[i]->StaticClass() == DataClass->StaticClass()) //¾ÆÀÌÅÛÀÌ °ãÄ¥ °æ¿ì
+			if (ItemArray[i]->StaticClass() == DataClass->StaticClass()) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¥ ï¿½ï¿½ï¿½
 			{
 				ItemArray[i]->ItemCount += Cnt;
 				return true;
@@ -85,6 +89,33 @@ bool UInventoryComponent::AddItemData(const TSubclassOf<class UItemData> DataCla
 
 	return false;
 }
+
+bool UInventoryComponent::AddItemInfo(FName ItemID, int Cnt)
+{
+	int NullNum = -1;
+	for (int i = 0; i < capacity; ++i)
+	{
+		if (NullNum == -1 && InfoArray[i].ItemID.IsNone()) NullNum = i;
+		else if (!InfoArray[i].ItemID.IsNone())
+		{
+			if (InfoArray[i].ItemID == ItemID)
+				{
+				InfoArray[i].cnt += Cnt;
+				return true;
+				}
+		}
+	}
+
+	if (NullNum != -1)
+	{
+		InfoArray[NullNum].ItemID = ItemID;
+		InfoArray[NullNum].cnt = Cnt;
+		return true;
+	}
+
+	return false;
+}
+
 
 void UInventoryComponent::ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex)
 {
@@ -131,6 +162,14 @@ void UInventoryComponent::ChangeSlot(FName TargetName, int TargetIndex, FName Go
 	}
 
 }
+
+void UInventoryComponent::SwapSlot(int TargetIndex, int GoalIndex)
+{
+	FItemCnter Temp = InfoArray[TargetIndex];
+	InfoArray[TargetIndex] = InfoArray[GoalIndex];
+	InfoArray[GoalIndex] = Temp;
+}
+
 
 // Called every frame
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

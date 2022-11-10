@@ -38,7 +38,7 @@ AHunter::AHunter()
 		GetMesh()->SetAnimInstanceClass(ANIM_HUNTER.Class);
 	}
 
-	//Ä«¸Ş¶ó
+	//Ä«ï¿½Ş¶ï¿½
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetOffset = FVector(0, 0, GetDefaultHalfHeight());
@@ -66,7 +66,7 @@ AHunter::AHunter()
 		MainUIClass = TempMainClass.Class;
 	}
 
-	//ÄÁÆ®·Ñ·¯ È¸Àü ½Ã È¸Àü x
+	//ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ È¸ï¿½ï¿½ ï¿½ï¿½ È¸ï¿½ï¿½ x
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
@@ -74,12 +74,12 @@ AHunter::AHunter()
 	// Character Rotation Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
-	//ÀÎº¥Åä¸®
+	//ì¸ë²¤í† ë¦¬
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	Inventory->capacity = 20;
 	Inventory->Hunter = this;
 
-	//Äü½½·Ô
+	//í€µìŠ¬ë¡¯ ë””í´íŠ¸
 	for (int i = 0; i < 10; ++i)
 	{
 		QuickSlotArray.AddDefaulted();
@@ -96,7 +96,7 @@ void AHunter::BeginPlay()
 	FIKeyDelegate.AddDynamic(this, &AHunter::OpenInventory);
 	FMouseWheelDelegate.AddDynamic(this, &AHunter::ChangeQuickslot);
 
-	//Ä«¸Ş¶ó, ÄÁÆ®·Ñ·¯
+	//ì¹´ë©”ë¼ ë˜ê¹… ê´€ë ¨
 	// Controller->bFindCameraComponentWhenViewTarget = true;
 
 	//UI
@@ -148,7 +148,7 @@ void AHunter::MoveForward(float Val)
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
-		//¹æÇâ º¤ÅÍ
+		//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, Val);
 	}
@@ -161,7 +161,7 @@ void AHunter::MoveRight(float Val)
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
-		//¹æÇâ º¤ÅÍ
+		//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		AddMovementInput(Direction, Val);
 	}
@@ -181,11 +181,11 @@ void AHunter::LMBDown()
 {
 	if (bZoom)
 	{
-		//°ø°İ
+		//ï¿½ï¿½ï¿½ï¿½
 	}
 	else 
 	{
-		//¾ÆÀÌÅÛ »ç¿ë
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 		if (QuickSlotArray[CurQuickKey] != NULL)
 		{
 			GetWorld()->SpawnActor<AItem>(QuickSlotArray[CurQuickKey]->ItemClass, GetActorLocation(), GetControlRotation());

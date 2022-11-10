@@ -20,12 +20,12 @@ public:
 	// Sets default values for this character's properties
 	AHunter();
 
-	//Ä«¸Þ¶ó
+	//Ä«ï¿½Þ¶ï¿½
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 		class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 		class UCameraComponent* FollowCamera;
-	//ÀÎº¥Åä¸®
+	//ï¿½Îºï¿½ï¿½ä¸®
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 		class UInventoryComponent* Inventory;
 
@@ -35,17 +35,17 @@ protected:
 
 public:
 
-	//»óÈ£ÀÛ¿ë
+	//ï¿½ï¿½È£ï¿½Û¿ï¿½
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	class AInteractActor* InteractingActor;
 
-	//Äü ½½·Ô
+	//ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
-	TArray<UItemData*> QuickSlotArray;
+	TArray<class UItemData*> QuickSlotArray;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
 	int CurQuickKey = 0;
 
-	//¾ÆÀÌÅÛ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	class AItem* CurItem;
 

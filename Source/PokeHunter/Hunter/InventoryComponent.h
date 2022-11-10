@@ -6,6 +6,18 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
+USTRUCT(BlueprintType)
+struct FItemCnter
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FName ItemID {};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int cnt{};
+};
+
 
 UCLASS(ClassGroup = (Custom), Blueprintable, meta = (BlueprintSpawnableComponent))
 class POKEHUNTER_API UInventoryComponent : public UActorComponent
@@ -18,6 +30,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Instanced, BlueprintReadOnly)
 	TArray<class UItemData*> ItemArray;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<FItemCnter> InfoArray;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class AHunter* Hunter;
@@ -35,12 +50,15 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	bool AddItem(const AItem* Item);
+	bool AddItem(const class AItem* Item);
 	UFUNCTION()
 	bool AddItemData(const TSubclassOf<class UItemData> DataClass, int32 Cnt);
+	UFUNCTION()
+	bool AddItemInfo(FName ItemID, int Cnt);
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex);
-
-
+	UFUNCTION(BlueprintCallable)
+	void SwapSlot(int TargetIndex, int GoalIndex);
+	
 };

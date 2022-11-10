@@ -24,6 +24,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 	TMap<int32,TSubclassOf<UItemData>> ItemDataClassMap;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
+	TMap<int32,FName> ItemInfoMap;
+
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Probability")

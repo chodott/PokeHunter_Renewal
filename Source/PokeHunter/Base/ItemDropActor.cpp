@@ -14,7 +14,7 @@ void AItemDropActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//»ý¼ºÀÚ¿¡¼­ ¾ÆÀÌÅÛµ¥ÀÌÅÍ Å¬·¡½º Ãß°¡ ½Ã »ý¼ºÀÚ¿¡¼­ ÁøÇà
+	//ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ûµï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	int32 RaritySum = 0;
 	for (auto& DataMap : ItemDataClassMap)
 	{
@@ -27,9 +27,9 @@ void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 {
 	Master = Hunter;
 
-	//·£´ýÇÑ È½¼ö·Î ¹è¿­ ÀÎµ¦½º Á¢±Ù
-	//·£´ýÇÑ ÀÎµ¦½º ¾ÆÀÌÅÛ µ¥ÀÌÅÍ Å¬·¡½º Àü´Þ
-	//·£´ýÇÑ ¾ÆÀÌÅÛ °³¼ö Àü´Þ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È½ï¿½ï¿½ï¿½ï¿½ ï¿½è¿­ ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	DropCnt =  FMath::RandRange(0, 100);
 
@@ -37,20 +37,44 @@ void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 	{
 		int32 Probability = FMath::RandRange(0, 100);
 		int32 StartProbability = 0;
-		for (auto& DataMap : ItemDataClassMap)
+		
+		//ì•„ì´í…œ ë°ì´í„° í´ëž˜ìŠ¤
+		//for (auto& DataMap : ItemDataClassMap)
+		//{
+		//	if (Probability >= StartProbability && Probability < StartProbability + BaseProbability * DataMap.Key)
+		//	{
+		//		//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï±ï¿½
+		//		int32 ItemCnt = FMath::RandRange(1, 5);
+		//		bool bAddSuccess = Master->Inventory->AddItemData(DataMap.Value, ItemCnt);
+		//		if (bAddSuccess) 
+		//		{ 
+		//			this->Destroy(); 
+		//			return;
+		//		}
+		//		else {
+		//			//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ - Ã¢ ï¿½ï¿½ï¿½ï¿½
+		//			return;
+		//		}
+		//	}
+		//	StartProbability += BaseProbability * DataMap.Key;
+		//}
+
+		//ì•„ì´í…œ ë°ì´í„° êµ¬ì¡°ì²´
+		StartProbability = 0;
+		for (auto& DataMap : ItemInfoMap)
 		{
 			if (Probability >= StartProbability && Probability < StartProbability + BaseProbability * DataMap.Key)
 			{
-				//°³¼ö Á¤ÇÏ±â
+				//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï±ï¿½
 				int32 ItemCnt = FMath::RandRange(1, 5);
-				bool bAddSuccess = Master->Inventory->AddItemData(DataMap.Value, ItemCnt);
+				bool bAddSuccess = Master->Inventory->AddItemInfo(DataMap.Value, ItemCnt);
 				if (bAddSuccess) 
 				{ 
 					this->Destroy(); 
 					return;
 				}
 				else {
-					//½Àµæ ½ÇÆÐ - Ã¢ ¶ç¿ì±â
+					//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ - Ã¢ ï¿½ï¿½ï¿½ï¿½
 					return;
 				}
 			}

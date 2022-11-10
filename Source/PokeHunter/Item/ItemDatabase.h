@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemInfo.h"
 #include "Engine/DataAsset.h"
 #include "ItemDatabase.generated.h"
 
@@ -22,4 +23,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
 	TArray<class UItemData*> DataArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
+	TArray<FItemInfo> InfoArray;
 };

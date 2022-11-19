@@ -36,6 +36,5 @@ void AItem::Tick(float DeltaTime)
 void AItem::Interact_Implementation(AHunter* Hunter)
 {
 	Master = Hunter;
-	Hunter->Inventory->AddItem(this);
 	this->Destroy();
 }

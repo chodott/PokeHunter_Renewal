@@ -6,17 +6,11 @@
 
 UItemData::UItemData()
 {
-	ItemCount = 1;
-	ItemName = "None";
-	ItemIcon = NULL;
-	ItemClass = NULL;
+
 
 }
 
 void UItemData::SetItemData(const AItem* Item, int Index)
 {
-	ItemClass = Item->StaticClass();
-	ItemIcon = Item->Icon;
-	ItemName = Item->Name;
-	ItemIndex = Index;
+
 }

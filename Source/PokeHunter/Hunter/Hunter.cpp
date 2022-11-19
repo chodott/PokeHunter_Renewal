@@ -188,14 +188,16 @@ void AHunter::LMBDown()
 		//������ ���
 		if (QuickSlotArray[CurQuickKey] != NULL)
 		{
-			GetWorld()->SpawnActor<AItem>(QuickSlotArray[CurQuickKey]->ItemClass, GetActorLocation(), GetControlRotation());
-			QuickSlotArray[CurQuickKey]->ItemCount--;
+			//Use Item Update need
+			//GetWorld()->SpawnActor<AItem>(QuickSlotArray[CurQuickKey]->ItemClass, GetActorLocation(), GetControlRotation());
+
+			/*QuickSlotArray[CurQuickKey]->--;
 			if (QuickSlotArray[CurQuickKey]->ItemCount == 0)
 			{
 				Inventory->ItemArray[QuickSlotArray[CurQuickKey]->ItemIndex] = NULL;
 				QuickSlotArray[CurQuickKey]->ConditionalBeginDestroy();
 				QuickSlotArray[CurQuickKey] = NULL;
-			}
+			}*/
 
 		}
 	}

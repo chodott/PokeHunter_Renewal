@@ -35,7 +35,7 @@ void UInventoryComponent::BeginPlay()
 	
 }
 
-bool UInventoryComponent::AddItem(const class AItem* Item)
+bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
 {
 	int NullNum = -1;
 	for (int i = 0; i < capacity; ++i)
@@ -43,38 +43,10 @@ bool UInventoryComponent::AddItem(const class AItem* Item)
 		if (NullNum == -1 && ItemArray[i] == NULL) NullNum = i;
 		else if (ItemArray[i] != NULL)
 		{
-			if (ItemArray[i]->ItemName == Item->Name) //�������� ��ĥ ���
+			if (ItemArray[i]->getID() == ItemName) //�������� ��ĥ ���
 			{
-				ItemArray[i]->ItemCount++;
-				return true;
-			}
-		}
-	}
-
-	//����� �������� �ٽ� �κ��丮�� ���� �ʿ伺�� �ִ°�?
-	//if (NullNum != -1) //�̹� �����ϴ� �������� ���� ��� 
-	//{
-	//	UItemData* ItemData = NewObject<UItemData>(this, Item->::StaticClass(), TEXT("PLEASE"));
-	//	ItemData->SetItemData(Item, NullNum);
-	//	ItemArray[NullNum] = ItemData;
-	//	return true;
-	//}
-
-	//������ ���� �� ���
-	return false;
-}
-
-bool UInventoryComponent::AddItemData(const TSubclassOf<class UItemData> DataClass, int32 Cnt)
-{
-	int NullNum = -1;
-	for (int i = 0; i < capacity; ++i)
-	{
-		if (NullNum == -1 && ItemArray[i] == NULL) NullNum = i;
-		else if (ItemArray[i] != NULL)
-		{
-			if (ItemArray[i]->StaticClass() == DataClass->StaticClass()) //�������� ��ĥ ���
-			{
-				ItemArray[i]->ItemCount += Cnt;
+				//Add ItemCnt Update need
+				//ItemArray[i]->ItemCount += Cnt;
 				return true;
 			}
 		}
@@ -82,8 +54,9 @@ bool UInventoryComponent::AddItemData(const TSubclassOf<class UItemData> DataCla
 
 	if (NullNum != -1)
 	{
-		UItemData* ItemData = NewObject<UItemData>(this, DataClass, TEXT("PLEASE"));
-		ItemArray[NullNum] = ItemData;
+		//Find Object Need
+		//UItemData* ItemData = NewObject<UItemData>(this, DataClass, TEXT("PLEASE"));
+		//ItemArray[NullNum] = ItemData;
 		return true;
 	}
 

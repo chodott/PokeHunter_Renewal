@@ -50,9 +50,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	bool AddItem(const class AItem* Item);
-	UFUNCTION()
-	bool AddItemData(const TSubclassOf<class UItemData> DataClass, int32 Cnt);
+	bool AddItemData(FName ItemName, int Cnt);
 	UFUNCTION()
 	bool AddItemInfo(FName ItemID, int Cnt);
 

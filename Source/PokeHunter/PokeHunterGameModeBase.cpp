@@ -9,7 +9,7 @@
 APokeHunterGameModeBase::APokeHunterGameModeBase()
 {
 	DefaultPawnClass = AHunter::StaticClass();
-	// PlayerControllerClass = AHunterController::StaticClass();
+	PlayerControllerClass = AHunterController::StaticClass();
 }
 
 void APokeHunterGameModeBase::PostLogin(APlayerController* NewPlayer)

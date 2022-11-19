@@ -5,11 +5,29 @@
 #include "..\PokeHunter.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "PokeHunter/Item/ItemData.h"
 #include "Hunter.generated.h"
 
 //Dynamic 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDynamicDele);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicDeleParam, float, val);
+
+USTRUCT(BlueprintType)
+struct FHunterInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	float HunterHP;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	float HunterStamina;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Status")
+	bool bCanUseItem;
+	
+};
 
 UCLASS()
 class POKEHUNTER_API AHunter : public ACharacter
@@ -20,12 +38,12 @@ public:
 	// Sets default values for this character's properties
 	AHunter();
 
-	//ī�޶�
+	//Camera Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 		class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 		class UCameraComponent* FollowCamera;
-	//�κ��丮
+	//Inventory Component
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 		class UInventoryComponent* Inventory;
 
@@ -34,18 +52,21 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-
-	//��ȣ�ۿ�
+	//HunterInfo
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HunterStatus")
+	FHunterInfo HunterInfo;
+	
+	//Interaction
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	class AInteractActor* InteractingActor;
 
-	//�� ����
+	//QuickSlot
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
 	TArray<class UItemData*> QuickSlotArray;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
 	int CurQuickKey = 0;
 
-	//������
+	//Item
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	class AItem* CurItem;
 

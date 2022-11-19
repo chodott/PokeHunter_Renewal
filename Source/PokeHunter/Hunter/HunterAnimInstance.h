@@ -24,12 +24,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = AnimationProperties)
 	void UpdateAnimationProperties();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
 	float MovementSpeed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
 	float Direction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Combat")
+	bool bZoom;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
+	bool bRunning;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
 	class AHunter* Hunter;
 };

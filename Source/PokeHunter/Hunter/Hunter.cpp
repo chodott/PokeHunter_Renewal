@@ -135,6 +135,8 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAxis("MouseWheel", this, &AHunter::WheelInput);
 
+	PlayerInputComponent->BindAction("LSHIFT", IE_Pressed, this, &AHunter::LSHIFTDown);
+	PlayerInputComponent->BindAction("LSHIFT", IE_Released, this, &AHunter::LSHIFTUp);
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AHunter::LMBDown);
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &AHunter::RMBDown);
 	PlayerInputComponent->BindAction("RMB", IE_Released, this, &AHunter::RMBUp);
@@ -177,6 +179,20 @@ void AHunter::LookUp(float NewAxisValue)
 	AddControllerPitchInput(NewAxisValue);
 }
 
+void AHunter::LSHIFTDown()
+{
+	if(bZoom)
+	{
+		bRunning = 1;
+		GetCharacterMovement()->MaxWalkSpeed = 1000.f;
+	}
+}
+
+void AHunter::LSHIFTUp()
+{
+	
+}
+
 void AHunter::LMBDown()
 {
 	if (bZoom)
@@ -212,19 +228,27 @@ void AHunter::RMBDown()
 	}
 
 	CameraBoom->TargetArmLength = 100;
-	//bUseControllerRotationYaw = true;
-	//bUseControllerRotationPitch = true;
+	bUseControllerRotationYaw = true;
+	bUseControllerRotationPitch = true;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	bZoom = true;
+
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
 void AHunter::RMBUp()
 {
-	CameraBoom->TargetArmLength = 300;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationPitch = false;
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	bZoom = false;
+	if(bZoom)
+	{
+		CameraBoom->TargetArmLength = 300;
+		bUseControllerRotationYaw = false;
+		bUseControllerRotationPitch = false;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+		bZoom = false;
+
+		SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
+		Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 600.0f;
+	}
 }
 
 void AHunter::WheelInput(float Val)

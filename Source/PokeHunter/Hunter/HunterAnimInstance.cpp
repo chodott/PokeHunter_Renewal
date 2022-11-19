@@ -34,11 +34,17 @@ void UHunterAnimInstance::UpdateAnimationProperties()
 {
 	if(Hunter != nullptr)
 	{
+		//Zoom
+		bZoom = Hunter->bZoom;
+		bRunning = Hunter->bRunning;
+		
 		FVector Speed = Hunter->GetVelocity();
 		FVector XYspeed = FVector(Speed.X, Speed.Y, 0.f);
 		MovementSpeed = XYspeed.Size();
 
 		UInputComponent* Input = Hunter->InputComponent;
 		Direction = CalculateDirection(Speed, Hunter->GetActorRotation());
+
+		
 	}
 }

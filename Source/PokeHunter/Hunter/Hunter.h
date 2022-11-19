@@ -40,12 +40,12 @@ public:
 
 	//Camera Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class USpringArmComponent* CameraBoom;
+	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class UCameraComponent* FollowCamera;
+	class UCameraComponent* FollowCamera;
 	//Inventory Component
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-		class UInventoryComponent* Inventory;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
+	class UInventoryComponent* Inventory;
 
 protected:
 	// Called when the game starts or when spawned
@@ -93,6 +93,12 @@ public:
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
 	FDynamicDele FIKeyDelegate;
 
+	//Bool
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	bool bZoom;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	bool bRunning;
+
 
 public:
 	// Called every frame
@@ -102,6 +108,10 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UFUNCTION(BlueprintCallable)
+	void LSHIFTDown();
+	UFUNCTION(BlueprintCallable)
+	void LSHIFTUp();
 	void LMBDown();
 	UFUNCTION(BlueprintCallable)
 	void RMBDown();
@@ -121,7 +131,6 @@ public:
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	bool bZoom;
 
 private:
 	// Character Movement Input

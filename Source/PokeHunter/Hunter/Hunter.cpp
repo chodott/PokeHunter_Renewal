@@ -1,12 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Hunter.h"
+
+#include <mftransform.h>
+#include <vector>
+
 #include "InventoryComponent.h"
+#include "HunterAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components\SphereComponent.h"
 #include "Components\CapsuleComponent.h"
+#include "Components/TimelineComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetTree.h"
 #include "PokeHunter/Npc/Npc.h"
@@ -25,7 +31,8 @@ AHunter::AHunter()
 
 	//  Mesh
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_HUNTER(TEXT("/Game/Hunter/Asset/YBot/Y_Bot.Y_Bot"));
-	if (SK_HUNTER.Succeeded()) {
+	if (SK_HUNTER.Succeeded())
+	{
 		GetMesh()->SetSkeletalMesh(SK_HUNTER.Object);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
 	}
@@ -38,7 +45,16 @@ AHunter::AHunter()
 		GetMesh()->SetAnimInstanceClass(ANIM_HUNTER.Class);
 	}
 
-	//ī�޶�
+	//Timeline
+	static ConstructorHelpers::FObjectFinder<UCurveFloat>DIVE_CURVE(TEXT("/Game/Hunter/Blueprint/DiveCurve.DiveCurve"));
+	if (DIVE_CURVE.Succeeded())
+	{
+		DiveCurve = DIVE_CURVE.Object;
+	}
+
+
+
+	//Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetOffset = FVector(0, 0, GetDefaultHalfHeight());
@@ -66,7 +82,7 @@ AHunter::AHunter()
 		MainUIClass = TempMainClass.Class;
 	}
 
-	//��Ʈ�ѷ� ȸ�� �� ȸ�� x
+	//Using Controller Rotation
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
@@ -74,12 +90,12 @@ AHunter::AHunter()
 	// Character Rotation Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
-	//인벤토리
+	//Inventory
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	Inventory->capacity = 20;
 	Inventory->Hunter = this;
 
-	//퀵슬롯 디폴트
+	//Set Quickslot Default
 	for (int i = 0; i < 10; ++i)
 	{
 		QuickSlotArray.AddDefaulted();
@@ -103,6 +119,14 @@ void AHunter::BeginPlay()
 	MainUI = CreateWidget(GetWorld(), MainUIClass, TEXT("MainUI"));
 	MainUI->AddToViewport();
 
+	//Timeline
+	DiveInterpCallback.BindUFunction(this, FName("DiveInterpReturn"));
+	if (DiveCurve)
+	{
+		DiveTimeline.AddInterpFloat(DiveCurve, DiveInterpCallback);
+		DiveTimeline.SetTimelineLength(1.63f);
+	}
+
 }
 
 // Called every frame
@@ -110,12 +134,15 @@ void AHunter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
+	DiveTimeline.TickTimeline(DeltaTime);
 }
 
 void AHunter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	auto AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->OnMontageEnded.AddDynamic(this, &AHunter::OnCombatMontageEnded);
 }
 
 void AHunter::PossessedBy(AController* NewController)
@@ -135,17 +162,39 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAxis("MouseWheel", this, &AHunter::WheelInput);
 
-	PlayerInputComponent->BindAction("LSHIFT", IE_Pressed, this, &AHunter::LSHIFTDown);
-	PlayerInputComponent->BindAction("LSHIFT", IE_Released, this, &AHunter::LSHIFTUp);
+	PlayerInputComponent->BindAction("SpaceBar", IE_Pressed, this, &AHunter::SpaceDown);
+	PlayerInputComponent->BindAction("LShift", IE_Pressed, this, &AHunter::LShiftDown);
+	PlayerInputComponent->BindAction("LShift", IE_Released, this, &AHunter::LShiftUp);
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AHunter::LMBDown);
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &AHunter::RMBDown);
 	PlayerInputComponent->BindAction("RMB", IE_Released, this, &AHunter::RMBUp);
 	PlayerInputComponent->BindAction("I_Key", IE_Pressed, this, &AHunter::OpenInventory);
 }
+void AHunter::SpaceDown()
+{
+	if(bDiving) return;
+	
+	if(!bZoom)
+	{
+		bDiving = 1;
+		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
+		if(AnimInstance) AnimInstance->PlayCombatMontage();
+		FVector Speed = GetVelocity();
+		FVector XYspeed = FVector(Speed.X, Speed.Y, 0.f);
+		if (XYspeed.Size() <= 300.f) LastSpeed = 300.0f;
+		else 
+		{
+			LastSpeed = XYspeed.Size();
+		}
+		DiveTimeline.PlayFromStart();
+	}
+}
 
 void AHunter::MoveForward(float Val)
 {
-	if (Val != 0.0f)
+	if(bDiving) return;
+	
+	if (Val != 0.0f && !bDiving)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
@@ -158,7 +207,9 @@ void AHunter::MoveForward(float Val)
 
 void AHunter::MoveRight(float Val)
 {
-	if (Val != 0.0f)
+	if(bDiving) return;
+	
+	if (Val != 0.0f && !bDiving)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
@@ -179,22 +230,26 @@ void AHunter::LookUp(float NewAxisValue)
 	AddControllerPitchInput(NewAxisValue);
 }
 
-void AHunter::LSHIFTDown()
+void AHunter::LShiftDown()
 {
-	if(bZoom)
+	if(bDiving) return;
+	
+	if(!bZoom)
 	{
 		bRunning = 1;
 		GetCharacterMovement()->MaxWalkSpeed = 1000.f;
 	}
 }
 
-void AHunter::LSHIFTUp()
+void AHunter::LShiftUp()
 {
 	
 }
 
 void AHunter::LMBDown()
 {
+	if(bDiving) return;
+	
 	if (bZoom)
 	{
 		//����
@@ -221,6 +276,8 @@ void AHunter::LMBDown()
 
 void AHunter::RMBDown()
 {
+	if(bDiving) return;
+	
 	if (InteractingActor)
 	{
 		InteractingActor->Interact_Implementation(this);
@@ -297,6 +354,11 @@ void AHunter::OpenInventory()
 	}
 }
 
+void AHunter::OnCombatMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if(bDiving) bDiving = false;
+}
+
 
 void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -335,4 +397,21 @@ void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AAct
 			}
 		}
 	}
+}
+
+void AHunter::DiveInterpReturn(float Value)
+{
+	auto HunterMovement = GetCharacterMovement();
+	FVector CurLocation = GetActorLocation();
+	FVector GoalLocation = GetActorLocation() + GetActorForwardVector() * LastSpeed;
+	
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+	ActorLineTraceSingle(HitResult, CurLocation, GoalLocation, ECC_WorldDynamic, QueryParams);
+	if (HitResult.bBlockingHit)
+	{
+		GoalLocation = HitResult.Location;
+		UE_LOG(LogTemp, Warning, TEXT("Collision"));
+	}
+	SetActorLocation(FMath::VInterpTo(CurLocation, GoalLocation, GetWorld()->GetDeltaSeconds(), 1.0f));
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "..\PokeHunter.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "PokeHunter/Item/ItemData.h"
@@ -83,6 +84,7 @@ public:
 	TSubclassOf <UUserWidget> StorageUIClass;
 	class UUserWidget* StorageUI;
 
+	//Partner
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
 	class APartner* Partner;
 	
@@ -93,11 +95,20 @@ public:
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
 	FDynamicDele FIKeyDelegate;
 
+	//Timeline
+	FTimeline DiveTimeline;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Timeline")
+	UCurveFloat* DiveCurve;
+	FOnTimelineFloat DiveInterpCallback;
+	float LastSpeed;
+
 	//Bool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	bool bZoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	bool bRunning;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	bool bDiving;
 
 
 public:
@@ -109,9 +120,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UFUNCTION(BlueprintCallable)
-	void LSHIFTDown();
+	void SpaceDown();
 	UFUNCTION(BlueprintCallable)
-	void LSHIFTUp();
+	void LShiftDown();
+	UFUNCTION(BlueprintCallable)
+	void LShiftUp();
 	void LMBDown();
 	UFUNCTION(BlueprintCallable)
 	void RMBDown();
@@ -126,12 +139,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OpenInventory();
 
+	//Collision Function
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	//Animation Function
+	UFUNCTION()
+	void OnCombatMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	//Timeline Function
+	UFUNCTION()
+	void DiveInterpReturn(float Value);
+	
 private:
 	// Character Movement Input
 	void MoveForward(float Val);

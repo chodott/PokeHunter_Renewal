@@ -142,7 +142,8 @@ void AHunter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	auto AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->OnMontageEnded.AddDynamic(this, &AHunter::OnCombatMontageEnded);
+	AnimInstance->OnMontageEnded.AddDynamic(this, &AHunter::OnMontageEnded);
+
 }
 
 void AHunter::PossessedBy(AController* NewController)
@@ -181,11 +182,13 @@ void AHunter::SpaceDown()
 		if(AnimInstance) AnimInstance->PlayCombatMontage();
 		FVector Speed = GetVelocity();
 		FVector XYspeed = FVector(Speed.X, Speed.Y, 0.f);
+		LastInput = GetCharacterMovement()->GetLastInputVector();
 		if (XYspeed.Size() <= 300.f) LastSpeed = 300.0f;
 		else 
 		{
 			LastSpeed = XYspeed.Size();
 		}
+
 		DiveTimeline.PlayFromStart();
 	}
 }
@@ -194,14 +197,14 @@ void AHunter::MoveForward(float Val)
 {
 	if(bDiving) return;
 	
-	if (Val != 0.0f && !bDiving)
+	if (Val != 0.0f)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 		//���� ����
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Val);
+		if(!bDiving) AddMovementInput(Direction, Val);
 	}
 }
 
@@ -216,7 +219,7 @@ void AHunter::MoveRight(float Val)
 
 		//���� ����
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(Direction, Val);
+		if (!bDiving) AddMovementInput(Direction, Val);
 	}
 }
 
@@ -281,6 +284,27 @@ void AHunter::RMBDown()
 	if (InteractingActor)
 	{
 		InteractingActor->Interact_Implementation(this);
+		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
+		//Left Right 
+		FVector TargetVector = (InteractingActor->GetActorLocation() - GetActorLocation());
+		FVector HunterForwardVector = GetActorForwardVector();
+		TargetVector.Z = 0;
+		TargetVector.Normalize();
+		HunterForwardVector.Z = 0;
+		FVector cross = FVector::CrossProduct(HunterForwardVector, TargetVector);
+		float sign = FMath::Sign(cross.Z);
+		if (sign <=0)
+		{
+			AnimInstance->PlayInteractMontage(FName("RunLeftPickup"));
+			UE_LOG(LogTemp, Warning, TEXT("Left"));
+		}
+		else
+		{
+			AnimInstance->PlayInteractMontage(FName("RunRightPickup"));
+			UE_LOG(LogTemp, Warning, TEXT("Right"));
+		}
+		bUpperOnly = true;
+
 		return;
 	}
 
@@ -354,11 +378,14 @@ void AHunter::OpenInventory()
 	}
 }
 
-void AHunter::OnCombatMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	if(bDiving) bDiving = false;
+	if (bDiving)
+	{
+		bDiving = false;
+	}
+	if (bUpperOnly) bUpperOnly = false;
 }
-
 
 void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -401,17 +428,5 @@ void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AAct
 
 void AHunter::DiveInterpReturn(float Value)
 {
-	auto HunterMovement = GetCharacterMovement();
-	FVector CurLocation = GetActorLocation();
-	FVector GoalLocation = GetActorLocation() + GetActorForwardVector() * LastSpeed;
-	
-	FHitResult HitResult;
-	FCollisionQueryParams QueryParams;
-	ActorLineTraceSingle(HitResult, CurLocation, GoalLocation, ECC_WorldDynamic, QueryParams);
-	if (HitResult.bBlockingHit)
-	{
-		GoalLocation = HitResult.Location;
-		UE_LOG(LogTemp, Warning, TEXT("Collision"));
-	}
-	SetActorLocation(FMath::VInterpTo(CurLocation, GoalLocation, GetWorld()->GetDeltaSeconds(), 1.0f));
+	AddMovementInput(LastInput, 1.0f);
 }

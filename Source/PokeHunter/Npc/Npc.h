@@ -24,9 +24,9 @@ public:
 
 	//Ä«¸Þ¶ó
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class USpringArmComponent* CameraBoom;
+	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class UCameraComponent* FollowCamera;
+	class UCameraComponent* FollowCamera;
 
 	//UI
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")

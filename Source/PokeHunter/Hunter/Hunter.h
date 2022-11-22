@@ -65,7 +65,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
 	TArray<class UItemData*> QuickSlotArray;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
-	int CurQuickKey = 0;
+		int CurQuickKey{};
 
 	//Item
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
@@ -101,6 +101,7 @@ public:
 	UCurveFloat* DiveCurve;
 	FOnTimelineFloat DiveInterpCallback;
 	float LastSpeed;
+	FVector LastInput;
 
 	//Bool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
@@ -109,6 +110,8 @@ public:
 	bool bRunning;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	bool bDiving;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	bool bUpperOnly;
 
 
 public:
@@ -147,7 +150,7 @@ public:
 
 	//Animation Function
 	UFUNCTION()
-	void OnCombatMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 	//Timeline Function
 	UFUNCTION()

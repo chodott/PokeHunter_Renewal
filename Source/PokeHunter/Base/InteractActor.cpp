@@ -17,9 +17,10 @@ AInteractActor::AInteractActor()
 
 
 	//Collision
-	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
+	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractSphere"));
+	InteractionSphere->AddLocalOffset(FVector(0.f, 0.f, GetSimpleCollisionHalfHeight()));
 	InteractionSphere->SetupAttachment(GetRootComponent());
-	InteractionSphere->SetSphereRadius(100.f);
+	InteractionSphere->SetSphereRadius(50.f);
 
 }
 

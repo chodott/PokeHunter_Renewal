@@ -10,6 +10,10 @@ UHunterAnimInstance::UHunterAnimInstance()
 	ConstructorHelpers::FObjectFinder<UAnimMontage> CombatMontageObj(TEXT("/Game/Hunter/Blueprint/CombatMontage.CombatMontage"));
 	if(CombatMontageObj.Succeeded()) CombatMontage = CombatMontageObj.Object;
 	MovementSpeed = 0.0f;
+
+	//InteractMontage Init
+	ConstructorHelpers::FObjectFinder<UAnimMontage> InteractMontageObj(TEXT("/Game/Hunter/Blueprint/InteractMontage.InteractMontage"));
+	if (CombatMontageObj.Succeeded()) InteractMontage = InteractMontageObj.Object;
 	
 }
 
@@ -49,12 +53,19 @@ void UHunterAnimInstance::UpdateAnimationProperties()
 		UInputComponent* Input = Hunter->InputComponent;
 		Direction = CalculateDirection(Speed, Hunter->GetActorRotation());
 
+		//Upper
+		bUpperOnly = Hunter->bUpperOnly;
 		
 	}
 }
 
 void UHunterAnimInstance::PlayCombatMontage()
 {
-	Montage_Play(CombatMontage,1.0f);
+	if (CombatMontage) Montage_Play(CombatMontage,1.0f);
 }
 
+void UHunterAnimInstance::PlayInteractMontage(FName Section)
+{
+	Montage_Play(InteractMontage, 1.0f);
+	Montage_JumpToSection(Section, InteractMontage);
+}

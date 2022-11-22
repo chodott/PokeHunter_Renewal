@@ -38,12 +38,18 @@ public:
 	bool bRunning;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
+	bool bUpperOnly;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
 	class AHunter* Hunter;
 
 	//Montage
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, category = "Combat" )
 	UAnimMontage* CombatMontage;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, category = "Interact")
+	UAnimMontage* InteractMontage;
 
 public:
 	void PlayCombatMontage();
+	void PlayInteractMontage(FName Section);
 };

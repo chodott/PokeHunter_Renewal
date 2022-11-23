@@ -20,13 +20,16 @@ struct FHunterInfo
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	int HunterNum;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
 	float HunterHP;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
 	float HunterStamina;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Status")
-	bool bCanUseItem;
+	bool bCanCombat;
 	
 };
 

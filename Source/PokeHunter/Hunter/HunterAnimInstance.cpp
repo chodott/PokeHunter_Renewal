@@ -55,13 +55,16 @@ void UHunterAnimInstance::UpdateAnimationProperties()
 
 		//Upper
 		bUpperOnly = Hunter->bUpperOnly;
-		
+
+		//Falling
+		bFalling = Hunter->GetCharacterMovement()->IsFalling();
 	}
 }
 
-void UHunterAnimInstance::PlayCombatMontage()
-{
-	if (CombatMontage) Montage_Play(CombatMontage,1.0f);
+void UHunterAnimInstance::PlayCombatMontage(FName Section)
+{	
+	Montage_Play(CombatMontage,1.0f);
+	Montage_JumpToSection(Section, CombatMontage);
 }
 
 void UHunterAnimInstance::PlayInteractMontage(FName Section)

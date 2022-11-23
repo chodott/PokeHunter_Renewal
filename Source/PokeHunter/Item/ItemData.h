@@ -13,22 +13,22 @@ struct FItemInfo
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-		FName ItemID;
+	FName ID;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-		FText Name;
+	FText Name;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-		TSubclassOf<class AItem> ItemClass;
+	TSubclassOf<class AItem> ItemClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-		TArray<FName> OfferingItemID;
+	TArray<FName> OfferingItemID;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-		UTexture2D* ItemIcon;
+	UTexture2D* Icon;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-		int ItemAmount;
+	int ItemAmount;
 };
 
 
@@ -50,7 +50,7 @@ public:
 	int32 ItemIndex;
 
 	UFUNCTION()
-	FName getID() { return ItemInfo.ItemID; }
+	FName getID() { return ItemInfo.ID; }
 
 	void SetItemData(const AItem* Item, int32 Index);
 

@@ -37,7 +37,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class AHunter* Hunter;
 
-
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	int capacity;
 

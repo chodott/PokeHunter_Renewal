@@ -179,7 +179,7 @@ void AHunter::SpaceDown()
 	{
 		bDiving = 1;
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-		if(AnimInstance) AnimInstance->PlayCombatMontage();
+		if(AnimInstance) AnimInstance->PlayCombatMontage(FName("Dive"));
 		FVector Speed = GetVelocity();
 		FVector XYspeed = FVector(Speed.X, Speed.Y, 0.f);
 		LastInput = GetCharacterMovement()->GetLastInputVector();
@@ -255,7 +255,8 @@ void AHunter::LMBDown()
 	
 	if (bZoom)
 	{
-		//����
+		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
+		if (AnimInstance) AnimInstance->PlayCombatMontage(FName("Shot"));
 	}
 	else 
 	{

@@ -38,7 +38,11 @@ public:
 	bool bRunning;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
+	bool bFalling;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
 	bool bUpperOnly;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
 	class AHunter* Hunter;
@@ -50,6 +54,6 @@ public:
 	UAnimMontage* InteractMontage;
 
 public:
-	void PlayCombatMontage();
+	void PlayCombatMontage(FName Section);
 	void PlayInteractMontage(FName Section);
 };

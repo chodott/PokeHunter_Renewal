@@ -48,33 +48,11 @@ void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 					return;
 				}
 				else {
-					//���� ���� - â ����
+					//Full Inventory
 					return;
 				}
 			}
 			StartProbability += BaseProbability * DropItem.Key;
 		}
-
-		//아이템 데이터 구조체
-		//StartProbability = 0;
-		//for (auto& DataMap : ItemInfoMap)
-		//{
-		//	if (Probability >= StartProbability && Probability < StartProbability + BaseProbability * DataMap.Key)
-		//	{
-		//		//���� ���ϱ�
-		//		int32 ItemCnt = FMath::RandRange(1, 5);
-		//		bool bAddSuccess = Master->Inventory->AddItemInfo(DataMap.Value, ItemCnt);
-		//		if (bAddSuccess) 
-		//		{ 
-		//			this->Destroy(); 
-		//			return;
-		//		}
-		//		else {
-		//			//���� ���� - â ����
-		//			return;
-		//		}
-		//	}
-		//	StartProbability += BaseProbability * DataMap.Key;
-		//}
 	}
 }

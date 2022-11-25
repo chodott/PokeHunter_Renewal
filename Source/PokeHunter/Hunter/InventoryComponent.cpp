@@ -2,11 +2,9 @@
 
 
 #include "InventoryComponent.h"
-#include "PokeHunter/Item/ItemData.h"
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Npc//NpcStorage.h"
 #include "Hunter.h"
-#include "PokeHunter/Item/ItemInfo.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -40,13 +38,13 @@ bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
 	int NullNum = -1;
 	for (int i = 0; i < capacity; ++i)
 	{
-		if (NullNum == -1 && ItemArray[i] == NULL) NullNum = i;
-		else if (ItemArray[i] != NULL)
+		if (NullNum == -1 && InfoArray[i].ItemID == FName("None")) NullNum = i;
+		else if (InfoArray[i].ItemID != FName("None"))
 		{
-			if (ItemArray[i]->getID() == ItemName) //�������� ��ĥ ���
+			if (InfoArray[i].ItemID == ItemName) 
 			{
 				//Add ItemCnt Update need
-				//ItemArray[i]->ItemCount += Cnt;
+				InfoArray[i].cnt += Cnt;
 				return true;
 			}
 		}
@@ -55,8 +53,8 @@ bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
 	if (NullNum != -1)
 	{
 		//Find Object Need
-		//UItemData* ItemData = NewObject<UItemData>(this, DataClass, TEXT("PLEASE"));
-		//ItemArray[NullNum] = ItemData;
+		InfoArray[NullNum].ItemID = ItemName;
+		InfoArray[NullNum].cnt += Cnt;
 		return true;
 	}
 
@@ -92,23 +90,23 @@ bool UInventoryComponent::AddItemInfo(FName ItemID, int Cnt)
 
 void UInventoryComponent::ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex)
 {
-	UItemData* Temp = NULL;
 	ANpcStorage* StorageNpc;
+	FItemCnter temp;
 	if (TargetName == "Inventory")
 	{
-		Temp = ItemArray[TargetIndex];
+		temp = InfoArray[TargetIndex];
 		if (GoalName == "Inventory")
 		{
-			ItemArray[TargetIndex] = ItemArray[GoalIndex];
-			ItemArray[GoalIndex] = Temp;
+			InfoArray[TargetIndex] = InfoArray[GoalIndex];
+			InfoArray[GoalIndex] = temp;
 		}
 		else 
 		{
 			StorageNpc = Cast<ANpcStorage>(Hunter->InteractingActor);
 			if (StorageNpc)
 			{
-				ItemArray[TargetIndex] = StorageNpc->Storage->ItemArray[GoalIndex];
-				StorageNpc->Storage->ItemArray[GoalIndex] = Temp;
+				InfoArray[TargetIndex] = StorageNpc->Storage->InfoArray[GoalIndex];
+				StorageNpc->Storage->InfoArray[GoalIndex] = temp;
 			}
 		}
 	}
@@ -119,17 +117,17 @@ void UInventoryComponent::ChangeSlot(FName TargetName, int TargetIndex, FName Go
 
 		if (StorageNpc)
 		{
-			Temp = StorageNpc->Storage->ItemArray[TargetIndex];
+			temp = StorageNpc->Storage->InfoArray[TargetIndex];
 
 			if (GoalName == "Inventory")
 			{
-				StorageNpc->Storage->ItemArray[TargetIndex] = ItemArray[GoalIndex];
-				ItemArray[GoalIndex] = Temp;
+				StorageNpc->Storage->InfoArray[TargetIndex] = InfoArray[GoalIndex];
+				InfoArray[GoalIndex] = temp;
 			}
 			else
 			{
-				StorageNpc->Storage->ItemArray[TargetIndex] = StorageNpc->Storage->ItemArray[GoalIndex];
-				StorageNpc->Storage->ItemArray[GoalIndex] = Temp;
+				StorageNpc->Storage->InfoArray[TargetIndex] = StorageNpc->Storage->InfoArray[GoalIndex];
+				StorageNpc->Storage->InfoArray[GoalIndex] = temp;
 			}
 		}
 	}

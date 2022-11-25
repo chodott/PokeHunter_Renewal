@@ -66,9 +66,9 @@ public:
 
 	//QuickSlot
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
-	TArray<class UItemData*> QuickSlotArray;
+	TArray<FItemCnter> QuickSlotArray;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
-		int CurQuickKey{};
+	int CurQuickKey{};
 
 	//Item
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
@@ -141,7 +141,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeQuickslot(float Val);
 	UFUNCTION(BlueprintCallable)
-	void SetQuickslot(class UItemData* TargetData, int Key);
+	void SetQuickslot(FName ItemID, int index);
 	UFUNCTION(BlueprintCallable)
 	void OpenInventory();
 

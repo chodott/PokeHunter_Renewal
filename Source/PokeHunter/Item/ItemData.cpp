@@ -9,8 +9,3 @@ UItemData::UItemData()
 
 
 }
-
-void UItemData::SetItemData(const AItem* Item, int Index)
-{
-
-}

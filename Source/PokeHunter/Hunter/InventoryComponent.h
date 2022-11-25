@@ -4,19 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "PokeHunter/Item/ItemData.h"
 #include "InventoryComponent.generated.h"
 
-USTRUCT(BlueprintType)
-struct FItemCnter
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FName ItemID {};
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	int cnt{};
-};
 
 
 UCLASS(ClassGroup = (Custom), Blueprintable, meta = (BlueprintSpawnableComponent))

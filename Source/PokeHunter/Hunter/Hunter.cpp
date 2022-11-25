@@ -20,6 +20,8 @@
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Item/ItemData.h"
 #include "PokeHunter/Base/InteractActor.h"
+#include "PokeHunter/Base/DatabaseActor.h"
+
 
 
 
@@ -126,7 +128,6 @@ void AHunter::BeginPlay()
 		DiveTimeline.AddInterpFloat(DiveCurve, DiveInterpCallback);
 		DiveTimeline.SetTimelineLength(1.63f);
 	}
-
 }
 
 // Called every frame
@@ -260,19 +261,32 @@ void AHunter::LMBDown()
 	}
 	else 
 	{
-		//������ ���
-		if (QuickSlotArray[CurQuickKey] != NULL)
+		if (QuickSlotArray[CurQuickKey].ItemID != FName("None"))
 		{
 			//Use Item Update need
-			//GetWorld()->SpawnActor<AItem>(QuickSlotArray[CurQuickKey]->ItemClass, GetActorLocation(), GetControlRotation());
+			FName ItemID = QuickSlotArray[CurQuickKey].ItemID;
+			AActor* TempActor = UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass());
+			ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(TempActor);
+			if(DatabaseActor)
+			{ 
+				TSubclassOf<AItem> ItemClass = DatabaseActor->FindItem(ItemID)->ItemInfo.ItemClass;
+				if (ItemClass == NULL) return;
+				else GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(), GetControlRotation());
+			}
 
-			/*QuickSlotArray[CurQuickKey]->--;
-			if (QuickSlotArray[CurQuickKey]->ItemCount == 0)
+			QuickSlotArray[CurQuickKey].cnt--;
+			if (QuickSlotArray[CurQuickKey].cnt == 0)
 			{
-				Inventory->ItemArray[QuickSlotArray[CurQuickKey]->ItemIndex] = NULL;
-				QuickSlotArray[CurQuickKey]->ConditionalBeginDestroy();
-				QuickSlotArray[CurQuickKey] = NULL;
-			}*/
+				for (auto& Info : Inventory->InfoArray)
+				{
+					if (Info.ItemID == ItemID)
+					{
+						Info.ItemID == FName("None");
+						Info.cnt = 0;
+					}
+					QuickSlotArray[CurQuickKey].ItemID = FName("None");
+				}
+			}
 
 		}
 	}
@@ -284,7 +298,6 @@ void AHunter::RMBDown()
 	
 	if (InteractingActor)
 	{
-		InteractingActor->Interact_Implementation(this);
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		//Left Right 
 		FVector TargetVector = (InteractingActor->GetActorLocation() - GetActorLocation());
@@ -305,7 +318,7 @@ void AHunter::RMBDown()
 			UE_LOG(LogTemp, Warning, TEXT("Right"));
 		}
 		bUpperOnly = true;
-
+		InteractingActor->Interact_Implementation(this);
 		return;
 	}
 
@@ -349,9 +362,10 @@ void AHunter::ChangeQuickslot(float Val)
 	if (FMouseWheelDelegate.IsBound()) FMouseWheelDelegate.Broadcast(Val);
 }
 
-void AHunter::SetQuickslot(class UItemData* TargetData, int Key)
+void AHunter::SetQuickslot(FName ItemID, int index)
 {
-	QuickSlotArray[Key] = TargetData;
+	QuickSlotArray[index].ItemID = ItemID;
+	QuickSlotArray[index].cnt = 10;
 }
 
 void AHunter::OpenInventory()
@@ -430,4 +444,5 @@ void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AAct
 void AHunter::DiveInterpReturn(float Value)
 {
 	AddMovementInput(LastInput, 1.0f);
+	
 }

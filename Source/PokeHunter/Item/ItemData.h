@@ -31,6 +31,23 @@ public:
 	int ItemAmount;
 };
 
+/////////////
+
+USTRUCT(BlueprintType)
+struct FItemCnter
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FName ItemID {
+		FName("None")
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int cnt{ 0 };
+};
+
+
 
 /**
  * 
@@ -51,8 +68,6 @@ public:
 
 	UFUNCTION()
 	FName getID() { return ItemInfo.ID; }
-
-	void SetItemData(const AItem* Item, int32 Index);
 
 };
 

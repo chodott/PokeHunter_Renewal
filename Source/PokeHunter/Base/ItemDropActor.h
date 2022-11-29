@@ -22,7 +22,10 @@ public:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
-	TMap<int32,TSubclassOf<UItemData>> ItemDataClassMap;
+	TMap<int32,FName> DropItemMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
+	TMap<int32,FName> ItemInfoMap;
 
 
 

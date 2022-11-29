@@ -15,11 +15,11 @@ ANpc::ANpc()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	////충돌 박스
-	//CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
-	//SetRootComponent(CollisionBox);
+	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
+	CollisionBox->AddLocalOffset(FVector(0.f, 0.f, GetSimpleCollisionHalfHeight()),false);
+	CollisionBox->SetupAttachment(GetRootComponent());
 
-	//카메라
+	//Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetOffset = FVector(0, 0, 0.0f);
@@ -72,7 +72,7 @@ void ANpc::OpenUI()
 	else
 	{
 		Master->StorageUI = CreateWidget(Cast<APlayerController>(Master->Controller), UIClass);
-		Master->StorageUI->AddToViewport();
+		Master->StorageUI-> AddToViewport();
 		bActive = true;
 	}
 	Master->EnableInput(Cast<APlayerController>(Master->Controller));

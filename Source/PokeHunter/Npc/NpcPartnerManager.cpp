@@ -8,7 +8,7 @@
 ANpcPartnerManager::ANpcPartnerManager()
 {
 	CameraBoom->TargetArmLength = 300.f;
-	static ConstructorHelpers::FClassFinder<UUserWidget> TempUI(TEXT("/Game/UI/WBP_PartnerMangerUI"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> TempUI(TEXT("/Game/UI/PartnerMgr/WBP_PartnerMangerUI"));
 	if (TempUI.Succeeded())
 	{
 		UIClass = TempUI.Class;

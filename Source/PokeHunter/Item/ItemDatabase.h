@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemData.h"
 #include "Engine/DataAsset.h"
 #include "ItemDatabase.generated.h"
 
@@ -15,11 +16,12 @@ class POKEHUNTER_API UItemDatabase : public UDataAsset
 	GENERATED_BODY()
 
 protected:
+	
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
 	TArray<TSubclassOf<class UItemData>> DataClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
-	TArray<class UItemData*> DataArray;
+	TArray<FItemInfo> InfoArray;
 };

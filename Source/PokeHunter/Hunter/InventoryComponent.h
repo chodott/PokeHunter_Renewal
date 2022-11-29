@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "PokeHunter/Item/ItemData.h"
 #include "InventoryComponent.generated.h"
+
 
 
 UCLASS(ClassGroup = (Custom), Blueprintable, meta = (BlueprintSpawnableComponent))
@@ -20,8 +22,10 @@ public:
 	TArray<class UItemData*> ItemArray;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class AHunter* Hunter;
+	TArray<FItemCnter> InfoArray;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class AHunter* Hunter;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	int capacity;
@@ -35,12 +39,13 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	bool AddItem(const AItem* Item);
+	bool AddItemData(FName ItemName, int Cnt);
 	UFUNCTION()
-	bool AddItemData(const TSubclassOf<class UItemData> DataClass, int32 Cnt);
+	bool AddItemInfo(FName ItemID, int Cnt);
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex);
-
-
+	UFUNCTION(BlueprintCallable)
+	void SwapSlot(int TargetIndex, int GoalIndex);
+	
 };

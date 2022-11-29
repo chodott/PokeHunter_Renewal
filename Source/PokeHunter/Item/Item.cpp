@@ -4,9 +4,6 @@
 #include "Item.h"
 #include "ItemData.h"
 #include "Components/StaticMeshComponent.h"
-#include "Components/SphereComponent.h"
-#include "PokeHunter//Hunter/Hunter.h"
-#include "PokeHunter/Hunter/InventoryComponent.h"
 
 
 // Sets default values
@@ -15,7 +12,10 @@ AItem::AItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+
+	SetRootComponent(StaticMesh);
+	StaticMesh->SetCollisionProfileName("WorldDynamic");
 
 }
 
@@ -33,9 +33,7 @@ void AItem::Tick(float DeltaTime)
 
 }
 
-void AItem::Interact_Implementation(AHunter* Hunter)
+void AItem::UseItem()
 {
-	Master = Hunter;
-	Hunter->Inventory->AddItem(this);
-	this->Destroy();
+
 }

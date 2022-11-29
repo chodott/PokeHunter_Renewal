@@ -3,13 +3,35 @@
 #pragma once
 
 #include "..\PokeHunter.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "PokeHunter/Item/ItemData.h"
 #include "Hunter.generated.h"
 
 //Dynamic 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDynamicDele);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicDeleParam, float, val);
+
+USTRUCT(BlueprintType)
+struct FHunterInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	int HunterNum;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	float HunterHP;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	float HunterStamina;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Status")
+	bool bCanCombat;
+	
+};
 
 UCLASS()
 class POKEHUNTER_API AHunter : public ACharacter
@@ -20,32 +42,35 @@ public:
 	// Sets default values for this character's properties
 	AHunter();
 
-	//카메라
+	//Camera Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class USpringArmComponent* CameraBoom;
+	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class UCameraComponent* FollowCamera;
-	//인벤토리
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-		class UInventoryComponent* Inventory;
+	class UCameraComponent* FollowCamera;
+	//Inventory Component
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
+	class UInventoryComponent* Inventory;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-
-	//상호작용
+	//HunterInfo
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HunterStatus")
+	FHunterInfo HunterInfo;
+	
+	//Interaction
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	class AInteractActor* InteractingActor;
 
-	//퀵 슬롯
+	//QuickSlot
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
-	TArray<UItemData*> QuickSlotArray;
+	TArray<FItemCnter> QuickSlotArray;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
-	int CurQuickKey = 0;
+	int CurQuickKey{};
 
-	//아이템
+	//Item
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	class AItem* CurItem;
 
@@ -62,6 +87,7 @@ public:
 	TSubclassOf <UUserWidget> StorageUIClass;
 	class UUserWidget* StorageUI;
 
+	//Partner
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
 	class APartner* Partner;
 	
@@ -72,6 +98,24 @@ public:
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
 	FDynamicDele FIKeyDelegate;
 
+	//Timeline
+	FTimeline DiveTimeline;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Timeline")
+	UCurveFloat* DiveCurve;
+	FOnTimelineFloat DiveInterpCallback;
+	float LastSpeed;
+	FVector LastInput;
+
+	//Bool
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	bool bZoom;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	bool bRunning;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	bool bDiving;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	bool bUpperOnly;
+
 
 public:
 	// Called every frame
@@ -81,6 +125,12 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UFUNCTION(BlueprintCallable)
+	void SpaceDown();
+	UFUNCTION(BlueprintCallable)
+	void LShiftDown();
+	UFUNCTION(BlueprintCallable)
+	void LShiftUp();
 	void LMBDown();
 	UFUNCTION(BlueprintCallable)
 	void RMBDown();
@@ -91,17 +141,24 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeQuickslot(float Val);
 	UFUNCTION(BlueprintCallable)
-	void SetQuickslot(class UItemData* TargetData, int Key);
+	void SetQuickslot(FName ItemID, int index);
 	UFUNCTION(BlueprintCallable)
 	void OpenInventory();
 
+	//Collision Function
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	bool bZoom;
+	//Animation Function
+	UFUNCTION()
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	//Timeline Function
+	UFUNCTION()
+	void DiveInterpReturn(float Value);
+	
 private:
 	// Character Movement Input
 	void MoveForward(float Val);

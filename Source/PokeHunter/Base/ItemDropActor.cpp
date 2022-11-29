@@ -14,9 +14,9 @@ void AItemDropActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//»ı¼ºÀÚ¿¡¼­ ¾ÆÀÌÅÛµ¥ÀÌÅÍ Å¬·¡½º Ãß°¡ ½Ã »ı¼ºÀÚ¿¡¼­ ÁøÇà
+	//ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ûµï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	int32 RaritySum = 0;
-	for (auto& DataMap : ItemDataClassMap)
+	for (auto& DataMap : DropItemMap)
 	{
 		RaritySum += DataMap.Key;
 	}
@@ -27,34 +27,32 @@ void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 {
 	Master = Hunter;
 
-	//·£´ıÇÑ È½¼ö·Î ¹è¿­ ÀÎµ¦½º Á¢±Ù
-	//·£´ıÇÑ ÀÎµ¦½º ¾ÆÀÌÅÛ µ¥ÀÌÅÍ Å¬·¡½º Àü´Ş
-	//·£´ıÇÑ ¾ÆÀÌÅÛ °³¼ö Àü´Ş
-
 	DropCnt =  FMath::RandRange(0, 100);
 
 	for (int32 i = 0; i < DropCnt; ++i)
 	{
 		int32 Probability = FMath::RandRange(0, 100);
 		int32 StartProbability = 0;
-		for (auto& DataMap : ItemDataClassMap)
+		
+		//ì•„ì´í…œ ë°ì´í„° í´ë˜ìŠ¤
+		for (auto& DropItem : DropItemMap)
 		{
-			if (Probability >= StartProbability && Probability < StartProbability + BaseProbability * DataMap.Key)
+			if (Probability >= StartProbability && Probability < StartProbability + BaseProbability * DropItem.Key)
 			{
-				//°³¼ö Á¤ÇÏ±â
+				//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï±ï¿½
 				int32 ItemCnt = FMath::RandRange(1, 5);
-				bool bAddSuccess = Master->Inventory->AddItemData(DataMap.Value, ItemCnt);
+				bool bAddSuccess = Master->Inventory->AddItemData(DropItem.Value, ItemCnt);
 				if (bAddSuccess) 
 				{ 
 					this->Destroy(); 
 					return;
 				}
 				else {
-					//½Àµæ ½ÇÆĞ - Ã¢ ¶ç¿ì±â
+					//Full Inventory
 					return;
 				}
 			}
-			StartProbability += BaseProbability * DataMap.Key;
+			StartProbability += BaseProbability * DropItem.Key;
 		}
 	}
 }

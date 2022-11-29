@@ -4,8 +4,8 @@
 
 void AHunterController::BeginPlay()
 {
-	/*Super::BeginPlay();
-	SetInputMode(FInputModeGameAndUI());*/
+	//Super::BeginPlay();
+	//SetInputMode(FInputModeGameAndUI());
 }
 
 void AHunterController::PostInitializeComponents()

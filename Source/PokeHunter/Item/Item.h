@@ -7,7 +7,7 @@
 #include "Item.generated.h"
 
 UCLASS()
-class POKEHUNTER_API AItem : public AInteractActor
+class POKEHUNTER_API AItem: public AActor
 {
 	GENERATED_BODY()
 	
@@ -15,12 +15,8 @@ public:
 	// Sets default values for this actor's properties
 	AItem();
 
-	//Icon
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture2D* Icon;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName Name;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh")
+	class UStaticMeshComponent* StaticMesh;
 
 protected:
 	// Called when the game starts or when spawned
@@ -29,6 +25,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void Interact_Implementation(AHunter* Hunter) override;
+	virtual void UseItem();
 
 };

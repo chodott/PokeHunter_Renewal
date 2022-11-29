@@ -72,7 +72,7 @@ AHunter::AHunter()
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
 
 	//UI
-	static ConstructorHelpers::FClassFinder<UUserWidget>TempInvenClass(TEXT("/Game/UI/WBP_InventoryList"));
+	static ConstructorHelpers::FClassFinder<UUserWidget>TempInvenClass(TEXT("/Game/UI/InvenStorage/WBP_InventoryList"));
 	if (TempInvenClass.Succeeded())
 	{
 		InventoryUIClass = TempInvenClass.Class;
@@ -258,6 +258,20 @@ void AHunter::LMBDown()
 	{
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		if (AnimInstance) AnimInstance->PlayCombatMontage(FName("Shot"));
+
+		FName ItemID = QuickSlotArray[CurQuickKey].ItemID;
+		AActor* TempActor = UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass());
+		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(TempActor);
+		if (DatabaseActor)
+		{
+			TSubclassOf<AItem> ItemClass = DatabaseActor->FindItem(ItemID)->ItemInfo.ItemClass;
+			if (ItemClass == NULL) return;
+			else
+			{
+				AItem* item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation() + GetActorForwardVector() * 100.f , GetControlRotation());
+				item->UseItem();
+			}
+		}
 	}
 	else 
 	{

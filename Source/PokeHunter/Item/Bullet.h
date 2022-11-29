@@ -21,5 +21,5 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UProjectileMovementComponent* ProjectileMovement;
-
+	virtual void UseItem() override;
 };

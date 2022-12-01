@@ -23,7 +23,7 @@ public:
 	int HunterNum;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
-	float HunterHP;
+	float HunterHP{100};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
 	float HunterStamina;
@@ -95,7 +95,7 @@ public:
 	//Delegate
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
 	FDynamicDeleParam FMouseWheelDelegate;
-	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable)
 	FDynamicDele FIKeyDelegate;
 
 	//Timeline
@@ -115,7 +115,8 @@ public:
 	bool bDiving;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	bool bUpperOnly;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
+	bool bPartnerMode;
 
 public:
 	// Called every frame
@@ -144,6 +145,15 @@ public:
 	void SetQuickslot(FName ItemID, int index);
 	UFUNCTION(BlueprintCallable)
 	void OpenInventory();
+	UFUNCTION(BlueprintCallable)
+	void EKeyDown();
+	UFUNCTION(BlueprintCallable)
+	void GKeyDown();
+	UFUNCTION(BlueprintCallable)
+	void CtrlDown();
+	UFUNCTION(BlueprintCallable)
+	void CtrlUp();
+
 
 	//Collision Function
 	UFUNCTION()

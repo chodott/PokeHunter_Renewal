@@ -9,6 +9,7 @@
 #include "HunterAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components\SphereComponent.h"
 #include "Components\CapsuleComponent.h"
@@ -159,8 +160,11 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveForward", this, &AHunter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AHunter::MoveRight);
 
-	PlayerInputComponent->BindAxis("Turn", this, &AHunter::AddControllerYawInput);		// X
-	PlayerInputComponent->BindAxis("LookUp", this, &AHunter::AddControllerPitchInput);	// Y
+	//PlayerInputComponent->BindAxis("Turn", this, &AHunter::AddControllerYawInput);		// X
+	//PlayerInputComponent->BindAxis("LookUp", this, &AHunter::AddControllerPitchInput);	// Y
+
+	PlayerInputComponent->BindAxis("Turn", this, &AHunter::Turn);		// X
+	PlayerInputComponent->BindAxis("LookUp", this, &AHunter::LookUp);	// Y
 
 	PlayerInputComponent->BindAxis("MouseWheel", this, &AHunter::WheelInput);
 
@@ -171,6 +175,10 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &AHunter::RMBDown);
 	PlayerInputComponent->BindAction("RMB", IE_Released, this, &AHunter::RMBUp);
 	PlayerInputComponent->BindAction("I_Key", IE_Pressed, this, &AHunter::OpenInventory);
+	PlayerInputComponent->BindAction("E_Key", IE_Pressed, this, &AHunter::EKeyDown);
+	PlayerInputComponent->BindAction("G_Key", IE_Pressed, this, &AHunter::GKeyDown);
+	PlayerInputComponent->BindAction("Ctrl", IE_Pressed, this, &AHunter::CtrlDown);
+	PlayerInputComponent->BindAction("Ctrl", IE_Released, this, &AHunter::CtrlUp);
 }
 void AHunter::SpaceDown()
 {
@@ -226,11 +234,15 @@ void AHunter::MoveRight(float Val)
 
 void AHunter::Turn(float NewAxisValue)
 {
+	if (bPartnerMode) return;
+
 	AddControllerYawInput(NewAxisValue);
 }
 
 void AHunter::LookUp(float NewAxisValue)
 {
+	if (bPartnerMode) return;
+
 	AddControllerPitchInput(NewAxisValue);
 }
 
@@ -253,8 +265,19 @@ void AHunter::LShiftUp()
 void AHunter::LMBDown()
 {
 	if(bDiving) return;
+
 	
-	if (bZoom)
+	if (bPartnerMode)
+	{
+		FHitResult HitResult;
+		GetController()->CastToPlayerController()->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, 0, HitResult);
+		//HitResult.Location;
+		Partner->TargetPos = HitResult.Location;
+		Partner->bOrdered = true;
+
+
+	}
+	else if (bZoom)
 	{
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		if (AnimInstance) AnimInstance->PlayCombatMontage(FName("Shot"));
@@ -262,7 +285,7 @@ void AHunter::LMBDown()
 		FName ItemID = QuickSlotArray[CurQuickKey].ItemID;
 		AActor* TempActor = UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass());
 		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(TempActor);
-		if (DatabaseActor)
+		if (DatabaseActor && ItemID != "None")
 		{
 			TSubclassOf<AItem> ItemClass = DatabaseActor->FindItem(ItemID)->ItemInfo.ItemClass;
 			if (ItemClass == NULL) return;
@@ -309,32 +332,6 @@ void AHunter::LMBDown()
 void AHunter::RMBDown()
 {
 	if(bDiving) return;
-	
-	if (InteractingActor)
-	{
-		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-		//Left Right 
-		FVector TargetVector = (InteractingActor->GetActorLocation() - GetActorLocation());
-		FVector HunterForwardVector = GetActorForwardVector();
-		TargetVector.Z = 0;
-		TargetVector.Normalize();
-		HunterForwardVector.Z = 0;
-		FVector cross = FVector::CrossProduct(HunterForwardVector, TargetVector);
-		float sign = FMath::Sign(cross.Z);
-		if (sign <=0)
-		{
-			AnimInstance->PlayInteractMontage(FName("RunLeftPickup"));
-			UE_LOG(LogTemp, Warning, TEXT("Left"));
-		}
-		else
-		{
-			AnimInstance->PlayInteractMontage(FName("RunRightPickup"));
-			UE_LOG(LogTemp, Warning, TEXT("Right"));
-		}
-		bUpperOnly = true;
-		InteractingActor->Interact_Implementation(this);
-		return;
-	}
 
 	CameraBoom->TargetArmLength = 100;
 	bUseControllerRotationYaw = true;
@@ -384,27 +381,61 @@ void AHunter::SetQuickslot(FName ItemID, int index)
 
 void AHunter::OpenInventory()
 {
-	if (InventoryUI == nullptr)
-	{
 
+}
 
-		//InventoryUI = CreateWidget<UUserWidget>(GetWorld(), InventoryUIClass, TEXT("Inventory"));
-		//InventoryUI = MainUI->CreateWidgetInstance(*GetWorld(), InventoryUIClass, TEXT("Inventory"));
-		//InventoryUI->AddToViewport();
-		//InventoryUI->Visibility = ESlateVisibility::Visible;
-	}
-	
-	else 
+void AHunter::EKeyDown()
+{
+	if (InteractingActor)
 	{
-		if (InventoryUI->Visibility == ESlateVisibility::Visible)
+		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
+		//Left Right 
+		FVector TargetVector = (InteractingActor->GetActorLocation() - GetActorLocation());
+		FVector HunterForwardVector = GetActorForwardVector();
+		TargetVector.Z = 0;
+		TargetVector.Normalize();
+		HunterForwardVector.Z = 0;
+		FVector cross = FVector::CrossProduct(HunterForwardVector, TargetVector);
+		float sign = FMath::Sign(cross.Z);
+		if (sign <= 0)
 		{
-			InventoryUI->Visibility = ESlateVisibility::Hidden;
+			AnimInstance->PlayInteractMontage(FName("RunLeftPickup"));
+			UE_LOG(LogTemp, Warning, TEXT("Left"));
 		}
-		else if(InventoryUI->Visibility == ESlateVisibility::Hidden)
+		else
 		{
-			InventoryUI->Visibility = ESlateVisibility::Visible;
+			AnimInstance->PlayInteractMontage(FName("RunRightPickup"));
+			UE_LOG(LogTemp, Warning, TEXT("Right"));
 		}
+		bUpperOnly = true;
+		InteractingActor->Interact_Implementation(this);
+		return;
 	}
+}
+
+void AHunter::GKeyDown()
+{
+	FHitResult HitResult;
+	GetController()->CastToPlayerController()->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1,0,HitResult);
+	//HitResult.Location;
+	Partner->TargetPos = HitResult.Location;
+	Partner->bOrdered = true;
+
+}
+
+void AHunter::CtrlDown()
+{
+	if (Partner == NULL) return;
+	bPartnerMode = true;
+	GetController()->CastToPlayerController()->bShowMouseCursor = true;
+
+}
+
+void AHunter::CtrlUp()
+{
+	if (Partner == NULL) return;
+	bPartnerMode = false;
+	GetController()->CastToPlayerController()->bShowMouseCursor = false;
 }
 
 void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

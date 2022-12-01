@@ -25,8 +25,6 @@ void UInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 	for (int i = 0; i < capacity; i++)
 	{
-		//아이템 class
-		ItemArray.AddDefaulted();
 		//아이템 struct
 		InfoArray.AddDefaulted();
 	}

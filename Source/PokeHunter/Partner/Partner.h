@@ -16,7 +16,7 @@ public:
 	APartner();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
-		class AHunter* Hunter;
+	class AHunter* Hunter;
 
 protected:
 	// Called when the game starts or when spawned
@@ -30,4 +30,5 @@ public:
 public:
 	FVector TargetPos;
 	bool bPosing;
+	bool bOrdered;
 };

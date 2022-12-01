@@ -15,4 +15,5 @@ void UPartnerBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(FName("Hunter"),Partner->Hunter);
 	OwnerComp.GetBlackboardComponent()->SetValueAsVector(FName("TargetPos"), Partner->TargetPos);
 	OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName("bPosing"), Partner->bPosing);
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName("bOrdered"), Partner->bOrdered);
 }

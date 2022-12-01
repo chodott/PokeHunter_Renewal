@@ -33,8 +33,10 @@ void ADatabaseActor::Tick(float DeltaTime)
 
 UItemData* ADatabaseActor::FindItem(FName ItemID)
 {
-	if (ItemDataObjectMap.Find(ItemID)) 
-		return *ItemDataObjectMap.Find(ItemID);
+	if (ItemID == "None") return NULL;
+	UItemData* ItemData = *ItemDataObjectMap.Find(ItemID);
+	if (ItemData != nullptr) 
+		return ItemData;
 	else return NULL;
 }
 

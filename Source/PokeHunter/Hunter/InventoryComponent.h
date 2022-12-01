@@ -18,9 +18,6 @@ public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
 
-	UPROPERTY(VisibleAnywhere, Instanced, BlueprintReadOnly)
-	TArray<class UItemData*> ItemArray;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<FItemCnter> InfoArray;
 

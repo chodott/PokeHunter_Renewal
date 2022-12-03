@@ -15,6 +15,8 @@ AEnemy::AEnemy()
 
 	
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
+
+	
 }
 
 // Called when the game starts or when spawned
@@ -22,7 +24,8 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	auto AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
 	
 }
 

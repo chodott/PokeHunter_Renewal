@@ -63,6 +63,10 @@ AHunter::AHunter()
 	CameraBoom->TargetOffset = FVector(0, 0, GetDefaultHalfHeight());
 	CameraBoom->TargetArmLength = 500.f;
 	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->bEnableCameraLag = true;
+	ArmLengthTo = 200.f;
+	ArmSpeed = 20.f;
+	CameraZoomTo = 100.f;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
@@ -137,6 +141,18 @@ void AHunter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	DiveTimeline.TickTimeline(DeltaTime);
+
+	if (bZoom)
+	{
+		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength,ArmLengthTo, DeltaTime, ArmSpeed);
+		CameraBoom->SetRelativeLocation(FVector(0,FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, CameraZoomTo, DeltaTime, ArmSpeed),0));
+	}
+	else
+	{
+		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, 500.f, DeltaTime, ArmSpeed);
+		float temp = FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, 0.f, DeltaTime, ArmSpeed);
+		CameraBoom->SetRelativeLocation(FVector(0.f, temp, 0.f));
+	}
 }
 
 void AHunter::PostInitializeComponents()
@@ -272,9 +288,11 @@ void AHunter::LMBDown()
 		FHitResult HitResult;
 		GetController()->CastToPlayerController()->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, 0, HitResult);
 		//HitResult.Location;
-		Partner->TargetPos = HitResult.Location;
-		Partner->bOrdered = true;
-
+		if (HitResult.bBlockingHit)
+		{
+			Partner->TargetPos = HitResult.Location;
+			Partner->bOrdered = true;
+		}
 
 	}
 	else if (bZoom)
@@ -293,6 +311,19 @@ void AHunter::LMBDown()
 			{
 				AItem* item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation() + GetActorForwardVector() * 100.f , GetControlRotation());
 				item->UseItem();
+				QuickSlotArray[CurQuickKey].cnt--;
+				if (QuickSlotArray[CurQuickKey].cnt == 0)
+				{
+					for (auto& Info : Inventory->InfoArray)
+					{
+						if (Info.ItemID == ItemID)
+						{
+							Info.ItemID == FName("None");
+							Info.cnt = 0;
+						}
+						QuickSlotArray[CurQuickKey].ItemID = FName("None");
+					}
+				}
 			}
 		}
 	}
@@ -333,7 +364,7 @@ void AHunter::RMBDown()
 {
 	if(bDiving) return;
 
-	CameraBoom->TargetArmLength = 100;
+	//CameraBoom->TargetArmLength = 200;
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationPitch = true;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
@@ -346,7 +377,6 @@ void AHunter::RMBUp()
 {
 	if(bZoom)
 	{
-		CameraBoom->TargetArmLength = 300;
 		bUseControllerRotationYaw = false;
 		bUseControllerRotationPitch = false;
 		GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -418,9 +448,11 @@ void AHunter::GKeyDown()
 	FHitResult HitResult;
 	GetController()->CastToPlayerController()->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1,0,HitResult);
 	//HitResult.Location;
-	Partner->TargetPos = HitResult.Location;
-	Partner->bOrdered = true;
-
+	if (HitResult.bBlockingHit)
+	{
+		Partner->TargetPos = HitResult.Location;
+		Partner->bOrdered = true;
+	}
 }
 
 void AHunter::CtrlDown()

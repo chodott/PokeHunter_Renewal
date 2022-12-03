@@ -106,6 +106,17 @@ public:
 	float LastSpeed;
 	FVector LastInput;
 
+	//Camera Variable
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	float ArmLengthTo;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	float CameraZoomTo;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	float ArmSpeed;
+
+	
+
+
 	//Bool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	bool bZoom;

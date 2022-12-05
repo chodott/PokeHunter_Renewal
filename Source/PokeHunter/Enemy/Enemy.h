@@ -18,6 +18,9 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float HP{30};
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class APawn* Target;
+
 
 protected:
 	// Called when the game starts or when spawned

@@ -13,6 +13,15 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDynamicDele);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicDeleParam, float, val);
 
+UENUM(BlueprintType)
+enum class EPlayerState : uint8
+{
+	Idle,
+	Run,
+	Dive,
+	Zoom
+};
+
 USTRUCT(BlueprintType)
 struct FHunterInfo
 {
@@ -114,16 +123,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	float ArmSpeed;
 
-	
-
+	//PlayerState
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	EPlayerState CurState {EPlayerState::Idle};
 
 	//Bool
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
-	bool bZoom;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
-	bool bRunning;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
-	bool bDiving;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	bool bUpperOnly;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")

@@ -17,9 +17,8 @@ class POKEHUNTER_API ABullet : public AItem
 public:
 	ABullet();
 
-
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UProjectileMovementComponent* ProjectileMovement;
-	virtual void UseItem() override;
+	virtual void UseItem(AHunter* ItemOwner) override;
 };

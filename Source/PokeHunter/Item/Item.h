@@ -15,6 +15,9 @@ public:
 	// Sets default values for this actor's properties
 	AItem();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class AHunter* Hunter;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh")
 	class UStaticMeshComponent* StaticMesh;
 
@@ -25,6 +28,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void UseItem();
+	virtual void UseItem(AHunter* Owner);
 
 };

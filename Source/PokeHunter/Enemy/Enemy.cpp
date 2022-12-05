@@ -4,7 +4,9 @@
 #include "Enemy.h"
 #include "EnemyAnimInstance.h"
 #include "components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "PokeHunter/Item/Item.h"
+#include "PokeHunter/Hunter/Hunter.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -12,7 +14,12 @@ AEnemy::AEnemy()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+	
 
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
 
@@ -49,9 +56,7 @@ void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 	if (HitItem)
 	{
 		HP -= 5;
-		HitItem->Destroy();
 		auto AnimInstance = Cast<UEnemyAnimInstance>(GetMesh()->GetAnimInstance());
-
 
 		if (AnimInstance)
 		{
@@ -64,6 +69,14 @@ void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 				AnimInstance->PlayCombatMontage(FName("Hit"));
 			}
 		}
+
+		//Target Select
+		if (Target == NULL)
+		{
+			Target = HitItem->Hunter;
+		}
+
+		//HitItem->Destroy();
 	}
 }
 

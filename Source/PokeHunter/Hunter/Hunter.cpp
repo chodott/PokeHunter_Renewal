@@ -142,7 +142,7 @@ void AHunter::Tick(float DeltaTime)
 
 	DiveTimeline.TickTimeline(DeltaTime);
 
-	if (bZoom)
+	if (CurState == EPlayerState::Zoom)
 	{
 		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength,ArmLengthTo, DeltaTime, ArmSpeed);
 		CameraBoom->SetRelativeLocation(FVector(0,FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, CameraZoomTo, DeltaTime, ArmSpeed),0));
@@ -198,11 +198,9 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 void AHunter::SpaceDown()
 {
-	if(bDiving) return;
-	
-	if(!bZoom)
+	if(CurState == EPlayerState::Idle)
 	{
-		bDiving = 1;
+		CurState = EPlayerState::Dive;
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		if(AnimInstance) AnimInstance->PlayCombatMontage(FName("Dive"));
 		FVector Speed = GetVelocity();
@@ -220,8 +218,7 @@ void AHunter::SpaceDown()
 
 void AHunter::MoveForward(float Val)
 {
-	if(bDiving) return;
-	
+	if (CurState == EPlayerState::Dive) return;
 	if (Val != 0.0f)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -229,22 +226,22 @@ void AHunter::MoveForward(float Val)
 
 		//���� ����
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		if(!bDiving) AddMovementInput(Direction, Val);
+		 AddMovementInput(Direction, Val);
 	}
 }
 
 void AHunter::MoveRight(float Val)
 {
-	if(bDiving) return;
+	if (CurState == EPlayerState::Dive) return;
 	
-	if (Val != 0.0f && !bDiving)
+	if (Val != 0.0f)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 		//���� ����
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		if (!bDiving) AddMovementInput(Direction, Val);
+		 AddMovementInput(Direction, Val);
 	}
 }
 
@@ -264,11 +261,8 @@ void AHunter::LookUp(float NewAxisValue)
 
 void AHunter::LShiftDown()
 {
-	if(bDiving) return;
-	
-	if(!bZoom)
+	if (CurState == EPlayerState::Idle)
 	{
-		bRunning = 1;
 		GetCharacterMovement()->MaxWalkSpeed = 1000.f;
 	}
 }
@@ -280,9 +274,8 @@ void AHunter::LShiftUp()
 
 void AHunter::LMBDown()
 {
-	if(bDiving) return;
+	if (CurState == EPlayerState::Dive) return;
 
-	
 	if (bPartnerMode)
 	{
 		FHitResult HitResult;
@@ -295,7 +288,7 @@ void AHunter::LMBDown()
 		}
 
 	}
-	else if (bZoom)
+	else if (CurState == EPlayerState::Zoom)
 	{
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		if (AnimInstance) AnimInstance->PlayCombatMontage(FName("Shot"));
@@ -310,7 +303,7 @@ void AHunter::LMBDown()
 			else
 			{
 				AItem* item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation() + GetActorForwardVector() * 100.f , GetControlRotation());
-				item->UseItem();
+				item->UseItem(this);
 				QuickSlotArray[CurQuickKey].cnt--;
 				if (QuickSlotArray[CurQuickKey].cnt == 0)
 				{
@@ -362,25 +355,26 @@ void AHunter::LMBDown()
 
 void AHunter::RMBDown()
 {
-	if(bDiving) return;
+	if (CurState == EPlayerState::Idle)
+	{
+		//CameraBoom->TargetArmLength = 200;
+		CurState = EPlayerState::Zoom;
+		bUseControllerRotationYaw = true;
+		bUseControllerRotationPitch = true;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
 
-	//CameraBoom->TargetArmLength = 200;
-	bUseControllerRotationYaw = true;
-	bUseControllerRotationPitch = true;
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-	bZoom = true;
-
-	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+		GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	}
 }
 
 void AHunter::RMBUp()
 {
-	if(bZoom)
+	if(CurState == EPlayerState::Zoom)
 	{
 		bUseControllerRotationYaw = false;
 		bUseControllerRotationPitch = false;
 		GetCharacterMovement()->bOrientRotationToMovement = true;
-		bZoom = false;
+		CurState = EPlayerState::Idle;
 
 		SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
 		Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 600.0f;
@@ -472,10 +466,11 @@ void AHunter::CtrlUp()
 
 void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (bDiving)
+	if (CurState == EPlayerState::Dive) 
 	{
-		bDiving = false;
+		CurState = EPlayerState::Idle;
 	}
+
 	if (bUpperOnly) bUpperOnly = false;
 }
 
@@ -521,5 +516,4 @@ void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AAct
 void AHunter::DiveInterpReturn(float Value)
 {
 	AddMovementInput(LastInput, 1.0f);
-	
 }

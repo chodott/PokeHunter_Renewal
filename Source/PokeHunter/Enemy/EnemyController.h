@@ -4,21 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "PartnerController.generated.h"
+#include "BehaviorTree/BlackboardData.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "EnemyController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class POKEHUNTER_API APartnerController : public AAIController
+class POKEHUNTER_API AEnemyController : public AAIController
 {
 	GENERATED_BODY()
 
 public:
-	APartnerController();
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
-	class AHunter* Hunter;
+	AEnemyController();
 
 	virtual void OnPossess(APawn* pawn) override;
 
@@ -27,9 +26,7 @@ public:
 
 private:
 	UPROPERTY()
-		class UBehaviorTree* BTPartner;
+	class UBehaviorTree* BTEnemy;
 	UPROPERTY()
-		class UBlackboardData* BBPartner;
-
-	
+	class UBlackboardData* BBEnemy;
 };

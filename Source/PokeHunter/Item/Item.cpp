@@ -4,6 +4,7 @@
 #include "Item.h"
 #include "ItemData.h"
 #include "Components/StaticMeshComponent.h"
+#include "PokeHunter/Hunter/Hunter.h"
 
 
 // Sets default values
@@ -33,7 +34,7 @@ void AItem::Tick(float DeltaTime)
 
 }
 
-void AItem::UseItem()
+void AItem::UseItem(AHunter* ItemOwner)
 {
 
 }

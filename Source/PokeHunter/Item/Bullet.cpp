@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "PokeHunter/Hunter/Hunter.h"
 
 ABullet::ABullet()
 {
@@ -21,7 +22,8 @@ ABullet::ABullet()
 
 };
 
-void ABullet::UseItem()
+void ABullet::UseItem(AHunter* ItemOwner)
 {
+	Hunter = ItemOwner;
 	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
 }

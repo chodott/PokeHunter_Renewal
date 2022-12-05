@@ -6,16 +6,19 @@
 
 UEnemyAnimInstance::UEnemyAnimInstance()
 {
-	
-	if (Enemy == nullptr)
-	{
-		//Enemy = Cast<AEnemy>(TryGetPawnOwner());
-	}
+
+	MovementSpeed = 0.0f;
 }
 
 void UEnemyAnimInstance::UpdateAnimationProperties()
 {
-	if (Enemy != nullptr)
+
+	if (Enemy == nullptr)
+	{
+		Enemy = Cast<AEnemy>(TryGetPawnOwner());
+	}
+
+	else
 	{
 		Enemy->GetVelocity();
 		FVector Speed = Enemy->GetVelocity();

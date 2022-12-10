@@ -17,6 +17,8 @@ class POKEHUNTER_API ABullet : public AItem
 public:
 	ABullet();
 
+	float TimeLimit{5.f};
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UProjectileMovementComponent* ProjectileMovement;

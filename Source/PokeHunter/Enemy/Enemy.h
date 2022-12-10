@@ -6,6 +6,16 @@
 #include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
+
+enum class EEnemyState : uint8
+{
+	Patrol,
+	Chase,
+	
+};
+
+
 UCLASS()
 class POKEHUNTER_API AEnemy : public ACharacter
 {
@@ -20,6 +30,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class APawn* Target;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UEnemyAnimInstance* EnemyAnim;
+
+	FOnMontageEndDelegate OnMontageEnd;
 
 
 protected:
@@ -36,6 +51,9 @@ public:
 	//CollisionFunction
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION()
+	virtual void Attack();
 
 	//Animation Function
 	UFUNCTION()

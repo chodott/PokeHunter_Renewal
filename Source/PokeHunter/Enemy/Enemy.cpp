@@ -22,7 +22,6 @@ AEnemy::AEnemy()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
-
 	
 }
 
@@ -31,8 +30,8 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
+	EnemyAnim = Cast<UEnemyAnimInstance>(GetMesh()->GetAnimInstance());
+	EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
 	
 }
 
@@ -56,17 +55,16 @@ void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 	if (HitItem)
 	{
 		HP -= 5;
-		auto AnimInstance = Cast<UEnemyAnimInstance>(GetMesh()->GetAnimInstance());
 
-		if (AnimInstance)
+		if (EnemyAnim != NULL)
 		{
 			if (HP <= 0)
 			{
-				AnimInstance->PlayCombatMontage(FName("Die"));
+				//EnemyAnim->PlayCombatMontage(FName("Die"));
 			}
 			else
 			{
-				AnimInstance->PlayCombatMontage(FName("Hit"));
+				//EnemyAnim->PlayCombatMontage(FName("Hit"));
 			}
 		}
 
@@ -76,12 +74,24 @@ void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 			Target = HitItem->Hunter;
 		}
 
-		//HitItem->Destroy();
+		HitItem->Destroy();
+	}
+}
+
+void AEnemy::Attack()
+{
+	if (Target != NULL)
+	{
+		EnemyAnim->PlayCombatMontage(TEXT("Attack"));
 	}
 }
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
+	EnemyAnim->bPlaying = false;
+
+	OnMontageEnd.Broadcast();
+
 	if(HP <= 0) this->Destroy();
 }
 

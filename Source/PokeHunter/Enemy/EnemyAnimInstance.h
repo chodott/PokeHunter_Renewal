@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
 	float Direction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
+	bool bPlaying;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
 	class AEnemy* Enemy;
 
@@ -34,5 +37,5 @@ public:
 	UAnimMontage* CombatMontage;
 
 public:
-	void PlayCombatMontage(FName Section);
+	bool PlayCombatMontage(FName Section);
 };

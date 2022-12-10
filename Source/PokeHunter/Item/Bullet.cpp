@@ -26,4 +26,5 @@ void ABullet::UseItem(AHunter* ItemOwner)
 {
 	Hunter = ItemOwner;
 	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
+	SetLifeSpan(TimeLimit);
 }

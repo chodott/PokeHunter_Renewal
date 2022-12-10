@@ -357,7 +357,6 @@ void AHunter::RMBDown()
 {
 	if (CurState == EPlayerState::Idle)
 	{
-		//CameraBoom->TargetArmLength = 200;
 		CurState = EPlayerState::Zoom;
 		bUseControllerRotationYaw = true;
 		bUseControllerRotationPitch = true;
@@ -466,6 +465,7 @@ void AHunter::CtrlUp()
 
 void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
+
 	if (CurState == EPlayerState::Dive) 
 	{
 		CurState = EPlayerState::Idle;

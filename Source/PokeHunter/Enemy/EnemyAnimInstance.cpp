@@ -29,8 +29,14 @@ void UEnemyAnimInstance::UpdateAnimationProperties()
 	}
 }
 
-void UEnemyAnimInstance::PlayCombatMontage(FName Section)
+bool UEnemyAnimInstance::PlayCombatMontage(FName Section)
 {
-	Montage_Play(CombatMontage, 1.0f);
-	Montage_JumpToSection(Section, CombatMontage);
+	if (!bPlaying)
+	{
+		bPlaying = true;
+		Montage_Play(CombatMontage, 1.0f);
+		Montage_JumpToSection(Section, CombatMontage);
+		return true;
+	}
+	return false;
 }

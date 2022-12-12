@@ -26,7 +26,7 @@ EBTNodeResult::Type UBTTask_EnemyAttack::ExecuteTask(UBehaviorTreeComponent& Own
 			bPlaying = false;
 		});
 
-	return EBTNodeResult::Type();
+	return EBTNodeResult::Type::InProgress;
 }
 
 void UBTTask_EnemyAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

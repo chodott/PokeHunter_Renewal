@@ -99,7 +99,6 @@ public:
 	//Partner
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
 	class APartner* Partner;
-	
 
 	//Delegate
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
@@ -169,6 +168,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CtrlUp();
 
+	//Partner
+	void SetPartnerTarget(AActor* setTarget);
 
 	//Collision Function
 	UFUNCTION()

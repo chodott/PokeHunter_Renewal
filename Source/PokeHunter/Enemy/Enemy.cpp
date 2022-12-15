@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Hunter/Hunter.h"
+#include "PokeHunter/Partner/Partner.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -21,6 +22,7 @@ AEnemy::AEnemy()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
+	GetCapsuleComponent()->SetCapsuleRadius(90.f);
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
 	
 }
@@ -54,26 +56,24 @@ void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 	AItem* HitItem = Cast<AItem>(OtherActor);
 	if (HitItem)
 	{
-		HP -= 5;
-
-		if (EnemyAnim != NULL)
+		if (EnemyAnim != NULL && HP > 0)
 		{
+			HP -= 5;
 			if (HP <= 0)
 			{
-				//EnemyAnim->PlayCombatMontage(FName("Die"));
+				EnemyAnim->PlayCombatMontage(FName("Die"));
 			}
 			else
 			{
-				//EnemyAnim->PlayCombatMontage(FName("Hit"));
+				if (Target == NULL)
+				{
+					EnemyAnim->PlayCombatMontage(FName("Hit"));
+					HitItem->Hunter->SetPartnerTarget(this);
+					Target = HitItem->Hunter;
+					bFirstHit = 0;
+				}
 			}
 		}
-
-		//Target Select
-		if (Target == NULL)
-		{
-			Target = HitItem->Hunter;
-		}
-
 		HitItem->Destroy();
 	}
 }
@@ -86,12 +86,19 @@ void AEnemy::Attack()
 	}
 }
 
+void AEnemy::Roar()
+{
+	if (EnemyAnim != NULL)
+	{
+		EnemyAnim->PlayCombatMontage(TEXT("Roar"));
+	}
+}
+
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
+
 	EnemyAnim->bPlaying = false;
 
 	OnMontageEnd.Broadcast();
-
-	if(HP <= 0) this->Destroy();
 }
 

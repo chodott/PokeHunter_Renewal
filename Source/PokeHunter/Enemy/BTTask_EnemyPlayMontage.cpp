@@ -22,8 +22,31 @@ EBTNodeResult::Type UBTTask_EnemyPlayMontage::ExecuteTask(UBehaviorTreeComponent
 	if (Enemy == NULL) return EBTNodeResult::Failed;
 	if (EnemyAnim == NULL) return EBTNodeResult::Failed;
 
+	bPlaying = true;
 
-	bPlayOnce = EnemyAnim->PlayCombatMontage("Roar");
+	switch (Enemy->CurState)
+	{
+	case EEnemyState::Hit:
+		EnemyAnim->bPlaying = false;
+		EnemyAnim->PlayCombatMontage("Hit");
+		break;
+
+	case EEnemyState::Roar:
+		EnemyAnim->PlayCombatMontage("Roar");
+		break;
+
+	case EEnemyState::Die:
+		EnemyAnim->bPlaying = false;
+		EnemyAnim->PlayCombatMontage("Die");
+		break;
+
+	case EEnemyState::Patrol:
+		EnemyAnim->PlayCombatMontage("Patrol");
+		break;
+
+	default:
+		break;
+	}
 
 	Enemy->OnMontageEnd.AddLambda([this]() -> void {
 		bPlaying = false;
@@ -39,8 +62,18 @@ void UBTTask_EnemyPlayMontage::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	UEnemyAnimInstance* EnemyAnim = Enemy->EnemyAnim;
-	if (bPlayOnce && !EnemyAnim->bPlaying)
+	if (!bPlaying)
 	{
+		if (Enemy->CurState == EEnemyState::Hit)
+		{
+			Enemy->CurState = EEnemyState::Roar;
+		}
+
+		else if(Enemy->CurState == EEnemyState::Roar)
+		{
+			Enemy->CurState = EEnemyState::Chase;
+		}
+
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

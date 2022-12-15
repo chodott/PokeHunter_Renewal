@@ -15,6 +15,7 @@ void UPartnerAnimInstance::NativeInitializeAnimation()
 	{
 		Partner = Cast<APartner>(TryGetPawnOwner());
 	}
+	
 }
 
 void UPartnerAnimInstance::UpdateAnimationProperties()
@@ -30,3 +31,16 @@ void UPartnerAnimInstance::UpdateAnimationProperties()
 		MovementSpeed = LateralSpeed.Size();
 	}
 }
+
+bool UPartnerAnimInstance::PlayCombatMontage(FName Section)
+{
+	if (!bPlaying)
+	{
+		bPlaying = true;
+		Montage_Play(CombatMontage, 1.0f);
+		Montage_JumpToSection(Section, CombatMontage);
+		return true;
+	}
+	return false;
+}
+

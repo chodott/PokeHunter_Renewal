@@ -465,7 +465,6 @@ void AHunter::CtrlUp()
 
 void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-
 	if (CurState == EPlayerState::Dive) 
 	{
 		CurState = EPlayerState::Idle;
@@ -516,4 +515,13 @@ void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AAct
 void AHunter::DiveInterpReturn(float Value)
 {
 	AddMovementInput(LastInput, 1.0f);
+}
+
+void AHunter::SetPartnerTarget(AActor* setTarget)
+{
+	if (Partner != NULL)
+	{
+		Partner->SetTarget(setTarget);
+	}
+	
 }

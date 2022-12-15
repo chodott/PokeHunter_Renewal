@@ -7,7 +7,7 @@
 
 ANpcPartnerManager::ANpcPartnerManager()
 {
-	CameraBoom->TargetArmLength = 300.f;
+	CameraBoom->TargetArmLength = 0.f;
 	static ConstructorHelpers::FClassFinder<UUserWidget> TempUI(TEXT("/Game/UI/PartnerMgr/WBP_PartnerMangerUI"));
 	if (TempUI.Succeeded())
 	{
@@ -18,14 +18,18 @@ ANpcPartnerManager::ANpcPartnerManager()
 void ANpcPartnerManager::BeginPlay()
 {
 	FVector BaseLocation = GetActorLocation();
+	float LookVecX = GetActorForwardVector().X;
 	for (int i = 0; i<PartnerClassArray.Num(); ++i)
 	{
-		PositionArray.Add(FVector(BaseLocation.X - 200.f, BaseLocation.Y + PARTNER_GAP * (i - 1), BaseLocation.Z));
+		
+
+		PositionArray.Add(FVector(BaseLocation.X - LookVecX * 400.f, BaseLocation.Y + PARTNER_GAP * (i - 1), BaseLocation.Z));
 		APartner* temp = GetWorld()->SpawnActor<APartner>(PartnerClassArray[i], PositionArray[i], GetActorRotation());
 		temp->TargetPos = temp->GetActorLocation();
+		temp->LookTargetVec = GetActorForwardVector();
 		PartnerArray.Add(temp);
 	}
-	PosePos = FVector(BaseLocation.X - 100, BaseLocation.Y, BaseLocation.Z);
+	PosePos = FVector(BaseLocation.X - LookVecX * 200.f, BaseLocation.Y, BaseLocation.Z);
 }
 
 void ANpcPartnerManager::Tick(float DeltaTime)
@@ -47,11 +51,11 @@ void ANpcPartnerManager::LeavePartner()
 		if (PartnerArray[i] == NULL)
 		{
 			PartnerArray[i] = Master->Partner;
-			PartnerArray[i]->Hunter = NULL;
-			PartnerArray[i]->TargetPos = PositionArray[i];
+			APartner* SelectedPartner = PartnerArray[i];
+			SelectedPartner->Hunter = NULL;
+			SelectedPartner->TargetPos = PositionArray[i];
 			Master->Partner = NULL;
 			break;
-
 		}
 	}
 }
@@ -60,8 +64,10 @@ void ANpcPartnerManager::ChangePartner()
 {
 	if(Master->Partner)
 	UE_LOG(LogTemp, Warning, TEXT("Change success"));
-	PartnerArray[CurrentIndex]->TargetPos = PosePos;
-	PartnerArray[CurrentIndex]->bPosing = true;
+	APartner* SelectedPartner = PartnerArray[CurrentIndex];
+	SelectedPartner->TargetPos = PosePos;
+	SelectedPartner->bPosing = true;
+	SelectedPartner->CurState = EPartnerState::Posing;
 }
 
 void ANpcPartnerManager::AddIndex(int Val)

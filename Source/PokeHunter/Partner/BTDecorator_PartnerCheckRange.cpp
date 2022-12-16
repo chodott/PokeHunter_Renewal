@@ -15,6 +15,6 @@ bool UBTDecorator_PartnerCheckRange::CalculateRawConditionValue(UBehaviorTreeCom
 	if (Partner->Target == NULL)
 		return false;
 
-	bResult = (Partner->Target->GetDistanceTo(Partner) <= 100);
+	bResult = (Partner->Target->GetDistanceTo(Partner) <= 200);
 	return bResult;
 }

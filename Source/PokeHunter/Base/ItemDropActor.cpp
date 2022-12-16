@@ -7,7 +7,7 @@
 
 AItemDropActor::AItemDropActor()
 {
-	
+	InteractionSphere->SetSphereRadius(80.f);
 }
 
 void AItemDropActor::BeginPlay()

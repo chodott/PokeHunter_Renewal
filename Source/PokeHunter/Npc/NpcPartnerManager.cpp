@@ -21,8 +21,6 @@ void ANpcPartnerManager::BeginPlay()
 	float LookVecX = GetActorForwardVector().X;
 	for (int i = 0; i<PartnerClassArray.Num(); ++i)
 	{
-		
-
 		PositionArray.Add(FVector(BaseLocation.X - LookVecX * 400.f, BaseLocation.Y + PARTNER_GAP * (i - 1), BaseLocation.Z));
 		APartner* temp = GetWorld()->SpawnActor<APartner>(PartnerClassArray[i], PositionArray[i], GetActorRotation());
 		temp->TargetPos = temp->GetActorLocation();

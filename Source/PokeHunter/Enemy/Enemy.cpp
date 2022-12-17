@@ -59,8 +59,9 @@ void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 		if (EnemyAnim != NULL && HP > 0)
 		{
 			HP -= 5;
-			if (HP <= 0)
+			if (HP <= 0 && CurState != EEnemyState::Die)
 			{
+				CurState = EEnemyState::Die;
 				EnemyAnim->PlayCombatMontage(FName("Die"));
 			}
 			else
@@ -70,6 +71,7 @@ void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 					EnemyAnim->PlayCombatMontage(FName("Hit"));
 					HitItem->Hunter->SetPartnerTarget(this);
 					Target = HitItem->Hunter;
+					CurState = EEnemyState::Hit;
 					bFirstHit = 0;
 				}
 			}
@@ -88,7 +90,8 @@ void AEnemy::Attack()
 
 void AEnemy::Roar()
 {
-	if (EnemyAnim != NULL)
+	if (EnemyAnim == NULL) return;
+	if (CurState == EEnemyState::Roar)
 	{
 		EnemyAnim->PlayCombatMontage(TEXT("Roar"));
 	}
@@ -96,9 +99,12 @@ void AEnemy::Roar()
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-
-	EnemyAnim->bPlaying = false;
-
-	OnMontageEnd.Broadcast();
+	if(!bInterrupted)
+	{
+		EnemyAnim->bPlaying = false;
+		if (CurState == EEnemyState::Hit) CurState = EEnemyState::Roar;
+		else if (CurState == EEnemyState::Roar) CurState = EEnemyState::Chase;
+		OnMontageEnd.Broadcast();
+	}
 }
 

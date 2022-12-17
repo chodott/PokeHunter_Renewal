@@ -17,14 +17,13 @@ EBTNodeResult::Type UBTTask_Roar::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	UEnemyAnimInstance* EnemyAnim = Enemy->EnemyAnim;
 	if (Enemy == NULL)return EBTNodeResult::Failed;
-	Enemy->Roar();
 	bPlaying = true;
 
 	Enemy->OnMontageEnd.AddLambda([this]()->void
 		{
 			bPlaying = false;
 		});
-
+	Enemy->Roar();
 	return EBTNodeResult::Type::InProgress;
 }
 
@@ -35,7 +34,6 @@ void UBTTask_Roar::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 	if (!bPlaying)
 	{
 		AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
-		Enemy->CurState = EEnemyState::Chase;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

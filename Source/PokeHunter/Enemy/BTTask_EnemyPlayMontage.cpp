@@ -39,7 +39,7 @@ EBTNodeResult::Type UBTTask_EnemyPlayMontage::ExecuteTask(UBehaviorTreeComponent
 		EnemyAnim->bPlaying = false;
 		EnemyAnim->PlayCombatMontage("Die");
 		break;
-
+		
 	case EEnemyState::Patrol:
 		EnemyAnim->PlayCombatMontage("Patrol");
 		break;
@@ -64,16 +64,6 @@ void UBTTask_EnemyPlayMontage::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 	UEnemyAnimInstance* EnemyAnim = Enemy->EnemyAnim;
 	if (!bPlaying)
 	{
-		if (Enemy->CurState == EEnemyState::Hit)
-		{
-			Enemy->CurState = EEnemyState::Roar;
-		}
-
-		else if(Enemy->CurState == EEnemyState::Roar)
-		{
-			Enemy->CurState = EEnemyState::Chase;
-		}
-
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

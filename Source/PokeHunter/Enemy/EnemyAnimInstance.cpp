@@ -36,6 +36,7 @@ bool UEnemyAnimInstance::PlayCombatMontage(FName Section)
 		bPlaying = true;
 		Montage_Play(CombatMontage, 1.0f);
 		Montage_JumpToSection(Section, CombatMontage);
+
 		return true;
 	}
 	else if (!bPlaying)

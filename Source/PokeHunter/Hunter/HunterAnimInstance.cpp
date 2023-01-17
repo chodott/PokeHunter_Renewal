@@ -59,7 +59,10 @@ void UHunterAnimInstance::UpdateAnimationProperties()
 
 void UHunterAnimInstance::PlayCombatMontage(FName Section)
 {	
-	Montage_Play(CombatMontage,1.0f);
+	float PlayRate = 1.0f;
+	float MaxSpeed = 800.f;
+	if (Section == FName("Dive")) PlayRate += MovementSpeed / MaxSpeed;
+	Montage_Play(CombatMontage,PlayRate);
 	Montage_JumpToSection(Section, CombatMontage);
 }
 

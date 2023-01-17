@@ -279,7 +279,8 @@ void AHunter::LMBDown()
 	if (bPartnerMode)
 	{
 		FHitResult HitResult;
-		GetController()->CastToPlayerController()->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, 0, HitResult);
+		APlayerController* PlayerController = Cast<APlayerController>(GetController());
+		PlayerController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, 0, HitResult);
 		//HitResult.Location;
 		if (HitResult.bBlockingHit)
 		{
@@ -439,7 +440,8 @@ void AHunter::EKeyDown()
 void AHunter::GKeyDown()
 {
 	FHitResult HitResult;
-	GetController()->CastToPlayerController()->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1,0,HitResult);
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	PlayerController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1,0,HitResult);
 	//HitResult.Location;
 	if (HitResult.bBlockingHit)
 	{
@@ -452,7 +454,8 @@ void AHunter::CtrlDown()
 {
 	if (Partner == NULL) return;
 	bPartnerMode = true;
-	GetController()->CastToPlayerController()->bShowMouseCursor = true;
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	PlayerController->bShowMouseCursor = true;
 
 }
 
@@ -460,7 +463,8 @@ void AHunter::CtrlUp()
 {
 	if (Partner == NULL) return;
 	bPartnerMode = false;
-	GetController()->CastToPlayerController()->bShowMouseCursor = false;
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	PlayerController->bShowMouseCursor = false;
 }
 
 void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

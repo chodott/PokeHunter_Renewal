@@ -31,11 +31,21 @@ void UEnemyAnimInstance::UpdateAnimationProperties()
 
 bool UEnemyAnimInstance::PlayCombatMontage(FName Section)
 {
-	if (!bPlaying)
+	if (Section == FName("Die") || Section == FName("Hit"))
 	{
 		bPlaying = true;
 		Montage_Play(CombatMontage, 1.0f);
 		Montage_JumpToSection(Section, CombatMontage);
+
+		return true;
+	}
+	else if (!bPlaying)
+	{
+
+		bPlaying = true;
+		Montage_Play(CombatMontage, 1.0f);
+		Montage_JumpToSection(Section, CombatMontage);
+
 		return true;
 	}
 	return false;

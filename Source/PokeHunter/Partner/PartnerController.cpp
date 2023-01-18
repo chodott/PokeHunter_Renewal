@@ -33,7 +33,8 @@ void APartnerController::OnPossess(APawn* pawn)
 
 void APartnerController::RunAI()
 {
-	if (UseBlackboard(BBPartner, Blackboard)) RunBehaviorTree(BTPartner);
+	//Upgrade5
+	//if (UseBlackboard(BBPartner, Blackboard)) RunBehaviorTree(BTPartner);
 
 }
 

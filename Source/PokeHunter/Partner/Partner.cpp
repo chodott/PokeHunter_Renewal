@@ -3,6 +3,7 @@
 
 #include "Partner.h"
 #include "PartnerController.h"
+#include "PartnerAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "PokeHunter/Hunter/Hunter.h"
 
@@ -18,6 +19,9 @@ APartner::APartner()
 void APartner::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PartnerAnim = Cast<UPartnerAnimInstance>(GetMesh()->GetAnimInstance());
+	PartnerAnim->OnMontageEnded.AddDynamic(this, &APartner::OnMontageEnded);
 }
 
 // Called every frame
@@ -32,4 +36,23 @@ void APartner::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void APartner::Attack()
+{
+	if (Target != NULL)
+	{
+		PartnerAnim->PlayCombatMontage(TEXT("Attack"));
+	}
+
+	
+}
+
+void APartner::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	PartnerAnim->bPlaying = false;
+
+	OnMontageEnd.Broadcast();
+
+	if (HP <= 0) this->Destroy();
 }

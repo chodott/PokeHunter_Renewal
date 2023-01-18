@@ -8,10 +8,14 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
 
+UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
-	Patrol,
-	Chase,
+	Patrol UMETA(DisplayName = "Patrol"),
+	Chase UMETA(DisplayName = "Chase"),
+	Hit UMETA(DisplayName = "Hit"),
+	Die UMETA(DisplayName = "Die"),
+	Roar UMETA(DisplayName = "Roar")
 	
 };
 
@@ -34,6 +38,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UEnemyAnimInstance* EnemyAnim;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	EEnemyState CurState{EEnemyState::Patrol};
+
 	FOnMontageEndDelegate OnMontageEnd;
 
 
@@ -54,8 +61,12 @@ public:
 
 	UFUNCTION()
 	virtual void Attack();
+	virtual void Roar();
 
 	//Animation Function
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+public:
+	bool bFirstHit{ true};
 };

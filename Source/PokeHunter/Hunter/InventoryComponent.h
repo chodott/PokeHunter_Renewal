@@ -37,12 +37,14 @@ public:
 
 	UFUNCTION()
 	bool AddItemData(FName ItemName, int Cnt);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	bool AddItemInfo(FName ItemID, int Cnt);
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex);
 	UFUNCTION(BlueprintCallable)
 	void SwapSlot(int TargetIndex, int GoalIndex);
+	UFUNCTION(BlueprintCallable)
+	int GetItemCnt(FName id);
 	
 };

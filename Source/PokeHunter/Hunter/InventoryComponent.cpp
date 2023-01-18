@@ -139,6 +139,19 @@ void UInventoryComponent::SwapSlot(int TargetIndex, int GoalIndex)
 	InfoArray[GoalIndex] = Temp;
 }
 
+int UInventoryComponent::GetItemCnt(FName id)
+{
+	int cnt = 0;
+	for (auto cnter : InfoArray)
+	{
+		if (cnter.ItemID == id)
+		{
+			cnt += cnter.cnt;
+		}
+	}
+	return cnt;
+}
+
 
 // Called every frame
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

@@ -147,11 +147,25 @@ void AHunter::Tick(float DeltaTime)
 		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength,ArmLengthTo, DeltaTime, ArmSpeed);
 		CameraBoom->SetRelativeLocation(FVector(0,FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, CameraZoomTo, DeltaTime, ArmSpeed),0));
 	}
+
+	else if (CurState == EPlayerState::Run)
+	{
+		if (HunterInfo.HunterStamina > 0) HunterInfo.HunterStamina -= DeltaTime * 1;
+		else
+		{
+			HunterInfo.HunterStamina = 0;
+			GetCharacterMovement()->MaxWalkSpeed = 600.f;
+		}
+	}
+
 	else
 	{
 		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, 500.f, DeltaTime, ArmSpeed);
 		float temp = FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, 0.f, DeltaTime, ArmSpeed);
 		CameraBoom->SetRelativeLocation(FVector(0.f, temp, 0.f));
+
+		if (HunterInfo.HunterStamina < 100) HunterInfo.HunterStamina += DeltaTime * 1;
+		else HunterInfo.HunterStamina = 100;
 	}
 }
 

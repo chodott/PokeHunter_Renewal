@@ -35,7 +35,7 @@ public:
 	float HunterHP{100};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
-	float HunterStamina;
+	float HunterStamina{ 100 };
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Status")
 	bool bCanCombat;

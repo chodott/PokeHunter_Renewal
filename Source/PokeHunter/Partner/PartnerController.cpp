@@ -36,6 +36,8 @@ void APartnerController::RunAI()
 	//Upgrade5
 	//if (UseBlackboard(BBPartner, Blackboard)) RunBehaviorTree(BTPartner);
 
+	RunBehaviorTree(BTPartner);
+
 }
 
 void APartnerController::StopAI()

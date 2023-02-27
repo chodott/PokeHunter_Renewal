@@ -27,7 +27,9 @@ void AEnemyController::OnPossess(APawn* pawn)
 
 void AEnemyController::RunAI()
 {
+	//upgrade5
 	//if (UseBlackboard(BBEnemy, Blackboard)) RunBehaviorTree(BTEnemy);
+	RunBehaviorTree(BTEnemy);
 }
 
 void AEnemyController::StopAI()

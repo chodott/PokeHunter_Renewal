@@ -21,6 +21,13 @@ void ADatabaseActor::BeginPlay()
 		auto ItemData = NewObject<UItemData>(this, ItemDataClass.Value);
 		ItemDataObjectMap.Add(ItemDataClass.Key, ItemData);
 	}
+
+	for (auto& SkillInfo : SkillInfoArray)
+	{
+		auto SkillData = NewObject<USkillData>(this);
+		SkillData->SkillInfo = SkillInfo;
+		SkillDataObjectMap.Add(SkillInfo.ID, SkillData);
+	}
 	
 }
 

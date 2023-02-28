@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "PokeHunter/Item/ItemData.h"
+#include "PokeHunter/Base/SkillData.h"
 #include "DatabaseActor.generated.h"
 
 UCLASS()
@@ -20,6 +21,12 @@ public:
 	TMap<FName,TSubclassOf<class UItemData>> ItemDataClassMap;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,category = "ItemData")
 	TMap<FName, class UItemData*> ItemDataObjectMap;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SkillData")
+	TArray<FSkillInfo> SkillInfoArray;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "ItemData")
+	TMap<FName, class USkillData*> SkillDataObjectMap;
+
 
 
 protected:

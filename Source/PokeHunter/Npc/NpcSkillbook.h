@@ -10,22 +10,6 @@
  * 
  */
 
-USTRUCT(BlueprintType)
-struct FSkillInfo
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-	FName ID;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-	FText Name;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-	UTexture2D* Icon;
-};
-
 
 UCLASS()
 class POKEHUNTER_API ANpcSkillbook : public ANpc
@@ -34,6 +18,7 @@ class POKEHUNTER_API ANpcSkillbook : public ANpc
 
 public:
 	ANpcSkillbook();
+
 
 protected:
 	// Called when the game starts or when spawned

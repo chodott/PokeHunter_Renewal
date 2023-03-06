@@ -39,6 +39,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Status")
 	bool bCanCombat;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Partner Skill")
+	TArray<FString> PartnerSkillArray;
+
 	
 };
 
@@ -169,6 +173,8 @@ public:
 	void CtrlUp();
 
 	//Partner
+	UFUNCTION(BlueprintCallable)
+	void SetPartnerSkill(TArray<FString> SkillArray);
 	void SetPartnerTarget(AActor* setTarget);
 
 	//Collision Function

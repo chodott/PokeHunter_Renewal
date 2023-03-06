@@ -108,6 +108,12 @@ AHunter::AHunter()
 		QuickSlotArray.AddDefaulted();
 	}
 
+	//Set PartnerSkill Default
+	for (int i = 0; i < 12; ++i)
+	{
+		HunterInfo.PartnerSkillArray.AddDefaulted();
+	}
+
 }
 
 // Called when the game starts or when spawned
@@ -533,6 +539,14 @@ void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AAct
 void AHunter::DiveInterpReturn(float Value)
 {
 	AddMovementInput(LastInput, 1.0f);
+}
+
+void AHunter::SetPartnerSkill(TArray<FString> SkillArray)
+{
+	for (int i = 0; i < 4; ++i)
+	{
+		HunterInfo.PartnerSkillArray[i] = SkillArray[i];
+	}
 }
 
 void AHunter::SetPartnerTarget(AActor* setTarget)

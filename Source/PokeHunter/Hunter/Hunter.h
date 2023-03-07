@@ -174,7 +174,7 @@ public:
 
 	//Partner
 	UFUNCTION(BlueprintCallable)
-	void SetPartnerSkill(TArray<FString> SkillArray);
+	void SetPartnerSkill(TArray<FString> SkillArray, int SkillListNum);
 	void SetPartnerTarget(AActor* setTarget);
 
 	//Collision Function

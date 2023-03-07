@@ -25,7 +25,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SkillData")
 	TArray<FSkillInfo> SkillInfoArray;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "ItemData")
-	TMap<FName, class USkillData*> SkillDataObjectMap;
+	TMap<FString, class USkillData*> SkillDataObjectMap;
 
 
 
@@ -39,5 +39,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UItemData* FindItem(FName ItemID);
+
+	UFUNCTION(BlueprintCallable)
+	FSkillInfo FindSkill(FString SkillID);
 
 };

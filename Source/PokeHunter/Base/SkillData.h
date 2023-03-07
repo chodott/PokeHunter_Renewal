@@ -17,7 +17,7 @@ struct FSkillInfo
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-	FName ID;
+	FString ID;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	FName Name;

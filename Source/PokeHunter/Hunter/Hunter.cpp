@@ -541,11 +541,11 @@ void AHunter::DiveInterpReturn(float Value)
 	AddMovementInput(LastInput, 1.0f);
 }
 
-void AHunter::SetPartnerSkill(TArray<FString> SkillArray)
+void AHunter::SetPartnerSkill(TArray<FString> SkillArray, int SkillListNum)
 {
 	for (int i = 0; i < 4; ++i)
 	{
-		HunterInfo.PartnerSkillArray[i] = SkillArray[i];
+		HunterInfo.PartnerSkillArray[4 * SkillListNum + i] = SkillArray[i];
 	}
 }
 

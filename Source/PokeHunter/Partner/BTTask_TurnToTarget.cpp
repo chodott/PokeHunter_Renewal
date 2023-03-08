@@ -8,6 +8,7 @@
 
 UBTTask_TurnToTarget::UBTTask_TurnToTarget()
 {
+	bNotifyTick = true;
 	NodeName = TEXT("TurnToTarget");
 }
 
@@ -15,12 +16,33 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 
+	return EBTNodeResult::InProgress;
+}
+
+
+void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
 	APartner* Partner = Cast<APartner>(OwnerComp.GetAIOwner()->GetPawn());
-	if (Partner == nullptr) return EBTNodeResult::Failed;
+	if (Partner == nullptr) FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	FVector TargetPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(TEXT("TargetPos"));
 	FVector LookVec = TargetPos - Partner->GetActorLocation();
-	FRotator Rot = FRotationMatrix::MakeFromX(LookVec).Rotator();
-	Partner->SetActorRotation(FMath::RInterpTo(Partner->GetActorRotation(), Rot, GetWorld()->GetDeltaSeconds(), 1.0f));
 
-	return EBTNodeResult::Succeeded;
+	if (Partner->CurState == EPartnerState::Posing || Partner->CurState == EPartnerState::Unselected)
+	{
+		LookVec = Partner->LookTargetVec;
+	}
+
+	else if (Partner->CurState == EPartnerState::Unselected)
+	{
+		LookVec = Partner->LookTargetVec;
+	}
+	FRotator Rot = FRotationMatrix::MakeFromX(LookVec).Rotator();
+
+	Partner->SetActorRotation(FMath::RInterpTo(Partner->GetActorRotation(), Rot, GetWorld()->GetDeltaSeconds(), 5.f));
+	if (Partner->GetActorForwardVector() == Partner->LookTargetVec)
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
 }

@@ -47,5 +47,5 @@ public:
 	TArray<class APartner*> PartnerArray;
 	TArray<FVector>PositionArray;
 	FVector PosePos;
-	int CurrentIndex = 0;
+	int CurrentIndex = 1;
 };

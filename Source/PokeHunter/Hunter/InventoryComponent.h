@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "PokeHunter/Item/ItemData.h"
 #include "InventoryComponent.generated.h"
+
 
 
 UCLASS(ClassGroup = (Custom), Blueprintable, meta = (BlueprintSpawnableComponent))
@@ -16,9 +18,14 @@ public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<FItemCnter> InfoArray;
 
-	UPROPERTY(EditDefaultsOnly, Instanced, BlueprintReadOnly)
-	TArray<class UItemData*> ItemArray;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class AHunter* Hunter;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	int capacity;
 
 protected:
 	// Called when the game starts
@@ -29,5 +36,15 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-		bool AddItem(TSubclassOf<class UItemData> ItemDataClass);
+	bool AddItemData(FName ItemName, int Cnt);
+	UFUNCTION(BlueprintCallable)
+	bool AddItemInfo(FName ItemID, int Cnt);
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex);
+	UFUNCTION(BlueprintCallable)
+	void SwapSlot(int TargetIndex, int GoalIndex);
+	UFUNCTION(BlueprintCallable)
+	int GetItemCnt(FName id);
+	
 };

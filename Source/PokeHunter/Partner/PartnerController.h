@@ -18,9 +18,9 @@ public:
 	APartnerController();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
-		class AHunter* Hunter;
+	class AHunter* Hunter;
 
-	virtual void OnPossess(APawn* Pawn) override;
+	virtual void OnPossess(APawn* pawn) override;
 
 	void RunAI();
 	void StopAI();

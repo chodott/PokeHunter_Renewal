@@ -6,71 +6,68 @@
 #include "UObject/NoExportTypes.h"
 #include "ItemData.generated.h"
 
+USTRUCT(BlueprintType)
+struct FItemInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+	FName ID;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+	FText Name;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+	TSubclassOf<class AItem> ItemClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+	TArray<FName> OfferingItemID;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+	UTexture2D* Icon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+	int ItemAmount;
+};
+
+/////////////
+
+USTRUCT(BlueprintType)
+struct FItemCnter
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FName ItemID {
+		FName("None")
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int cnt{ 0 };
+};
+
+
+
 /**
  * 
  */
-UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew, Abstract)
+UCLASS(Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew)
 class POKEHUNTER_API UItemData : public UObject
 {
 	GENERATED_BODY()
 
 public:
-
 	UItemData();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 Index;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 ItemNum;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 ItemCount;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString ItemName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTexture2D* Icon;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<class AItem> ItemClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+	FItemInfo ItemInfo;
 
-	int32 GetIndex() 
-	{
-		return Index;
-	}
-	int32 GetItemNum() const
-	{
-		return ItemNum;
-	}
-	int32 GetItemCount() const
-	{
-		return ItemCount;
-	}
-	FString GetItemName() const
-	{
-		return ItemName;
-	}
-	UTexture2D* GetIcon() const
-	{
-		return Icon;
-	}
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 ItemIndex;
 
-	void SetItemIndex(int32 index)
-	{
-		Index = index;
-	}
-	void SetItemNum(int32 num)
-	{
-		ItemNum = num;
-	}
-	void SetItemCount(int32 cnt)
-	{
-		ItemCount = cnt;
-	}
-	void SetItemName(const FString& name)
-	{
-		ItemName = name;
-	}
-	void SetIcon(UTexture2D* texture)
-	{
-		Icon = texture;
-	}
+	UFUNCTION()
+	FName getID() { return ItemInfo.ID; }
 
 };
+

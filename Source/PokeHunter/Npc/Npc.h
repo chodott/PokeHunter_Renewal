@@ -18,23 +18,15 @@ public:
 	// Sets default values for this actor's properties
 	ANpc();
 
-	//상호작용
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
-		class USphereComponent* InteractionSphere;
-
-	//메쉬
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
-		UStaticMeshComponent* StaticMesh;
-
 	//충돌
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
-		class UBoxComponent* CollisionBox;
+	class UBoxComponent* CollisionBox;
 
 	//카메라
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class USpringArmComponent* CameraBoom;
+	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class UCameraComponent* FollowCamera;
+	class UCameraComponent* FollowCamera;
 
 	//UI
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")

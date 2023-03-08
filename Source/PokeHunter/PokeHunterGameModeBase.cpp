@@ -4,11 +4,12 @@
 #include "PokeHunterGameModeBase.h"
 #include "Hunter/Hunter.h"
 #include "Hunter/HunterController.h"
+#include "Item/ItemDatabase.h"
 
 APokeHunterGameModeBase::APokeHunterGameModeBase()
 {
 	DefaultPawnClass = AHunter::StaticClass();
-	// PlayerControllerClass = AHunterController::StaticClass();
+	PlayerControllerClass = AHunterController::StaticClass();
 }
 
 void APokeHunterGameModeBase::PostLogin(APlayerController* NewPlayer)
@@ -17,3 +18,22 @@ void APokeHunterGameModeBase::PostLogin(APlayerController* NewPlayer)
 	Super::PostLogin(NewPlayer);
 	ABLOG(Warning, TEXT("PostLogin End"));
 }
+
+FItemInfo APokeHunterGameModeBase::FindItem_Implementation(FName ItemID, bool& Success)
+{
+	Success = false;
+	FItemInfo Info;
+	if(ItemDatabase == nullptr) return Info;
+
+	for(int i=0; i<ItemDatabase->InfoArray.Num(); ++i)
+	{
+		if(ItemDatabase->InfoArray[i].ID == ItemID)
+		{
+			Success = true;
+			return ItemDatabase->InfoArray[i];
+		}
+	}
+
+	return Info;
+}
+

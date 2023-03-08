@@ -4,9 +4,8 @@
 #include "Item.h"
 #include "ItemData.h"
 #include "Components/StaticMeshComponent.h"
-#include "Components/SphereComponent.h"
-#include "PokeHunter//Hunter/Hunter.h"
-#include "PokeHunter/Hunter/InventoryComponent.h"
+#include "PokeHunter/Hunter/Hunter.h"
+
 
 // Sets default values
 AItem::AItem()
@@ -14,22 +13,10 @@ AItem::AItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//Mesh
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMesh->SetupAttachment(GetRootComponent());
 
-	//Collision
-	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
-	CollisionSphere->SetupAttachment(GetRootComponent());
-	CollisionSphere->SetSphereRadius(100.f);
-
-	//Data
-	static ConstructorHelpers::FClassFinder<UItemData>TempClass(TEXT("/Game/Item/Blueprint/BP_DefaultItemData"));
-	if (TempClass.Succeeded())
-	{
-		ItemDataClass = TempClass.Class;
-	}
-
+	SetRootComponent(StaticMesh);
+	StaticMesh->SetCollisionProfileName("WorldDynamic");
 
 }
 
@@ -47,8 +34,7 @@ void AItem::Tick(float DeltaTime)
 
 }
 
-void AItem::Interact_Implementation(AHunter* Hunter)
+void AItem::UseItem(AHunter* ItemOwner)
 {
-	Hunter->Inventory->AddItem(ItemDataClass);
-	this->Destroy();
+
 }

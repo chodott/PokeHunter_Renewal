@@ -7,7 +7,7 @@
 #include "PartnerAnimInstance.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class POKEHUNTER_API UPartnerAnimInstance : public UAnimInstance
@@ -30,5 +30,14 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
 		class APartner* Partner;
-	
+
+	bool bPlaying;
+
+	//Montage
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Combat")
+	UAnimMontage* CombatMontage;
+
+public:
+	bool PlayCombatMontage(FName Section);
+
 };

@@ -2,7 +2,9 @@
 
 
 #include "InventoryComponent.h"
-#include "PokeHunter/Item/ItemData.h"
+#include "PokeHunter/Item/Item.h"
+#include "PokeHunter/Npc//NpcStorage.h"
+#include "Hunter.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -19,20 +21,135 @@ UInventoryComponent::UInventoryComponent()
 // Called when the game starts
 void UInventoryComponent::BeginPlay()
 {
+	//아이템 배열(클래스) 초기화
 	Super::BeginPlay();
-	// ...
+	for (int i = 0; i < capacity; i++)
+	{
+		//아이템 struct
+		InfoArray.AddDefaulted();
+	}
 	
 }
 
-bool UInventoryComponent::AddItem(TSubclassOf<class UItemData> ItemDataClass)
+bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
 {
-	if (ItemDataClass != NULL)
+	int NullNum = -1;
+	for (int i = 0; i < capacity; ++i)
 	{
-		UItemData* Temp = NewObject<UItemData>(this, ItemDataClass, TEXT("Data!!!"));
-		ItemArray.Add(Temp);
+		if (NullNum == -1 && InfoArray[i].ItemID == FName("None")) NullNum = i;
+		else if (InfoArray[i].ItemID != FName("None"))
+		{
+			if (InfoArray[i].ItemID == ItemName) 
+			{
+				//Add ItemCnt Update need
+				InfoArray[i].cnt += Cnt;
+				return true;
+			}
+		}
+	}
+
+	if (NullNum != -1)
+	{
+		//Find Object Need
+		InfoArray[NullNum].ItemID = ItemName;
+		InfoArray[NullNum].cnt += Cnt;
 		return true;
 	}
+
 	return false;
+}
+
+bool UInventoryComponent::AddItemInfo(FName ItemID, int Cnt)
+{
+	int NullNum = -1;
+	for (int i = 0; i < capacity; ++i)
+	{
+		if (NullNum == -1 && InfoArray[i].ItemID.IsNone()) NullNum = i;
+		else if (!InfoArray[i].ItemID.IsNone())
+		{
+			if (InfoArray[i].ItemID == ItemID)
+				{
+				InfoArray[i].cnt += Cnt;
+				return true;
+				}
+		}
+	}
+
+	if (NullNum != -1)
+	{
+		InfoArray[NullNum].ItemID = ItemID;
+		InfoArray[NullNum].cnt = Cnt;
+		return true;
+	}
+
+	return false;
+}
+
+
+void UInventoryComponent::ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex)
+{
+	ANpcStorage* StorageNpc;
+	FItemCnter temp;
+	if (TargetName == "Inventory")
+	{
+		temp = InfoArray[TargetIndex];
+		if (GoalName == "Inventory")
+		{
+			InfoArray[TargetIndex] = InfoArray[GoalIndex];
+			InfoArray[GoalIndex] = temp;
+		}
+		else 
+		{
+			StorageNpc = Cast<ANpcStorage>(Hunter->InteractingActor);
+			if (StorageNpc)
+			{
+				InfoArray[TargetIndex] = StorageNpc->Storage->InfoArray[GoalIndex];
+				StorageNpc->Storage->InfoArray[GoalIndex] = temp;
+			}
+		}
+	}
+
+	else if (TargetName == "Storage")
+	{
+		StorageNpc = Cast<ANpcStorage>(Hunter->InteractingActor);
+
+		if (StorageNpc)
+		{
+			temp = StorageNpc->Storage->InfoArray[TargetIndex];
+
+			if (GoalName == "Inventory")
+			{
+				StorageNpc->Storage->InfoArray[TargetIndex] = InfoArray[GoalIndex];
+				InfoArray[GoalIndex] = temp;
+			}
+			else
+			{
+				StorageNpc->Storage->InfoArray[TargetIndex] = StorageNpc->Storage->InfoArray[GoalIndex];
+				StorageNpc->Storage->InfoArray[GoalIndex] = temp;
+			}
+		}
+	}
+
+}
+
+void UInventoryComponent::SwapSlot(int TargetIndex, int GoalIndex)
+{
+	FItemCnter Temp = InfoArray[TargetIndex];
+	InfoArray[TargetIndex] = InfoArray[GoalIndex];
+	InfoArray[GoalIndex] = Temp;
+}
+
+int UInventoryComponent::GetItemCnt(FName id)
+{
+	int cnt = 0;
+	for (auto cnter : InfoArray)
+	{
+		if (cnter.ItemID == id)
+		{
+			cnt += cnter.cnt;
+		}
+	}
+	return cnt;
 }
 
 

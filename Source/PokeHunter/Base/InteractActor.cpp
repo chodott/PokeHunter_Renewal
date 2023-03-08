@@ -2,12 +2,25 @@
 
 
 #include "InteractActor.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values
 AInteractActor::AInteractActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	//Mesh
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	SetRootComponent(StaticMesh);
+
+
+	//Collision
+	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractSphere"));
+	InteractionSphere->AddLocalOffset(FVector(0.f, 0.f, GetSimpleCollisionHalfHeight()));
+	InteractionSphere->SetupAttachment(GetRootComponent());
+	InteractionSphere->SetSphereRadius(50.f);
 
 }
 

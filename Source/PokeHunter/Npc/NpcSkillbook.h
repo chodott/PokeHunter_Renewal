@@ -9,6 +9,8 @@
 /**
  * 
  */
+
+
 UCLASS()
 class POKEHUNTER_API ANpcSkillbook : public ANpc
 {
@@ -16,6 +18,7 @@ class POKEHUNTER_API ANpcSkillbook : public ANpc
 
 public:
 	ANpcSkillbook();
+
 
 protected:
 	// Called when the game starts or when spawned

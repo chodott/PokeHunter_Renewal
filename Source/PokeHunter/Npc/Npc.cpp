@@ -15,20 +15,11 @@ ANpc::ANpc()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//충돌 박스
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
-	SetRootComponent(CollisionBox);
+	CollisionBox->AddLocalOffset(FVector(0.f, 0.f, GetSimpleCollisionHalfHeight()),false);
+	CollisionBox->SetupAttachment(GetRootComponent());
 
-	//메쉬
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMesh->SetupAttachment(GetRootComponent());
-
-	//상호작용 범위(구)
-	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
-	InteractionSphere->SetupAttachment(GetRootComponent());
-	InteractionSphere->SetSphereRadius(100.f);
-
-	//카메라
+	//Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetOffset = FVector(0, 0, 0.0f);
@@ -61,10 +52,11 @@ void ANpc::Interact_Implementation(AHunter* Hunter)
 	{
 		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(Hunter, 1.0f);
 		Master->StorageUI->RemoveFromViewport();
+		Master->GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Opacity"), 1);
 	}
 	else
 	{
-		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(this, 1.0f);
+		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(this, 1.0f);	
 	}
 	Master->DisableInput(Cast<APlayerController>(Master->Controller));
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &ANpc::OpenUI, 1.0f, false, 1.0f);
@@ -81,8 +73,9 @@ void ANpc::OpenUI()
 	else
 	{
 		Master->StorageUI = CreateWidget(Cast<APlayerController>(Master->Controller), UIClass);
-		Master->StorageUI->AddToViewport();
+		Master->StorageUI-> AddToViewport();
 		bActive = true;
+		Master->GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Opacity"), 0);
 	}
 	Master->EnableInput(Cast<APlayerController>(Master->Controller));
 

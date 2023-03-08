@@ -2,13 +2,10 @@
 
 
 #include "ItemData.h"
+#include "Item.h"
 
 UItemData::UItemData()
 {
-	Index = 0;
-	ItemNum = 0;
-	ItemCount = 0;
-	ItemName = "None";
-	Icon = NULL;
+
 
 }

@@ -17,16 +17,16 @@ struct FSkillInfo
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-	FString ID;
+	FString ID {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-	FName Name;
+	FName Name {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-	FName Type;
+	FName Type {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-	FText ToolTip;
+	FText ToolTip {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	UTexture2D* Icon;

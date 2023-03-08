@@ -10,6 +10,16 @@
  * 
  */
 
+UENUM(BlueprintType)
+enum class ESkillID : uint8
+{
+	None = 0,
+	Rush = 201,
+	Howling = 202,
+	Bress = 203
+	
+};
+
 USTRUCT(BlueprintType)
 struct FSkillInfo
 {
@@ -17,7 +27,7 @@ struct FSkillInfo
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-	FString ID {};
+	ESkillID ID {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	FName Name {};

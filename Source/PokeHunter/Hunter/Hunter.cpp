@@ -215,7 +215,12 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("G_Key", IE_Pressed, this, &AHunter::GKeyDown);
 	PlayerInputComponent->BindAction("Ctrl", IE_Pressed, this, &AHunter::CtrlDown);
 	PlayerInputComponent->BindAction("Ctrl", IE_Released, this, &AHunter::CtrlUp);
+	PlayerInputComponent->BindAction("1_Key", IE_Pressed, this, &AHunter::Use1Skill);
+	PlayerInputComponent->BindAction("2_Key", IE_Pressed, this, &AHunter::Use2Skill);
+	PlayerInputComponent->BindAction("3_Key", IE_Pressed, this, &AHunter::Use3Skill);
+	PlayerInputComponent->BindAction("4_Key", IE_Pressed, this, &AHunter::Use4Skill);
 }
+
 void AHunter::SpaceDown()
 {
 	if(CurState == EPlayerState::Idle)
@@ -487,6 +492,30 @@ void AHunter::CtrlUp()
 	PlayerController->bShowMouseCursor = false;
 }
 
+void AHunter::Use1Skill()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Skill1"));
+	if (Partner)
+	{
+		Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[0]);
+	}
+}
+
+void AHunter::Use2Skill()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Skill2"));
+}
+
+void AHunter::Use3Skill()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Skill3"));
+}
+
+void AHunter::Use4Skill()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Skill4"));
+}
+
 void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (CurState == EPlayerState::Dive) 
@@ -541,7 +570,7 @@ void AHunter::DiveInterpReturn(float Value)
 	AddMovementInput(LastInput, 1.0f);
 }
 
-void AHunter::SetPartnerSkill(TArray<FString> SkillArray, int SkillListNum)
+void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)
 {
 	for (int i = 0; i < 4; ++i)
 	{

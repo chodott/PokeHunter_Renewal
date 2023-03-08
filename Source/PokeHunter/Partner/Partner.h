@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PokeHunter/Base/SkillData.h"
 #include "Partner.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
@@ -12,8 +13,13 @@ DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
 UENUM(BlueprintType)
 enum class EPartnerState : uint8
 {
+	//Stay State
 	Posing,
 	Unselected,
+
+	//Leave State
+	Rushing,
+	Howling
 };
 
 UCLASS()
@@ -44,6 +50,9 @@ public:
 	
 	UFUNCTION()
 	virtual void Attack();
+	virtual void Howling();
+	virtual void StopSkill();
+	virtual void UseNormalSkill(ESkillID SkillID);
 	inline void SetTarget(AActor* setTarget) { Target = setTarget;  };
 
 	//AnimationFunction
@@ -54,6 +63,7 @@ public:
 	EPartnerState CurState;
 	FVector TargetPos;
 	FVector LookTargetVec;
+	FVector AttackPoint;
 	AActor* Target;
 	float HP{ 100 };
 	bool bPosing;

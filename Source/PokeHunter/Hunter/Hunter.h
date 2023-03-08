@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "PokeHunter/Item/ItemData.h"
+#include "PokeHunter/Base/SkillData.h"
 #include "Hunter.generated.h"
 
 //Dynamic 
@@ -41,7 +42,7 @@ public:
 	bool bCanCombat;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Partner Skill")
-	TArray<FString> PartnerSkillArray;
+	TArray<ESkillID> PartnerSkillArray;
 
 	
 };
@@ -171,10 +172,18 @@ public:
 	void CtrlDown();
 	UFUNCTION(BlueprintCallable)
 	void CtrlUp();
+	UFUNCTION(BlueprintCallable)
+	void Use1Skill();
+	UFUNCTION(BlueprintCallable)
+	void Use2Skill();
+	UFUNCTION(BlueprintCallable)
+	void Use3Skill();
+	UFUNCTION(BlueprintCallable)
+	void Use4Skill();
 
 	//Partner
 	UFUNCTION(BlueprintCallable)
-	void SetPartnerSkill(TArray<FString> SkillArray, int SkillListNum);
+	void SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum);
 	void SetPartnerTarget(AActor* setTarget);
 
 	//Collision Function

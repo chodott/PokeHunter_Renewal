@@ -47,7 +47,7 @@ UItemData* ADatabaseActor::FindItem(FName ItemID)
 	else return NULL;
 }
 
-FSkillInfo ADatabaseActor::FindSkill(FString SkillID)
+FSkillInfo ADatabaseActor::FindSkill(ESkillID SkillID)
 {
 	for (auto Skill : SkillInfoArray)
 	{

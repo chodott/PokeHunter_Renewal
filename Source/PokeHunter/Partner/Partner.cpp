@@ -42,10 +42,53 @@ void APartner::Attack()
 {
 	if (Target != NULL)
 	{
+		//Check Target in Range
+		GetCharacterMovement()->MaxWalkSpeed = 2000;
+		AttackPoint = Target->GetActorLocation();
+		auto AIController = Cast<AAIController>(GetController());
+		AIController->MoveToLocation(AttackPoint);
+
+
+		//Play Montage
 		PartnerAnim->PlayCombatMontage(TEXT("Attack"));
 	}
 
+
 	
+}
+
+void APartner::Howling()
+{
+	//Play Montage
+	PartnerAnim->PlayCombatMontage(TEXT("Howling"));
+}
+
+void APartner::StopSkill()
+{
+	bOrdered = false;
+	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+}
+
+void APartner::UseNormalSkill(ESkillID SkillID)
+{
+	//스킬 사용중 접근 불가 추가 필요
+
+
+	switch (SkillID)
+	{
+	case ESkillID::Rush:
+
+		break;
+
+	case ESkillID::Howling:
+
+		CurState = EPartnerState::Howling;
+
+		break;
+
+	default:
+		break;
+	}
 }
 
 void APartner::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

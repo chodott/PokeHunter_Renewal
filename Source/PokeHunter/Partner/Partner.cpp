@@ -21,7 +21,10 @@ void APartner::BeginPlay()
 	Super::BeginPlay();
 
 	PartnerAnim = Cast<UPartnerAnimInstance>(GetMesh()->GetAnimInstance());
-	PartnerAnim->OnMontageEnded.AddDynamic(this, &APartner::OnMontageEnded);
+	if (PartnerAnim)
+	{
+		PartnerAnim->OnMontageEnded.AddDynamic(this, &APartner::OnMontageEnded);
+	}
 }
 
 // Called every frame
@@ -78,10 +81,40 @@ void APartner::UseNormalSkill(ESkillID SkillID)
 	{
 	case ESkillID::Rush:
 
+		bOrdered = true;
+		CurState = EPartnerState::Rushing;
+
 		break;
 
 	case ESkillID::Howling:
 
+		bOrdered = true;
+		CurState = EPartnerState::Howling;
+
+		break;
+
+	default:
+		break;
+	}
+}
+
+void APartner::UseSpecialSkill(ESkillID SkillID)
+{
+	//스킬 사용중 접근 불가 추가 필요
+
+
+	switch (SkillID)
+	{
+	case ESkillID::Rush:
+
+		bOrdered = true;
+		CurState = EPartnerState::Rushing;
+
+		break;
+
+	case ESkillID::Howling:
+
+		bOrdered = true;
 		CurState = EPartnerState::Howling;
 
 		break;

@@ -13,19 +13,25 @@ ANpcPartnerManager::ANpcPartnerManager()
 	{
 		UIClass = TempUI.Class;
 	}
+
+	for (int i = 0; i < 3; ++i)
+	{
+		PositionArray.AddDefaulted();
+		PartnerArray.AddDefaulted();
+	}
 }
 
 void ANpcPartnerManager::BeginPlay()
 {
 	FVector BaseLocation = GetActorLocation();
 	float LookVecX = GetActorForwardVector().X;
-	for (int i = 0; i<PartnerClassArray.Num(); ++i)
+	for (int i = 0; i<3; ++i)
 	{
-		PositionArray.Add(FVector(BaseLocation.X - LookVecX * 400.f, BaseLocation.Y + PARTNER_GAP * (i - 1), BaseLocation.Z));
+		PositionArray[i] = FVector(BaseLocation.X - LookVecX * 400.f, BaseLocation.Y + PARTNER_GAP * (i - 1), BaseLocation.Z);
 		APartner* temp = GetWorld()->SpawnActor<APartner>(PartnerClassArray[i], PositionArray[i], GetActorRotation());
 		temp->TargetPos = temp->GetActorLocation();
 		temp->LookTargetVec = GetActorForwardVector();
-		PartnerArray.Add(temp);
+		PartnerArray[i] = temp;
 	}
 	PosePos = FVector(BaseLocation.X - LookVecX * 200.f, BaseLocation.Y, BaseLocation.Z);
 }
@@ -44,7 +50,7 @@ void ANpcPartnerManager::Interact_Implementation(AHunter* Hunter)
 
 void ANpcPartnerManager::LeavePartner()
 {
-	for (int i = 0; i < PartnerArray.Num(); ++i)
+	for (int i = 0; i < 3; ++i)
 	{
 		if (PartnerArray[i] == NULL)
 		{

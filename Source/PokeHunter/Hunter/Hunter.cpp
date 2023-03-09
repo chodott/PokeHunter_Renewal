@@ -22,6 +22,7 @@
 #include "PokeHunter/Item/ItemData.h"
 #include "PokeHunter/Base/InteractActor.h"
 #include "PokeHunter/Base/DatabaseActor.h"
+#include "PokeHunter/Base/ItemDropActor.h"
 
 
 
@@ -381,7 +382,7 @@ void AHunter::LMBDown()
 
 void AHunter::RMBDown()
 {
-	if (CurState == EPlayerState::Idle)
+	if (CurState == EPlayerState::Idle && !GetCharacterMovement()->IsFalling())
 	{
 		CurState = EPlayerState::Zoom;
 		bUseControllerRotationYaw = true;
@@ -438,7 +439,7 @@ void AHunter::EKeyDown()
 	if (InteractingActor)
 	{
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-		//Left Right 
+		//Left Right Check
 		FVector TargetVector = (InteractingActor->GetActorLocation() - GetActorLocation());
 		FVector HunterForwardVector = GetActorForwardVector();
 		TargetVector.Z = 0;
@@ -446,17 +447,19 @@ void AHunter::EKeyDown()
 		HunterForwardVector.Z = 0;
 		FVector cross = FVector::CrossProduct(HunterForwardVector, TargetVector);
 		float sign = FMath::Sign(cross.Z);
-		if (sign <= 0)
+		if (Cast<AItemDropActor>(InteractingActor))
 		{
-			AnimInstance->PlayInteractMontage(FName("RunLeftPickup"));
-			UE_LOG(LogTemp, Warning, TEXT("Left"));
+			if (sign <= 0)
+			{
+				AnimInstance->PlayInteractMontage(FName("RunLeftPickup"));
+			}
+			else
+			{
+				AnimInstance->PlayInteractMontage(FName("RunRightPickup"));
+			}
+			bUpperOnly = true;
 		}
-		else
-		{
-			AnimInstance->PlayInteractMontage(FName("RunRightPickup"));
-			UE_LOG(LogTemp, Warning, TEXT("Right"));
-		}
-		bUpperOnly = true;
+
 		InteractingActor->Interact_Implementation(this);
 		return;
 	}
@@ -504,16 +507,28 @@ void AHunter::Use1Skill()
 void AHunter::Use2Skill()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Skill2"));
+	if (Partner)
+	{
+		Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[1]);
+	}
 }
 
 void AHunter::Use3Skill()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Skill3"));
+	if (Partner)
+	{
+		Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[2]);
+	}
 }
 
 void AHunter::Use4Skill()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Skill4"));
+	if (Partner)
+	{
+		Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[3]);
+	}
 }
 
 void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

@@ -19,8 +19,15 @@ EBTNodeResult::Type UBTTask_PartnerHowling::ExecuteTask(UBehaviorTreeComponent& 
 	if (Partner == NULL)return EBTNodeResult::Failed;
 	
 	Partner->Howling();
+	bPlaying = true;
 
-	return EBTNodeResult::Type();
+	Partner->OnMontageEnd.AddLambda([this]()->void
+		{
+			bPlaying = false;
+		});
+
+
+	return EBTNodeResult::Type::InProgress;
 }
 
 void UBTTask_PartnerHowling::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

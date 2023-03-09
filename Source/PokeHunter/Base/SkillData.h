@@ -16,7 +16,7 @@ enum class ESkillID : uint8
 	None = 0,
 	Rush = 201,
 	Howling = 202,
-	Bress = 203
+	IceShard = 211
 	
 };
 

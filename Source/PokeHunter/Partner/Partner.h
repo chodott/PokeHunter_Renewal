@@ -19,7 +19,8 @@ enum class EPartnerState : uint8
 
 	//Leave State
 	Rushing,
-	Howling
+	Howling,
+	IceShard
 };
 
 UCLASS()
@@ -53,6 +54,7 @@ public:
 	virtual void Howling();
 	virtual void StopSkill();
 	virtual void UseNormalSkill(ESkillID SkillID);
+	virtual void UseSpecialSkill(ESkillID SkillID);
 	inline void SetTarget(AActor* setTarget) { Target = setTarget;  };
 
 	//AnimationFunction

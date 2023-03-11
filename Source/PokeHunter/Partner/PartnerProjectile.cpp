@@ -3,6 +3,7 @@
 
 #include "PartnerProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APartnerProjectile::APartnerProjectile()
@@ -11,6 +12,7 @@ APartnerProjectile::APartnerProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	StaticMesh->SetSimulatePhysics(true);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->InitialSpeed = 300.f;
@@ -32,8 +34,15 @@ void APartnerProjectile::Tick(float DeltaTime)
 
 }
 
-void APartnerProjectile::FireInDirection(const FVector& ShootDirection)
+void APartnerProjectile::FireInDirection(const FVector& DirectionVec, const FVector& InitialPos, const FVector& EndPos)
 {
-	ProjectileMovement->Velocity = ShootDirection * ProjectileMovement->InitialSpeed;
+
+	FVector Velocity = FVector::ZeroVector;
+	if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, Velocity, InitialPos, EndPos, GetWorld()->GetGravityZ(), 1.f))
+	{
+		
+		ProjectileMovement->Velocity = Velocity;
+
+	}
 }
 

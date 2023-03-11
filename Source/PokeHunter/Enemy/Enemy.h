@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GenericTeamAgentInterface.h"
 #include "Enemy.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
@@ -21,7 +22,7 @@ enum class EEnemyState : uint8
 
 
 UCLASS()
-class POKEHUNTER_API AEnemy : public ACharacter
+class POKEHUNTER_API AEnemy : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -42,6 +43,9 @@ public:
 	EEnemyState CurState{EEnemyState::Patrol};
 
 	FOnMontageEndDelegate OnMontageEnd;
+
+	//TeamID
+	FGenericTeamId TeamID;
 
 
 protected:

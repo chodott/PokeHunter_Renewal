@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "BehaviorTree/BlackboardData.h"
-#include "BehaviorTree/BehaviorTree.h"
+#include "Perception/AIPerceptionComponent.h"
+
 #include "EnemyController.generated.h"
 
 /**
@@ -19,7 +19,12 @@ class POKEHUNTER_API AEnemyController : public AAIController
 public:
 	AEnemyController();
 
+	virtual void BeginPlay();
+
 	virtual void OnPossess(APawn* pawn) override;
+
+	UFUNCTION()
+	void OnPerception(AActor* Actor, FAIStimulus Stimulus);
 
 	void RunAI();
 	void StopAI();
@@ -29,4 +34,9 @@ private:
 	class UBehaviorTree* BTEnemy;
 	UPROPERTY()
 	class UBlackboardData* BBEnemy;
+	UPROPERTY()
+	class UAISenseConfig_Sight* ConfigSight;
+	UPROPERTY()
+	class UAISenseConfig_Hearing* ConfigHearing;
+
 };

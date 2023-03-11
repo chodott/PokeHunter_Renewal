@@ -13,7 +13,7 @@ UBTTask_WolfIceShard::UBTTask_WolfIceShard()
 
 EBTNodeResult::Type UBTTask_WolfIceShard::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	//일정 범위 안의 enemy 클래스들에게 어그로 끌기
+
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 	AWolfPartner* Wolf = Cast<AWolfPartner>(OwnerComp.GetAIOwner()->GetPawn());
 	if (Wolf == NULL)return EBTNodeResult::Failed;

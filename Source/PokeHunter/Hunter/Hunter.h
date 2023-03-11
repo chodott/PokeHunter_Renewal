@@ -6,6 +6,7 @@
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "GenericTeamAgentInterface.h"
 #include "PokeHunter/Item/ItemData.h"
 #include "PokeHunter/Base/SkillData.h"
 #include "Hunter.generated.h"
@@ -29,16 +30,16 @@ struct FHunterInfo
 	GENERATED_USTRUCT_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
 	int HunterNum;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
 	float HunterHP{100};
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
 	float HunterStamina{ 100 };
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Status")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, category = "Status")
 	bool bCanCombat;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Partner Skill")
@@ -48,7 +49,7 @@ public:
 };
 
 UCLASS()
-class POKEHUNTER_API AHunter : public ACharacter
+class POKEHUNTER_API AHunter : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -65,11 +66,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
 	class UInventoryComponent* Inventory;
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
 	//HunterInfo
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HunterStatus")
 	FHunterInfo HunterInfo;
@@ -136,6 +132,14 @@ public:
 	bool bUpperOnly;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
 	bool bPartnerMode;
+	
+	//TeamID
+	FGenericTeamId TeamID;
+
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 public:
 	// Called every frame
@@ -202,6 +206,8 @@ public:
 	
 private:
 	// Character Movement Input
+
+
 	void MoveForward(float Val);
 	void MoveRight(float Val);
 	void LookUp(float NewAxisValue);

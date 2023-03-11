@@ -25,6 +25,7 @@ AEnemy::AEnemy()
 	GetCapsuleComponent()->SetCapsuleRadius(90.f);
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
 	
+	TeamID = FGenericTeamId(1);
 }
 
 // Called when the game starts or when spawned

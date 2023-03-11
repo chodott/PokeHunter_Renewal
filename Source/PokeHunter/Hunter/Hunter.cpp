@@ -115,6 +115,8 @@ AHunter::AHunter()
 		HunterInfo.PartnerSkillArray.AddDefaulted();
 	}
 
+	TeamID = FGenericTeamId(0);
+
 }
 
 // Called when the game starts or when spawned

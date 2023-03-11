@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GenericTeamAgentInterface.h"
 #include "PokeHunter/Base/SkillData.h"
 #include "Partner.generated.h"
 
@@ -24,7 +25,7 @@ enum class EPartnerState : uint8
 };
 
 UCLASS()
-class POKEHUNTER_API APartner : public ACharacter
+class POKEHUNTER_API APartner : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -39,6 +40,18 @@ public:
 	class UPartnerAnimInstance* PartnerAnim;
 
 	FOnMontageEndDelegate OnMontageEnd;
+
+	EPartnerState CurState;
+	FVector TargetPos;
+	FVector LookTargetVec;
+	FVector AttackPoint;
+	AActor* Target;
+	float HP{ 100 };
+	bool bPosing;
+	bool bOrdered;
+
+	//TeamID
+	FGenericTeamId TeamID;
 
 protected:
 	// Called when the game starts or when spawned
@@ -61,13 +74,4 @@ public:
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
-public:
-	EPartnerState CurState;
-	FVector TargetPos;
-	FVector LookTargetVec;
-	FVector AttackPoint;
-	AActor* Target;
-	float HP{ 100 };
-	bool bPosing;
-	bool bOrdered;
 };

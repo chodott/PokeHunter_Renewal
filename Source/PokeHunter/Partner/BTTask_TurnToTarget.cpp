@@ -28,7 +28,7 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	if (Partner == nullptr) FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	FVector TargetPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(TEXT("TargetPos"));
 	FVector LookVec = TargetPos - Partner->GetActorLocation();
-
+	FVector ForwardVec = Partner->GetActorForwardVector();
 	if (Partner->CurState == EPartnerState::Posing || Partner->CurState == EPartnerState::Unselected)
 	{
 		LookVec = Partner->LookTargetVec;
@@ -41,7 +41,9 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	FRotator Rot = FRotationMatrix::MakeFromX(LookVec).Rotator();
 
 	Partner->SetActorRotation(FMath::RInterpTo(Partner->GetActorRotation(), Rot, GetWorld()->GetDeltaSeconds(), 5.f));
-	if (Partner->GetActorForwardVector() == Partner->LookTargetVec)
+
+	float BetweenAngle = FMath::Acos(FVector::DotProduct(LookVec, ForwardVec) / (LookVec.Size() * ForwardVec.Size())) * (180.0f / PI);
+	if (BetweenAngle < 10.f)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

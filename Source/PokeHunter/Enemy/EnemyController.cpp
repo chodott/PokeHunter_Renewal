@@ -2,7 +2,13 @@
 
 
 #include "EnemyController.h"
-#include "EnemyController.h"
+#include "BehaviorTree/BlackboardData.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "Perception/AISenseConfig_Hearing.h"
+
+#include "Perception/AISenseConfig_Sight.h"
+
+#include "Enemy.h"
 
 AEnemyController::AEnemyController()
 {
@@ -17,13 +23,51 @@ AEnemyController::AEnemyController()
 	{
 		BTEnemy = BTObject.Object;
 	}
+
+	SetPerceptionComponent(*CreateOptionalDefaultSubobject<UAIPerceptionComponent>(TEXT("AI Perception")));
+
+	ConfigSight = CreateOptionalDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+	ConfigSight->DetectionByAffiliation.bDetectEnemies = true;
+	ConfigSight->DetectionByAffiliation.bDetectFriendlies = false;
+	ConfigSight->DetectionByAffiliation.bDetectNeutrals = false;
+
+	ConfigHearing = CreateOptionalDefaultSubobject<UAISenseConfig_Hearing>(TEXT("Hearing Config"));
+	ConfigHearing->DetectionByAffiliation.bDetectEnemies = true;
+	ConfigHearing->DetectionByAffiliation.bDetectFriendlies = false;
+	ConfigHearing->DetectionByAffiliation.bDetectNeutrals = false;
+
+	GetPerceptionComponent()->ConfigureSense(*ConfigSight);
+	GetPerceptionComponent()->ConfigureSense(*ConfigHearing);
+
+}
+
+void AEnemyController::BeginPlay()
+{
+	Super::BeginPlay();
+
+
 }
 
 void AEnemyController::OnPossess(APawn* pawn)
 {
 	Super::OnPossess(pawn);
 	RunAI();
+	GetAIPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyController::OnPerception);
 }
+
+void AEnemyController::OnPerception(AActor* Actor, FAIStimulus Stimulus)
+{
+	switch (Stimulus.Type)
+	{
+	case 1:
+
+		break;
+	case 2:
+		//½Ã¾ß
+		break;
+	}
+}
+
 
 void AEnemyController::RunAI()
 {

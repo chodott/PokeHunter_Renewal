@@ -17,8 +17,11 @@ class POKEHUNTER_API AWolfPartner : public APartner
 public:
 	AWolfPartner();
 	TSubclassOf<class APartnerProjectile> IceShardClass;
+
+	class UCapsuleComponent* StormCollision;
 	
 public:
 	virtual void UseSpecialSkill(ESkillID SkillID);
 	void LaunchIceShard();
+	void MakeStorm();
 };

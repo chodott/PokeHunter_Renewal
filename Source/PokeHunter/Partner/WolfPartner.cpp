@@ -4,6 +4,7 @@
 #include "WolfPartner.h"
 #include "PartnerProjectile.h"
 #include "PartnerAnimInstance.h"
+#include "Components/CapsuleComponent.h"
 
 AWolfPartner::AWolfPartner()
 {
@@ -15,6 +16,11 @@ AWolfPartner::AWolfPartner()
 	{
 		IceShardClass = TempIceShardClass.Class;
 	}
+
+	//스톰 범위 컴포넌트 추가
+	StormCollision = CreateDefaultSubobject<UCapsuleComponent>(FName("StormCollision"));
+	StormCollision->SetCapsuleHalfHeight(100.f);
+	StormCollision->Deactivate();
 }
 
 void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
@@ -26,6 +32,9 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 		TargetPos = Target->GetActorLocation();
 		CurState = EPartnerState::IceShard;
 		break;
+
+	case ESkillID::IceStorm:
+		CurState = EPartnerState::MakingStorm;
 
 	default:
 		break;
@@ -46,4 +55,10 @@ void AWolfPartner::LaunchIceShard()
 		auto IceShard = GetWorld()->SpawnActor<APartnerProjectile>(IceShardClass, InitialPos, DirectionVec.Rotation());
 		IceShard->FireInDirection(DirectionVec, InitialPos, EndPos);
 	}
+}
+
+void AWolfPartner::MakeStorm()
+{
+	PartnerAnim->PlayCombatMontage(TEXT("Attack"));
+	StormCollision->activate();
 }

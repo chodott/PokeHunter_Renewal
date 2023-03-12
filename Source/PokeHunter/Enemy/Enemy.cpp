@@ -52,6 +52,12 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void AEnemy::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
+{
+	OutLocation = GetMesh()->GetSocketLocation("HeadSocket");
+	OutRotation = GetMesh()->GetSocketRotation("HeadSocket");
+}
+
 void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	AItem* HitItem = Cast<AItem>(OtherActor);
@@ -73,12 +79,27 @@ void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 					HitItem->Hunter->SetPartnerTarget(this);
 					Target = HitItem->Hunter;
 					CurState = EEnemyState::Hit;
-					bFirstHit = 0;
+					bFirstHit = false;
 				}
 			}
 		}
 		HitItem->Destroy();
 	}
+}
+
+void AEnemy::SeeNewTarget(AActor* Actor)
+{
+	if (bFirstMeet)
+	{
+		bFirstMeet = false;
+		CurState = EEnemyState::Roar;
+	}
+}
+
+void AEnemy::HearSound(FVector SoundLoc)
+{
+	TargetPos = SoundLoc;
+	CurState = EEnemyState::Attention;
 }
 
 void AEnemy::Attack()
@@ -92,10 +113,13 @@ void AEnemy::Attack()
 void AEnemy::Roar()
 {
 	if (EnemyAnim == NULL) return;
-	if (CurState == EEnemyState::Roar)
-	{
 		EnemyAnim->PlayCombatMontage(TEXT("Roar"));
-	}
+}
+
+void AEnemy::Patrol()
+{
+	if (EnemyAnim == NULL) return;
+	EnemyAnim->PlayCombatMontage(TEXT("Patrol"));
 }
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

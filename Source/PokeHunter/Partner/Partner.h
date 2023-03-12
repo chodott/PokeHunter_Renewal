@@ -21,7 +21,8 @@ enum class EPartnerState : uint8
 	//Leave State
 	Rushing,
 	Howling,
-	IceShard
+	IceShard,
+	MakingStorm
 };
 
 UCLASS()

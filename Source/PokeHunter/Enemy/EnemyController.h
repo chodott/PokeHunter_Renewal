@@ -39,4 +39,7 @@ private:
 	UPROPERTY()
 	class UAISenseConfig_Hearing* ConfigHearing;
 
+public:
+	class AEnemy* Enemy;
+
 };

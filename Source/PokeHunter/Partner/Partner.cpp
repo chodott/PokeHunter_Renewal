@@ -4,6 +4,7 @@
 #include "Partner.h"
 #include "PartnerController.h"
 #include "PartnerAnimInstance.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "PokeHunter/Hunter/Hunter.h"
 
@@ -14,6 +15,8 @@ APartner::APartner()
 	PrimaryActorTick.bCanEverTick = true;
 
 	TeamID = FGenericTeamId(0);
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 }
 

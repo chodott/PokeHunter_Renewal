@@ -24,29 +24,8 @@ EBTNodeResult::Type UBTTask_EnemyPlayMontage::ExecuteTask(UBehaviorTreeComponent
 
 	bPlaying = true;
 
-	switch (Enemy->CurState)
-	{
-	case EEnemyState::Hit:
-		EnemyAnim->bPlaying = false;
-		EnemyAnim->PlayCombatMontage("Hit");
-		break;
-
-	case EEnemyState::Roar:
-		EnemyAnim->PlayCombatMontage("Roar");
-		break;
-
-	case EEnemyState::Die:
-		EnemyAnim->bPlaying = false;
-		EnemyAnim->PlayCombatMontage("Die");
-		break;
-		
-	case EEnemyState::Patrol:
-		EnemyAnim->PlayCombatMontage("Patrol");
-		break;
-
-	default:
-		break;
-	}
+	//Patrol
+	Enemy->Patrol();
 
 	Enemy->OnMontageEnd.AddLambda([this]() -> void {
 		bPlaying = false;
@@ -60,8 +39,6 @@ void UBTTask_EnemyPlayMontage::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
-	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
-	UEnemyAnimInstance* EnemyAnim = Enemy->EnemyAnim;
 	if (!bPlaying)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

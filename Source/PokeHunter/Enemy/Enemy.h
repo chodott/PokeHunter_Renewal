@@ -16,7 +16,8 @@ enum class EEnemyState : uint8
 	Chase UMETA(DisplayName = "Chase"),
 	Hit UMETA(DisplayName = "Hit"),
 	Die UMETA(DisplayName = "Die"),
-	Roar UMETA(DisplayName = "Roar")
+	Roar UMETA(DisplayName = "Roar"),
+	Attention
 	
 };
 
@@ -35,6 +36,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class APawn* Target;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FVector TargetPos;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UEnemyAnimInstance* EnemyAnim;
@@ -59,13 +63,20 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
+
 	//CollisionFunction
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	void SeeNewTarget(AActor* Actor);
+	void HearSound(FVector SoundLoc);
+
 	UFUNCTION()
 	virtual void Attack();
 	virtual void Roar();
+	UFUNCTION()
+	virtual void Patrol();
 
 	//Animation Function
 	UFUNCTION()
@@ -73,4 +84,5 @@ public:
 
 public:
 	bool bFirstHit{ true};
+	bool bFirstMeet{ true };
 };

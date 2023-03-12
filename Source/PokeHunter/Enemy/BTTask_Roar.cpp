@@ -19,11 +19,13 @@ EBTNodeResult::Type UBTTask_Roar::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 	if (Enemy == NULL)return EBTNodeResult::Failed;
 	bPlaying = true;
 
+	Enemy->Roar();
+
 	Enemy->OnMontageEnd.AddLambda([this]()->void
 		{
 			bPlaying = false;
 		});
-	Enemy->Roar();
+	
 	return EBTNodeResult::Type::InProgress;
 }
 

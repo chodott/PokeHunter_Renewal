@@ -4,29 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "Partner.h"
-#include "WolfPartner.generated.h"
-
+#include "GolemPartner.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class POKEHUNTER_API AWolfPartner : public APartner
+class POKEHUNTER_API AGolemPartner : public APartner
 {
 	GENERATED_BODY()
 
-public:
-	AWolfPartner();
+	AGolemPartner();
 
 	TSubclassOf<class APartnerProjectile> IceShardClass;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	class UCapsuleComponent* StormCollision;
-
 	
 public:
-
 	virtual void UseSpecialSkill(ESkillID SkillID);
-	void LaunchIceShard();
-	void MakeStorm();
+	void UseMeteor();
+	void ThrowRock();
+
 };

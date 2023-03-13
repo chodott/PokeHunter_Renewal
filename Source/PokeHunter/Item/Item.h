@@ -16,7 +16,7 @@ public:
 	AItem();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class AHunter* Hunter;
+	class APawn* ThisOwner;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh")
 	class UStaticMeshComponent* StaticMesh;
@@ -28,6 +28,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void UseItem(AHunter* Owner);
+	virtual void UseItem(APawn* ItemOwner);
 
 };

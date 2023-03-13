@@ -20,8 +20,10 @@ AWolfPartner::AWolfPartner()
 	//스톰 범위 컴포넌트 추가
 	StormCollision = CreateDefaultSubobject<UCapsuleComponent>(FName("StormCollision"));
 	StormCollision->SetCapsuleHalfHeight(100.f);
+	StormCollision->SetCapsuleRadius(150.f);
 	StormCollision->Deactivate();
 }
+
 
 void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 {
@@ -60,5 +62,5 @@ void AWolfPartner::LaunchIceShard()
 void AWolfPartner::MakeStorm()
 {
 	PartnerAnim->PlayCombatMontage(TEXT("Attack"));
-	StormCollision->activate();
+	StormCollision->Activate(true);
 }

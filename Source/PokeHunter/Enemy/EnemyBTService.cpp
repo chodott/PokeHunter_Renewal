@@ -13,4 +13,5 @@ void UEnemyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(FName("Target"), Enemy->Target);
 	OwnerComp.GetBlackboardComponent()->SetValueAsEnum(FName("State"), (uint8)Enemy->CurState);
+	OwnerComp.GetBlackboardComponent()->SetValueAsVector(FName("TargetPos"), Enemy->TargetPos);
 }

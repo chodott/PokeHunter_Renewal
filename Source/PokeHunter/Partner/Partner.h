@@ -17,6 +17,7 @@ enum class EPartnerState : uint8
 	//Stay State
 	Posing,
 	Unselected,
+	MoveTarget,
 
 	//Leave State
 	Rushing,

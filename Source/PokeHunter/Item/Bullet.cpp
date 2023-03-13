@@ -22,9 +22,9 @@ ABullet::ABullet()
 
 };
 
-void ABullet::UseItem(AHunter* ItemOwner)
+void ABullet::UseItem(APawn* ItemOwner)
 {
-	Hunter = ItemOwner;
+	ThisOwner = ItemOwner;
 	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
 	SetLifeSpan(TimeLimit);
 }

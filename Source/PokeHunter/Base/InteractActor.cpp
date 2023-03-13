@@ -9,19 +9,18 @@
 AInteractActor::AInteractActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-	//Mesh
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	SetRootComponent(StaticMesh);
-
+	PrimaryActorTick.bCanEverTick = false;
 
 	//Collision
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractSphere"));
 	InteractionSphere->AddLocalOffset(FVector(0.f, 0.f, GetSimpleCollisionHalfHeight()));
-	InteractionSphere->SetupAttachment(GetRootComponent());
 	InteractionSphere->SetSphereRadius(50.f);
+	SetRootComponent(InteractionSphere);
 
+
+	//Mesh
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	StaticMesh->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned

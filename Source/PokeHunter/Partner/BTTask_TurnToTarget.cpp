@@ -3,6 +3,7 @@
 
 #include "BTTask_TurnToTarget.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "PokeHunter/Enemy/Enemy.h"
 #include "Partner.h"
 #include "PartnerController.h"
 
@@ -24,23 +25,27 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
-	APartner* Partner = Cast<APartner>(OwnerComp.GetAIOwner()->GetPawn());
-	if (Partner == nullptr) FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+	APawn* Pawn = Cast<APawn>(OwnerComp.GetAIOwner()->GetPawn());
+	if (Pawn == nullptr) FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	FVector TargetPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(TEXT("TargetPos"));
-	FVector LookVec = TargetPos - Partner->GetActorLocation();
-	FVector ForwardVec = Partner->GetActorForwardVector();
-	if (Partner->CurState == EPartnerState::Posing || Partner->CurState == EPartnerState::Unselected)
+	FVector LookVec = TargetPos - Pawn->GetActorLocation();
+	FVector ForwardVec = Pawn->GetActorForwardVector();
+	APartner* Partner =Cast<APartner>(Pawn);
+	if (Partner)
 	{
-		LookVec = Partner->LookTargetVec;
-	}
+		if (Partner->CurState == EPartnerState::Posing || Partner->CurState == EPartnerState::Unselected)
+		{
+			LookVec = Partner->LookTargetVec;
+		}
 
-	else if (Partner->CurState == EPartnerState::Unselected)
-	{
-		LookVec = Partner->LookTargetVec;
+		else if (Partner->CurState == EPartnerState::Unselected)
+		{
+			LookVec = Partner->LookTargetVec;
+		}
 	}
 	FRotator Rot = FRotationMatrix::MakeFromX(LookVec).Rotator();
 
-	Partner->SetActorRotation(FMath::RInterpTo(Partner->GetActorRotation(), Rot, GetWorld()->GetDeltaSeconds(), 5.f));
+	Pawn->SetActorRotation(FMath::RInterpTo(Pawn->GetActorRotation(), Rot, GetWorld()->GetDeltaSeconds(), 5.f));
 
 	float BetweenAngle = FMath::Acos(FVector::DotProduct(LookVec, ForwardVec) / (LookVec.Size() * ForwardVec.Size())) * (180.0f / PI);
 	if (BetweenAngle < 10.f)

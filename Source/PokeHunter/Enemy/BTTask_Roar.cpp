@@ -35,7 +35,6 @@ void UBTTask_Roar::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 
 	if (!bPlaying)
 	{
-		AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

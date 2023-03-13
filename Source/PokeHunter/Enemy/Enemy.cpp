@@ -76,8 +76,11 @@ void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 				if (Target == NULL)
 				{
 					EnemyAnim->PlayCombatMontage(FName("Hit"));
-					HitItem->Hunter->SetPartnerTarget(this);
-					Target = HitItem->Hunter;
+					if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
+					{
+						Hunter->SetPartnerTarget(this);
+					}
+					Target = HitItem->ThisOwner;
 					CurState = EEnemyState::Hit;
 					bFirstHit = false;
 				}

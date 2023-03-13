@@ -17,7 +17,10 @@ enum class ESkillID : uint8
 	Rush = 201,
 	Howling = 202,
 	IceShard = 211,
-	IceStorm = 212
+	IceStorm = 212,
+	RockThrow = 221,
+	Meteor = 222
+
 	
 };
 

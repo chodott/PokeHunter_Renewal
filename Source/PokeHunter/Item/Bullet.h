@@ -17,10 +17,13 @@ class POKEHUNTER_API ABullet : public AItem
 public:
 	ABullet();
 
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Battle")
+	float Damage{};
+
 	float TimeLimit{5.f};
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UProjectileMovementComponent* ProjectileMovement;
-	virtual void UseItem(AHunter* ItemOwner) override;
+	virtual void UseItem(APawn* ItemOwner) override;
 };

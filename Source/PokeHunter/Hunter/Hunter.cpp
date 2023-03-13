@@ -314,6 +314,7 @@ void AHunter::LMBDown()
 		{
 			Partner->TargetPos = HitResult.Location;
 			Partner->bOrdered = true;
+			Partner->CurState = EPartnerState::MoveTarget;
 		}
 
 	}

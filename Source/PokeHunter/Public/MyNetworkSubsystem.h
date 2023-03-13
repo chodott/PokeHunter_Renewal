@@ -2,9 +2,16 @@
 
 #pragma once
 
-#include "Networking.h"
-#include "Sockets.h"
-#include "SocketSubsystem.h"
+#include "../../../../PH-Server/IOCPServer/protocol.h"
+
+#include "Windows/AllowWindowsPlatformTypes.h"
+#include "Windows/prewindowsapi.h"
+
+#pragma comment(lib, "ws2_32.lib")
+#include <WinSock2.h>
+
+#include "Windows/PostWindowsApi.h"
+#include "Windows/HideWindowsPlatformTypes.h"
 
 #include "CoreMinimal.h"
 #include "Net/Subsystems/NetworkSubsystem.h"
@@ -13,6 +20,27 @@
 /**
  * 
  */
+
+USTRUCT(BlueprintType)
+struct FU_SC_LOGIN_INFO_PACK {
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString _player_skin;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString _pet_num;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString q_item;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString q_skill;
+};
+
 UCLASS()
 class POKEHUNTER_API UMyNetworkSubsystem : public UNetworkSubsystem
 {
@@ -21,13 +49,12 @@ class POKEHUNTER_API UMyNetworkSubsystem : public UNetworkSubsystem
 public:
 	UMyNetworkSubsystem();
 
-	FSocket* Socket;
+	SOCKET Socket;
+	WSADATA wsaData;
+	SOCKADDR_IN stServerAddr;
 
-	FString address;
-	int32 port;
-	FIPv4Address ip;
+	int reval;
 
 	UFUNCTION(BlueprintCallable, Category = Socket)
-		void ConnectToServer();
-
+		FU_SC_LOGIN_INFO_PACK ConnectToServer(FString in_id, FString in_pw);
 };

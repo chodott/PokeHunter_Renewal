@@ -18,16 +18,17 @@ UCLASS()
 class POKEHUNTER_API UMySubsystem : public USubsystem
 {
 	GENERATED_BODY()
-		UMySubsystem();
 	
 public:
+	UMySubsystem();
+
 	FSocket* Socket;
 
 	FString address;
 	int32 port;
 	FIPv4Address ip;
 
-	UFUNCTION(Blueprintcallable, Category=Socket)
+	UFUNCTION(BlueprintCallable, Category=Socket)
 		void ConnectToServer();
 
 };

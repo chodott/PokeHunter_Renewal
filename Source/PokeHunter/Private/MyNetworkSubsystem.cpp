@@ -38,9 +38,9 @@ FU_SC_LOGIN_INFO_PACK UMyNetworkSubsystem::ConnectToServer(FString in_id, FStrin
 					recv(Socket, (char*)&info_pack, sizeof(SC_LOGIN_INFO_PACK), NULL);
 					
 					u_info_pack.name = ANSI_TO_TCHAR(info_pack.name);
-					/*u_info_pack._player_skin[0] = info_pack._player_skin;
-					u_info_pack._pet_num[0] = info_pack._pet_num;
-					u_info_pack.q_item[0] = info_pack.q_item;*/
+					u_info_pack._player_skin = FString::Printf(TEXT("%hs"), info_pack._player_skin);
+					u_info_pack._pet_num = FString::Printf(TEXT("%hs"), info_pack._player_skin);
+					u_info_pack.q_item = FString::Printf(TEXT("%hs"), info_pack.q_item);
 					u_info_pack.q_skill = ANSI_TO_TCHAR(info_pack.q_skill);
 
 					return u_info_pack;

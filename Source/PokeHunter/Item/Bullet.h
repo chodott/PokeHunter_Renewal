@@ -25,5 +25,11 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UProjectileMovementComponent* ProjectileMovement;
-	virtual void UseItem(APawn* ItemOwner) override;
+
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
+
+	void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos) ;
 };

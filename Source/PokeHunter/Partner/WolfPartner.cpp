@@ -45,18 +45,22 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 
 void AWolfPartner::LaunchIceShard()
 {
-	if (IceShardClass)
+	if (PartnerAnim)
 	{
 		PartnerAnim->PlayCombatMontage(TEXT("Attack"));
-		FVector InitialPos = GetMesh()->GetSocketLocation(FName("Head")) + GetActorForwardVector() * 300.f;
-		FVector EndPos = Target->GetActorLocation();
-		FVector DirectionVec = EndPos - GetActorLocation();
-		DirectionVec.Normalize();
-
-
-		auto IceShard = GetWorld()->SpawnActor<APartnerProjectile>(IceShardClass, InitialPos, DirectionVec.Rotation());
-		IceShard->FireInDirection(DirectionVec, InitialPos, EndPos);
 	}
+}
+
+void AWolfPartner::MakeIceShard()
+{
+	FVector InitialPos = GetMesh()->GetSocketLocation(FName("Head")) + GetActorForwardVector() * 300.f;
+	FVector EndPos = Target->GetActorLocation();
+	FVector DirectionVec = EndPos - GetActorLocation();
+	DirectionVec.Normalize();
+
+
+	auto IceShard = GetWorld()->SpawnActor<APartnerProjectile>(IceShardClass, InitialPos, DirectionVec.Rotation());
+	IceShard->FireInDirection(DirectionVec, InitialPos, EndPos);
 }
 
 void AWolfPartner::MakeStorm()

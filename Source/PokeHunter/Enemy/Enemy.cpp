@@ -58,6 +58,13 @@ void AEnemy::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) 
 	OutRotation = GetMesh()->GetSocketRotation("HeadSocket");
 }
 
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	return Damage;
+}
+
 void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	AItem* HitItem = Cast<AItem>(OtherActor);

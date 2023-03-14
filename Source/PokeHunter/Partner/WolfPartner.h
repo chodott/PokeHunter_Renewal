@@ -28,5 +28,7 @@ public:
 
 	virtual void UseSpecialSkill(ESkillID SkillID);
 	void LaunchIceShard();
+	UFUNCTION(BlueprintCallable)
+	void MakeIceShard();
 	void MakeStorm();
 };

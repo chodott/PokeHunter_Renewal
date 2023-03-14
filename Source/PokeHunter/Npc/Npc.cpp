@@ -21,7 +21,7 @@ ANpc::ANpc()
 
 	//Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(GetRootComponent());
+	CameraBoom->SetupAttachment(StaticMesh);
 	CameraBoom->TargetOffset = FVector(0, 0, 0.0f);
 	CameraBoom->TargetArmLength = 100.f;
 	CameraBoom->SetWorldRotation(FRotator(0, 180.0f, 0));

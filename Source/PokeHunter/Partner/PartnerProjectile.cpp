@@ -38,7 +38,7 @@ void APartnerProjectile::FireInDirection(const FVector& DirectionVec, const FVec
 	if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, Velocity, InitialPos, EndPos, GetWorld()->GetGravityZ(), 1.f))
 	{
 		
-		ProjectileMovement->Velocity = Velocity;
+		ProjectileMovement->Velocity = Velocity * ProjectileMovement->InitialSpeed;
 
 	}
 }

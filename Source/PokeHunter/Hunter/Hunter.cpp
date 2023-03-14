@@ -20,6 +20,7 @@
 #include "PokeHunter/Partner/Partner.h"
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Item/ItemData.h"
+#include "PokeHunter/Item/Bullet.h"
 #include "PokeHunter/Base/InteractActor.h"
 #include "PokeHunter/Base/DatabaseActor.h"
 #include "PokeHunter/Base/ItemDropActor.h"
@@ -332,8 +333,16 @@ void AHunter::LMBDown()
 			if (ItemClass == NULL) return;
 			else
 			{
-				AItem* item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation() + GetActorForwardVector() * 100.f , GetControlRotation());
-				item->UseItem(this);
+				FHitResult* HitResult = new FHitResult();
+				FVector StartTrace = FollowCamera->GetComponentLocation();
+				FVector EndTrace = StartTrace + FollowCamera->GetForwardVector() * 5000.f;
+
+				GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility);
+
+			
+				//ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(ItemClass, GetActorLocation() + GetActorForwardVector() * 100.f, GetControlRotation());
+				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(ItemClass, GetMesh()->GetSocketLocation(FName("Muzzle")),GetControlRotation());
+				Bullet->UseItem(this, GetMesh()->GetSocketLocation(FName("Muzzle")), EndTrace);
 				QuickSlotArray[CurQuickKey].cnt--;
 				if (QuickSlotArray[CurQuickKey].cnt == 0)
 				{
@@ -347,6 +356,7 @@ void AHunter::LMBDown()
 						QuickSlotArray[CurQuickKey].ItemID = FName("None");
 					}
 				}
+				
 			}
 		}
 	}

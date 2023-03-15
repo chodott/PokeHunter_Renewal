@@ -8,6 +8,7 @@
 #include "Enemy.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDamageDelegate,float, Damage,FVector, HitLoc);
 
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
@@ -47,6 +48,9 @@ public:
 	EEnemyState CurState{EEnemyState::Patrol};
 
 	FOnMontageEndDelegate OnMontageEnd;
+
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
+	FDamageDelegate DamageDele;
 
 	//TeamID
 	FGenericTeamId TeamID;

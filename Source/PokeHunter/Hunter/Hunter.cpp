@@ -337,7 +337,10 @@ void AHunter::LMBDown()
 				FVector StartTrace = FollowCamera->GetComponentLocation();
 				FVector EndTrace = StartTrace + FollowCamera->GetForwardVector() * 5000.f;
 
-				GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility);
+				if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility))
+				{
+					EndTrace = HitResult->Location;
+				}
 
 			
 				//ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(ItemClass, GetActorLocation() + GetActorForwardVector() * 100.f, GetControlRotation());

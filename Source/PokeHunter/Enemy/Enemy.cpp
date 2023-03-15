@@ -23,7 +23,7 @@ AEnemy::AEnemy()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
 	GetCapsuleComponent()->SetCapsuleRadius(90.f);
-	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
+	//GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
 	
 	TeamID = FGenericTeamId(1);
 }
@@ -60,9 +60,36 @@ void AEnemy::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) 
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	AItem* HitItem = Cast<AItem>(DamageCauser);
+	if (HitItem)
+	{
+		if (HP <= 0 && CurState != EEnemyState::Die)
+		{
+			CurState = EEnemyState::Die;
+			EnemyAnim->PlayCombatMontage(FName("Die"));
+		}
+		else
+		{
+			if (Target == NULL)
+			{
+				EnemyAnim->PlayCombatMontage(FName("Hit"));
+				if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
+				{
+					Hunter->SetPartnerTarget(this);
+				}
+				Target = HitItem->ThisOwner;
+				CurState = EEnemyState::Hit;
+				bFirstHit = false;
+			}
+		}
+		HitItem->Destroy();
+	}
 
-	return Damage;
+	HP -= DamageAmount;
+	UE_LOG(LogTemp, Warning,TEXT("damage"));
+	DamageDele.Broadcast(DamageAmount, GetActorLocation());
+
+	return DamageAmount;
 }
 
 void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

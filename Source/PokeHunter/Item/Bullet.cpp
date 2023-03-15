@@ -30,9 +30,10 @@ void ABullet::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ABullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
+void ABullet::OnHit(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UGameplayStatics::ApplyPointDamage(OtherActor, Damage,GetActorForwardVector(),Hit,NULL,Owner,NULL);
+	UGameplayStatics::ApplyPointDamage(OtherActor, Damage,GetActorForwardVector(),SweepResult,NULL,this,UDamageType::StaticClass());
+
 }
 
 void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)

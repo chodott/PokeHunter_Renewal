@@ -50,7 +50,10 @@ public:
 	AActor* Target;
 	float HP{ 100 };
 	bool bPosing;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bOrdered;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bUsingSkill;
 
 	//TeamID
 	FGenericTeamId TeamID;

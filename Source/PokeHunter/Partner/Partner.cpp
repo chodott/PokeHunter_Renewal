@@ -74,6 +74,7 @@ void APartner::Howling()
 void APartner::StopSkill()
 {
 	bOrdered = false;
+	bUsingSkill = false;
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 }
 
@@ -81,19 +82,20 @@ void APartner::UseNormalSkill(ESkillID SkillID)
 {
 	//스킬 사용중 접근 불가 추가 필요
 
+	if (bUsingSkill) return;
+	bOrdered = true;
+	bUsingSkill = true;
 
 	switch (SkillID)
 	{
 	case ESkillID::Rush:
 
-		bOrdered = true;
 		CurState = EPartnerState::Rushing;
 
 		break;
 
 	case ESkillID::Howling:
 
-		bOrdered = true;
 		CurState = EPartnerState::Howling;
 
 		break;
@@ -107,19 +109,20 @@ void APartner::UseSpecialSkill(ESkillID SkillID)
 {
 	//스킬 사용중 접근 불가 추가 필요
 
+	if (bUsingSkill) return;
+	bOrdered = true;
+	bUsingSkill = true;
 
 	switch (SkillID)
 	{
 	case ESkillID::Rush:
 
-		bOrdered = true;
 		CurState = EPartnerState::Rushing;
 
 		break;
 
 	case ESkillID::Howling:
 
-		bOrdered = true;
 		CurState = EPartnerState::Howling;
 
 		break;
@@ -135,5 +138,4 @@ void APartner::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 
 	OnMontageEnd.Broadcast();
 
-	if (HP <= 0) this->Destroy();
 }

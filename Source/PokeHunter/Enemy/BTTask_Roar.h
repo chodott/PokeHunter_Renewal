@@ -20,5 +20,6 @@ public:
 	void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	
 public:
+	UBehaviorTreeComponent* BTComponent;
 	bool bPlaying;
 };

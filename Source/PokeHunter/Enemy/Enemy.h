@@ -39,6 +39,9 @@ public:
 	class APawn* Target;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<class APawn*> TargetArray;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FVector TargetPos;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

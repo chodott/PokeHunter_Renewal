@@ -23,6 +23,7 @@ EBTNodeResult::Type UBTTask_EnemyAttack::ExecuteTask(UBehaviorTreeComponent& Own
 	Enemy->OnMontageEnd.AddLambda([this]()->void
 		{
 			bPlaying = false;
+			//FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		});
 
 	return EBTNodeResult::Type::InProgress;

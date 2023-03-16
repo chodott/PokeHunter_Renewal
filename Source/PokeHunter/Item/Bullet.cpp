@@ -40,18 +40,21 @@ void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 {
 	FVector Velocity = FVector::ZeroVector;
 
-	UGameplayStatics::SuggestProjectileVelocity(this, Velocity, InitialPos, EndPos, ProjectileMovement->InitialSpeed, false, 1.f, GetWorld()->GetGravityZ());
+	UGameplayStatics::SuggestProjectileVelocity(this, Velocity, InitialPos, EndPos, 
+		ProjectileMovement->InitialSpeed, false, 0.f, GetWorld()->GetGravityZ(),ESuggestProjVelocityTraceOption::DoNotTrace);
+	//UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, Velocity, InitialPos, EndPos, GetWorld()->GetGravityZ(), 1.f);
 	ThisOwner = ItemOwner;
 	ProjectileMovement->Velocity = Velocity;
 	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
 	SetLifeSpan(TimeLimit);
 
+	//경로 디버그 용
 	/*FPredictProjectilePathParams predictParams(20.0f, InitialPos, Velocity, 15.0f);   
 	predictParams.DrawDebugTime = 15.0f;    
 	predictParams.DrawDebugType = EDrawDebugTrace::Type::ForDuration; 
-	predictParams.OverrideGravityZ = GetWorld()->GetGravityZ();
+	predictParams.OverrideGravityZ = GetWorld()->GetGravity3Z();
 	FPredictProjectilePathResult result;
 	UGameplayStatics::PredictProjectilePath(this, predictParams, result);*/
 	ProjectileMovement->UpdateComponentVelocity();
-	StaticMesh->AddImpulse(Velocity,FName(""), true);
+	StaticMesh->AddImpulse(Velocity, FName(""),true);
 }

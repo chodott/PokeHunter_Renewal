@@ -27,7 +27,10 @@ AWolfPartner::AWolfPartner()
 
 void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 {
+	if (bUsingSkill) return;
 	bOrdered = true;
+	bUsingSkill = true;
+
 	switch (SkillID)
 	{
 	case ESkillID::IceShard:

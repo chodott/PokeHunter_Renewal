@@ -63,7 +63,8 @@ void AEnemyController::OnPerception(AActor* Actor, FAIStimulus Stimulus)
 	switch (Stimulus.Type)
 	{
 	case 0:
-		Enemy->SeeNewTarget(Actor);
+		if(APawn * SeenTarget = Cast<APawn>(Actor))
+			Enemy->TargetArray.AddUnique(SeenTarget);
 		break;
 	case 1:
 		FVector SoundLoc = Stimulus.StimulusLocation;

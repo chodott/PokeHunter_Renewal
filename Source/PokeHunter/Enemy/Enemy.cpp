@@ -24,6 +24,12 @@ AEnemy::AEnemy()
 	
 	GetCapsuleComponent()->SetCapsuleRadius(90.f);
 	//GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
+
+	//Set TargetArray
+	for (int i = 0; i < 8; ++i)
+	{
+		TargetArray.AddDefaulted();
+	}
 	
 	TeamID = FGenericTeamId(1);
 }

@@ -5,25 +5,25 @@
 
 ULoginServerManager::ULoginServerManager()
 {
-    
+	gameinstance = Cast<UServerIntance>(UGameplayStatics::GetGameInstance((GetWorld())));
 }
 
 FU_SC_LOGIN_INFO_PACK ULoginServerManager::LoginToServer(FString in_id, FString in_pw)
 {
 	FU_SC_LOGIN_INFO_PACK u_info_pack;
 	SC_LOGIN_INFO_PACK info_pack;
-
-	CS_LOGIN_PACK msg;
+	
+	CS_LOGIN_PACK msg{};
 	msg.size = sizeof(CS_LOGIN_PACK);
 	msg.type = CS_LOGIN;
 	strcpy(msg.id, TCHAR_TO_ANSI(*in_id));
 	strcpy(msg.pw, TCHAR_TO_ANSI(*in_pw));
-	send(Socket, (char*)&msg, msg.size, NULL);
-
-	SC_LOGIN_SUCCESS_PACK ok_pack;
-	recv(Socket, (char*)&ok_pack, sizeof(SC_LOGIN_SUCCESS_PACK), NULL);
+	send(gameinstance->Socket, (char*)&msg, msg.size, NULL);
+	
+	SC_LOGIN_SUCCESS_PACK ok_pack{};
+	recv(gameinstance->Socket, (char*)&ok_pack, sizeof(SC_LOGIN_SUCCESS_PACK), NULL);
 	if (SC_LOGIN_SUCCESS == ok_pack.type) {
-		recv(Socket, (char*)&info_pack, sizeof(SC_LOGIN_INFO_PACK), NULL);
+		recv(gameinstance->Socket, (char*)&info_pack, sizeof(SC_LOGIN_INFO_PACK), NULL);
 
 		u_info_pack._name = ANSI_TO_TCHAR(info_pack.name);
 		u_info_pack._player_skin = FString::Printf(TEXT("%hs"), info_pack._player_skin);
@@ -33,7 +33,7 @@ FU_SC_LOGIN_INFO_PACK ULoginServerManager::LoginToServer(FString in_id, FString 
 
 		return u_info_pack;
 	}
-
-	u_info_pack.name = ANSI_TO_TCHAR("empty");
+	
+	u_info_pack._name = ANSI_TO_TCHAR("empty");
 	return u_info_pack;
 }

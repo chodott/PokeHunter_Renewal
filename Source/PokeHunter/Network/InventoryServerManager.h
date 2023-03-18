@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Kismet/GameplayStatics.h"
 #include "ServerIntance.h"
 #include "PokeHunter/Hunter/InventoryComponent.h"
 
@@ -13,12 +14,14 @@
  * 
  */
 UCLASS()
-class POKEHUNTER_API UInventoryServerManager : public UNetworkSubsystem, UServerIntance, UInventoryComponent
+class POKEHUNTER_API UInventoryServerManager : public UNetworkSubsystem //, public UServerIntance , UInventoryComponent
 {
 	GENERATED_BODY()
 	
 public:
 	UInventoryServerManager();
+
+	UServerIntance* gameinstance;
 
 	UFUNCTION(BlueprintCallable)
 		bool GetInventoryDBInfos();

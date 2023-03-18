@@ -65,9 +65,21 @@ public:
 
 	int reval;
 
-	UFUNCTION(BlueprintCallable, Category = Socket)
-		BOOL ConnectToServer();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString Player_Name;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString Player_Skin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString Pet_Number;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString Quick_Item;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString Quick_Skill;
+	
 	UFUNCTION(BlueprintCallable, Category = Socket)
-		void USendPacket(void* packet);
+		bool ConnectToServer();
 };

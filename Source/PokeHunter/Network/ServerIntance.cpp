@@ -8,14 +8,11 @@ UServerIntance::UServerIntance()
 
 	stServerAddr.sin_family = AF_INET;
 	stServerAddr.sin_port = htons(PORT_NUM);
-	stServerAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	stServerAddr.sin_addr.s_addr = inet_addr("172.28.208.1");
 }
 
-BOOL UServerIntance::ConnectToServer()
+bool UServerIntance::ConnectToServer()
 {
-	FU_SC_LOGIN_INFO_PACK u_info_pack;
-	SC_LOGIN_INFO_PACK info_pack;
-
 	if (reval != 0) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("network fail")));
 	else {
 		Socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
@@ -30,10 +27,4 @@ BOOL UServerIntance::ConnectToServer()
 		}
 	}
 	return false;
-}
-
-void UServerIntance::USendPacket(void* packet)
-{
-	char* p = reinterpret_cast<char*>(packet);
-	send(Socket, (char*)&packet, p[0], NULL);
 }

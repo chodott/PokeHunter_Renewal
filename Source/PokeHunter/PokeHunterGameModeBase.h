@@ -27,5 +27,4 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ItemMgr")
 	FItemInfo FindItem(FName ItemID, bool& Success);
 	FItemInfo FindItem_Implementation(FName ItemID, bool& Success);
-	
 };

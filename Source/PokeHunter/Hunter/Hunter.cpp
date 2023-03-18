@@ -7,6 +7,7 @@
 
 #include "InventoryComponent.h"
 #include "HunterAnimInstance.h"
+#include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -129,6 +130,9 @@ void AHunter::BeginPlay()
 	FIKeyDelegate.AddDynamic(this, &AHunter::OpenInventory);
 	FMouseWheelDelegate.AddDynamic(this, &AHunter::ChangeQuickslot);
 
+	//Animation
+	HunterAnim = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
+
 	//카메라 래깅 관련
 	// Controller->bFindCameraComponentWhenViewTarget = true;
 
@@ -193,6 +197,24 @@ void AHunter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 }
 
+void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AHunter, CurState);
+}
+
+void AHunter::MultiPlayMontage_Implementation(AHunter* Hunter, FName Session)
+{
+	Hunter->HunterAnim->PlayCombatMontage(Session);
+}
+
+void AHunter::ServerPlayMontage_Implementation(AHunter* Hunter ,FName Session)
+{
+	MultiPlayMontage(Hunter, Session);
+	
+}
+
 // Called to bind functionality to input
 void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -231,7 +253,7 @@ void AHunter::SpaceDown()
 	{
 		CurState = EPlayerState::Dive;
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-		if(AnimInstance) AnimInstance->PlayCombatMontage(FName("Dive"));
+		ServerPlayMontage(this, FName("Dive"));
 		FVector Speed = GetVelocity();
 		FVector XYspeed = FVector(Speed.X, Speed.Y, 0.f);
 		LastInput = GetCharacterMovement()->GetLastInputVector();
@@ -322,7 +344,7 @@ void AHunter::LMBDown()
 	else if (CurState == EPlayerState::Zoom)
 	{
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-		if (AnimInstance) AnimInstance->PlayCombatMontage(FName("Shot"));
+		ServerPlayMontage(this, FName("Shot"));
 
 		FName ItemID = QuickSlotArray[CurQuickKey].ItemID;
 		AActor* TempActor = UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass());

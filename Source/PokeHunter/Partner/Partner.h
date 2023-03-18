@@ -66,7 +66,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	//Animation
+	UFUNCTION(Server, Reliable)
+	void ServerPlayMontage(FName Section);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiPlayMontage(FName Section);
 	
+
 	UFUNCTION()
 	virtual void Attack();
 	virtual void Howling();

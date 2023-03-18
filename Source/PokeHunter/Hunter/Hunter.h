@@ -54,6 +54,9 @@ class POKEHUNTER_API AHunter : public ACharacter, public IGenericTeamAgentInterf
 	GENERATED_BODY()
 
 public:
+	//Event
+
+public:
 	// Sets default values for this character's properties
 	AHunter();
 
@@ -124,8 +127,12 @@ public:
 	float ArmSpeed;
 
 	//PlayerState
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "Animation")
 	EPlayerState CurState {EPlayerState::Idle};
+
+	//Animation
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	class UHunterAnimInstance* HunterAnim;
 
 	//Bool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
@@ -146,6 +153,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void PostInitializeComponents() override;
 	virtual void PossessedBy(AController* NewController) override;
+
+	//Replicated
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
+	UFUNCTION(Server, Reliable)
+	void ServerPlayMontage (AHunter* Hunter, FName Session);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiPlayMontage(AHunter* Hunter, FName Session);
+
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -206,8 +221,6 @@ public:
 	
 private:
 	// Character Movement Input
-
-
 	void MoveForward(float Val);
 	void MoveRight(float Val);
 	void LookUp(float NewAxisValue);

@@ -17,25 +17,13 @@ class POKEHUNTER_API AGolemBoss : public AEnemy
 public:
 		AGolemBoss();
 
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Collision")
-		class UBoxComponent* HeadCollisionBox;
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
+		TMap<FName, float> PartHP;
 
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Collision")
-		class UBoxComponent* BodyCollisionBox;
-
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Collision")
-		class UBoxComponent* LeftArmCollisionBox;
-
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Collision")
-		class UBoxComponent* RightArmCollisionBox;
-
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Collision")
-		class UBoxComponent*	LeftLegCollisionBox;
-
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Collision")
-		class UBoxComponent*	RightLegCollisionBox;
 
 public:
 	virtual void BeginPlay() override;
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
 };

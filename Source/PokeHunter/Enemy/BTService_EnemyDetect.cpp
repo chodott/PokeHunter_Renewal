@@ -21,7 +21,7 @@ void UBTService_EnemyDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 	UWorld* World = Enemy->GetWorld();
 	FVector EnemyLoc = Enemy->GetActorLocation();
 
-	float AttackRange = 200.f;
+	float AttackRange = Enemy->AttackRange;
 
 	Enemy->Target->GetActorLocation();
 

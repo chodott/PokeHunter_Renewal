@@ -12,16 +12,17 @@
 // Sets default values
 AEnemy::AEnemy()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-	
+
+
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	
+
 	GetCapsuleComponent()->SetCapsuleRadius(90.f);
 	//GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
 
@@ -30,7 +31,7 @@ AEnemy::AEnemy()
 	{
 		TargetArray.AddDefaulted();
 	}
-	
+
 	TeamID = FGenericTeamId(1);
 }
 
@@ -41,7 +42,7 @@ void AEnemy::BeginPlay()
 
 	EnemyAnim = Cast<UEnemyAnimInstance>(GetMesh()->GetAnimInstance());
 	EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
-	
+
 }
 
 // Called every frame
@@ -66,6 +67,10 @@ void AEnemy::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) 
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+
+
 	AItem* HitItem = Cast<AItem>(DamageCauser);
 	if (HitItem)
 	{
@@ -92,10 +97,19 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	}
 
 	HP -= DamageAmount;
-	UE_LOG(LogTemp, Warning,TEXT("damage"));
-	DamageDele.Broadcast(DamageAmount, GetActorLocation());
 
 	return DamageAmount;
+}
+
+void AEnemy::ServerPlayMontage_Implementation(AEnemy* Enemy, FName Section)
+{
+	MultiPlayMontage(this, Section);
+}
+
+
+void AEnemy::MultiPlayMontage_Implementation(AEnemy* Enemy, FName Section)
+{
+	EnemyAnim->PlayCombatMontage(Section);
 }
 
 void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -149,25 +163,28 @@ void AEnemy::Attack()
 {
 	if (Target != NULL)
 	{
-		EnemyAnim->PlayCombatMontage(TEXT("Attack"));
+		ServerPlayMontage(this, FName("Attack"));
+		//EnemyAnim->PlayCombatMontage(TEXT("Attack"));
 	}
 }
 
 void AEnemy::Roar()
 {
 	if (EnemyAnim == NULL) return;
-		EnemyAnim->PlayCombatMontage(TEXT("Roar"));
+	ServerPlayMontage(this, FName("Roar"));
+	EnemyAnim->PlayCombatMontage(TEXT("Roar"));
 }
 
 void AEnemy::Patrol()
 {
 	if (EnemyAnim == NULL) return;
+	ServerPlayMontage(this, FName("Patrol"));
 	EnemyAnim->PlayCombatMontage(TEXT("Patrol"));
 }
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	if(!bInterrupted)
+	if (!bInterrupted)
 	{
 		EnemyAnim->bPlaying = false;
 		if (CurState == EEnemyState::Hit) CurState = EEnemyState::Roar;

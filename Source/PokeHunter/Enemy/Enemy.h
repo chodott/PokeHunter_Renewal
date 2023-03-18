@@ -8,7 +8,6 @@
 #include "Enemy.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDamageDelegate,float, Damage,FVector, HitLoc);
 
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
@@ -52,11 +51,11 @@ public:
 
 	FOnMontageEndDelegate OnMontageEnd;
 
-	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
-	FDamageDelegate DamageDele;
-
 	//TeamID
 	FGenericTeamId TeamID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AttackRange = 200.f;
 
 
 protected:
@@ -75,10 +74,14 @@ public:
 	//CollisionFunction
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	//Animation
+	UFUNCTION(Server, Reliable)
+	void ServerPlayMontage(AEnemy* Enemy, FName Section);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiPlayMontage(AEnemy* Enemy, FName Section);
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
 
 
 	void SeeNewTarget(AActor* Actor);

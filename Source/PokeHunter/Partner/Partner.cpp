@@ -46,6 +46,16 @@ void APartner::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void APartner::ServerPlayMontage_Implementation(FName Section)
+{
+	MultiPlayMontage(Section);
+}
+
+void APartner::MultiPlayMontage_Implementation(FName Section)
+{
+	PartnerAnim->PlayCombatMontage(Section);
+}
+
 void APartner::Attack()
 {
 	if (Target != NULL)
@@ -58,7 +68,8 @@ void APartner::Attack()
 
 
 		//Play Montage
-		PartnerAnim->PlayCombatMontage(TEXT("Attack"));
+		ServerPlayMontage(FName("Attack"));
+		//PartnerAnim->PlayCombatMontage(TEXT("Attack"));
 	}
 
 
@@ -68,7 +79,8 @@ void APartner::Attack()
 void APartner::Howling()
 {
 	//Play Montage
-	PartnerAnim->PlayCombatMontage(TEXT("Howling"));
+	ServerPlayMontage(FName("Howling"));
+	//PartnerAnim->PlayCombatMontage(TEXT("Howling"));
 }
 
 void APartner::StopSkill()

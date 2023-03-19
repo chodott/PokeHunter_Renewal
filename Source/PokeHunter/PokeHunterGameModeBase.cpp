@@ -2,38 +2,90 @@
 #pragma once
 
 #include "PokeHunterGameModeBase.h"
-#include "Hunter/Hunter.h"
-#include "Hunter/HunterController.h"
-#include "Item/ItemDatabase.h"
 
 APokeHunterGameModeBase::APokeHunterGameModeBase()
 {
-	DefaultPawnClass = AHunter::StaticClass();
-	PlayerControllerClass = AHunterController::StaticClass();
+	
 }
 
-void APokeHunterGameModeBase::PostLogin(APlayerController* NewPlayer)
+void APokeHunterGameModeBase::BeginPlay()
 {
-	ABLOG(Warning, TEXT("PostLogin Begin"));
-	Super::PostLogin(NewPlayer);
-	ABLOG(Warning, TEXT("PostLogin End"));
-}
+	Super::BeginPlay();
 
-FItemInfo APokeHunterGameModeBase::FindItem_Implementation(FName ItemID, bool& Success)
-{
-	Success = false;
-	FItemInfo Info;
-	if(ItemDatabase == nullptr) return Info;
+#if WITH_GAMELIFT
+	auto InitSDKOutcome = Aws::GameLift::Server::InitSDK();
 
-	for(int i=0; i<ItemDatabase->InfoArray.Num(); ++i)
-	{
-		if(ItemDatabase->InfoArray[i].ID == ItemID)
+	if (InitSDKOutcome.IsSuccess()) {
+		auto OnStartGameSession = [](Aws::GameLift::Server::Model::GameSession GameSessionObj, void* Params) {
+			FStartGameSessionState* State = (FStartGameSessionState*)Params;
+
+			State->Status = Aws::GameLift::Server::ActivateGameSession().IsSuccess();
+		};
+
+		auto OnUpdateGameSession = [](Aws::GameLift::Server::Model::UpdateGameSession UpdateGameSessionObj, void* Params) {
+			FUpdateGameSessionState* State = (FUpdateGameSessionState*)Params;
+		};
+
+		auto OnProcessTerminate = [](void* Params) {
+			FProcessTerminateState* State = (FProcessTerminateState*)Params;
+			auto GetTerminationTimeOutcome = Aws::GameLift::Server::GetTerminationTime();
+			if (GetTerminationTimeOutcome.IsSuccess()) {
+				State->TerminationTime = GetTerminationTimeOutcome.GetResult();
+			}
+
+			auto ProcessEndingOutcome = Aws::GameLift::Server::ProcessEnding();
+
+			if (ProcessEndingOutcome.IsSuccess()) {
+				State->Status = true;
+				FGenericPlatformMisc::RequestExit(false);
+			}
+		};
+
+		auto OnHealthCheck = [](void* Params)
 		{
-			Success = true;
-			return ItemDatabase->InfoArray[i];
-		}
-	}
+			FHealthCheckState* State = (FHealthCheckState*)Params;
+			State->Status = true;
 
-	return Info;
+			return State->Status;
+		};
+
+		TArray<FString> CommandLineTokens;
+		TArray<FString> CommandLineSwitches;
+		int Port = FURL::UrlConfig.DefaultPort;
+
+		// GameLiftTutorialServer.exe token -port=7777
+		FCommandLine::Parse(FCommandLine::Get(), CommandLineTokens, CommandLineSwitches);
+
+		for (FString Str : CommandLineSwitches) {
+			FString Key;
+			FString Value;
+
+			if (Str.Split("=", &Key, &Value)) {
+				if (Key.Equals("port")) {
+					Port = FCString::Atoi(*Value);
+				}
+			}
+		}
+
+		const char* LogFile = "aLogFile.txt";
+		const char** LogFiles = &LogFile;
+		auto LogParams = new Aws::GameLift::Server::LogParameters(LogFiles, 1);
+
+		auto Params = new Aws::GameLift::Server::ProcessParameters(
+			OnStartGameSession,
+			&StartGameSessionState,
+			OnUpdateGameSession,
+			&UpdateGameSessionState,
+			OnProcessTerminate,
+			&ProcessTerminateState,
+			OnHealthCheck,
+			&HealthCheckState,
+			Port,
+			*LogParams
+		);
+
+		auto ProcessReadyOutcome = Aws::GameLift::Server::ProcessReady(*Params);
+	}
+#endif
 }
 

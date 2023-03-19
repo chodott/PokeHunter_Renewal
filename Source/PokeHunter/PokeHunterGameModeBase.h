@@ -2,29 +2,87 @@
 
 #pragma once
 
-#include "PokeHunter.h"
+#include "CoreMinimal.h"
+#include "GameLiftServerSDK.h"
 #include "GameFramework/GameModeBase.h"
-#include "Item/ItemDatabase.h"
 #include "PokeHunterGameModeBase.generated.h"
 
 /**
  * 
  */
+
+USTRUCT()
+struct FStartGameSessionState
+{
+	GENERATED_BODY();
+
+	UPROPERTY()
+		bool Status;
+
+	FStartGameSessionState() {
+		Status = false;
+	}
+};
+
+USTRUCT()
+struct FUpdateGameSessionState
+{
+	GENERATED_BODY();
+
+	FUpdateGameSessionState() {
+
+	}
+};
+
+USTRUCT()
+struct FProcessTerminateState
+{
+	GENERATED_BODY();
+
+	UPROPERTY()
+		bool Status;
+
+	long TerminationTime;
+
+	FProcessTerminateState() {
+		Status = false;
+	}
+};
+
+USTRUCT()
+struct FHealthCheckState
+{
+	GENERATED_BODY();
+
+	UPROPERTY()
+		bool Status;
+
+	FHealthCheckState() {
+		Status = false;
+	}
+};
+
 UCLASS()
 class POKEHUNTER_API APokeHunterGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
+public:
 	APokeHunterGameModeBase();
 
-public:
-	virtual void PostLogin(APlayerController* NewPlayer) override;
+protected:
+	virtual void BeginPlay() override;
 
-	//Item Database
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Database")
-	class UItemDatabase* ItemDatabase;
+private:
+	UPROPERTY()
+		FStartGameSessionState StartGameSessionState;
+	
+	UPROPERTY()
+		FUpdateGameSessionState UpdateGameSessionState;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ItemMgr")
-	FItemInfo FindItem(FName ItemID, bool& Success);
-	FItemInfo FindItem_Implementation(FName ItemID, bool& Success);
+	UPROPERTY()
+		FProcessTerminateState ProcessTerminateState;
+
+	UPROPERTY()
+		FHealthCheckState HealthCheckState;
 };

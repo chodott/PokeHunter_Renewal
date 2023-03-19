@@ -3,6 +3,7 @@
 
 #include "Enemy.h"
 #include "EnemyAnimInstance.h"
+#include "EnemyProjectile.h"
 #include "components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PokeHunter/Item/Item.h"
@@ -101,6 +102,11 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	return DamageAmount;
 }
 
+bool AEnemy::IsJumping()
+{
+	return GetCharacterMovement()->IsFalling();
+}
+
 void AEnemy::ServerPlayMontage_Implementation(AEnemy* Enemy, FName Section)
 {
 	MultiPlayMontage(this, Section);
@@ -159,13 +165,24 @@ void AEnemy::HearSound(FVector SoundLoc)
 	CurState = EEnemyState::Attention;
 }
 
-void AEnemy::Attack()
+void AEnemy::Attack(int AttackPattern)
 {
 	if (Target != NULL)
 	{
 		ServerPlayMontage(this, FName("Attack"));
 		//EnemyAnim->PlayCombatMontage(TEXT("Attack"));
 	}
+}
+
+void AEnemy::LongAttack()
+{
+	if (EnemyAnim == NULL) return;
+	FVector InitialPos = GetMesh()->GetSocketLocation(FName("LeftHand")) + GetActorForwardVector() * 300.f;
+	FVector EndPos = Target->GetActorLocation();
+	FVector DirectionVec = EndPos - GetActorLocation();
+
+	//발사체 생성
+
 }
 
 void AEnemy::Roar()
@@ -180,6 +197,17 @@ void AEnemy::Patrol()
 	if (EnemyAnim == NULL) return;
 	ServerPlayMontage(this, FName("Patrol"));
 	EnemyAnim->PlayCombatMontage(TEXT("Patrol"));
+}
+
+void AEnemy::JumpAttack()
+{
+	float Distance = GetDistanceTo(Target); 
+	GetCharacterMovement()->Velocity = FVector(1000, 1000, 0);
+	bool bJump = GetCharacterMovement()->DoJump(false);
+	if (bJump)
+	{
+		GetCharacterMovement()->UpdateComponentVelocity();
+	}
 }
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

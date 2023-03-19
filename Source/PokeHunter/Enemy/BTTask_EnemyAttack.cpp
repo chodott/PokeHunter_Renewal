@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include "EnemyAnimInstance.h"
 #include "EnemyController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_EnemyAttack::UBTTask_EnemyAttack()
 {
@@ -17,7 +18,8 @@ EBTNodeResult::Type UBTTask_EnemyAttack::ExecuteTask(UBehaviorTreeComponent& Own
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	UEnemyAnimInstance* EnemyAnim = Enemy->EnemyAnim;
 	if (Enemy == NULL)return EBTNodeResult::Failed;
-	Enemy->Attack();
+	int PatternNum = OwnerComp.GetBlackboardComponent()->GetValueAsInt(FName("AttackPattern"));
+	Enemy->Attack(PatternNum);
 	bPlaying = true;
 
 	Enemy->OnMontageEnd.AddLambda([this]()->void

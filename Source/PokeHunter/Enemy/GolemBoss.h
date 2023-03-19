@@ -26,4 +26,13 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
+	//BTTask
+
+	virtual void Attack(int AttackPattern);
+
+	virtual void LongAttack();
+
+	UFUNCTION()
+	void LaunchStone();
+
 };

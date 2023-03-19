@@ -18,13 +18,13 @@ public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FItemCnter> InfoArray;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class AHunter* Hunter;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int capacity;
 
 protected:

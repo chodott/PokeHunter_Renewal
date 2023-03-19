@@ -34,8 +34,7 @@ void ABullet::BeginPlay()
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 //void ABullet::OnHit(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UGameplayStatics::ApplyPointDamage(OtherActor, Damage,GetActorForwardVector(),Hit,NULL,this,UDamageType::StaticClass());
-	UE_LOG(LogTemp, Warning, TEXT("%d, %d,%d"), Hit.Location.X, Hit.Location.Y,Hit.Location.Z);
+	ServerApplyDamage(OtherActor, Damage,GetActorForwardVector(),Hit,NULL,this,UDamageType::StaticClass());
 }
 
 void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
@@ -59,4 +58,14 @@ void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 	UGameplayStatics::PredictProjectilePath(this, predictParams, result);*/
 	ProjectileMovement->UpdateComponentVelocity();
 	StaticMesh->AddImpulse(Velocity, FName(""),true);
+}
+
+void ABullet::ServerApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)
+{
+	MultiApplyDamage(DamagedActor, DamageAmount, Direction, HitInfo, EventInstigator, DamageCauser, DamageTypeClass);
+}
+
+void ABullet::MultiApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)
+{
+	UGameplayStatics::ApplyPointDamage(DamagedActor, DamageAmount, Direction, HitInfo, NULL, DamageCauser, DamageTypeClass);
 }

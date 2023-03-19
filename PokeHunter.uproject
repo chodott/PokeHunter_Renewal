@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.1",
+	"EngineAssociation": "{0C1950B6-4014-D828-FAFE-A190C45BE097}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -14,6 +14,12 @@
 				"CoreUObject",
 				"UMG"
 			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "GameLiftServerSDK",
+			"Enabled": true
 		}
 	]
 }

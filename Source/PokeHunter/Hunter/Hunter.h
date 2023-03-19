@@ -78,9 +78,9 @@ public:
 	class AInteractActor* InteractingActor;
 
 	//QuickSlot
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuickSlot")
 	TArray<FItemCnter> QuickSlotArray;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "QuickSlot")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuickSlot")
 	int CurQuickKey{};
 
 	//Item

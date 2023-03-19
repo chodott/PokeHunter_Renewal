@@ -228,7 +228,7 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("Turn", this, &AHunter::Turn);		// X
 	PlayerInputComponent->BindAxis("LookUp", this, &AHunter::LookUp);	// Y
 
-	PlayerInputComponent->BindAxis("MouseWheel", this, &AHunter::WheelInput);
+	//PlayerInputComponent->BindAxis("MouseWheel", this, &AHunter::WheelInput);
 
 	PlayerInputComponent->BindAction("SpaceBar", IE_Pressed, this, &AHunter::SpaceDown);
 	PlayerInputComponent->BindAction("LShift", IE_Pressed, this, &AHunter::LShiftDown);
@@ -466,7 +466,6 @@ void AHunter::ChangeQuickslot(float Val)
 	CurQuickKey += int(Val);
 	if (CurQuickKey < 0) CurQuickKey += 10;
 	else if (CurQuickKey > 9) CurQuickKey -= 10;
-	if (FMouseWheelDelegate.IsBound()) FMouseWheelDelegate.Broadcast(Val);
 }
 
 void AHunter::SetQuickslot(FName ItemID, int index)

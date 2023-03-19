@@ -49,6 +49,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	EEnemyState CurState{EEnemyState::Patrol};
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf <class AEnemyProjectile> ProjectileClass;
+
 	FOnMontageEndDelegate OnMontageEnd;
 
 	//TeamID
@@ -74,6 +77,8 @@ public:
 	//CollisionFunction
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	bool IsJumping();
+
 	//Animation
 	UFUNCTION(Server, Reliable)
 	void ServerPlayMontage(AEnemy* Enemy, FName Section);
@@ -88,10 +93,13 @@ public:
 	void HearSound(FVector SoundLoc);
 
 	UFUNCTION()
-	virtual void Attack();
+	virtual void Attack(int AttackPattern);
+	UFUNCTION()
+	virtual void LongAttack();
 	virtual void Roar();
 	UFUNCTION()
 	virtual void Patrol();
+	virtual void JumpAttack();
 
 	//Animation Function
 	UFUNCTION()

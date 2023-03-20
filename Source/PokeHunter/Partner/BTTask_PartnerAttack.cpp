@@ -15,6 +15,7 @@ EBTNodeResult::Type UBTTask_PartnerAttack::ExecuteTask(UBehaviorTreeComponent& O
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 	APartner* Partner = Cast<APartner>(OwnerComp.GetAIOwner()->GetPawn());
 	if (Partner == NULL)return EBTNodeResult::Failed;
+	if (Partner->CurState != EPartnerState::Rushing) return EBTNodeResult::Failed;
 	Partner->Attack();
 	bPlaying = true;
 

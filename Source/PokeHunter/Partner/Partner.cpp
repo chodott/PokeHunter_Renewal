@@ -89,6 +89,7 @@ void APartner::StopSkill()
 {
 	bOrdered = false;
 	bUsingSkill = false;
+	CurState = EPartnerState::MoveTarget;
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 }
 

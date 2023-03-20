@@ -17,7 +17,7 @@ EBTNodeResult::Type UBTTask_PartnerHowling::ExecuteTask(UBehaviorTreeComponent& 
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 	APartner* Partner = Cast<APartner>(OwnerComp.GetAIOwner()->GetPawn());
 	if (Partner == NULL)return EBTNodeResult::Failed;
-	
+	if(Partner->CurState != EPartnerState::Howling) return EBTNodeResult::Failed;
 	Partner->Howling();
 	bPlaying = true;
 

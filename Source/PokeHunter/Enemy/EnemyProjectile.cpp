@@ -21,12 +21,14 @@ AEnemyProjectile::AEnemyProjectile()
 
 	//Movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	ProjectileMovement->InitialSpeed = 1000.f;
-	ProjectileMovement->MaxSpeed = 3000.f;
+	ProjectileMovement->InitialSpeed = 500.f;
+	ProjectileMovement->MaxSpeed = 500.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 
 	StaticMesh->OnComponentHit.AddDynamic(this, &AEnemyProjectile::OnHit);
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -51,12 +53,23 @@ void AEnemyProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAct
 void AEnemyProjectile::FireInDirection(const FVector& DirectionVec, const FVector& InitialPos, const FVector& EndPos)
 {
 	FVector Velocity = FVector::ZeroVector;
-	if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, Velocity, InitialPos, EndPos, GetWorld()->GetGravityZ(), 1.f))
-	{
 
-		ProjectileMovement->Velocity = Velocity * ProjectileMovement->InitialSpeed;
+	UGameplayStatics::SuggestProjectileVelocity(this, Velocity, InitialPos, EndPos,
+		ProjectileMovement->InitialSpeed, false, 0.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::DoNotTrace);
+	//UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, Velocity, InitialPos, EndPos, GetWorld()->GetGravityZ(), 1.f);
+	ProjectileMovement->Velocity = Velocity;
+	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
+	SetLifeSpan(TimeLimit);
 
-	}
+	//경로 디버그 용
+	/*FPredictProjectilePathParams predictParams(20.0f, InitialPos, Velocity, 15.0f);
+	predictParams.DrawDebugTime = 15.0f;
+	predictParams.DrawDebugType = EDrawDebugTrace::Type::ForDuration;
+	predictParams.OverrideGravityZ = GetWorld()->GetGravity3Z();
+	FPredictProjectilePathResult result;
+	UGameplayStatics::PredictProjectilePath(this, predictParams, result);*/
+	ProjectileMovement->UpdateComponentVelocity();
+	StaticMesh->AddImpulse(Velocity, FName(""), true);
 }
 
 void AEnemyProjectile::ServerApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)

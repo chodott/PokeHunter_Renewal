@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include "EnemyAnimInstance.h"
 #include "EnemyProjectile.h"
+#include "Net/UnrealNetwork.h"
 #include "components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PokeHunter/Item/Item.h"
@@ -107,6 +108,15 @@ bool AEnemy::IsJumping()
 	return GetCharacterMovement()->IsFalling();
 }
 
+void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AEnemy, CurState);
+	DOREPLIFETIME(AEnemy, Target);
+
+}
+
 void AEnemy::ServerPlayMontage_Implementation(AEnemy* Enemy, FName Section)
 {
 	MultiPlayMontage(this, Section);
@@ -177,13 +187,10 @@ void AEnemy::Attack(int AttackPattern)
 
 void AEnemy::LongAttack()
 {
-	if (EnemyAnim == NULL) return;
+	if (EnemyAnim == NULL || Target == NULL) return;
 	FVector InitialPos = GetMesh()->GetSocketLocation(FName("LeftHand")) + GetActorForwardVector() * 300.f;
 	FVector EndPos = Target->GetActorLocation();
 	FVector DirectionVec = EndPos - GetActorLocation();
-
-	//발사체 생성
-
 }
 
 void AEnemy::Roar()
@@ -217,7 +224,6 @@ void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	{
 		EnemyAnim->bPlaying = false;
 		if (CurState == EEnemyState::Hit) CurState = EEnemyState::Roar;
-		else if (CurState == EEnemyState::Roar) CurState = EEnemyState::Chase;
 		OnMontageEnd.Broadcast();
 	}
 }

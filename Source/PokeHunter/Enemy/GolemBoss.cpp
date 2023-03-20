@@ -24,16 +24,17 @@ void AGolemBoss::LongAttack()
 {
 	if (EnemyAnim)
 	{
-		EnemyAnim->PlayCombatMontage(TEXT("Throw"));
+		MultiPlayMontage(this, FName("Throw"));
 	}
 	TargetPos = Target->GetActorLocation();
 }
 
 void AGolemBoss::LaunchStone()
 {
-	FVector InitialPos = GetMesh()->GetSocketLocation(FName("Head")) + GetActorForwardVector() * 300.f;
+	FVector InitialPos = GetMesh()->GetSocketLocation(FName("LeftHand"));
+	if (Target == NULL) UE_LOG(LogTemp, Warning, TEXT("Dd"));
 	FVector EndPos = Target->GetActorLocation();
-	FVector DirectionVec = EndPos - GetActorLocation();
+	FVector DirectionVec = EndPos - InitialPos;
 	DirectionVec.Normalize();
 
 
@@ -43,6 +44,7 @@ void AGolemBoss::LaunchStone()
 
 float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{
@@ -51,8 +53,6 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		FName HitPart = PointDamageEvent.HitInfo.GetComponent()->ComponentTags[0];
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *HitPart.ToString());
 		if (PartHP.Contains(HitPart)) PartHP.Emplace(HitPart, PartHP[HitPart] - DamageAmount);
-
-		Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	}
 	return DamageAmount;

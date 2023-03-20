@@ -36,6 +36,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddIndex(int Val);
 	UFUNCTION(BlueprintCallable)
+	void ShowPartner(int Val);
+	UFUNCTION(BlueprintCallable)
 	void ChangePartner();
 	UFUNCTION(BlueprintCallable)
 	void LeavePartner();

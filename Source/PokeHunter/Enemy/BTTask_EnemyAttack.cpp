@@ -28,7 +28,7 @@ EBTNodeResult::Type UBTTask_EnemyAttack::ExecuteTask(UBehaviorTreeComponent& Own
 			//FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		});
 
-	return EBTNodeResult::Type::InProgress;
+	return EBTNodeResult::Type::Succeeded;
 }
 
 void UBTTask_EnemyAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

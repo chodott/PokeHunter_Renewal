@@ -26,6 +26,7 @@ void AGolemBoss::LongAttack()
 	{
 		EnemyAnim->PlayCombatMontage(TEXT("Throw"));
 	}
+	TargetPos = Target->GetActorLocation();
 }
 
 void AGolemBoss::LaunchStone()

@@ -141,6 +141,7 @@ void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 						Hunter->SetPartnerTarget(this);
 					}
 					Target = HitItem->ThisOwner;
+					TargetPos = Target->GetActorLocation();
 					CurState = EEnemyState::Hit;
 					bFirstHit = false;
 				}
@@ -155,7 +156,7 @@ void AEnemy::SeeNewTarget(AActor* Actor)
 	if (bFirstMeet)
 	{
 		bFirstMeet = false;
-		CurState = EEnemyState::Roar;
+		//CurState = EEnemyState::Roar;
 	}
 }
 
@@ -189,14 +190,14 @@ void AEnemy::Roar()
 {
 	if (EnemyAnim == NULL) return;
 	ServerPlayMontage(this, FName("Roar"));
-	EnemyAnim->PlayCombatMontage(TEXT("Roar"));
+	//EnemyAnim->PlayCombatMontage(TEXT("Roar"));
 }
 
 void AEnemy::Patrol()
 {
 	if (EnemyAnim == NULL) return;
 	ServerPlayMontage(this, FName("Patrol"));
-	EnemyAnim->PlayCombatMontage(TEXT("Patrol"));
+	//EnemyAnim->PlayCombatMontage(TEXT("Patrol"));
 }
 
 void AEnemy::JumpAttack()

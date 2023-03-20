@@ -35,7 +35,6 @@ void UBTTask_WolfIceShard::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	{
 		APartner* Partner = Cast<APartner>(OwnerComp.GetAIOwner()->GetPawn());
 		Partner->StopSkill();
-		Partner->CurState = EPartnerState::MoveTarget;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

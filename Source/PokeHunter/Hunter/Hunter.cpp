@@ -204,6 +204,25 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AHunter, CurState);
 }
 
+void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
+{
+	if (bSprinting && Hunter->CurState == EPlayerState::Idle)
+	{
+		Hunter->GetCharacterMovement()->MaxWalkSpeed = 1000.f;
+		Hunter->CurState = EPlayerState::Run;
+	}
+	else if (!bSprinting && Hunter->CurState == EPlayerState::Run)
+	{
+		Hunter->GetCharacterMovement()->MaxWalkSpeed = 600.f;
+		Hunter->CurState = EPlayerState::Idle;
+	}
+}
+
+void AHunter::ServerSprint_Implementation(AHunter* Hunter, bool bSprinting)
+{
+	Hunter->MultiSprint(Hunter, bSprinting);
+}
+
 void AHunter::MultiPlayMontage_Implementation(AHunter* Hunter, FName Session)
 {
 	Hunter->HunterAnim->PlayCombatMontage(Session);
@@ -213,6 +232,40 @@ void AHunter::ServerPlayMontage_Implementation(AHunter* Hunter ,FName Session)
 {
 	MultiPlayMontage(Hunter, Session);
 	
+}
+
+void AHunter::ServerZoom_Implementation(AHunter* Hunter, bool bZoom)
+{
+	MultiZoom(Hunter, bZoom);
+}
+
+void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
+{
+	if (bZoom)
+	{
+		if (CurState == EPlayerState::Idle && !GetCharacterMovement()->IsFalling())
+		{
+			CurState = EPlayerState::Zoom;
+			bUseControllerRotationYaw = true;
+			bUseControllerRotationPitch = true;
+			GetCharacterMovement()->bOrientRotationToMovement = false;
+
+			GetCharacterMovement()->MaxWalkSpeed = 300.f;
+		}
+	}
+	else
+	{
+		if (CurState == EPlayerState::Zoom)
+		{
+			bUseControllerRotationYaw = false;
+			bUseControllerRotationPitch = false;
+			GetCharacterMovement()->bOrientRotationToMovement = true;
+			CurState = EPlayerState::Idle;
+
+			SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
+			Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 600.0f;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -312,15 +365,12 @@ void AHunter::LookUp(float NewAxisValue)
 
 void AHunter::LShiftDown()
 {
-	if (CurState == EPlayerState::Idle)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 1000.f;
-	}
+	ServerSprint(this, true);
 }
 
 void AHunter::LShiftUp()
 {
-	
+	ServerSprint(this, false);
 }
 
 void AHunter::LMBDown()
@@ -428,29 +478,12 @@ void AHunter::LMBDown()
 
 void AHunter::RMBDown()
 {
-	if (CurState == EPlayerState::Idle && !GetCharacterMovement()->IsFalling())
-	{
-		CurState = EPlayerState::Zoom;
-		bUseControllerRotationYaw = true;
-		bUseControllerRotationPitch = true;
-		GetCharacterMovement()->bOrientRotationToMovement = false;
-
-		GetCharacterMovement()->MaxWalkSpeed = 300.f;
-	}
+	ServerZoom(this,true);
 }
 
 void AHunter::RMBUp()
 {
-	if(CurState == EPlayerState::Zoom)
-	{
-		bUseControllerRotationYaw = false;
-		bUseControllerRotationPitch = false;
-		GetCharacterMovement()->bOrientRotationToMovement = true;
-		CurState = EPlayerState::Idle;
-
-		SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
-		Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 600.0f;
-	}
+	ServerZoom(this, false);
 }
 
 void AHunter::WheelInput(float Val)

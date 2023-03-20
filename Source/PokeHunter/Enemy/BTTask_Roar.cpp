@@ -17,6 +17,7 @@ EBTNodeResult::Type UBTTask_Roar::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	UEnemyAnimInstance* EnemyAnim = Enemy->EnemyAnim;
 	if (Enemy == NULL)return EBTNodeResult::Failed;
+	if (Enemy->CurState != EEnemyState::Roar) return EBTNodeResult::Failed;
 	bPlaying = true;
 
 	
@@ -26,6 +27,7 @@ EBTNodeResult::Type UBTTask_Roar::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 		{
 			bPlaying = false;
 		});
+
 	 
 	return EBTNodeResult::Type::InProgress;
 }
@@ -38,5 +40,6 @@ void UBTTask_Roar::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 	{
 		Enemy->CurState = EEnemyState::Chase;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		
 	}
 }

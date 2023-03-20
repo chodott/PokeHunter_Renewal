@@ -17,7 +17,7 @@ EBTNodeResult::Type UBTTask_WolfIceShard::ExecuteTask(UBehaviorTreeComponent& Ow
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 	AWolfPartner* Wolf = Cast<AWolfPartner>(OwnerComp.GetAIOwner()->GetPawn());
 	if (Wolf == NULL)return EBTNodeResult::Failed;
-
+	if (Wolf->CurState != EPartnerState::IceShard) return EBTNodeResult::Failed;
 	bPlaying = true;
 	Wolf->LaunchIceShard();
 
@@ -35,7 +35,6 @@ void UBTTask_WolfIceShard::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	{
 		APartner* Partner = Cast<APartner>(OwnerComp.GetAIOwner()->GetPawn());
 		Partner->StopSkill();
-		Partner->CurState = EPartnerState::MoveTarget;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

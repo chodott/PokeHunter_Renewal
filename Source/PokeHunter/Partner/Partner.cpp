@@ -6,6 +6,8 @@
 #include "PartnerAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
 #include "PokeHunter/Hunter/Hunter.h"
 
 // Sets default values
@@ -87,6 +89,7 @@ void APartner::StopSkill()
 {
 	bOrdered = false;
 	bUsingSkill = false;
+	CurState = EPartnerState::MoveTarget;
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 }
 

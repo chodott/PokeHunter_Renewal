@@ -84,6 +84,13 @@ void ANpcPartnerManager::AddIndex(int Val)
 	CurrentIndex += Val;
 }
 
+void ANpcPartnerManager::ShowPartner(int Val)
+{
+	PartnerArray[CurrentIndex]->TargetPos = PositionArray[CurrentIndex];
+	PartnerArray[CurrentIndex]->bPosing = false;
+	CurrentIndex = Val;
+}
+
 void ANpcPartnerManager::SelectPartner()
 {
 	PartnerArray[CurrentIndex]->Hunter = Master;

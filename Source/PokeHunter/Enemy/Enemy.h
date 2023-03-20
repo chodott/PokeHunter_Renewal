@@ -34,19 +34,19 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float HP{30};
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
 	class APawn* Target;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<class APawn*> TargetArray;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
 	FVector TargetPos;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UEnemyAnimInstance* EnemyAnim;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
 	EEnemyState CurState{EEnemyState::Patrol};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -79,7 +79,9 @@ public:
 
 	bool IsJumping();
 
-	//Animation
+	//Replication
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
+
 	UFUNCTION(Server, Reliable)
 	void ServerPlayMontage(AEnemy* Enemy, FName Section);
 	UFUNCTION(NetMulticast, Reliable)
@@ -92,10 +94,11 @@ public:
 	void SeeNewTarget(AActor* Actor);
 	void HearSound(FVector SoundLoc);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void Attack(int AttackPattern);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void LongAttack();
+	UFUNCTION(BlueprintCallable)
 	virtual void Roar();
 	UFUNCTION()
 	virtual void Patrol();

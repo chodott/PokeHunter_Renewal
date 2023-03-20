@@ -161,6 +161,22 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiPlayMontage(AHunter* Hunter, FName Session);
 
+	UFUNCTION(Server, Reliable)
+	void ServerSprint(AHunter* Hunter, bool bSprinting);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSprint(AHunter* Hunter, bool bSprinting);
+
+	UFUNCTION(Server, Reliable)
+	void ServerZoom(AHunter* Hunter, bool bZoom);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiZoom(AHunter* Hunter, bool bZoom);
+
+	//Status
+	UFUNCTION(BlueprintCallable)
+	void SetHP(float HP) { HunterInfo.HunterHP = HP; };
+	UFUNCTION(BlueprintCallable)
+	void SetStamina(float Stamina) { HunterInfo.HunterStamina = Stamina; };
+
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

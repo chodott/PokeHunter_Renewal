@@ -21,5 +21,5 @@ public:
 	
 public:
 	UBehaviorTreeComponent* BTComponent;
-	bool bPlaying;
+	bool bPlaying{ true };
 };

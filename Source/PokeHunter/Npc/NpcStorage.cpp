@@ -19,6 +19,8 @@ ANpcStorage::ANpcStorage()
 	//인벤토리
 	Storage = CreateDefaultSubobject<UInventoryComponent>(TEXT("Storage"));
 	Storage->capacity = 30;
+
+	InteractionSphere->SetSphereRadius(100.f);
 }
 
 // Called when the game starts or when spawned

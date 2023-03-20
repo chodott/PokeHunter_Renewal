@@ -25,7 +25,7 @@ public:
 	void RunAI();
 	void StopAI();
 
-private:
+public:
 	UPROPERTY()
 		class UBehaviorTree* BTPartner;
 	UPROPERTY()

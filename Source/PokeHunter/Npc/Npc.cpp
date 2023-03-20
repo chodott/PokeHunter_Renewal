@@ -51,7 +51,7 @@ void ANpc::Interact_Implementation(AHunter* Hunter)
 	if (bActive)
 	{
 		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(Hunter, 1.0f);
-		Master->StorageUI->RemoveFromViewport();
+		Master->StorageUI->RemoveFromParent();
 		Master->GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Opacity"), 1);
 	}
 	else

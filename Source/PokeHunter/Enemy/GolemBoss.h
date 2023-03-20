@@ -32,7 +32,7 @@ public:
 
 	virtual void LongAttack();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void LaunchStone();
 
 };

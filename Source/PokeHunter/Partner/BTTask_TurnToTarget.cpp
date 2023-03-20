@@ -29,8 +29,9 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	if (Pawn == nullptr) FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	FVector TargetPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(TEXT("TargetPos"));
 	FVector LookVec = TargetPos - Pawn->GetActorLocation();
-	FVector ForwardVec = Pawn->GetActorForwardVector();
+	
 	APartner* Partner =Cast<APartner>(Pawn);
+	AEnemy* Enemy = Cast<AEnemy>(Pawn);
 	if (Partner)
 	{
 		if (Partner->CurState == EPartnerState::Posing || Partner->CurState == EPartnerState::Unselected)
@@ -43,12 +44,28 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 			LookVec = Partner->LookTargetVec;
 		}
 	}
+
+	else if (Enemy)
+	{
+		if (Enemy->Target != NULL)
+		{
+			TargetPos = Enemy->Target->GetActorLocation();
+			LookVec = TargetPos - Pawn->GetActorLocation();
+		}
+	}
+
+	LookVec.Z = 0.f;
+	FVector ForwardVec = Pawn->GetActorForwardVector();
+
+	LookVec.Normalize();
 	FRotator Rot = FRotationMatrix::MakeFromX(LookVec).Rotator();
 
 	Pawn->SetActorRotation(FMath::RInterpTo(Pawn->GetActorRotation(), Rot, GetWorld()->GetDeltaSeconds(), 5.f));
 
+
+
 	float BetweenAngle = FMath::Acos(FVector::DotProduct(LookVec, ForwardVec) / (LookVec.Size() * ForwardVec.Size())) * (180.0f / PI);
-	if (BetweenAngle < 10.f)
+	if (BetweenAngle < 5.f)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

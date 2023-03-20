@@ -15,12 +15,12 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Runtime/Online/HTTP/Public/Http.h"
 #include "ServerIntance.generated.h"
 
 /**
  * 
  */
-
 USTRUCT(BlueprintType)
 struct FU_SC_LOGIN_INFO_PACK {
 	GENERATED_USTRUCT_BODY()
@@ -56,6 +56,7 @@ UCLASS()
 class POKEHUNTER_API UServerIntance : public UGameInstance
 {
 	GENERATED_BODY()
+
 public:
 	UServerIntance();
 
@@ -82,4 +83,32 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = Socket)
 		bool ConnectToServer();
+
+	virtual void Shutdown() override;
+
+	UPROPERTY()
+		FString AccessToken;
+
+	UPROPERTY()
+		FString IdToken;
+
+	UPROPERTY()
+		FString RefreshToken;
+
+	UPROPERTY()
+		FTimerHandle RetrieveNewTokensHandle;
+
+	UFUNCTION()
+		void SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken);
+
+private:
+	FHttpModule* HttpModule;
+
+	UPROPERTY()
+		FString ApiUrl;
+
+	UFUNCTION()
+		void RetrieveNewTokens();
+
+	void OnRetrieveNewTokensResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 };

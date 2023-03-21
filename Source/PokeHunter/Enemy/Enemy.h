@@ -86,6 +86,10 @@ public:
 	void ServerPlayMontage(AEnemy* Enemy, FName Section);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiPlayMontage(AEnemy* Enemy, FName Section);
+	//UFUNCTION(Server, Reliable)
+	//void ServerTakeDamage(AEnemy* Enemy, FName Section);
+	//UFUNCTION(NetMulticast, Reliable)
+	//void MultiTakeDamage(AEnemy* Enemy);
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

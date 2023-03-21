@@ -23,6 +23,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh")
 	class UStaticMeshComponent* StaticMesh;
 
+	class AHunter* Master;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -32,5 +34,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Interact_Implementation(AHunter* Hunter) override;
-	class AHunter* Master;
+
+
 };

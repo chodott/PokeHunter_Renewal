@@ -75,14 +75,14 @@ void AEnemyController::OnPerception(AActor* Actor, FAIStimulus Stimulus)
 }
 
 
-void AEnemyController::RunAI()
+void AEnemyController::RunAI_Implementation()
 {
 	//upgrade5
 	//if (UseBlackboard(BBEnemy, Blackboard)) RunBehaviorTree(BTEnemy);
 	RunBehaviorTree(BTEnemy);
 }
 
-void AEnemyController::StopAI()
+void AEnemyController::StopAI_Implementation()
 {
 	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
 	if (BehaviorTreeComponent == nullptr) return;

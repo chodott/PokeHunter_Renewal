@@ -17,6 +17,7 @@ EBTNodeResult::Type UBTTask_LongAttack::ExecuteTask(UBehaviorTreeComponent& Owne
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	UEnemyAnimInstance* EnemyAnim = Enemy->EnemyAnim;
 	if (Enemy == NULL)return EBTNodeResult::Failed;
+	if (Enemy->CurState != EEnemyState::LongAttack)
 	Enemy->LongAttack();
 	bPlaying = true;
 

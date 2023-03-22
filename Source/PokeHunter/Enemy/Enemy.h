@@ -17,7 +17,9 @@ enum class EEnemyState : uint8
 	Hit UMETA(DisplayName = "Hit"),
 	Die UMETA(DisplayName = "Die"),
 	Roar UMETA(DisplayName = "Roar"),
-	Attention
+	Attention UMETA(DisplayName = "Attention"),
+	JumpAttack UMETA(DisplayName = "JumpAttack"),
+	LongAttack UMETA(DisplayName = "LongAttack")
 	
 };
 
@@ -46,7 +48,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UEnemyAnimInstance* EnemyAnim;
 
-	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
 	EEnemyState CurState{EEnemyState::Patrol};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)

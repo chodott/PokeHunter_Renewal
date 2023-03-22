@@ -26,7 +26,9 @@ public:
 	UFUNCTION()
 	void OnPerception(AActor* Actor, FAIStimulus Stimulus);
 
+	UFUNCTION(Server, Reliable)
 	void RunAI();
+	UFUNCTION(Server, Reliable)
 	void StopAI();
 
 private:

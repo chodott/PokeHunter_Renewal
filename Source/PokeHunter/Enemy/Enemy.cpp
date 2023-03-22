@@ -188,6 +188,7 @@ void AEnemy::Attack(int AttackPattern)
 void AEnemy::LongAttack()
 {
 	if (EnemyAnim == NULL || Target == NULL) return;
+	CurState = EEnemyState::LongAttack;
 	FVector InitialPos = GetMesh()->GetSocketLocation(FName("LeftHand")) + GetActorForwardVector() * 300.f;
 	FVector EndPos = Target->GetActorLocation();
 	FVector DirectionVec = EndPos - GetActorLocation();
@@ -209,13 +210,13 @@ void AEnemy::Patrol()
 
 void AEnemy::JumpAttack()
 {
-	float Distance = GetDistanceTo(Target); 
-	GetCharacterMovement()->Velocity = FVector(1000, 1000, 0);
-	bool bJump = GetCharacterMovement()->DoJump(false);
-	if (bJump)
-	{
-		GetCharacterMovement()->UpdateComponentVelocity();
-	}
+	CurState = EEnemyState::JumpAttack;
+	float Distance = GetDistanceTo(Target);
+	FVector LookVec = Target->GetActorLocation() - GetActorLocation();
+	LookVec.Normalize();
+	LookVec.Z = 0.2f;
+	FVector Velocity = LookVec * Distance;
+	GetCharacterMovement()->Launch(Velocity);
 }
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

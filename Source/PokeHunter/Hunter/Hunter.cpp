@@ -333,7 +333,7 @@ void AHunter::SpaceDown()
 
 void AHunter::MoveForward(float Val)
 {
-	if (CurState == EPlayerState::Dive) return;
+	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install) return;
 	if (Val != 0.0f)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -347,7 +347,7 @@ void AHunter::MoveForward(float Val)
 
 void AHunter::MoveRight(float Val)
 {
-	if (CurState == EPlayerState::Dive) return;
+	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install) return;
 	
 	if (Val != 0.0f)
 	{
@@ -400,22 +400,27 @@ void AHunter::LMBDown()
 			Partner->bOrdered = true;
 			Partner->CurState = EPartnerState::MoveTarget;
 		}
-
+		return;
 	}
-	else if (CurState == EPlayerState::Zoom)
-	{
-		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-		ServerPlayMontage(this, FName("Shot"));
 
+	if (QuickSlotArray[CurQuickKey].ItemID != FName("None"))
+	{
 		FName ItemID = QuickSlotArray[CurQuickKey].ItemID;
-		AActor* TempActor = UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass());
-		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(TempActor);
-		if (DatabaseActor && ItemID != "None")
+		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
+		if (DatabaseActor)
 		{
 			TSubclassOf<AItem> ItemClass = DatabaseActor->FindItem(ItemID)->ItemInfo.ItemClass;
 			if (ItemClass == NULL) return;
-			else
+
+			AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(), GetControlRotation());
+			auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
+
+			//ZoomMode
+			if (CurState == EPlayerState::Zoom)
 			{
+				
+				ServerPlayMontage(this, FName("Shot"));
+
 				FHitResult* HitResult = new FHitResult();
 				FVector StartTrace = FollowCamera->GetComponentLocation();
 				FVector EndTrace = StartTrace + FollowCamera->GetForwardVector() * 5000.f;
@@ -432,43 +437,29 @@ void AHunter::LMBDown()
 					);
 					EndTrace = HitResult->Location;
 				}
-
-			
-				//ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(ItemClass, GetActorLocation() + GetActorForwardVector() * 100.f, GetControlRotation());
-				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(ItemClass, GetMesh()->GetSocketLocation(FName("Muzzle")),GetControlRotation());
-				Bullet->UseItem(this, GetMesh()->GetSocketLocation(FName("Muzzle")), EndTrace);
-				QuickSlotArray[CurQuickKey].cnt--;
-				if (QuickSlotArray[CurQuickKey].cnt == 0)
+				Item->UseItem(this, StartTrace, EndTrace);
+			}
+			//NormalMode
+			else
+			{
+				switch (Item->ItemType)
 				{
-					for (auto& Info : Inventory->InfoArray)
-					{
-						if (Info.ItemID == ItemID)
-						{
-							Info.ItemID == FName("None");
-							Info.cnt = 0;
-						}
-						QuickSlotArray[CurQuickKey].ItemID = FName("None");
-					}
+				case EItemType::Potion:
+					ServerPlayMontage(this, FName("Drink"));
+					Item->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
+					CurItem = Item;
+					bUpperOnly = true;
+					break;
+				case EItemType::Trap:
+					ServerPlayMontage(this, FName("Install"));
+					Item->SetActorLocation((GetActorLocation() + GetActorForwardVector() * 100.f));
+					CurState = EPlayerState::Install;
+					break;
 				}
-				
-			}
-		}
-	}
-	else 
-	{
-		if (QuickSlotArray[CurQuickKey].ItemID != FName("None"))
-		{
-			//Use Item Update need
-			FName ItemID = QuickSlotArray[CurQuickKey].ItemID;
-			AActor* TempActor = UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass());
-			ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(TempActor);
-			if(DatabaseActor)
-			{ 
-				TSubclassOf<AItem> ItemClass = DatabaseActor->FindItem(ItemID)->ItemInfo.ItemClass;
-				if (ItemClass == NULL) return;
-				else GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(), GetControlRotation());
+				Item->UseItem(this);
 			}
 
+			//인벤토리 처리
 			QuickSlotArray[CurQuickKey].cnt--;
 			if (QuickSlotArray[CurQuickKey].cnt == 0)
 			{
@@ -482,9 +473,9 @@ void AHunter::LMBDown()
 					QuickSlotArray[CurQuickKey].ItemID = FName("None");
 				}
 			}
-
 		}
 	}
+	
 }
 
 void AHunter::RMBDown()
@@ -634,6 +625,12 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	{
 		CurState = EPlayerState::Idle;
 	}
+	else if (CurState == EPlayerState::Install)
+	{
+		CurState = EPlayerState::Idle;
+	}
+
+	if (CurItem != NULL) CurItem->Destroy();
 
 	if (bUpperOnly) bUpperOnly = false;
 }

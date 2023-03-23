@@ -15,6 +15,9 @@ ANpc::ANpc()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	SceneRootComponent = CreateDefaultSubobject<USceneComponent>("My Scene Component");
+	SetRootComponent(SceneRootComponent);
+
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	CollisionBox->AddLocalOffset(FVector(0.f, 0.f, GetSimpleCollisionHalfHeight()),false);
 	CollisionBox->SetupAttachment(GetRootComponent());

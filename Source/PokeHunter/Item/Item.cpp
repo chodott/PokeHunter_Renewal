@@ -13,9 +13,12 @@ AItem::AItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	SceneRootComponent = CreateDefaultSubobject<USceneComponent>("My Scene Component");
+	SetRootComponent(SceneRootComponent);
 
-	SetRootComponent(StaticMesh);
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	StaticMesh->SetupAttachment(SceneRootComponent);
+
 	StaticMesh->SetCollisionProfileName("WorldDynamic");
 
 }
@@ -35,6 +38,11 @@ void AItem::Tick(float DeltaTime)
 }
 
 void AItem::UseItem(APawn* ItemOwner)
+{
+
+}
+
+void AItem::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 {
 
 }

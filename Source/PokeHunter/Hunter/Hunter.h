@@ -21,7 +21,8 @@ enum class EPlayerState : uint8
 	Idle,
 	Run,
 	Dive,
-	Zoom
+	Zoom,
+	Install
 };
 
 USTRUCT(BlueprintType)

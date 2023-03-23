@@ -24,6 +24,8 @@ ABullet::ABullet()
 	StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
 	//StaticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnHit);
 
+	ItemType = EItemType::Bullet;
+
 };
 
 void ABullet::BeginPlay()

@@ -10,14 +10,14 @@ void AHunterController::BeginPlay()
 
 void AHunterController::PostInitializeComponents()
 {
-	Super::PostInitializeComponents();
-	ABLOG_S(Warning);
+//	Super::PostInitializeComponents();
+	// ABLOG_S(Warning);
 }
 
 void AHunterController::OnPossess(APawn* aPawn)
 {
-	ABLOG_S(Warning);
-	Super::Possess(aPawn);
+ // 	ABLOG_S(Warning);
+// 	Super::Possess(aPawn);
 	
 
 }

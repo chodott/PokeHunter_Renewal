@@ -143,6 +143,14 @@ public:
 	//TeamID
 	FGenericTeamId TeamID;
 
+	//
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	bool bInvincible{ false};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float InvincibleTime{ 2.f };
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
+	float StartInvincibleTime;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -170,6 +178,14 @@ public:
 	void ServerZoom(AHunter* Hunter, bool bZoom);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiZoom(AHunter* Hunter, bool bZoom);
+
+	UFUNCTION(Server, Reliable)
+	void ServerStartInvincibility();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiStartInvincibility();
+	UFUNCTION(BlueprintCallable)
+	void StartInvincibility();
+
 
 	//Status
 	UFUNCTION(BlueprintCallable)

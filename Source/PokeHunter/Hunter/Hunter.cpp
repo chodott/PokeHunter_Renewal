@@ -181,6 +181,17 @@ void AHunter::Tick(float DeltaTime)
 		if (HunterInfo.HunterStamina < 100) HunterInfo.HunterStamina += DeltaTime * 1;
 		else HunterInfo.HunterStamina = 100;
 	}
+
+	//Invincible
+	if (bInvincible)
+	{
+		float ElapsedTime = GetWorld()->TimeSeconds - StartInvincibleTime;
+		float TimeLeft = InvincibleTime - ElapsedTime;
+		if (TimeLeft <= 0.0f)
+		{
+			bInvincible = false;
+		}
+	}
 }
 
 void AHunter::PostInitializeComponents()
@@ -315,7 +326,7 @@ void AHunter::SpaceDown()
 		{
 			LastSpeed = XYspeed.Size();
 		}
-
+		ServerStartInvincibility();
 		DiveTimeline.PlayFromStart();
 	}
 }
@@ -678,4 +689,20 @@ void AHunter::SetPartnerTarget(AActor* setTarget)
 		Partner->SetTarget(setTarget);
 	}
 	
+}
+
+void AHunter::ServerStartInvincibility_Implementation()
+{
+	MultiStartInvincibility();
+}
+
+void AHunter::MultiStartInvincibility_Implementation()
+{
+	bInvincible = true;
+	StartInvincibleTime = GetWorld()->TimeSeconds;
+}
+
+void AHunter::StartInvincibility()
+{
+	ServerStartInvincibility();
 }

@@ -44,7 +44,7 @@ void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 				bool bAddSuccess = Master->Inventory->AddItemData(DropItem.Value, ItemCnt);
 				if (bAddSuccess) 
 				{ 
-					this->Destroy(); 
+					this->Destroy();
 					return;
 				}
 				else {

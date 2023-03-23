@@ -15,14 +15,18 @@ EBTNodeResult::Type UBTTask_JumpAttack::ExecuteTask(UBehaviorTreeComponent& Owne
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	if (Enemy == NULL)return EBTNodeResult::Failed;
+	if(Enemy->CurState != EEnemyState::JumpAttack)
 	Enemy->JumpAttack();
-	return EBTNodeResult::Type();
+	return EBTNodeResult::InProgress;
 }
 
 void UBTTask_JumpAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
-	if(!Enemy->IsJumping())
+	if (!Enemy->IsJumping())
+	{
+		Enemy->CurState = EEnemyState::Chase;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-
+		
+	}
 }

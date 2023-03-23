@@ -21,7 +21,11 @@ public:
 	TSubclassOf<class APartnerProjectile> IceShardClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	class UCapsuleComponent* StormCollision;
+	class UStaticMeshComponent* StormCollision;
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 	
 public:
@@ -31,4 +35,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void MakeIceShard();
 	void MakeStorm();
+	void IntoStorm(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OutStorm(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

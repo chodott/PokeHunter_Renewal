@@ -4,7 +4,7 @@
 #include "WolfPartner.h"
 #include "PartnerProjectile.h"
 #include "PartnerAnimInstance.h"
-#include "Components/CapsuleComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 AWolfPartner::AWolfPartner()
 {
@@ -18,12 +18,17 @@ AWolfPartner::AWolfPartner()
 	}
 
 	//½ºÅè ¹üÀ§ ÄÄÆ÷³ÍÆ® Ãß°¡
-	StormCollision = CreateDefaultSubobject<UCapsuleComponent>(FName("StormCollision"));
-	StormCollision->SetCapsuleHalfHeight(100.f);
-	StormCollision->SetCapsuleRadius(150.f);
-	StormCollision->Deactivate();
+	StormCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("StormCollision"));
 }
 
+
+void AWolfPartner::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//StormCollision->OnComponentBeginOverlap.AddDynamic(this, &AWolfPartner::IntoStorm);
+	//StormCollision->OnComponentEndOverlap.AddDynamic(this, &AWolfPartner::OutStorm);
+}
 
 void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 {
@@ -69,5 +74,15 @@ void AWolfPartner::MakeIceShard()
 void AWolfPartner::MakeStorm()
 {
 	PartnerAnim->PlayCombatMontage(TEXT("Attack"));
-	StormCollision->Activate(true);
+	//StormCollision.set
+}
+
+void AWolfPartner::IntoStorm(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	
+}
+
+void AWolfPartner::OutStorm(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
 }

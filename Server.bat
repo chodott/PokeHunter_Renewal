@@ -1,1 +1,1 @@
-"C:\UnrealEngine-4.27-plus\Engine\Binaries\Win64\UE4Editor.exe" "C:\PokeHunter\PokeHunter\PokeHunter.uproject" -server -log -port=7777
+"C:\Program Files\Epic Games\UE_5.1\Engine\Binaries\Win64\UnrealEditor.exe" "C:\Project\PokeHunter\PokeHunter.uproject" -server -log -port=7777

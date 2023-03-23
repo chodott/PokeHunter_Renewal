@@ -222,7 +222,7 @@ void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
 		Hunter->GetCharacterMovement()->MaxWalkSpeed = 1000.f;
 		Hunter->CurState = EPlayerState::Run;
 	}
-	else if (!bSprinting && Hunter->CurState == EPlayerState::Run)
+	else if (!bSprinting && (Hunter->CurState == EPlayerState::Run || Hunter->CurState == EPlayerState::Dive))
 	{
 		Hunter->GetCharacterMovement()->MaxWalkSpeed = 600.f;
 		Hunter->CurState = EPlayerState::Idle;
@@ -313,7 +313,7 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AHunter::SpaceDown()
 {
-	if(CurState == EPlayerState::Idle)
+	if(CurState == EPlayerState::Idle || CurState == EPlayerState::Run)
 	{
 		CurState = EPlayerState::Dive;
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
@@ -525,6 +525,8 @@ void AHunter::OpenInventory()
 
 void AHunter::EKeyDown()
 {
+	if (CurState == EPlayerState::Zoom || CurState == EPlayerState::Dive) return;
+
 	if (InteractingActor)
 	{
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
@@ -547,6 +549,12 @@ void AHunter::EKeyDown()
 				AnimInstance->PlayInteractMontage(FName("RunRightPickup"));
 			}
 			bUpperOnly = true;
+		}
+
+		else
+		{
+			//아마 npc
+			ServerSprint(this, false);
 		}
 
 		InteractingActor->Interact_Implementation(this);

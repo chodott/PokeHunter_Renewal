@@ -23,7 +23,8 @@ void UInventoryComponent::BeginPlay()
 {
 	//아이템 배열(클래스) 초기화
 	Super::BeginPlay();
-	for (int i = 0; i < capacity; i++)
+	int ArrayLength = InfoArray.Num();
+	for (int i = ArrayLength; i < capacity; i++)
 	{
 		//아이템 struct
 		InfoArray.AddDefaulted();

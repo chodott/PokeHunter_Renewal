@@ -73,7 +73,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HunterStatus")
 	FHunterInfo HunterInfo;
 	
-	//Interaction
+	//
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	class AInteractActor* InteractingActor;
 

@@ -21,6 +21,7 @@
 #include "PokeHunter/Partner/Partner.h"
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Item/ItemData.h"
+#include "PokeHunter/Item/Potion.h"
 #include "PokeHunter/Item/Bullet.h"
 #include "PokeHunter/Base/InteractActor.h"
 #include "PokeHunter/Base/DatabaseActor.h"
@@ -162,16 +163,6 @@ void AHunter::Tick(float DeltaTime)
 		CameraBoom->SetRelativeLocation(FVector(0,FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, CameraZoomTo, DeltaTime, ArmSpeed),0));
 	}
 
-	else if (CurState == EPlayerState::Run)
-	{
-		if (HunterInfo.HunterStamina > 0) HunterInfo.HunterStamina -= DeltaTime * 1;
-		else
-		{
-			HunterInfo.HunterStamina = 0;
-			GetCharacterMovement()->MaxWalkSpeed = 600.f;
-		}
-	}
-
 	else
 	{
 		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, 500.f, DeltaTime, ArmSpeed);
@@ -181,6 +172,18 @@ void AHunter::Tick(float DeltaTime)
 		if (HunterInfo.HunterStamina < 100) HunterInfo.HunterStamina += DeltaTime * 1;
 		else HunterInfo.HunterStamina = 100;
 	}
+
+	//Stamina
+		if (GetCharacterMovement()->GetMaxSpeed() > 600.f)
+		{
+			if (HunterInfo.HunterStamina > 0) HunterInfo.HunterStamina -= DeltaTime * 1;
+			else
+			{
+				HunterInfo.HunterStamina = 0;
+				GetCharacterMovement()->MaxWalkSpeed = 600.f;
+			}
+	}
+
 
 	//Invincible
 	if (bInvincible)
@@ -220,12 +223,10 @@ void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
 	if (bSprinting && Hunter->CurState == EPlayerState::Idle)
 	{
 		Hunter->GetCharacterMovement()->MaxWalkSpeed = 1000.f;
-		Hunter->CurState = EPlayerState::Run;
 	}
-	else if (!bSprinting && (Hunter->CurState == EPlayerState::Run || Hunter->CurState == EPlayerState::Dive))
+	else if (!bSprinting)
 	{
 		Hunter->GetCharacterMovement()->MaxWalkSpeed = 600.f;
-		Hunter->CurState = EPlayerState::Idle;
 	}
 }
 
@@ -313,7 +314,7 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AHunter::SpaceDown()
 {
-	if(CurState == EPlayerState::Idle || CurState == EPlayerState::Run)
+	if(CurState == EPlayerState::Idle)
 	{
 		CurState = EPlayerState::Dive;
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
@@ -410,14 +411,15 @@ void AHunter::LMBDown()
 		if (DatabaseActor)
 		{
 			TSubclassOf<AItem> ItemClass = DatabaseActor->FindItem(ItemID)->ItemInfo.ItemClass;
-			if (ItemClass == NULL) return;
-
-			AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(), GetControlRotation());
+			if (ItemClass == NULL) return; 
 			auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-
+			
 			//ZoomMode
 			if (CurState == EPlayerState::Zoom)
 			{
+				TSubclassOf<ABullet> BulletClass = ItemClass;
+				if (BulletClass == NULL) return;
+				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, GetMesh()->GetSocketLocation(FName("Muzzle")), GetControlRotation());
 				
 				ServerPlayMontage(this, FName("Shot"));
 
@@ -437,26 +439,31 @@ void AHunter::LMBDown()
 					);
 					EndTrace = HitResult->Location;
 				}
-				Item->UseItem(this, StartTrace, EndTrace);
+				Bullet->UseItem(this, StartTrace, EndTrace);
 			}
 			//NormalMode
 			else
 			{
+				AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(), GetControlRotation());
+
 				switch (Item->ItemType)
 				{
 				case EItemType::Potion:
 					ServerPlayMontage(this, FName("Drink"));
 					Item->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
 					CurItem = Item;
+					CurState = EPlayerState::Drink;
 					bUpperOnly = true;
 					break;
+
 				case EItemType::Trap:
 					ServerPlayMontage(this, FName("Install"));
 					Item->SetActorLocation((GetActorLocation() + GetActorForwardVector() * 100.f));
 					CurState = EPlayerState::Install;
+					Item->UseItem(this);
 					break;
 				}
-				Item->UseItem(this);
+				
 			}
 
 			//인벤토리 처리
@@ -629,15 +636,19 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	{
 		CurState = EPlayerState::Idle;
 	}
-
-	if (CurItem != NULL) CurItem->Destroy();
+	else if (CurState == EPlayerState::Drink)
+	{
+		CurItem->UseItem(this);
+		if (CurItem != NULL) CurItem->Destroy();
+		CurState = EPlayerState::Idle;
+	}
 
 	if (bUpperOnly) bUpperOnly = false;
 }
 
 void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OverlappedComp == GetCapsuleComponent()) UE_LOG(LogTemp, Warning, TEXT("OverlapBegin"));
+	//if (OverlappedComp == GetCapsuleComponent()) UE_LOG(LogTemp, Warning, TEXT("OverlapBegin"));
 	if (InteractingActor == nullptr)
 	{
 		if (OtherActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))

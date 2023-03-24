@@ -19,10 +19,10 @@ UENUM(BlueprintType)
 enum class EPlayerState : uint8
 {
 	Idle,
-	Run,
 	Dive,
 	Zoom,
-	Install
+	Install,
+	Drink
 };
 
 USTRUCT(BlueprintType)

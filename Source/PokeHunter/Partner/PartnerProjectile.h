@@ -16,6 +16,9 @@ public:
 	// Sets default values for this actor's properties
 	APartnerProjectile();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector Velocity;
+
 
 
 protected:

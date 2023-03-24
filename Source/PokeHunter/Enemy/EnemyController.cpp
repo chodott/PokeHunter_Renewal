@@ -17,7 +17,8 @@ AEnemyController::AEnemyController()
 		BBEnemy = BBObject.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/Enemy/BT_Enemy.BT_Enemy"));
+	//static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/Enemy/BT_Enemy.BT_Enemy"));
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/Enemy/BT_DefaultEnemy.BT_DefaultEnemy"));
 	if (BTObject.Succeeded())
 	{
 		BTEnemy = BTObject.Object;

@@ -2,6 +2,7 @@
 
 
 #include "Potion.h"
+#include "PokeHunter/Hunter/Hunter.h"
 
 APotion::APotion()
 {
@@ -10,6 +11,7 @@ APotion::APotion()
 
 void APotion::UseItem(APawn* ItemOwner)
 {
-
+	AHunter* Hunter = Cast<AHunter>(ItemOwner);
+	if (Hunter) Hunter->HunterInfo.HunterHP += HealAmount;
 }
 

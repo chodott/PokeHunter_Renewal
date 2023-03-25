@@ -31,10 +31,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void StopAI();
 
-private:
-	UPROPERTY()
+public:
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadWrite, "AI")
+	class UBehaviorTreeComponent* BTComponent;*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
 	class UBehaviorTree* BTEnemy;
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
 	class UBlackboardData* BBEnemy;
 	UPROPERTY()
 	class UAISenseConfig_Sight* ConfigSight;

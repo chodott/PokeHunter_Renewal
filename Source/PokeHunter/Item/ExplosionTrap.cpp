@@ -11,6 +11,7 @@ AExplosionTrap::AExplosionTrap()
 	ExplosionCollision = CreateDefaultSubobject<USphereComponent>(FName("ExplosionCollision"));
 	ExplosionCollision->SetupAttachment(GetRootComponent());
 	ExplosionCollision->OnComponentBeginOverlap.AddDynamic(this, &AExplosionTrap::OnExplosionOverlap);
+	ExplosionCollision->Deactivate();
 	Damage = 50.f;
 }
 
@@ -18,6 +19,17 @@ void AExplosionTrap::OnExplosionOverlap(UPrimitiveComponent* OverlappedComp, AAc
 {
 	if (OtherActor->IsA<AEnemy>())
 	{
-		UGameplayStatics::ApplyDamage(OtherActor, Damage,NULL,this, UDamageType::StaticClass());
+		ExplosionCollision->Activate();
+		ServerApplyDamage(OtherActor, Damage, NULL, this, UDamageType::StaticClass());
 	}
+}
+
+void AExplosionTrap::ServerApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, class AController* ItemOwner, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)
+{
+	MultiApplyDamage(DamagedActor, DamageAmount, ItemOwner, DamageCauser, DamageTypeClass);
+}
+
+void AExplosionTrap::MultiApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, class AController* ItemOwner, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)
+{
+	UGameplayStatics::ApplyDamage(DamagedActor, DamageAmount,	ItemOwner, DamageCauser, DamageTypeClass);
 }

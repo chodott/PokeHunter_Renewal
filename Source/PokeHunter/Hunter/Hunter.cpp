@@ -195,6 +195,13 @@ void AHunter::Tick(float DeltaTime)
 			bInvincible = false;
 		}
 	}
+
+	//HealPerSecond
+	if (GetHP() < 100.f)
+	{
+		float NewHP = GetHP() + HealPerSecondAmount * DeltaTime;
+		SetHP(NewHP);
+	}
 }
 
 void AHunter::PostInitializeComponents()

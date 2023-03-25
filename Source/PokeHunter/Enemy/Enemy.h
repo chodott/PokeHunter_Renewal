@@ -15,6 +15,7 @@ enum class EEnemyState : uint8
 	Patrol UMETA(DisplayName = "Patrol"),
 	Chase UMETA(DisplayName = "Chase"),
 	Hit UMETA(DisplayName = "Hit"),
+	Binding UMETA(DisplayName = "Binding"),
 	Die UMETA(DisplayName = "Die"),
 	Roar UMETA(DisplayName = "Roar"),
 	Attention UMETA(DisplayName = "Attention"),
@@ -61,8 +62,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackRange = 200.f;
-
-
 
 
 protected:

@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+/*
 #include "ServerIntance.h"
 #include "Json.h"
 #include "JsonUtilities.h"
@@ -7,10 +7,10 @@
 
 UServerIntance::UServerIntance()
 {
-	/*reval = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	reval = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
 	stServerAddr.sin_family = AF_INET;
-	stServerAddr.sin_port = htons(PORT_NUM);*/
+	stServerAddr.sin_port = htons(PORT_NUM);
 	// stServerAddr.sin_addr.s_addr = inet_addr("172.28.208.1");
 
 	UTextReaderComponent* TextReader = CreateDefaultSubobject<UTextReaderComponent>(TEXT("TextReaderComp"));
@@ -22,7 +22,7 @@ UServerIntance::UServerIntance()
 
 bool UServerIntance::ConnectToServer()
 {
-	/*if (reval != 0) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("network fail")));
+	if (reval != 0) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("network fail")));
 	else {
 		Socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 		if (Socket == INVALID_SOCKET) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("socket fail")));
@@ -34,7 +34,7 @@ bool UServerIntance::ConnectToServer()
 				return true;
 			}
 		}
-	}*/
+	}
 	return false;
 }
 
@@ -107,3 +107,4 @@ void UServerIntance::OnRetrieveNewTokensResponseReceived(FHttpRequestPtr Request
 		GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UServerIntance::RetrieveNewTokens, 1.0f, false, 30.0f);
 	}
 }
+*/

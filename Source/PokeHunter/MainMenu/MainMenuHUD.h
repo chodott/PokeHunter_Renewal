@@ -2,13 +2,18 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "GameFramework/HUD.h"
-#include "MainMenuHUD.generated.h"
+
 
 /**
  * 
  */
+
+/*
+
+#include "CoreMinimal.h"
+#include "GameFramework/HUD.h"
+#include "MainMenuHUD.generated.h"
+
 UCLASS()
 class POKEHUNTER_API AMainMenuHUD : public AHUD
 {
@@ -24,3 +29,4 @@ private:
 	UPROPERTY()
 		TSubclassOf<UUserWidget> MainMenuWidgetClass;
 };
+*/

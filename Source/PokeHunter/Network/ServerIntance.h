@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
+/*
 #include "../../../../PH-Server/IOCPServer/protocol.h"
 
 #include "Windows/AllowWindowsPlatformTypes.h"
@@ -17,10 +17,13 @@
 #include "Engine/GameInstance.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
 #include "ServerIntance.generated.h"
+*/
 
 /**
  * 
  */
+
+ /*
 USTRUCT(BlueprintType)
 struct FU_SC_LOGIN_INFO_PACK {
 	GENERATED_USTRUCT_BODY()
@@ -112,3 +115,4 @@ private:
 
 	void OnRetrieveNewTokensResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 };
+*/

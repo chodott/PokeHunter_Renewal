@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 #pragma once
 
+/*
 #include "PokeHunterGameModeBase.h"
 
 APokeHunterGameModeBase::APokeHunterGameModeBase()
@@ -89,3 +90,4 @@ void APokeHunterGameModeBase::BeginPlay()
 #endif
 }
 
+*/

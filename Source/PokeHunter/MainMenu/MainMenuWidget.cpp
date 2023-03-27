@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+/*
 #include "MainMenuWidget.h"
 #include "TextReaderComponent.h"
 #include "WebBrowser.h"
@@ -97,3 +98,4 @@ void UMainMenuWidget::OnExchangeCodeForTokensResponseReceived(FHttpRequestPtr Re
 		}
 	}
 }
+*/

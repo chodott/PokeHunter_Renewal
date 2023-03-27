@@ -1,16 +1,18 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-
+/*
 #include "CoreMinimal.h"
 #include "GameLiftServerSDK.h"
 #include "GameFramework/GameModeBase.h"
 #include "PokeHunterGameModeBase.generated.h"
+*/
 
 /**
  * 
  */
 
+/*
 USTRUCT()
 struct FStartGameSessionState
 {
@@ -86,3 +88,4 @@ private:
 	UPROPERTY()
 		FHealthCheckState HealthCheckState;
 };
+*/

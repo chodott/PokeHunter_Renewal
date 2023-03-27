@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+/*
 #include "LoginServerManager.h"
 
 ULoginServerManager::ULoginServerManager()
@@ -37,3 +37,4 @@ FU_SC_LOGIN_INFO_PACK ULoginServerManager::LoginToServer(FString in_id, FString 
 	u_info_pack._name = ANSI_TO_TCHAR("empty");
 	return u_info_pack;
 }
+*/

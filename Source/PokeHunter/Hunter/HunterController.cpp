@@ -4,20 +4,15 @@
 
 void AHunterController::BeginPlay()
 {
-	//Super::BeginPlay();
+	Super::BeginPlay();
 	//SetInputMode(FInputModeGameAndUI());
+
+	PlayerCameraManager->ViewPitchMax = 45.f;
+	PlayerCameraManager->ViewPitchMin = -30.f;
+	
 }
 
 void AHunterController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	ABLOG_S(Warning);
-}
-
-void AHunterController::OnPossess(APawn* aPawn)
-{
-	ABLOG_S(Warning);
-	Super::Possess(aPawn);
-	
-
 }

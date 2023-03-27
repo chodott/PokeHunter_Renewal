@@ -2,21 +2,17 @@
 
 #pragma once
 
-/*
 #include "Kismet/GameplayStatics.h"
-#include "ServerIntance.h"
+#include "PokeHunter/Base/BaseInstance.h"
 #include "PokeHunter/Hunter/InventoryComponent.h"
 
 #include "CoreMinimal.h"
 #include "Net/Subsystems/NetworkSubsystem.h"
 #include "InventoryServerManager.generated.h"
-*/
 
 /**
  * 
  */
-
- /*
 UCLASS()
 class POKEHUNTER_API UInventoryServerManager : public UNetworkSubsystem //, public UServerIntance , UInventoryComponent
 {
@@ -25,9 +21,8 @@ class POKEHUNTER_API UInventoryServerManager : public UNetworkSubsystem //, publ
 public:
 	UInventoryServerManager();
 
-	UServerIntance* gameinstance;
+	UBaseInstance* gameinstance;
 
 	UFUNCTION(BlueprintCallable)
 		bool GetInventoryDBInfos();
 };
-*/

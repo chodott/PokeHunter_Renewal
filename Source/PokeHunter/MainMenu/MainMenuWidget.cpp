@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-/*
 #include "MainMenuWidget.h"
 #include "TextReaderComponent.h"
 #include "WebBrowser.h"
@@ -9,7 +8,7 @@
 #include "IWebBrowserCookieManager.h"
 #include "Json.h"
 #include "JsonUtilities.h"
-#include "../Network/ServerIntance.h"
+#include "PokeHunter/Base/BaseInstance.h"
 
 UMainMenuWidget::UMainMenuWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	UTextReaderComponent* TextReader = CreateDefaultSubobject<UTextReaderComponent>(TEXT("TextReaderComp"));
@@ -89,7 +88,7 @@ void UMainMenuWidget::OnExchangeCodeForTokensResponseReceived(FHttpRequestPtr Re
 			if (!JsonObject->HasField("error")) {
 				UGameInstance* GameInstance = GetGameInstance();
 				if (GameInstance != nullptr) {
-					UServerIntance* ServerIntance = Cast<UServerIntance>(GameInstance);
+					UBaseInstance* ServerIntance = Cast<UBaseInstance>(GameInstance);
 					if (ServerIntance != nullptr) {
 						ServerIntance->SetCognitoTokens(JsonObject->GetStringField("access_token"), JsonObject->GetStringField("id_token"), JsonObject->GetStringField("refresh_token"));
 					}
@@ -98,4 +97,3 @@ void UMainMenuWidget::OnExchangeCodeForTokensResponseReceived(FHttpRequestPtr Re
 		}
 	}
 }
-*/

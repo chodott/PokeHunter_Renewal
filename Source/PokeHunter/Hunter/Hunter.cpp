@@ -21,6 +21,7 @@
 #include "PokeHunter/Partner/Partner.h"
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Item/ItemData.h"
+#include "PokeHunter/Item/Potion.h"
 #include "PokeHunter/Item/Bullet.h"
 #include "PokeHunter/Base/InteractActor.h"
 #include "PokeHunter/Base/DatabaseActor.h"
@@ -162,16 +163,6 @@ void AHunter::Tick(float DeltaTime)
 		CameraBoom->SetRelativeLocation(FVector(0,FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, CameraZoomTo, DeltaTime, ArmSpeed),0));
 	}
 
-	else if (CurState == EPlayerState::Run)
-	{
-		if (HunterInfo.HunterStamina > 0) HunterInfo.HunterStamina -= DeltaTime * 1;
-		else
-		{
-			HunterInfo.HunterStamina = 0;
-			GetCharacterMovement()->MaxWalkSpeed = 600.f;
-		}
-	}
-
 	else
 	{
 		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, 500.f, DeltaTime, ArmSpeed);
@@ -182,6 +173,18 @@ void AHunter::Tick(float DeltaTime)
 		else HunterInfo.HunterStamina = 100;
 	}
 
+	//Stamina
+		if (GetCharacterMovement()->GetMaxSpeed() > 600.f)
+		{
+			if (HunterInfo.HunterStamina > 0) HunterInfo.HunterStamina -= DeltaTime * 1;
+			else
+			{
+				HunterInfo.HunterStamina = 0;
+				GetCharacterMovement()->MaxWalkSpeed = 600.f;
+			}
+	}
+
+
 	//Invincible
 	if (bInvincible)
 	{
@@ -190,6 +193,24 @@ void AHunter::Tick(float DeltaTime)
 		if (TimeLeft <= 0.0f)
 		{
 			bInvincible = false;
+		}
+	}
+
+	//HealPerSecond
+	if (GetHP() < 100.f)
+	{
+		float ElapsedTime = GetWorld()->TimeSeconds;
+		int CurSecond = FMath::FloorToInt(ElapsedTime);
+		if (CurSecond == SaveSecond)
+		{
+
+		}
+		else
+		{
+			SaveSecond = CurSecond;
+			float NewHP = GetHP() + HealPerSecondAmount;
+			if (NewHP > 100.f) NewHP = 100.f;
+			SetHP(NewHP);
 		}
 	}
 }
@@ -220,12 +241,10 @@ void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
 	if (bSprinting && Hunter->CurState == EPlayerState::Idle)
 	{
 		Hunter->GetCharacterMovement()->MaxWalkSpeed = 1000.f;
-		Hunter->CurState = EPlayerState::Run;
 	}
-	else if (!bSprinting && (Hunter->CurState == EPlayerState::Run || Hunter->CurState == EPlayerState::Dive))
+	else if (!bSprinting)
 	{
 		Hunter->GetCharacterMovement()->MaxWalkSpeed = 600.f;
-		Hunter->CurState = EPlayerState::Idle;
 	}
 }
 
@@ -313,7 +332,7 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AHunter::SpaceDown()
 {
-	if(CurState == EPlayerState::Idle || CurState == EPlayerState::Run)
+	if(CurState == EPlayerState::Idle)
 	{
 		CurState = EPlayerState::Dive;
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
@@ -333,7 +352,7 @@ void AHunter::SpaceDown()
 
 void AHunter::MoveForward(float Val)
 {
-	if (CurState == EPlayerState::Dive) return;
+	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install) return;
 	if (Val != 0.0f)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -347,7 +366,7 @@ void AHunter::MoveForward(float Val)
 
 void AHunter::MoveRight(float Val)
 {
-	if (CurState == EPlayerState::Dive) return;
+	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install) return;
 	
 	if (Val != 0.0f)
 	{
@@ -400,75 +419,74 @@ void AHunter::LMBDown()
 			Partner->bOrdered = true;
 			Partner->CurState = EPartnerState::MoveTarget;
 		}
-
+		return;
 	}
-	else if (CurState == EPlayerState::Zoom)
-	{
-		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-		ServerPlayMontage(this, FName("Shot"));
 
+	if (QuickSlotArray[CurQuickKey].ItemID != FName("None"))
+	{
 		FName ItemID = QuickSlotArray[CurQuickKey].ItemID;
-		AActor* TempActor = UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass());
-		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(TempActor);
-		if (DatabaseActor && ItemID != "None")
+		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
+		if (DatabaseActor)
 		{
 			TSubclassOf<AItem> ItemClass = DatabaseActor->FindItem(ItemID)->ItemInfo.ItemClass;
-			if (ItemClass == NULL) return;
-			else
+			if (ItemClass == NULL) return; 
+			auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
+			
+			//ZoomMode
+			if (CurState == EPlayerState::Zoom)
 			{
+				TSubclassOf<ABullet> BulletClass = ItemClass;
+				if (BulletClass == NULL) return;
+				FVector StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle"));
+				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, StartTrace, GetControlRotation());
+				
+				ServerPlayMontage(this, FName("Shot"));
+
 				FHitResult* HitResult = new FHitResult();
-				FVector StartTrace = FollowCamera->GetComponentLocation();
-				FVector EndTrace = StartTrace + FollowCamera->GetForwardVector() * 5000.f;
+				
+				FVector EndTrace =   FollowCamera->GetComponentLocation()  + FollowCamera->GetForwardVector() * 3000.f;
 
 				if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility))
 				{
-					DrawDebugLine(
+					//Debug LineTrace
+					/*DrawDebugLine(
 						GetWorld(),
 						StartTrace,
 						HitResult->Location,
 						FColor(255, 0, 0),
 						false, 3, 0,
 						12.333
-					);
+					);*/
 					EndTrace = HitResult->Location;
 				}
+				Bullet->UseItem(this, StartTrace, EndTrace);
+			}
+			//NormalMode
+			else
+			{
+				AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(), GetControlRotation());
 
-			
-				//ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(ItemClass, GetActorLocation() + GetActorForwardVector() * 100.f, GetControlRotation());
-				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(ItemClass, GetMesh()->GetSocketLocation(FName("Muzzle")),GetControlRotation());
-				Bullet->UseItem(this, GetMesh()->GetSocketLocation(FName("Muzzle")), EndTrace);
-				QuickSlotArray[CurQuickKey].cnt--;
-				if (QuickSlotArray[CurQuickKey].cnt == 0)
+				switch (Item->ItemType)
 				{
-					for (auto& Info : Inventory->InfoArray)
-					{
-						if (Info.ItemID == ItemID)
-						{
-							Info.ItemID == FName("None");
-							Info.cnt = 0;
-						}
-						QuickSlotArray[CurQuickKey].ItemID = FName("None");
-					}
+				case EItemType::Potion:
+					ServerPlayMontage(this, FName("Drink"));
+					Item->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
+					CurItem = Item;
+					CurState = EPlayerState::Drink;
+					bUpperOnly = true;
+					break;
+
+				case EItemType::Trap:
+					ServerPlayMontage(this, FName("Install"));
+					Item->SetActorLocation((GetActorLocation() + GetActorForwardVector() * 100.f));
+					CurState = EPlayerState::Install;
+					Item->UseItem(this);
+					break;
 				}
 				
 			}
-		}
-	}
-	else 
-	{
-		if (QuickSlotArray[CurQuickKey].ItemID != FName("None"))
-		{
-			//Use Item Update need
-			FName ItemID = QuickSlotArray[CurQuickKey].ItemID;
-			AActor* TempActor = UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass());
-			ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(TempActor);
-			if(DatabaseActor)
-			{ 
-				TSubclassOf<AItem> ItemClass = DatabaseActor->FindItem(ItemID)->ItemInfo.ItemClass;
-				if (ItemClass == NULL) return;
-				else GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(), GetControlRotation());
-			}
 
+			//인벤토리 처리
 			QuickSlotArray[CurQuickKey].cnt--;
 			if (QuickSlotArray[CurQuickKey].cnt == 0)
 			{
@@ -482,9 +500,9 @@ void AHunter::LMBDown()
 					QuickSlotArray[CurQuickKey].ItemID = FName("None");
 				}
 			}
-
 		}
 	}
+	
 }
 
 void AHunter::RMBDown()
@@ -634,13 +652,23 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	{
 		CurState = EPlayerState::Idle;
 	}
+	else if (CurState == EPlayerState::Install)
+	{
+		CurState = EPlayerState::Idle;
+	}
+	else if (CurState == EPlayerState::Drink)
+	{
+		CurItem->UseItem(this);
+		if (CurItem != NULL) CurItem->Destroy();
+		CurState = EPlayerState::Idle;
+	}
 
 	if (bUpperOnly) bUpperOnly = false;
 }
 
 void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OverlappedComp == GetCapsuleComponent()) UE_LOG(LogTemp, Warning, TEXT("OverlapBegin"));
+	//if (OverlappedComp == GetCapsuleComponent()) UE_LOG(LogTemp, Warning, TEXT("OverlapBegin"));
 	if (InteractingActor == nullptr)
 	{
 		if (OtherActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))

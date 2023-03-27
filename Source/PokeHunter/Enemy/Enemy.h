@@ -8,6 +8,7 @@
 #include "Enemy.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageDelegate, float, DamageAmount);
 
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
@@ -15,6 +16,7 @@ enum class EEnemyState : uint8
 	Patrol UMETA(DisplayName = "Patrol"),
 	Chase UMETA(DisplayName = "Chase"),
 	Hit UMETA(DisplayName = "Hit"),
+	Binding UMETA(DisplayName = "Binding"),
 	Die UMETA(DisplayName = "Die"),
 	Roar UMETA(DisplayName = "Roar"),
 	Attention UMETA(DisplayName = "Attention"),
@@ -55,6 +57,8 @@ public:
 	TSubclassOf <class AEnemyProjectile> ProjectileClass;
 
 	FOnMontageEndDelegate OnMontageEnd;
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable)
+	FOnDamageDelegate OnDamage;
 
 	//TeamID
 	FGenericTeamId TeamID;
@@ -62,8 +66,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackRange = 200.f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float StartBindingTime;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float BindingTime;
 
+	//상태 이상
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bPoisoned{ false };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float PoisonedTime{};
+	float StartPoisonedTime;
+	int PoisonSaveTime{};
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bBurning{ false };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float BurningTime{};
+	float StartBurningTime;
+	int BurningSaveTime{};
 
 protected:
 	// Called when the game starts or when spawned
@@ -90,13 +111,19 @@ public:
 	void ServerPlayMontage(AEnemy* Enemy, FName Section);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiPlayMontage(AEnemy* Enemy, FName Section);
+	UFUNCTION(Server, Reliable)
+	void ServerStartBinding();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiStartBinding();
+	UFUNCTION(BlueprintCallable)
+	void StartBinding();
+	UFUNCTION(BlueprintCallable)
+	void StartPoison();
 	//UFUNCTION(Server, Reliable)
 	//void ServerTakeDamage(AEnemy* Enemy, FName Section);
 	//UFUNCTION(NetMulticast, Reliable)
 	//void MultiTakeDamage(AEnemy* Enemy);
 
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 
 	void SeeNewTarget(AActor* Actor);

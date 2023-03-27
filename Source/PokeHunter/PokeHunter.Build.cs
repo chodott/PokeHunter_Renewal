@@ -8,9 +8,9 @@ public class PokeHunter : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "AIModule", "GameplayTasks", "NavigationSystem", "Niagara" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "AIModule", "GameplayTasks", "NavigationSystem", "UMG", "Niagara",
+                                                            "HeadMountedDisplay", "GameLiftServerSDK", "HTTP", "Json", "JsonUtilities", "WebBrowserWidget"});
 
-        // "Networking", "Sockets", "HeadMountedDisplay", "GameLiftServerSDK", "SlateCore", "Json", "JsonUtilities", "WebBrowserWidget", "Http",
         //PrivateDependencyModuleNames.AddRange(new string[] {  });
 
         // Uncomment if you are using Slate UI
@@ -18,7 +18,7 @@ public class PokeHunter : ModuleRules
 
         bEnableUndefinedIdentifierWarnings = false;
         // Uncomment if you are using online features
-        // PrivateDependencyModuleNames.Add("OnlineSubsystem");
+        PrivateDependencyModuleNames.Add("OnlineSubsystem");
 
         // To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
     }

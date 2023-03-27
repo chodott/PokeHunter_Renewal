@@ -19,9 +19,10 @@ UENUM(BlueprintType)
 enum class EPlayerState : uint8
 {
 	Idle,
-	Run,
 	Dive,
-	Zoom
+	Zoom,
+	Install,
+	Drink
 };
 
 USTRUCT(BlueprintType)
@@ -147,9 +148,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	bool bInvincible{ false};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
-	float InvincibleTime{ 2.f };
+	float InvincibleTime{ 1.f };
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
 	float StartInvincibleTime;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float HealPerSecondAmount;
+	int SaveSecond;
 
 
 protected:
@@ -190,6 +194,8 @@ public:
 	//Status
 	UFUNCTION(BlueprintCallable)
 	void SetHP(float HP) { HunterInfo.HunterHP = HP; };
+	UFUNCTION(BlueprintCallable)
+	float GetHP() { return HunterInfo.HunterHP; };
 	UFUNCTION(BlueprintCallable)
 	void SetStamina(float Stamina) { HunterInfo.HunterStamina = Stamina; };
 

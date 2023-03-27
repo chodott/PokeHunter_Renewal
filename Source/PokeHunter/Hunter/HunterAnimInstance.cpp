@@ -14,6 +14,7 @@ UHunterAnimInstance::UHunterAnimInstance()
 	//InteractMontage Init
 	ConstructorHelpers::FObjectFinder<UAnimMontage> InteractMontageObj(TEXT("/Game/Hunter/Blueprint/InteractMontage.InteractMontage"));
 	if (CombatMontageObj.Succeeded()) InteractMontage = InteractMontageObj.Object;
+
 	
 }
 

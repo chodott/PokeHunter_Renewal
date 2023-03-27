@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-/*
+
 #include "TextReaderComponent.h"
 #include "Runtime/Core/Public/Misc/Paths.h"
 #include "Runtime/Core/Public/HAL/PlatformFilemanager.h"
@@ -23,4 +23,3 @@ FString UTextReaderComponent::ReadFile(FString FilePath) {
 
 	return Result;
 }
-*/

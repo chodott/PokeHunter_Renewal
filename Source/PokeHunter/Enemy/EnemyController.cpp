@@ -11,17 +11,18 @@
 
 AEnemyController::AEnemyController()
 {
-	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBObject(TEXT("/Game/Enemy/BB_Enemy.BB_Enemy"));
-	if (BBObject.Succeeded())
-	{
-		BBEnemy = BBObject.Object;
-	}
+	//static ConstructorHelpers::FObjectFinder<UBlackboardData> BBObject(TEXT("/Game/Enemy/BB_Enemy.BB_Enemy"));
+	//if (BBObject.Succeeded())
+	//{
+	//	BBEnemy = BBObject.Object;
+	//}
 
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/Enemy/BT_Enemy.BT_Enemy"));
-	if (BTObject.Succeeded())
-	{
-		BTEnemy = BTObject.Object;
-	}
+	////static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/Enemy/BT_Enemy.BT_Enemy"));
+	//static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/Enemy/BT_DefaultEnemy.BT_DefaultEnemy"));
+	//if (BTObject.Succeeded())
+	//{
+	//	BTEnemy = BTObject.Object;
+	//}
 
 	SetPerceptionComponent(*CreateOptionalDefaultSubobject<UAIPerceptionComponent>(TEXT("AI Perception")));
 

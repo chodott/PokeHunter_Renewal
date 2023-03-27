@@ -7,6 +7,8 @@
 #include "Components/PrimitiveComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "PokeHunter/Hunter/Hunter.h"
+#include "PokeHunter/Partner/Partner.h"
+#include "PokeHunter/Enemy/Enemy.h"
 
 ABullet::ABullet()
 {
@@ -24,6 +26,8 @@ ABullet::ABullet()
 	StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
 	//StaticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnHit);
 
+	ItemType = EItemType::Bullet;
+
 };
 
 void ABullet::BeginPlay()
@@ -32,9 +36,11 @@ void ABullet::BeginPlay()
 }
 
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
-//void ABullet::OnHit(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ServerApplyDamage(OtherActor, Damage,GetActorForwardVector(),Hit,NULL,this,UDamageType::StaticClass());
+	if (OtherActor->IsA<AEnemy>())
+	{
+		ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+	}
 }
 
 void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)

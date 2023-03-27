@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-/*
+
 #include "CoreMinimal.h"
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
@@ -10,13 +10,10 @@
 class UWebBrowser;
 class UButton;
 class UTextBlock;
-*/
 
 /**
  *
  */
-
-/*
 UCLASS()
 class POKEHUNTER_API UMainMenuWidget : public UUserWidget
 {
@@ -47,4 +44,3 @@ private:
 
 	void OnExchangeCodeForTokensResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 };
-*/

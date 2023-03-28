@@ -2,15 +2,16 @@
 
 #pragma once
 
-/*
+/**/
 #include "../../../../PH-Server/IOCPServer/protocol.h"
 #include "Windows/AllowWindowsPlatformTypes.h"
 #include "Windows/prewindowsapi.h"
+
 #pragma comment(lib, "ws2_32.lib")
+
 #include <WinSock2.h>
 #include "Windows/PostWindowsApi.h"
 #include "Windows/HideWindowsPlatformTypes.h"
-*/
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
@@ -60,13 +61,6 @@ class POKEHUNTER_API UBaseInstance : public UGameInstance
 public:
 	UBaseInstance();
 
-	/*
-	SOCKET Socket;
-	WSADATA wsaData;
-	SOCKADDR_IN stServerAddr;
-
-	int reval;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString Player_Name;
 
@@ -82,9 +76,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString Quick_Skill;
 
+	SOCKET Socket;
+	WSADATA wsaData;
+	SOCKADDR_IN ServerAddr;
+
+	int reval;
+
 	UFUNCTION(BlueprintCallable, Category = Socket)
-		bool ConnectToServer();
-	*/
+		bool ConnectToServer(FString server_addr ="127.0.0.1");	// Default Addr = 127.0.0.1
 	
 	virtual void Shutdown() override;
 

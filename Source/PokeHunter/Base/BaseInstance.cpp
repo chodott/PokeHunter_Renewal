@@ -8,14 +8,6 @@
 
 UBaseInstance::UBaseInstance()
 {
-	/*
-	reval = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-	stServerAddr.sin_family = AF_INET;
-	stServerAddr.sin_port = htons(PORT_NUM);
-	stServerAddr.sin_addr.s_addr = inet_addr("172.28.208.1");
-	*/
-
 	UTextReaderComponent* TextReader = CreateDefaultSubobject<UTextReaderComponent>(TEXT("TextReaderComp"));
 
 	ApiUrl = TextReader->ReadFile("Urls/ApiUrl.txt");
@@ -23,15 +15,20 @@ UBaseInstance::UBaseInstance()
 	HttpModule = &FHttpModule::Get();
 }
 
-/*
-bool UBaseInstance::ConnectToServer()
+bool UBaseInstance::ConnectToServer(FString server_addr)
 {
+	reval = WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+	ServerAddr.sin_family = AF_INET;
+	ServerAddr.sin_port = htons(PORT_NUM);
+	ServerAddr.sin_addr.s_addr = inet_addr(TCHAR_TO_ANSI(*server_addr));
+
 	if (reval != 0) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("network fail")));
 	else {
 		Socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 		if (Socket == INVALID_SOCKET) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("socket fail")));
 		else {
-			reval = connect(Socket, (sockaddr*)&stServerAddr, sizeof(stServerAddr));
+			reval = connect(Socket, (sockaddr*)&ServerAddr, sizeof(ServerAddr));
 			if (reval == SOCKET_ERROR) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("connect fail")));
 			else {
 				UE_LOG(LogTemp, Warning, TEXT("Success connect server"));
@@ -41,7 +38,6 @@ bool UBaseInstance::ConnectToServer()
 	}
 	return false;
 }
-*/
 
 void UBaseInstance::Shutdown()
 {

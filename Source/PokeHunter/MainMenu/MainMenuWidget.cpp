@@ -41,6 +41,7 @@ void UMainMenuWidget::NativeConstruct() {
 	FScriptDelegate LoginDelegate;
 	LoginDelegate.BindUFunction(this, "HandleLoginUrlChange");
 	WebBrowser->OnUrlChanged.Add(LoginDelegate);
+	WebBrowser->GetTitleText();
 }
 
 void UMainMenuWidget::HandleLoginUrlChange()

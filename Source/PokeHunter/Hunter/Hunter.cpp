@@ -417,7 +417,6 @@ void AHunter::LMBDown()
 		{
 			Partner->TargetPos = HitResult.Location;
 			Partner->bOrdered = true;
-			Partner->CurState = EPartnerState::MoveTarget;
 		}
 		return;
 	}
@@ -598,8 +597,10 @@ void AHunter::CtrlDown()
 	if (Partner == NULL) return;
 	bPartnerMode = true;
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	FInputModeGameAndUI InputMode;
+	InputMode.SetHideCursorDuringCapture(false);
 	PlayerController->bShowMouseCursor = true;
-
+	PlayerController->SetInputMode(InputMode);
 }
 
 void AHunter::CtrlUp()
@@ -608,6 +609,7 @@ void AHunter::CtrlUp()
 	bPartnerMode = false;
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	PlayerController->bShowMouseCursor = false;
+	PlayerController->SetInputMode(FInputModeGameOnly());
 }
 
 void AHunter::Use1Skill()

@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GenericTeamAgentInterface.h"
+#include "PokeHunter/Base/ItemInteractInterface.h"
 #include "Enemy.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageDelegate, float, DamageAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDamageDelegate, float, DamageAmount, FVector, HitLoc);
 
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
@@ -27,7 +28,7 @@ enum class EEnemyState : uint8
 
 
 UCLASS()
-class POKEHUNTER_API AEnemy : public ACharacter, public IGenericTeamAgentInterface
+class POKEHUNTER_API AEnemy : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface
 {
 	GENERATED_BODY()
 
@@ -39,10 +40,11 @@ public:
 	float HP{30};
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
-	class APawn* Target;
+	class AActor* Target;
+	class AActor* AgroTarget;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<class APawn*> TargetArray;
+	TArray<class AActor*> TargetArray;
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
 	FVector TargetPos;
@@ -125,9 +127,9 @@ public:
 	//void MultiTakeDamage(AEnemy* Enemy);
 
 
-
+	void SetTarget(AActor* NewTarget) { Target = NewTarget; };
 	void SeeNewTarget(AActor* Actor);
-	void HearSound(FVector SoundLoc);
+	void HearSound(FVector SoundLoc, AActor* AgroTarget);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Attack(int AttackPattern);
@@ -142,6 +144,10 @@ public:
 	//Animation Function
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	//Interface
+	virtual void InteractIce_Implementation();
+	virtual void InteractFire_Implementation(UPrimitiveComponent* HitComponent);
 
 public:
 	bool bFirstHit{ true};

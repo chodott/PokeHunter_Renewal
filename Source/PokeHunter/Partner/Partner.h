@@ -44,6 +44,7 @@ public:
 	FOnMontageEndDelegate OnMontageEnd;
 
 	EPartnerState CurState;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FVector TargetPos;
 	FVector LookTargetVec;
 	FVector AttackPoint;
@@ -82,6 +83,8 @@ public:
 	virtual void UseNormalSkill(ESkillID SkillID);
 	virtual void UseSpecialSkill(ESkillID SkillID);
 	inline void SetTarget(AActor* setTarget) { Target = setTarget;  };
+
+	void FollowHunter(class AHunter* Hunter);
 
 	//AnimationFunction
 	UFUNCTION()

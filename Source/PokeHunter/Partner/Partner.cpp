@@ -147,6 +147,13 @@ void APartner::UseSpecialSkill(ESkillID SkillID)
 	}
 }
 
+void APartner::FollowHunter(AHunter* Master)
+{
+	Hunter = Master;
+	bPosing = false;
+	CurState = EPartnerState::MoveTarget;
+}
+
 void APartner::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	PartnerAnim->bPlaying = false;

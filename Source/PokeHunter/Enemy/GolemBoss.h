@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Enemy.h"
+#include "PokeHunter/Base/HitBoxComponent.h"
 #include "GolemBoss.generated.h"
 
 /**
@@ -16,12 +17,23 @@ class POKEHUNTER_API AGolemBoss : public AEnemy
 
 public:
 		AGolemBoss();
-
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
-		TMap<FName, float> PartHP;
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+		TArray<class UHitBoxComponent*> PartHitBox;
+		/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+		class UHitBoxComponent* BodyHitBox;
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+		class UHitBoxComponent* LeftArmHitBox;
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+		class UHitBoxComponent* LeftLegHitBox;
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+		class UHitBoxComponent* RightArmHitBox;
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+		class UHitBoxComponent* RightLegHitBox;*/
 
 
 public:
+	virtual void Tick(float DeltaTime) override;
+
 	virtual void BeginPlay() override;
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
@@ -34,5 +46,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void LaunchStone();
+
+	//ItemInteractInterface
+	virtual void InteractFire_Implementation(UPrimitiveComponent* HitComponent);
 
 };

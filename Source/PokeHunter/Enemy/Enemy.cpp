@@ -28,11 +28,6 @@ AEnemy::AEnemy()
 	GetCapsuleComponent()->SetCapsuleRadius(90.f);
 	//GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
 
-	//Set TargetArray
-	for (int i = 0; i < 8; ++i)
-	{
-		TargetArray.AddDefaulted();
-	}
 
 	TeamID = FGenericTeamId(1);
 }
@@ -88,7 +83,7 @@ void AEnemy::Tick(float DeltaTime)
 				TakeDamage(DamageAmount, PoisonDamage, NULL, NULL);
 
 				//Damage UI Print Event
-				OnDamage.Broadcast(DamageAmount);
+				OnDamage.Broadcast(DamageAmount, GetActorLocation());
 			}
 		}
 	}
@@ -117,7 +112,7 @@ void AEnemy::Tick(float DeltaTime)
 				TakeDamage(DamageAmount, BurningDamage, NULL, NULL);
 
 				//Damage UI Print Event
-				OnDamage.Broadcast(DamageAmount);
+				OnDamage.Broadcast(DamageAmount, GetActorLocation());
 			}
 		}
 	}
@@ -140,6 +135,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	//Hit Anim
 	AItem* HitItem = Cast<AItem>(DamageCauser);
 	if (HitItem)
 	{
@@ -165,9 +161,21 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		//HitItem->Destroy();
 	}
 
+	//Damage and UI
+	FVector HitLoc;
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
+		HitLoc = PointDamageEvent.HitInfo.Location;
+	}
+	else
+	{
+		HitLoc = GetActorLocation();
+	}
 	HP -= DamageAmount;
+	OnDamage.Broadcast(DamageAmount, HitLoc);
 
-	OnDamage.Broadcast(DamageAmount);
+	
 
 	return DamageAmount;
 }
@@ -221,16 +229,20 @@ void AEnemy::StartPoison()
 
 void AEnemy::SeeNewTarget(AActor* Actor)
 {
-	if (bFirstMeet)
+	TargetArray.AddUnique(Actor);
+	if (Actor == AgroTarget)
 	{
-		bFirstMeet = false;
-		//CurState = EEnemyState::Roar;
+		SetTarget(Actor);
+		CurState = EEnemyState::Chase;
+		AgroTarget = NULL;
 	}
+	
 }
 
-void AEnemy::HearSound(FVector SoundLoc)
+void AEnemy::HearSound(FVector SoundLoc, AActor* AgroActor)
 {
 	TargetPos = SoundLoc;
+	AgroTarget = AgroActor;
 	CurState = EEnemyState::Attention;
 }
 
@@ -287,3 +299,13 @@ void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	}
 }
 
+void AEnemy::InteractIce_Implementation()
+{
+	GetCharacterMovement()->MaxWalkSpeed /= 2;
+}
+
+void AEnemy::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
+{
+	bBurning = true;
+	StartBurningTime = GetWorld()->TimeSeconds;
+}

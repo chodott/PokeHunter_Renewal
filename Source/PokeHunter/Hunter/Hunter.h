@@ -153,6 +153,7 @@ public:
 	float StartInvincibleTime;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float HealPerSecondAmount;
+	int SaveSecond;
 
 
 protected:
@@ -241,6 +242,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum);
 	void SetPartnerTarget(AActor* setTarget);
+	void SetPartner(class APartner* SelectedPartner) { Partner = SelectedPartner; };
 
 	//Collision Function
 	UFUNCTION()

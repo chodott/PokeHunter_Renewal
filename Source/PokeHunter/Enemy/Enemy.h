@@ -5,9 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GenericTeamAgentInterface.h"
+#include "PokeHunter/Base/ItemInteractInterface.h"
 #include "Enemy.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDamageDelegate, float, DamageAmount, FVector, HitLoc);
 
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
@@ -26,7 +28,7 @@ enum class EEnemyState : uint8
 
 
 UCLASS()
-class POKEHUNTER_API AEnemy : public ACharacter, public IGenericTeamAgentInterface
+class POKEHUNTER_API AEnemy : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface
 {
 	GENERATED_BODY()
 
@@ -38,10 +40,11 @@ public:
 	float HP{30};
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
-	class APawn* Target;
+	class AActor* Target;
+	class AActor* AgroTarget;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<class APawn*> TargetArray;
+	TArray<class AActor*> TargetArray;
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
 	FVector TargetPos;
@@ -56,6 +59,8 @@ public:
 	TSubclassOf <class AEnemyProjectile> ProjectileClass;
 
 	FOnMontageEndDelegate OnMontageEnd;
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable)
+	FOnDamageDelegate OnDamage;
 
 	//TeamID
 	FGenericTeamId TeamID;
@@ -63,6 +68,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackRange = 200.f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float StartBindingTime;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float BindingTime;
+
+	//상태 이상
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bPoisoned{ false };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float PoisonedTime{};
+	float StartPoisonedTime;
+	int PoisonSaveTime{};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bBurning{ false };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float BurningTime{};
+	float StartBurningTime;
+	int BurningSaveTime{};
 
 protected:
 	// Called when the game starts or when spawned
@@ -89,17 +113,23 @@ public:
 	void ServerPlayMontage(AEnemy* Enemy, FName Section);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiPlayMontage(AEnemy* Enemy, FName Section);
+	UFUNCTION(Server, Reliable)
+	void ServerStartBinding();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiStartBinding();
+	UFUNCTION(BlueprintCallable)
+	void StartBinding();
+	UFUNCTION(BlueprintCallable)
+	void StartPoison();
 	//UFUNCTION(Server, Reliable)
 	//void ServerTakeDamage(AEnemy* Enemy, FName Section);
 	//UFUNCTION(NetMulticast, Reliable)
 	//void MultiTakeDamage(AEnemy* Enemy);
 
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-
+	void SetTarget(AActor* NewTarget) { Target = NewTarget; };
 	void SeeNewTarget(AActor* Actor);
-	void HearSound(FVector SoundLoc);
+	void HearSound(FVector SoundLoc, AActor* AgroTarget);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Attack(int AttackPattern);
@@ -114,6 +144,10 @@ public:
 	//Animation Function
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	//Interface
+	virtual void InteractIce_Implementation();
+	virtual void InteractFire_Implementation(UPrimitiveComponent* HitComponent);
 
 public:
 	bool bFirstHit{ true};

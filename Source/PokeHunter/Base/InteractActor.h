@@ -34,6 +34,4 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Interact_Implementation(AHunter* Hunter) override;
-
-
 };

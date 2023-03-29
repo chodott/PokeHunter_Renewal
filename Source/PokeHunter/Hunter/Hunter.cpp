@@ -199,8 +199,19 @@ void AHunter::Tick(float DeltaTime)
 	//HealPerSecond
 	if (GetHP() < 100.f)
 	{
-		float NewHP = GetHP() + HealPerSecondAmount * DeltaTime;
-		SetHP(NewHP);
+		float ElapsedTime = GetWorld()->TimeSeconds;
+		int CurSecond = FMath::FloorToInt(ElapsedTime);
+		if (CurSecond == SaveSecond)
+		{
+
+		}
+		else
+		{
+			SaveSecond = CurSecond;
+			float NewHP = GetHP() + HealPerSecondAmount;
+			if (NewHP > 100.f) NewHP = 100.f;
+			SetHP(NewHP);
+		}
 	}
 }
 
@@ -406,7 +417,6 @@ void AHunter::LMBDown()
 		{
 			Partner->TargetPos = HitResult.Location;
 			Partner->bOrdered = true;
-			Partner->CurState = EPartnerState::MoveTarget;
 		}
 		return;
 	}
@@ -426,24 +436,26 @@ void AHunter::LMBDown()
 			{
 				TSubclassOf<ABullet> BulletClass = ItemClass;
 				if (BulletClass == NULL) return;
-				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, GetMesh()->GetSocketLocation(FName("Muzzle")), GetControlRotation());
+				FVector StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle"));
+				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, StartTrace, GetControlRotation());
 				
 				ServerPlayMontage(this, FName("Shot"));
 
 				FHitResult* HitResult = new FHitResult();
-				FVector StartTrace = FollowCamera->GetComponentLocation();
-				FVector EndTrace = StartTrace + FollowCamera->GetForwardVector() * 5000.f;
+				
+				FVector EndTrace =   FollowCamera->GetComponentLocation()  + FollowCamera->GetForwardVector() * 3000.f;
 
 				if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility))
 				{
-					DrawDebugLine(
+					//Debug LineTrace
+					/*DrawDebugLine(
 						GetWorld(),
 						StartTrace,
 						HitResult->Location,
 						FColor(255, 0, 0),
 						false, 3, 0,
 						12.333
-					);
+					);*/
 					EndTrace = HitResult->Location;
 				}
 				Bullet->UseItem(this, StartTrace, EndTrace);
@@ -585,8 +597,10 @@ void AHunter::CtrlDown()
 	if (Partner == NULL) return;
 	bPartnerMode = true;
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	FInputModeGameAndUI InputMode;
+	InputMode.SetHideCursorDuringCapture(false);
 	PlayerController->bShowMouseCursor = true;
-
+	PlayerController->SetInputMode(InputMode);
 }
 
 void AHunter::CtrlUp()
@@ -595,6 +609,7 @@ void AHunter::CtrlUp()
 	bPartnerMode = false;
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	PlayerController->bShowMouseCursor = false;
+	PlayerController->SetInputMode(FInputModeGameOnly());
 }
 
 void AHunter::Use1Skill()

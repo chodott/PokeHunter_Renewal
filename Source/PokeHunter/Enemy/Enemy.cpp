@@ -28,11 +28,6 @@ AEnemy::AEnemy()
 	GetCapsuleComponent()->SetCapsuleRadius(90.f);
 	//GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
 
-	//Set TargetArray
-	for (int i = 0; i < 8; ++i)
-	{
-		TargetArray.AddDefaulted();
-	}
 
 	TeamID = FGenericTeamId(1);
 }
@@ -52,6 +47,75 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (CurState == EEnemyState::Binding)
+	{
+		float ElapsedTime = GetWorld()->TimeSeconds - StartBindingTime;
+		float TimeLeft = BindingTime - ElapsedTime;
+		if (TimeLeft <= 0.0f)
+		{
+			CurState = EEnemyState::Chase;
+		}
+
+	}
+
+	//독 데미지 
+	if (bPoisoned)
+	{
+		float ElapsedTime = GetWorld()->TimeSeconds - StartPoisonedTime;
+		int CurSecond = FMath::FloorToInt(ElapsedTime);
+		float TimeLeft = PoisonedTime - ElapsedTime;
+		if (TimeLeft <= 0.0f)
+		{
+			bPoisoned = false;
+			CurSecond = 0;
+		}
+		else
+		{
+			if (CurSecond == PoisonSaveTime)
+			{
+				//
+			}
+			else
+			{
+				PoisonSaveTime = CurSecond;
+				FDamageEvent PoisonDamage;
+				float DamageAmount = 1.f;
+				TakeDamage(DamageAmount, PoisonDamage, NULL, NULL);
+
+				//Damage UI Print Event
+				OnDamage.Broadcast(DamageAmount, GetActorLocation());
+			}
+		}
+	}
+	//화상 데미지
+	if (bBurning)
+	{
+		float ElapsedTime = GetWorld()->TimeSeconds - StartBurningTime;
+		int CurSecond = FMath::FloorToInt(ElapsedTime);
+		float TimeLeft = BurningTime - ElapsedTime;
+		if (TimeLeft <= 0.0f)
+		{
+			bBurning = false;
+			CurSecond = 0;
+		}
+		else
+		{
+			if (CurSecond == BurningSaveTime)
+			{
+				//
+			}
+			else
+			{
+				BurningSaveTime = CurSecond;
+				FDamageEvent BurningDamage;
+				float DamageAmount = 1.f;
+				TakeDamage(DamageAmount, BurningDamage, NULL, NULL);
+
+				//Damage UI Print Event
+				OnDamage.Broadcast(DamageAmount, GetActorLocation());
+			}
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -71,8 +135,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-
-
+	//Hit Anim
 	AItem* HitItem = Cast<AItem>(DamageCauser);
 	if (HitItem)
 	{
@@ -95,10 +158,24 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 				bFirstHit = false;
 			}
 		}
-		HitItem->Destroy();
+		//HitItem->Destroy();
 	}
 
+	//Damage and UI
+	FVector HitLoc;
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
+		HitLoc = PointDamageEvent.HitInfo.Location;
+	}
+	else
+	{
+		HitLoc = GetActorLocation();
+	}
 	HP -= DamageAmount;
+	OnDamage.Broadcast(DamageAmount, HitLoc);
+
+	
 
 	return DamageAmount;
 }
@@ -128,51 +205,44 @@ void AEnemy::MultiPlayMontage_Implementation(AEnemy* Enemy, FName Section)
 	EnemyAnim->PlayCombatMontage(Section);
 }
 
-void AEnemy::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AEnemy::ServerStartBinding_Implementation()
 {
-	AItem* HitItem = Cast<AItem>(OtherActor);
-	if (HitItem)
-	{
-		if (EnemyAnim != NULL && HP > 0)
-		{
-			HP -= 5;
-			if (HP <= 0 && CurState != EEnemyState::Die)
-			{
-				CurState = EEnemyState::Die;
-				EnemyAnim->PlayCombatMontage(FName("Die"));
-			}
-			else
-			{
-				if (Target == NULL)
-				{
-					EnemyAnim->PlayCombatMontage(FName("Hit"));
-					if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
-					{
-						Hunter->SetPartnerTarget(this);
-					}
-					Target = HitItem->ThisOwner;
-					TargetPos = Target->GetActorLocation();
-					CurState = EEnemyState::Hit;
-					bFirstHit = false;
-				}
-			}
-		}
-		HitItem->Destroy();
-	}
+	MultiStartBinding_Implementation();
+}
+
+void AEnemy::MultiStartBinding_Implementation()
+{
+	CurState = EEnemyState::Binding;
+	StartBindingTime = GetWorld()->TimeSeconds;
+}
+
+void AEnemy::StartBinding()
+{
+	ServerStartBinding();
+}
+
+void AEnemy::StartPoison()
+{
+	bPoisoned = true;
+	StartPoisonedTime = GetWorld()->TimeSeconds;
 }
 
 void AEnemy::SeeNewTarget(AActor* Actor)
 {
-	if (bFirstMeet)
+	TargetArray.AddUnique(Actor);
+	if (Actor == AgroTarget)
 	{
-		bFirstMeet = false;
-		//CurState = EEnemyState::Roar;
+		SetTarget(Actor);
+		CurState = EEnemyState::Chase;
+		AgroTarget = NULL;
 	}
+	
 }
 
-void AEnemy::HearSound(FVector SoundLoc)
+void AEnemy::HearSound(FVector SoundLoc, AActor* AgroActor)
 {
 	TargetPos = SoundLoc;
+	AgroTarget = AgroActor;
 	CurState = EEnemyState::Attention;
 }
 
@@ -229,3 +299,13 @@ void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	}
 }
 
+void AEnemy::InteractIce_Implementation()
+{
+	GetCharacterMovement()->MaxWalkSpeed /= 2;
+}
+
+void AEnemy::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
+{
+	bBurning = true;
+	StartBurningTime = GetWorld()->TimeSeconds;
+}

@@ -93,8 +93,8 @@ void ANpcPartnerManager::ShowPartner(int Val)
 
 void ANpcPartnerManager::SelectPartner()
 {
-	PartnerArray[CurrentIndex]->Hunter = Master;
-	Master->Partner = PartnerArray[CurrentIndex];
-	PartnerArray[CurrentIndex]->bPosing = false;
+	PartnerArray[CurrentIndex]->FollowHunter(Master);
+	Master->SetPartner(PartnerArray[CurrentIndex]);
+
 	PartnerArray[CurrentIndex] = NULL;
 }

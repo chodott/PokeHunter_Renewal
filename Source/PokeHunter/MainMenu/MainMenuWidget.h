@@ -27,6 +27,7 @@ protected:
 
 private:
 	FHttpModule* HttpModule;
+
 	UPROPERTY()
 		FString LoginUrl;
 

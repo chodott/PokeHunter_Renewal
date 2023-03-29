@@ -2,7 +2,7 @@
 
 #pragma once
 
-/**/
+/*
 #include "../../../../PH-Server/IOCPServer/protocol.h"
 #include "Windows/AllowWindowsPlatformTypes.h"
 #include "Windows/prewindowsapi.h"
@@ -12,6 +12,7 @@
 #include <WinSock2.h>
 #include "Windows/PostWindowsApi.h"
 #include "Windows/HideWindowsPlatformTypes.h"
+*/
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
@@ -21,12 +22,11 @@
 /**
  * 
  */
-
 USTRUCT(BlueprintType)
 struct FU_SC_LOGIN_INFO_PACK {
 	GENERATED_USTRUCT_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString _name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -46,7 +46,7 @@ USTRUCT(BlueprintType)
 struct FU_SC_ITEM_INFO_PACK {
 	GENERATED_USTRUCT_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FName _name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -61,6 +61,7 @@ class POKEHUNTER_API UBaseInstance : public UGameInstance
 public:
 	UBaseInstance();
 
+	/*
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString Player_Name;
 
@@ -82,9 +83,10 @@ public:
 
 	int reval;
 
-	UFUNCTION(BlueprintCallable, Category = Socket)
-		bool ConnectToServer(FString server_addr ="127.0.0.1");	// Default Addr = 127.0.0.1
-	
+	UFUNCTION(BlueprintCallable, Category = "Socket")
+		bool ConnectToServer(FString server_addr ="127.0.0.1"); // Default Addr = 127.0.0.1
+	*/
+
 	virtual void Shutdown() override;
 
 	UPROPERTY()

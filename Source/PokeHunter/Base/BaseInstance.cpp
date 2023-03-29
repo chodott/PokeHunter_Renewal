@@ -15,6 +15,7 @@ UBaseInstance::UBaseInstance()
 	HttpModule = &FHttpModule::Get();
 }
 
+/*
 bool UBaseInstance::ConnectToServer(FString server_addr)
 {
 	reval = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -38,6 +39,7 @@ bool UBaseInstance::ConnectToServer(FString server_addr)
 	}
 	return false;
 }
+*/
 
 void UBaseInstance::Shutdown()
 {

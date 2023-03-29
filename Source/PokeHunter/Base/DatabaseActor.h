@@ -17,14 +17,14 @@ public:
 	// Sets default values for this actor's properties
 	ADatabaseActor();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
 	TMap<FName,TSubclassOf<class UItemData>> ItemDataClassMap;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
 	TMap<FName, class UItemData*> ItemDataObjectMap;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SkillData")
 	TArray<FSkillInfo> SkillInfoArray;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
 	TMap<ESkillID, class USkillData*> SkillDataObjectMap;
 
 

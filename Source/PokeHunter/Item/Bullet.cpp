@@ -70,9 +70,6 @@ void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 	StaticMesh->AddImpulse(Velocity, FName(""),true);
 }
 
-void ABullet::ApplyAbillity_Implementation(AActor* OtherActor, UPrimitiveComponent* OtherComponent)
-{
-}
 
 void ABullet::ServerApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)
 {

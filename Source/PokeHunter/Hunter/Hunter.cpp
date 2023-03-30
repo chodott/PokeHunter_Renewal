@@ -712,6 +712,16 @@ void AHunter::DiveInterpReturn(float Value)
 	AddMovementInput(LastInput, 1.0f);
 }
 
+void AHunter::InteractHealArea_Implementation()
+{
+	HealPerSecondAmount += 10.f;
+}
+
+void AHunter::OutHealArea_Implementation()
+{
+	HealPerSecondAmount -= 10.f;
+}
+
 void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)
 {
 	for (int i = 0; i < 4; ++i)

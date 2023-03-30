@@ -76,7 +76,9 @@ void AGolemBoss::LongAttack()
 {
 	if (EnemyAnim)
 	{
+		CurState = EEnemyState::LongAttack;
 		MultiPlayMontage(this, FName("Throw"));
+		
 	}
 	TargetPos = Target->GetActorLocation();
 }

@@ -74,6 +74,24 @@ void AEnemyController::OnPerception(AActor* Actor, FAIStimulus Stimulus)
 	}
 }
 
+bool AEnemyController::FindAgroActor()
+{
+	TArray<AActor*> PerceivedActors;
+	GetAIPerceptionComponent()->GetCurrentlyPerceivedActors(UAISense_Sight::StaticClass(), PerceivedActors);
+	for (AActor* Actor : PerceivedActors)
+	{
+		if(Actor == Enemy->AgroTarget)
+		{
+			Enemy->SetTarget(Actor);
+			Enemy->bWaitingAgro = false;
+			Enemy->CurState = EEnemyState::Roar;
+			return true;
+
+		}
+	}
+	return false;
+}
+
 
 void AEnemyController::RunAI_Implementation()
 {

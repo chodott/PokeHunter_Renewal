@@ -161,3 +161,13 @@ void APartner::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	OnMontageEnd.Broadcast();
 
 }
+
+void APartner::InteractHealArea_Implementation()
+{
+	HealPerSecondAmount += 10.f;
+}
+
+void APartner::OutHealArea_Implementation()
+{
+	HealPerSecondAmount -= 10.f;
+}

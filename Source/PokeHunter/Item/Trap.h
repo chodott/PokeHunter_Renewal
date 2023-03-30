@@ -19,11 +19,21 @@ public:
 	class UBoxComponent* CollisionBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 	float Damage;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Duration")
+	float LifeTime{ 5.f };
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Duration")
+	float StartTime;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Duration")
+	bool bHavingLife{ false };;
 
+protected:
+	virtual void BeginPlay() override;
 
 public:
 	ATrap();
+	virtual void Tick(float DeltaTime) override;
 	UFUNCTION()
 	void OnBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void CheckLifeTime(float DeltaTime);
 
 };

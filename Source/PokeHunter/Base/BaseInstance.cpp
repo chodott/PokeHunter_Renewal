@@ -62,8 +62,10 @@ void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken,
 	RefreshToken = NewRefreshToken;
 
 	UE_LOG(LogTemp, Warning, TEXT("access token: %s"), *AccessToken);
+	// UE_LOG(LogTemp, Warning, TEXT("IdToken token: %s"), *IdToken);
 	UE_LOG(LogTemp, Warning, TEXT("refresh token: %s"), *RefreshToken);
 
+	// World Timer에 등록하기
 	GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UBaseInstance::RetrieveNewTokens, 1.0f, false, 60.0f);
 }
 
@@ -98,7 +100,7 @@ void UBaseInstance::OnRetrieveNewTokensResponseReceived(FHttpRequestPtr Request,
 		TSharedPtr<FJsonObject> JsonObject;
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
-			if (!JsonObject->HasField("error")) {
+			if (!JsonObject->HasField("error") || !JsonObject->HasField("Unauthorized")) {
 				SetCognitoTokens(JsonObject->GetStringField("accessToken"), JsonObject->GetStringField("idToken"), RefreshToken);
 			}
 		}

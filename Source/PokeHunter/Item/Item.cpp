@@ -13,6 +13,7 @@ AItem::AItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	bReplicates = true;
 	SceneRootComponent = CreateDefaultSubobject<USceneComponent>("My Scene Component");
 	SetRootComponent(SceneRootComponent);
 
@@ -43,6 +44,11 @@ void AItem::UseItem(APawn* ItemOwner)
 }
 
 void AItem::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
+{
+
+}
+
+void AItem::ApplyAbillity_Implementation(AActor* OtherActor, UPrimitiveComponent* OtherComponent)
 {
 
 }

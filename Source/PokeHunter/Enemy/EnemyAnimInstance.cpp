@@ -29,9 +29,10 @@ void UEnemyAnimInstance::UpdateAnimationProperties()
 	}
 }
 
-bool UEnemyAnimInstance::PlayCombatMontage(FName Section)
+bool UEnemyAnimInstance::PlayCombatMontage(FName Section, bool bInterrupt)
 {
-	if (Section == FName("Die") || Section == FName("Hit"))
+	//if (Section == FName("Die") || Section == FName("Hit"))
+	if(bInterrupt)
 	{
 		bPlaying = true;
 		Montage_Play(CombatMontage, 1.0f);

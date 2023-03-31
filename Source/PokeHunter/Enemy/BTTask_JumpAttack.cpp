@@ -7,16 +7,17 @@
 
 UBTTask_JumpAttack::UBTTask_JumpAttack()
 {
-	bNotifyTick = true;
+	
 }
 
 EBTNodeResult::Type UBTTask_JumpAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
-	if (Enemy == NULL)return EBTNodeResult::Failed;
-	if(Enemy->CurState != EEnemyState::JumpAttack)
+	if (Enemy == NULL) return EBTNodeResult::Failed;
+	if(Enemy->CurState == EEnemyState::JumpAttack) return EBTNodeResult::Failed;
 	Enemy->JumpAttack();
+	bNotifyTick = true;
 	return EBTNodeResult::InProgress;
 }
 

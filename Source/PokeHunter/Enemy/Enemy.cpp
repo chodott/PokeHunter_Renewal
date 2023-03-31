@@ -142,13 +142,13 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		if (HP <= 0 && CurState != EEnemyState::Die)
 		{
 			CurState = EEnemyState::Die;
-			EnemyAnim->PlayCombatMontage(FName("Die"));
+			EnemyAnim->PlayCombatMontage(FName("Die"), true);
 		}
 		else
 		{
 			if (Target == NULL)
 			{
-				EnemyAnim->PlayCombatMontage(FName("Hit"));
+				EnemyAnim->PlayCombatMontage(FName("Hit"), true);
 				if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
 				{
 					Hunter->SetPartnerTarget(this);
@@ -202,7 +202,7 @@ void AEnemy::ServerPlayMontage_Implementation(AEnemy* Enemy, FName Section)
 
 void AEnemy::MultiPlayMontage_Implementation(AEnemy* Enemy, FName Section)
 {
-	EnemyAnim->PlayCombatMontage(Section);
+	EnemyAnim->PlayCombatMontage(Section, true);
 }
 
 void AEnemy::ServerStartBinding_Implementation()
@@ -230,11 +230,12 @@ void AEnemy::StartPoison()
 void AEnemy::SeeNewTarget(AActor* Actor)
 {
 	TargetArray.AddUnique(Actor);
-	if (Actor == AgroTarget)
+	
+	
+	if (Target == NULL)
 	{
 		SetTarget(Actor);
 		CurState = EEnemyState::Chase;
-		AgroTarget = NULL;
 	}
 	
 }
@@ -243,13 +244,14 @@ void AEnemy::HearSound(FVector SoundLoc, AActor* AgroActor)
 {
 	TargetPos = SoundLoc;
 	AgroTarget = AgroActor;
-	CurState = EEnemyState::Attention;
+	bWaitingAgro = true;
 }
 
 void AEnemy::Attack(int AttackPattern)
 {
 	if (Target != NULL)
 	{
+		CurState = EEnemyState::NormalAttack;
 		ServerPlayMontage(this, FName("Attack"));
 		//EnemyAnim->PlayCombatMontage(TEXT("Attack"));
 	}
@@ -284,7 +286,7 @@ void AEnemy::JumpAttack()
 	float Distance = GetDistanceTo(Target);
 	FVector LookVec = Target->GetActorLocation() - GetActorLocation();
 	LookVec.Normalize();
-	LookVec.Z = 0.2f;
+	LookVec.Z = 0.3f;
 	FVector Velocity = LookVec * Distance;
 	GetCharacterMovement()->Launch(Velocity);
 }
@@ -308,4 +310,10 @@ void AEnemy::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
 {
 	bBurning = true;
 	StartBurningTime = GetWorld()->TimeSeconds;
+}
+
+void AEnemy::InteractBindTrap_Implementation()
+{
+	CurState = EEnemyState::Binding;
+	StartBindingTime = GetWorld()->TimeSeconds;
 }

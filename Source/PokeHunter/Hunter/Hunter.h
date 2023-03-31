@@ -9,6 +9,7 @@
 #include "GenericTeamAgentInterface.h"
 #include "PokeHunter/Item/ItemData.h"
 #include "PokeHunter/Base/SkillData.h"
+#include "PokeHunter/Base/ItemInteractInterface.h"
 #include "Hunter.generated.h"
 
 //Dynamic 
@@ -50,16 +51,11 @@ public:
 };
 
 UCLASS()
-class POKEHUNTER_API AHunter : public ACharacter, public IGenericTeamAgentInterface
+class POKEHUNTER_API AHunter : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface
 {
 	GENERATED_BODY()
 
 public:
-	//Event
-
-public:
-	// Sets default values for this character's properties
-	AHunter();
 
 	//Camera Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
@@ -157,6 +153,8 @@ public:
 
 
 protected:
+	// Sets default values for this character's properties
+	AHunter();
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -190,6 +188,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartInvincibility();
 
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnItem(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSpawnItem(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
 
 	//Status
 	UFUNCTION(BlueprintCallable)
@@ -257,6 +259,10 @@ public:
 	//Timeline Function
 	UFUNCTION()
 	void DiveInterpReturn(float Value);
+
+	//ItemInterface Function
+	virtual void InteractHealArea_Implementation();
+	virtual void OutHealArea_Implementation();
 	
 private:
 	// Character Movement Input

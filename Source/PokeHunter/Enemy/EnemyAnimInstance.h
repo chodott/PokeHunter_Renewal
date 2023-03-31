@@ -37,5 +37,5 @@ public:
 	UAnimMontage* CombatMontage;
 
 public:
-	bool PlayCombatMontage(FName Section);
+	bool PlayCombatMontage(FName Section, bool interuupt = false);
 };

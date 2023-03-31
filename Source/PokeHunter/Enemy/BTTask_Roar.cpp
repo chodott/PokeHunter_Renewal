@@ -38,6 +38,7 @@ void UBTTask_Roar::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	if (!bPlaying)
 	{
+		Enemy->bWaitingAgro = false;
 		Enemy->CurState = EEnemyState::Chase;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		

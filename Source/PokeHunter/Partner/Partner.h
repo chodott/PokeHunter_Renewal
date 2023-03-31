@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "GenericTeamAgentInterface.h"
 #include "PokeHunter/Base/SkillData.h"
+#include "PokeHunter/Base/ItemInteractInterface.h"
 #include "Partner.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
@@ -27,7 +28,7 @@ enum class EPartnerState : uint8
 };
 
 UCLASS()
-class POKEHUNTER_API APartner : public ACharacter, public IGenericTeamAgentInterface
+class POKEHUNTER_API APartner : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface
 {
 	GENERATED_BODY()
 
@@ -50,7 +51,9 @@ public:
 	FVector AttackPoint;
 	AActor* Target;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
-	float HP{ 100 };
+	float HP{ 100.f};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
+	float HealPerSecondAmount{1.f};
 	bool bPosing;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bOrdered;
@@ -89,5 +92,9 @@ public:
 	//AnimationFunction
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	//ItemInteractInterface
+	virtual void InteractHealArea_Implementation();
+	virtual void OutHealArea_Implementation();
 
 };

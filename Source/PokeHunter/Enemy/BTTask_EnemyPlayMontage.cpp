@@ -38,9 +38,17 @@ EBTNodeResult::Type UBTTask_EnemyPlayMontage::ExecuteTask(UBehaviorTreeComponent
 void UBTTask_EnemyPlayMontage::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-
-	if (!bPlaying)
+	AEnemyController* Controller = Cast<AEnemyController>(OwnerComp.GetAIOwner());
+	if (Controller->FindAgroActor() == true)
 	{
+		AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
+		
+		Enemy->CurState = EEnemyState::Roar;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
+
+	//if (!bPlaying)
+	//{
+	//	FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	//}
 }

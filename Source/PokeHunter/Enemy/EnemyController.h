@@ -30,6 +30,7 @@ public:
 	void RunAI();
 	UFUNCTION(Server, Reliable)
 	void StopAI();
+	bool FindAgroActor();
 
 public:
 	/*UPROPERTY(VisibleAnywhere, BlueprintReadWrite, "AI")
@@ -44,6 +45,7 @@ public:
 	class UAISenseConfig_Hearing* ConfigHearing;
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	class AEnemy* Enemy;
 
 };

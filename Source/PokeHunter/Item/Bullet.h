@@ -32,8 +32,7 @@ public:
 	//void OnHit(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 	virtual void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos) ;
-	UFUNCTION(BlueprintNativeEvent)
-	void ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherComponent);
+	
 
 	UFUNCTION(Server, Reliable)
 	void ServerApplyDamage(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass);

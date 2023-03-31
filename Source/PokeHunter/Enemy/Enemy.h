@@ -21,6 +21,7 @@ enum class EEnemyState : uint8
 	Die UMETA(DisplayName = "Die"),
 	Roar UMETA(DisplayName = "Roar"),
 	Attention UMETA(DisplayName = "Attention"),
+	NormalAttack UMETA(DisplayName = "NormalAttack"),
 	JumpAttack UMETA(DisplayName = "JumpAttack"),
 	LongAttack UMETA(DisplayName = "LongAttack")
 	
@@ -41,10 +42,13 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
 	class AActor* Target;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class AActor* AgroTarget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bWaitingAgro;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<class AActor*> TargetArray;
+	TArray<AActor*> TargetArray;
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
 	FVector TargetPos;
@@ -137,9 +141,11 @@ public:
 	virtual void LongAttack();
 	UFUNCTION(BlueprintCallable)
 	virtual void Roar();
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void Patrol();
+	UFUNCTION(BlueprintCallable)
 	virtual void JumpAttack();
+	
 
 	//Animation Function
 	UFUNCTION()
@@ -148,6 +154,7 @@ public:
 	//Interface
 	virtual void InteractIce_Implementation();
 	virtual void InteractFire_Implementation(UPrimitiveComponent* HitComponent);
+	virtual void InteractBindTrap_Implementation();
 
 public:
 	bool bFirstHit{ true};

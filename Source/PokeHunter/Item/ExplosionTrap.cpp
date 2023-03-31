@@ -11,7 +11,7 @@ AExplosionTrap::AExplosionTrap()
 	ExplosionCollision = CreateDefaultSubobject<USphereComponent>(FName("ExplosionCollision"));
 	ExplosionCollision->SetupAttachment(GetRootComponent());
 	ExplosionCollision->OnComponentBeginOverlap.AddDynamic(this, &AExplosionTrap::OnExplosionOverlap);
-	ExplosionCollision->Deactivate();
+	
 	Damage = 50.f;
 }
 

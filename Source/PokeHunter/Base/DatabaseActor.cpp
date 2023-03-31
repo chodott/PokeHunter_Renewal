@@ -16,11 +16,14 @@ void ADatabaseActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*
+	* // -> InventoryServerManager.cpp에서 실행 
 	for (auto& ItemDataClass : ItemDataClassMap)
 	{
 		auto ItemData = NewObject<UItemData>(this, ItemDataClass.Value);
 		ItemDataObjectMap.Add(ItemDataClass.Key, ItemData);
 	}
+	*/
 
 	for (auto& SkillInfo : SkillInfoArray)
 	{

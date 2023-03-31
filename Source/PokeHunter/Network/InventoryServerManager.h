@@ -6,6 +6,8 @@
 #include "PokeHunter/Base/BaseInstance.h"
 #include "PokeHunter/Hunter/InventoryComponent.h"
 
+#include "PokeHunter/Base/DatabaseActor.h"
+
 #include "CoreMinimal.h"
 #include "Net/Subsystems/NetworkSubsystem.h"
 #include "InventoryServerManager.generated.h"

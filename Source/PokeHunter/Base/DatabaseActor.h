@@ -18,16 +18,16 @@ public:
 	ADatabaseActor();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
-	TMap<FName,TSubclassOf<class UItemData>> ItemDataClassMap;
+		TMap<FName,TSubclassOf<class UItemData>> ItemDataClassMap;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
-	TMap<FName, class UItemData*> ItemDataObjectMap;
+		TMap<FName, class UItemData*> ItemDataObjectMap;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SkillData")
-	TArray<FSkillInfo> SkillInfoArray;
+		TArray<FSkillInfo> SkillInfoArray;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
-	TMap<ESkillID, class USkillData*> SkillDataObjectMap;
-
-
+		TMap<ESkillID, class USkillData*> SkillDataObjectMap;
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,4 +43,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FSkillInfo FindSkill(ESkillID SkillID);
 
+	
+	void DeepCopyMap() {
+
+	}
 };

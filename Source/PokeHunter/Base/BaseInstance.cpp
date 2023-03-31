@@ -15,7 +15,6 @@ UBaseInstance::UBaseInstance()
 	HttpModule = &FHttpModule::Get();
 }
 
-/*
 bool UBaseInstance::ConnectToServer(FString server_addr)
 {
 	reval = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -39,7 +38,6 @@ bool UBaseInstance::ConnectToServer(FString server_addr)
 	}
 	return false;
 }
-*/
 
 void UBaseInstance::Shutdown()
 {
@@ -62,7 +60,7 @@ void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken,
 	RefreshToken = NewRefreshToken;
 
 	UE_LOG(LogTemp, Warning, TEXT("access token: %s"), *AccessToken);
-	// UE_LOG(LogTemp, Warning, TEXT("IdToken token: %s"), *IdToken);
+	UE_LOG(LogTemp, Warning, TEXT("IdToken token: %s"), *IdToken);
 	UE_LOG(LogTemp, Warning, TEXT("refresh token: %s"), *RefreshToken);
 
 	// World Timer에 등록하기
@@ -84,7 +82,12 @@ void UBaseInstance::RetrieveNewTokens()
 			RetrieveNewTokensRequest->SetURL(ApiUrl + "/retrievenewtokens");
 			RetrieveNewTokensRequest->SetVerb("POST");
 			RetrieveNewTokensRequest->SetHeader("Content-Type", "application/json");
-			RetrieveNewTokensRequest->SetHeader("Authorization", AccessToken);
+			
+
+			// RetrieveNewTokensRequest->SetHeader("Authorization", AccessToken);
+			RetrieveNewTokensRequest->SetHeader("Authorization", IdToken);
+			
+
 			RetrieveNewTokensRequest->SetContentAsString(RequestBody);
 			RetrieveNewTokensRequest->ProcessRequest();
 		}

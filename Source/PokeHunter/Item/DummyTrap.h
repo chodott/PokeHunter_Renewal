@@ -18,6 +18,8 @@ class POKEHUNTER_API ADummyTrap : public AExplosionTrap, public IGenericTeamAgen
 public:
 	ADummyTrap();
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 public:
 	//TeamID
 	FGenericTeamId TeamID;

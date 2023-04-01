@@ -16,7 +16,7 @@
  * 
  */
 UCLASS()
-class POKEHUNTER_API UInventoryServerManager : public UNetworkSubsystem //, public UServerIntance , UInventoryComponent
+class POKEHUNTER_API UInventoryServerManager : public UNetworkSubsystem
 {
 	GENERATED_BODY()
 	

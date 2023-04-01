@@ -64,7 +64,7 @@ public:
 	class UCameraComponent* FollowCamera;
 	//Inventory Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
-	class UInventoryComponent* Inventory;
+		class UInventoryComponent* Inventory{};
 
 	//HunterInfo
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HunterStatus")

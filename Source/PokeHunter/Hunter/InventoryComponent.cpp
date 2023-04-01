@@ -32,6 +32,7 @@ void UInventoryComponent::BeginPlay()
 	
 }
 
+// AItemDropActor::Interact_Implementation(AHunter* Hunter) 함수에서 호출
 bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
 {
 	int NullNum = -1;
@@ -60,6 +61,7 @@ bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
 	return false;
 }
 
+// 사용처 없음
 bool UInventoryComponent::AddItemInfo(FName ItemID, int Cnt)
 {
 	int NullNum = -1;
@@ -69,10 +71,10 @@ bool UInventoryComponent::AddItemInfo(FName ItemID, int Cnt)
 		else if (!InfoArray[i].ItemID.IsNone())
 		{
 			if (InfoArray[i].ItemID == ItemID)
-				{
+			{
 				InfoArray[i].cnt += Cnt;
 				return true;
-				}
+			}
 		}
 	}
 

@@ -27,4 +27,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool GetInventoryDBInfos();
+
+	UFUNCTION(BlueprintCallable)
+		bool SaveInventoryDB();
 };

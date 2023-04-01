@@ -454,18 +454,18 @@ void AHunter::LMBDown()
 					EndTrace = HitResult->Location;
 				}
 
-				//ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, StartTrace, GetControlRotation());
-				//Bullet->UseItem(this, StartTrace, EndTrace);
+				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, StartTrace, GetControlRotation());
+				Bullet->UseItem(this, StartTrace, EndTrace);
 
-				ServerSpawnItem(ItemClass, StartTrace, EndTrace, GetControlRotation());
+				//ServerSpawnItem(ItemClass, StartTrace, EndTrace, GetControlRotation());
 				ServerPlayMontage(this, FName("Shot"));	
 			}
 			//NormalMode
 			else
 			{
-				ServerSpawnItem(ItemClass, GetActorLocation(), FVector::ZeroVector, GetControlRotation());
-				//AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(), GetControlRotation());
-			/*	switch (Item->ItemType)
+				//ServerSpawnItem(ItemClass, GetActorLocation(), FVector::ZeroVector, GetControlRotation());
+				AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(), GetControlRotation());
+				switch (Item->ItemType)
 				{
 				case EItemType::Potion:
 					ServerPlayMontage(this, FName("Drink"));
@@ -481,7 +481,7 @@ void AHunter::LMBDown()
 					CurState = EPlayerState::Install;
 					Item->UseItem(this);
 					break;
-				}*/
+				}
 				
 			}
 
@@ -493,7 +493,7 @@ void AHunter::LMBDown()
 				{
 					if (Info.ItemID == ItemID)
 					{
-						Info.ItemID == FName("None");
+						Info.ItemID = FName("None");
 						Info.cnt = 0;
 					}
 					QuickSlotArray[CurQuickKey].ItemID = FName("None");
@@ -755,32 +755,32 @@ void AHunter::StartInvincibility()
 	ServerStartInvincibility();
 }
 
-void AHunter::ServerSpawnItem_Implementation(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
-{
-	MultiSpawnItem(SpawnItemClass, StartLoc, EndLoc, Rotation);
-}
-
-void AHunter::MultiSpawnItem_Implementation(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
-{
-	auto SpawnedItem = GetWorld()->SpawnActor<AItem>(SpawnItemClass, StartLoc, Rotation);
-	switch (SpawnedItem->ItemType)
-	{
-		case EItemType::Bullet:
-			SpawnedItem->UseItem(this, StartLoc, EndLoc);
-			ServerPlayMontage(this, FName("Shot"));
-			break;
-		case EItemType::Potion:
-			ServerPlayMontage(this, FName("Drink"));
-			SpawnedItem->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
-			CurItem = SpawnedItem;
-			CurState = EPlayerState::Drink;
-			bUpperOnly = true;
-			break;
-		case EItemType::Trap:
-			ServerPlayMontage(this, FName("Install"));
-			SpawnedItem->SetActorLocation((GetActorLocation() + GetActorForwardVector() * 100.f));
-			SpawnedItem->UseItem(this);;
-			CurState = EPlayerState::Install;
-			break;
-	}
-}
+//void AHunter::ServerSpawnItem_Implementation(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
+//{
+//	MultiSpawnItem(SpawnItemClass, StartLoc, EndLoc, Rotation);
+//}
+//
+//void AHunter::MultiSpawnItem_Implementation(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
+//{
+//	auto SpawnedItem = GetWorld()->SpawnActor<AItem>(SpawnItemClass, StartLoc, Rotation);
+//	switch (SpawnedItem->ItemType)
+//	{
+//		case EItemType::Bullet:
+//			SpawnedItem->UseItem(this, StartLoc, EndLoc);
+//			ServerPlayMontage(this, FName("Shot"));
+//			break;
+//		case EItemType::Potion:
+//			ServerPlayMontage(this, FName("Drink"));
+//			SpawnedItem->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
+//			CurItem = SpawnedItem;
+//			CurState = EPlayerState::Drink;
+//			bUpperOnly = true;
+//			break;
+//		case EItemType::Trap:
+//			ServerPlayMontage(this, FName("Install"));
+//			SpawnedItem->SetActorLocation((GetActorLocation() + GetActorForwardVector() * 100.f));
+//			SpawnedItem->UseItem(this);;
+//			CurState = EPlayerState::Install;
+//			break;
+//	}
+//}

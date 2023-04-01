@@ -8,6 +8,10 @@
 
 UBaseInstance::UBaseInstance()
 {
+	reval = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	ServerAddr.sin_family = AF_INET;
+	ServerAddr.sin_port = htons(PORT_NUM);
+
 	UTextReaderComponent* TextReader = CreateDefaultSubobject<UTextReaderComponent>(TEXT("TextReaderComp"));
 
 	ApiUrl = TextReader->ReadFile("Urls/ApiUrl.txt");
@@ -17,10 +21,7 @@ UBaseInstance::UBaseInstance()
 
 bool UBaseInstance::ConnectToServer(FString server_addr)
 {
-	reval = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-	ServerAddr.sin_family = AF_INET;
-	ServerAddr.sin_port = htons(PORT_NUM);
 	ServerAddr.sin_addr.s_addr = inet_addr(TCHAR_TO_ANSI(*server_addr));
 
 	if (reval != 0) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("network fail")));

@@ -20,16 +20,29 @@ bool UInventoryServerManager::GetInventoryDBInfos()
 		auto ItemData = NewObject<UItemData>(this, ItemDataClass.Value);
 		itemDB->ItemDataObjectMap.Add(ItemDataClass.Key, ItemData);
 	}
-	return true;
 
 	CS_QUEST_INVENTORY_PACK quest_item;
 	quest_item.size = sizeof(CS_QUEST_INVENTORY_PACK);
 	quest_item.type = CS_QUEST_INVENTORY;
 	send(gameinstance->Socket, (char*)&quest_item, quest_item.size, NULL);
 
+	SC_ITEM_INFO_PACK item_info{};
+	recv(gameinstance->Socket, (char*)&item_info, sizeof(SC_ITEM_INFO_PACK), NULL);
+
+	FString msg_name = item_info._name;
+	int msg_cnt = item_info._cnt;
+
+	// 아이템 테스트 확인용 출력
+	UE_LOG(LogTemp, Warning, TEXT("[Item name] : %s"), *msg_name);
+	UE_LOG(LogTemp, Warning, TEXT("[Item cnt] : %d"), msg_cnt);
+
+	/*
 	int db_err;
+	SC_ITEM_INFO_PACK item_info{};
+	db_err = recv(gameinstance->Socket, (char*)&item_info, sizeof(SC_ITEM_INFO_PACK), NULL);
+
 	for (int i = 0; i < MAX_ITEM_COUNT; ++i) {
-		SC_ITEM_INFO_PACK item_info{};
+		memset(&item_info, 0, sizeof(item_info));
 		db_err = recv(gameinstance->Socket, (char*)&item_info, item_info.size, NULL);
 
 		if (SOCKET_ERROR == db_err) {
@@ -39,11 +52,13 @@ bool UInventoryServerManager::GetInventoryDBInfos()
 			break;
 		}
 		else {
-			// AddItemInfo(FName(item_info._name), (int)(item_info._cnt));
+			// UItemData itemdata;
+			// itemDB->ItemDataClassMap.Add("test");
 			UE_LOG(LogTemp, Warning, TEXT("[Item name] : %s"), item_info._name);
 			continue;
 		}
 	}
+	*/
 	
 	return true;
 }

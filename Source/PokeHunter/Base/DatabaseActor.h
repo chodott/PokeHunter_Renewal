@@ -18,7 +18,7 @@ public:
 	ADatabaseActor();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
-		TMap<FName,TSubclassOf<class UItemData>> ItemDataClassMap;
+		TMap<FName, TSubclassOf<class UItemData>> ItemDataClassMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
 		TMap<FName, class UItemData*> ItemDataObjectMap;

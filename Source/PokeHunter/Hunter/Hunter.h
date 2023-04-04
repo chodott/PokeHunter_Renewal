@@ -66,6 +66,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
 	class UInventoryComponent* Inventory;
 
+	//
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
+	class UStaticMeshComponent* DestinationMesh;
+
 	//HunterInfo
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HunterStatus")
 	FHunterInfo HunterInfo;
@@ -150,7 +154,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float HealPerSecondAmount;
 	int SaveSecond;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bGrabbed;
 
 protected:
 	// Sets default values for this character's properties

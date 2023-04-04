@@ -17,6 +17,14 @@ EBTNodeResult::Type UBTTask_JumpAttack::ExecuteTask(UBehaviorTreeComponent& Owne
 	if (Enemy == NULL) return EBTNodeResult::Failed;
 	if(Enemy->CurState == EEnemyState::JumpAttack) return EBTNodeResult::Failed;
 	Enemy->JumpAttack();
+
+	bPlaying = true;
+
+	Enemy->OnMontageEnd.AddLambda([this]()->void
+		{
+			bPlaying = false;
+		});
+
 	bNotifyTick = true;
 	return EBTNodeResult::InProgress;
 }
@@ -24,10 +32,10 @@ EBTNodeResult::Type UBTTask_JumpAttack::ExecuteTask(UBehaviorTreeComponent& Owne
 void UBTTask_JumpAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
-	if (!Enemy->IsJumping())
+	if (!Enemy->IsJumping() && !bPlaying)
 	{
 		Enemy->CurState = EEnemyState::Chase;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-		
 	}
+
 }

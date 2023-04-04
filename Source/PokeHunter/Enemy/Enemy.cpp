@@ -47,12 +47,13 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CurState == EEnemyState::Binding)
+	if (bBinding)
 	{
 		float ElapsedTime = GetWorld()->TimeSeconds - StartBindingTime;
 		float TimeLeft = BindingTime - ElapsedTime;
 		if (TimeLeft <= 0.0f)
 		{
+			bBinding = false;
 			CurState = EEnemyState::Chase;
 		}
 
@@ -127,8 +128,8 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
 {
-	OutLocation = GetMesh()->GetSocketLocation("HeadSocket");
-	OutRotation = GetMesh()->GetSocketRotation("HeadSocket");
+	OutLocation = GetMesh()->GetSocketLocation("Head");
+	OutRotation = GetMesh()->GetSocketRotation("Head");
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -212,7 +213,7 @@ void AEnemy::ServerStartBinding_Implementation()
 
 void AEnemy::MultiStartBinding_Implementation()
 {
-	CurState = EEnemyState::Binding;
+	bBinding = true;
 	StartBindingTime = GetWorld()->TimeSeconds;
 }
 
@@ -283,6 +284,12 @@ void AEnemy::Patrol()
 void AEnemy::JumpAttack()
 {
 	CurState = EEnemyState::JumpAttack;
+	ServerPlayMontage(this, FName("Attack_Jump"));
+	
+}
+
+void AEnemy::LaunchToTarget()
+{
 	float Distance = GetDistanceTo(Target);
 	FVector LookVec = Target->GetActorLocation() - GetActorLocation();
 	LookVec.Normalize();
@@ -314,6 +321,6 @@ void AEnemy::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
 
 void AEnemy::InteractBindTrap_Implementation()
 {
-	CurState = EEnemyState::Binding;
+	bBinding = true;
 	StartBindingTime = GetWorld()->TimeSeconds;
 }

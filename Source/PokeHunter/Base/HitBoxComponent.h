@@ -17,6 +17,8 @@ class POKEHUNTER_API UHitBoxComponent : public UBoxComponent
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Part")
 	float PartHP;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
+	float Damage;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Part")
 	bool bDestroyed;
@@ -34,6 +36,7 @@ public:
 	
 
 public:
+	UHitBoxComponent();
 	void TakeDamage(float DamageAmount);
 	bool CheckBurning(float DeltaTime);
 

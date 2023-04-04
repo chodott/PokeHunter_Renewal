@@ -28,7 +28,7 @@ AGolemBoss::AGolemBoss()
 	PartHitBox.AddUnique(RightArmHitBox);
 
 	UHitBoxComponent* LeftArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftArmHitBox"));
-	LeftArmHitBox->SetupAttachment(GetMesh(), FName("LeftArm"));
+	LeftArmHitBox->SetupAttachment(GetMesh(), FName("LeftHand"));
 	LeftArmHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
 	PartHitBox.AddUnique(LeftArmHitBox);
 
@@ -41,7 +41,6 @@ AGolemBoss::AGolemBoss()
 	LeftLegHitBox->SetupAttachment(GetMesh(), FName("LeftLeg"));
 	LeftLegHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
 	PartHitBox.AddUnique(LeftLegHitBox);
-
 
 
 	AttackRange = 1000.f;
@@ -68,6 +67,8 @@ void AGolemBoss::BeginPlay()
 
 	for (int i = 0; i < PartHitBox.Num() - 1; ++i)
 	{
+		PartHitBox[i]->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+		//PartHitBox[i]->OnComponentHit.AddDynamic(this, &AGolemBoss::OnHit);
 		PartHitBox[i]->BurningTime = BurningTime;
 	}
 }
@@ -130,6 +131,43 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	return DamageAmount;
 }
 
+void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UHitBoxComponent* OverlapHitBox = Cast<UHitBoxComponent>(OverlappedComp);
+	
+	if (OverlapHitBox)
+	{
+		if (bCanGrab)
+		{
+			FName PartName = OverlapHitBox->GetAttachSocketName();
+			if (PartName == FName("LeftHand") || PartName == FName("RightHand"))
+			{
+				ACharacter* GrabbedCharacter = Cast<ACharacter>(OtherActor);
+				if (GrabbedCharacter)
+				{
+					OtherActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GrabSocket"));
+					GrabbedTarget = GrabbedCharacter;
+				}
+				return;
+			}
+		}
+		
+
+		UGameplayStatics::ApplyPointDamage(OtherActor, OverlapHitBox->Damage, SweepResult.Normal, SweepResult, GetController(), this, UDamageType::StaticClass());
+
+	}
+}
+
+void AGolemBoss::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	UHitBoxComponent* OverlapHitBox = Cast<UHitBoxComponent>(HitComponent);
+	if (OverlapHitBox)
+	{
+		UGameplayStatics::ApplyPointDamage(OtherActor, OverlapHitBox->Damage, Hit.ImpactNormal, Hit, GetController(), this, UDamageType::StaticClass());
+
+	}
+}
+
 void AGolemBoss::Attack(int AttackPattern)
 {
 	switch (AttackPattern)
@@ -143,6 +181,10 @@ void AGolemBoss::Attack(int AttackPattern)
 		break;
 	case 1:
 		ServerPlayMontage(this, FName("Attack_Punch"));
+		break;
+
+	case 2:
+		ServerPlayMontage(this, FName("Attack_Grab"));
 		break;
 
 	}

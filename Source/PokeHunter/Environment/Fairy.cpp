@@ -20,8 +20,37 @@ AFairy::AFairy()
 
 void AFairy::Tick(float DeltaTime)
 {
-	//날아다녀야 할듯
+	Super::Tick(DeltaTime);
 
+	//선형 이동
+	FVector PrevLocation = GetActorLocation();
+	FVector PrevDirection = Direction;
+
+	float MoveDelta = FMath::Sin(RunningTime* Frequency) * Amplitude;
+	
+	Direction.Z += MoveDelta;
+
+	FVector NewLocation = PrevLocation + Direction * Speed * DeltaTime;
+
+	SetActorLocation(NewLocation);
+
+	SetActorRotation(Direction.Rotation());
+
+	RunningTime += DeltaTime;
+
+}
+
+void AFairy::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//초기 방향벡터 설정
+	Direction = FMath::VRand();
+	Direction.Z = 0;
+	Direction.Normalize();
+
+	Frequency = FMath::RandRange(1.0f, 5.0f);
+	Amplitude = FMath::RandRange(10.0f, 30.0f);
 }
 
 void AFairy::Interact_Implementation(AHunter* Hunter)

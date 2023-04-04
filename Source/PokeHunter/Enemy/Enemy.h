@@ -17,7 +17,6 @@ enum class EEnemyState : uint8
 	Patrol UMETA(DisplayName = "Patrol"),
 	Chase UMETA(DisplayName = "Chase"),
 	Hit UMETA(DisplayName = "Hit"),
-	Binding UMETA(DisplayName = "Binding"),
 	Die UMETA(DisplayName = "Die"),
 	Roar UMETA(DisplayName = "Roar"),
 	Attention UMETA(DisplayName = "Attention"),
@@ -76,6 +75,8 @@ public:
 	float StartBindingTime;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float BindingTime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bBinding{ false };
 
 	//상태 이상
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -108,6 +109,7 @@ public:
 	//CollisionFunction
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(BlueprintCallable)
 	bool IsJumping();
 
 	//Replication
@@ -145,6 +147,8 @@ public:
 	virtual void Patrol();
 	UFUNCTION(BlueprintCallable)
 	virtual void JumpAttack();
+	UFUNCTION(BlueprintCallable)
+	virtual void LaunchToTarget();
 	
 
 	//Animation Function

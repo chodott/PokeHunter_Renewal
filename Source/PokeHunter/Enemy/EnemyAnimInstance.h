@@ -29,6 +29,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
 	bool bPlaying;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
+	bool bJumping;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
 	class AEnemy* Enemy;
 

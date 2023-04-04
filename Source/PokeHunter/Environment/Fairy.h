@@ -27,6 +27,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void BeginPlay() override;
+
 	virtual void Interact_Implementation(AHunter* Hunter) override;
 
 	UFUNCTION()
@@ -41,6 +43,21 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	EFairyType FairyType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FVector Direction;
+		
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float RunningTime;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float Frequency;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float Amplitude;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float Speed;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite)
 	bool bCaught{ false };

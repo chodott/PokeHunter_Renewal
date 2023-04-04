@@ -24,6 +24,7 @@ void UEnemyAnimInstance::UpdateAnimationProperties()
 		FVector Speed = Enemy->GetVelocity();
 		FVector XYspeed = FVector(Speed.X, Speed.Y, 0.f);
 		MovementSpeed = XYspeed.Size();
+		bJumping = Enemy->IsJumping();
 
 		Direction = CalculateDirection(Speed, Enemy->GetActorRotation());
 	}

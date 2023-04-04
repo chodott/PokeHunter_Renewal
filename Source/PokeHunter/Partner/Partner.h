@@ -59,6 +59,8 @@ public:
 	bool bOrdered;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bUsingSkill;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bGrabbed;
 
 	//TeamID
 	FGenericTeamId TeamID;

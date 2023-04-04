@@ -24,3 +24,4 @@ float ADummyTrap::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 
 	return DamageAmount;
 }
+

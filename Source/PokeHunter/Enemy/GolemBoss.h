@@ -16,19 +16,25 @@ class POKEHUNTER_API AGolemBoss : public AEnemy
 	GENERATED_BODY()
 
 public:
-		AGolemBoss();
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-		TArray<class UHitBoxComponent*> PartHitBox;
-		/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-		class UHitBoxComponent* BodyHitBox;
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-		class UHitBoxComponent* LeftArmHitBox;
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-		class UHitBoxComponent* LeftLegHitBox;
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-		class UHitBoxComponent* RightArmHitBox;
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-		class UHitBoxComponent* RightLegHitBox;*/
+	AGolemBoss();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	TArray<class UHitBoxComponent*> PartHitBox;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* BodyHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* LeftArmHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* LeftLegHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* RightArmHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* RightLegHitBox;*/
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class ACharacter* GrabbedTarget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
+	bool bCanGrab;
 
 
 public:
@@ -37,6 +43,11 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+
+	UFUNCTION()
+	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep = true, const FHitResult& SweepResult = FHitResult(1.f));
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
 	//BTTask
 

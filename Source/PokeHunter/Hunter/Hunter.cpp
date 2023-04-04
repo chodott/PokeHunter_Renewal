@@ -76,6 +76,10 @@ AHunter::AHunter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
+	DestinationMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DestinationMesh"));
+	DestinationMesh->SetupAttachment(GetRootComponent());
+	DestinationMesh->SetVisibility(false);
+
 	//Collision
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
@@ -464,7 +468,7 @@ void AHunter::LMBDown()
 			else
 			{
 				//ServerSpawnItem(ItemClass, GetActorLocation(), FVector::ZeroVector, GetControlRotation());
-				AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(), GetControlRotation());
+				AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(),FRotator::ZeroRotator);
 				switch (Item->ItemType)
 				{
 				case EItemType::Potion:
@@ -596,6 +600,7 @@ void AHunter::CtrlDown()
 {
 	if (Partner == NULL) return;
 	bPartnerMode = true;
+	DestinationMesh->SetVisibility(true);
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	FInputModeGameAndUI InputMode;
 	InputMode.SetHideCursorDuringCapture(false);
@@ -607,6 +612,7 @@ void AHunter::CtrlUp()
 {
 	if (Partner == NULL) return;
 	bPartnerMode = false;
+	DestinationMesh->SetVisibility(false);
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	PlayerController->bShowMouseCursor = false;
 	PlayerController->SetInputMode(FInputModeGameOnly());

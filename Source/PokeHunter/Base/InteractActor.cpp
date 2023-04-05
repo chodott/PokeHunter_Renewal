@@ -13,11 +13,14 @@ AInteractActor::AInteractActor()
 
 	bReplicates = true;
 
+	SceneRootComponent = CreateDefaultSubobject<USceneComponent>("My Scene Component");
+	SetRootComponent(SceneRootComponent);
+
 	//Collision
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractSphere"));
 	InteractionSphere->AddLocalOffset(FVector(0.f, 0.f, GetSimpleCollisionHalfHeight()));
 	InteractionSphere->SetSphereRadius(50.f);
-	SetRootComponent(InteractionSphere);
+	InteractionSphere->SetupAttachment(GetRootComponent());
 
 
 	//Mesh

@@ -233,6 +233,17 @@ void AHunter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 }
 
+float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (bInvincible) return 0.0f;
+
+	HunterInfo.HunterHP -= DamageAmount;
+
+	return DamageAmount;
+}
+
 void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -404,6 +415,7 @@ void AHunter::LShiftDown()
 
 void AHunter::LShiftUp()
 {
+	if(CurState != EPlayerState::Zoom)
 	ServerSprint(this, false);
 }
 

@@ -16,6 +16,9 @@ public:
 	// Sets default values for this actor's properties
 	AInteractActor();
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USceneComponent* SceneRootComponent = nullptr;
+
 	//상호작용
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	class USphereComponent* InteractionSphere;

@@ -111,6 +111,8 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 {
 	APawn::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+
+
 	FVector HitLoc;
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{

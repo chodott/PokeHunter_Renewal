@@ -46,6 +46,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bWaitingAgro;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "DropItem")
+	TSubclassOf <class AInteractActor> DropItemBoxClass;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<AActor*> TargetArray;
 
@@ -92,6 +95,9 @@ public:
 	float BurningTime{};
 	float StartBurningTime;
 	int BurningSaveTime{};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bDied{ false };
 
 protected:
 	// Called when the game starts or when spawned
@@ -149,6 +155,10 @@ public:
 	virtual void JumpAttack();
 	UFUNCTION(BlueprintCallable)
 	virtual void LaunchToTarget();
+	UFUNCTION(BlueprintCallable)
+	virtual void Die();
+	UFUNCTION(BlueprintCallable)
+	virtual void SpawnItem();
 	
 
 	//Animation Function

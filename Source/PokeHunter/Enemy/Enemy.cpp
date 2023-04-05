@@ -8,6 +8,7 @@
 #include "components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PokeHunter/Item/Item.h"
+#include "PokeHunter/Base/ItemDropActor.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "PokeHunter/Partner/Partner.h"
 
@@ -296,6 +297,20 @@ void AEnemy::LaunchToTarget()
 	LookVec.Z = 0.3f;
 	FVector Velocity = LookVec * Distance;
 	GetCharacterMovement()->Launch(Velocity);
+}
+
+void AEnemy::Die()
+{
+	SpawnItem();
+	Destroy();
+}
+
+void AEnemy::SpawnItem()
+{
+	FVector SpawnLoc = GetActorLocation();
+	SpawnLoc.Z += 50.f;
+	AInteractActor* ItemBox = GetWorld()->SpawnActor<AItemDropActor>(DropItemBoxClass, SpawnLoc, GetActorRotation());
+	
 }
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

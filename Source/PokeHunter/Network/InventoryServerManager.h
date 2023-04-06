@@ -2,32 +2,32 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "PokeHunter/Base/BaseInstance.h"
+#include "PokeHunter/Base/DatabaseActor.h"
+#include "PokeHunter/Hunter/Hunter.h"
 #include "PokeHunter/Hunter/InventoryComponent.h"
 
-#include "PokeHunter/Base/DatabaseActor.h"
-
-#include "CoreMinimal.h"
-#include "Net/Subsystems/NetworkSubsystem.h"
+#include "UObject/NoExportTypes.h"
 #include "InventoryServerManager.generated.h"
 
 /**
  * 
  */
-UCLASS()
-class POKEHUNTER_API UInventoryServerManager : public UNetworkSubsystem
+UCLASS(BlueprintType)
+class POKEHUNTER_API UInventoryServerManager : public UObject
 {
 	GENERATED_BODY()
-	
 public:
 	UInventoryServerManager();
 
 	UBaseInstance* gameinstance;
+	
+	UFUNCTION(BlueprintCallable, Category = "inventory")
+		bool GetInvenInfo(ACharacter* myPlayer);
 
-	UFUNCTION(BlueprintCallable)
-		bool GetInventoryDBInfos();
-
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "inventory")
 		bool SaveInventoryDB();
 };

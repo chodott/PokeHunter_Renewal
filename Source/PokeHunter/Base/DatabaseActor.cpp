@@ -16,7 +16,7 @@ void ADatabaseActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// -> InventoryServerManager.cpp에서 실행 
+	// -> InventoryServerManager.cpp에서 실행
 	for (auto& ItemDataClass : ItemDataClassMap)
 	{
 		auto ItemData = NewObject<UItemData>(this, ItemDataClass.Value);
@@ -29,7 +29,6 @@ void ADatabaseActor::BeginPlay()
 		SkillData->SkillInfo = SkillInfo;
 		SkillDataObjectMap.Add(SkillInfo.ID, SkillData);
 	}
-	
 }
 
 // Called every frame
@@ -44,6 +43,7 @@ UItemData* ADatabaseActor::FindItem(FName ItemID)
 	if (ItemID == "None")							return NULL;
 	if (0 == ItemDataClassMap.Num())				return NULL;
 	if (0 == ItemDataObjectMap.Num())				return NULL;
+	if (nullptr == ItemDataClassMap.Find(ItemID))	return NULL;
 	if (nullptr == ItemDataObjectMap.Find(ItemID))	return NULL;
 
 	UItemData* ItemData = *ItemDataObjectMap.Find(ItemID);

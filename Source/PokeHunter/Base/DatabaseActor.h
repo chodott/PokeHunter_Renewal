@@ -42,9 +42,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FSkillInfo FindSkill(ESkillID SkillID);
-
-	
-	void DeepCopyMap() {
-
-	}
 };

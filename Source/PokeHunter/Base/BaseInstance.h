@@ -2,19 +2,17 @@
 
 #pragma once
 
+#include "Runtime/Core/Public/Windows/AllowWindowsPlatformTypes.h"
+#include "Runtime/Online/HTTP/Public/Http.h"
+#include "Runtime/Networking/Public/Networking.h"
+#include "Runtime/Networking/Public/Interfaces/IPv4/IPv4Address.h"
+#include "Runtime/Sockets/Public/Sockets.h"
+#include "Runtime/Sockets/Public/SocketSubsystem.h"
 #include "../../../../PH-Server/IOCPServer/protocol.h"
-#include "Windows/AllowWindowsPlatformTypes.h"
-#include "Windows/prewindowsapi.h"
-
-#pragma comment(lib, "ws2_32.lib")
-
-#include <WinSock2.h>
-#include "Windows/PostWindowsApi.h"
-#include "Windows/HideWindowsPlatformTypes.h"
+#include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "Runtime/Online/HTTP/Public/Http.h"
 #include "BaseInstance.generated.h"
 
 /**
@@ -39,7 +37,6 @@ struct FU_SC_LOGIN_INFO_PACK {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString _q_skill;
 };
-
 USTRUCT(BlueprintType)
 struct FU_SC_ITEM_INFO_PACK {
 	GENERATED_USTRUCT_BODY()
@@ -74,10 +71,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString Quick_Skill;
 
-	SOCKET Socket;
-	WSADATA wsaData;
-	SOCKADDR_IN ServerAddr;
-
+	FSocket* gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
+	TSharedRef<FInternetAddr>addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+	FIPv4Address ip{};
 	int reval;
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")

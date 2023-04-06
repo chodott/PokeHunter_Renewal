@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "BaseInstance.h"
 #include "Json.h"
 #include "JsonUtilities.h"
@@ -8,38 +7,33 @@
 
 UBaseInstance::UBaseInstance()
 {
-	reval = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	ServerAddr.sin_family = AF_INET;
-	ServerAddr.sin_port = htons(PORT_NUM);
+	// gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
+	// addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 
 	UTextReaderComponent* TextReader = CreateDefaultSubobject<UTextReaderComponent>(TEXT("TextReaderComp"));
-
 	ApiUrl = TextReader->ReadFile("Urls/ApiUrl.txt");
-
 	HttpModule = &FHttpModule::Get();
 }
 
 bool UBaseInstance::ConnectToServer(FString server_addr)
 {
+	FIPv4Address::Parse(server_addr, ip);
+	addr->SetIp(ip.Value);
+	addr->SetPort(PORT_NUM);
 
-	ServerAddr.sin_addr.s_addr = inet_addr(TCHAR_TO_ANSI(*server_addr));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Trying to connect.")));
 
-	if (reval != 0) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("network fail")));
-	else {
-		Socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-		if (Socket == INVALID_SOCKET) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("socket fail")));
-		else {
-			reval = connect(Socket, (sockaddr*)&ServerAddr, sizeof(ServerAddr));
-			if (reval == SOCKET_ERROR) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("connect fail")));
-			else {
-				UE_LOG(LogTemp, Warning, TEXT("Success connect server"));
-				return true;
-			}
-		}
+	if (true == gSocket->Connect(*addr)) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Success] connect to server")));
+		return true;
 	}
-	return false;
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Fail] connect to server")));
+		return false;
+	}
 }
 
+// 클라이언트 종료시에 호출되는 함수
 void UBaseInstance::Shutdown()
 {
 	Super::Shutdown();
@@ -49,19 +43,24 @@ void UBaseInstance::Shutdown()
 		InvalidateTokensRequest->SetURL(ApiUrl + "/invalidatetokens");
 		InvalidateTokensRequest->SetVerb("GET");
 		InvalidateTokensRequest->SetHeader("Content-Type", "application/json");
-		InvalidateTokensRequest->SetHeader("Authorization", AccessToken);
+		InvalidateTokensRequest->SetHeader("Authorization", IdToken);
 		InvalidateTokensRequest->ProcessRequest();
 	}
 }
 
 void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken)
 {
+	NewAccessToken.ReplaceInline(TEXT("\n"), TEXT(""));
 	AccessToken = NewAccessToken;
+
+	NewIdToken.ReplaceInline(TEXT("\n"), TEXT(""));
 	IdToken = NewIdToken;
+	
+	NewRefreshToken.ReplaceInline(TEXT("\n"), TEXT(""));
 	RefreshToken = NewRefreshToken;
 
-	UE_LOG(LogTemp, Warning, TEXT("access token: %s"), *AccessToken);
-	UE_LOG(LogTemp, Warning, TEXT("IdToken token: %s"), *IdToken);
+	UE_LOG(LogTemp, Warning, TEXT("[X]access token: %s"), *AccessToken);
+	UE_LOG(LogTemp, Warning, TEXT("[O]IdToken token: %s"), *IdToken);
 	UE_LOG(LogTemp, Warning, TEXT("refresh token: %s"), *RefreshToken);
 
 	// World Timer에 등록하기
@@ -70,7 +69,7 @@ void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken,
 
 void UBaseInstance::RetrieveNewTokens()
 {
-	if (AccessToken.Len() > 0 && RefreshToken.Len() > 0) {
+	if (IdToken.Len() > 0 && RefreshToken.Len() > 0) {
 		TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
 		RequestObj->SetStringField("refreshToken", RefreshToken);
 
@@ -84,11 +83,9 @@ void UBaseInstance::RetrieveNewTokens()
 			RetrieveNewTokensRequest->SetVerb("POST");
 			RetrieveNewTokensRequest->SetHeader("Content-Type", "application/json");
 			
-
 			// RetrieveNewTokensRequest->SetHeader("Authorization", AccessToken);
 			RetrieveNewTokensRequest->SetHeader("Authorization", IdToken);
 			
-
 			RetrieveNewTokensRequest->SetContentAsString(RequestBody);
 			RetrieveNewTokensRequest->ProcessRequest();
 		}

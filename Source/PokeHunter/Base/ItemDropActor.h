@@ -22,6 +22,9 @@ public:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
+	TArray<FItemCnter> DropItemArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 	TMap<int32,FName> DropItemMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
@@ -38,6 +41,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Probability")
 		int32 BaseProbability {};
 
-
+public:
+	void CreateItemArray(TArray<FName> &ItemArray);
 	virtual void Interact_Implementation(AHunter* Hunter) override;
 };

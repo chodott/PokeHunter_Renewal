@@ -49,6 +49,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "DropItem")
 	TSubclassOf <class AInteractActor> DropItemBoxClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "DropItem")
+	TArray<FName> DropItemID_Array;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<AActor*> TargetArray;
 

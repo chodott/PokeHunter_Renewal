@@ -309,8 +309,8 @@ void AEnemy::SpawnItem()
 {
 	FVector SpawnLoc = GetActorLocation();
 	SpawnLoc.Z += 50.f;
-	AInteractActor* ItemBox = GetWorld()->SpawnActor<AItemDropActor>(DropItemBoxClass, SpawnLoc, GetActorRotation());
-	
+	AItemDropActor* ItemBox = GetWorld()->SpawnActor<AItemDropActor>(DropItemBoxClass, SpawnLoc, GetActorRotation());
+	ItemBox->CreateItemArray(DropItemID_Array);
 }
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

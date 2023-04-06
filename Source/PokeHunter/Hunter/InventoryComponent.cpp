@@ -32,9 +32,11 @@ void UInventoryComponent::BeginPlay()
 	
 }
 
-bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
+bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 {
 	int NullNum = -1;
+	FName ItemName = ItemCnter.ItemID;
+	int ItemCnt = ItemCnter.cnt;
 	for (int i = 0; i < capacity; ++i)
 	{
 		if (NullNum == -1 && InfoArray[i].ItemID == FName("None")) NullNum = i;
@@ -43,7 +45,7 @@ bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
 			if (InfoArray[i].ItemID == ItemName) 
 			{
 				//Add ItemCnt Update need
-				InfoArray[i].cnt += Cnt;
+				InfoArray[i].cnt += ItemCnt;
 				return true;
 			}
 		}
@@ -53,7 +55,7 @@ bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
 	{
 		//Find Object Need
 		InfoArray[NullNum].ItemID = ItemName;
-		InfoArray[NullNum].cnt += Cnt;
+		InfoArray[NullNum].cnt += ItemCnt;
 		return true;
 	}
 

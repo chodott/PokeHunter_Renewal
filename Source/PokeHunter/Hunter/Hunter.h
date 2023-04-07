@@ -10,6 +10,7 @@
 #include "PokeHunter/Item/ItemData.h"
 #include "PokeHunter/Base/SkillData.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
+#include "PokeHunter/Base/EnemyInteractInterface.h"
 #include "Hunter.generated.h"
 
 //Dynamic 
@@ -51,7 +52,7 @@ public:
 };
 
 UCLASS()
-class POKEHUNTER_API AHunter : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface
+class POKEHUNTER_API AHunter : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface
 {
 	GENERATED_BODY()
 
@@ -156,6 +157,8 @@ public:
 	int SaveSecond;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bGrabbed;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bBound;
 
 protected:
 	// Sets default values for this character's properties
@@ -269,6 +272,10 @@ public:
 	//ItemInterface Function
 	virtual void InteractHealArea_Implementation();
 	virtual void OutHealArea_Implementation();
+
+	//EnemyInterface Function
+	virtual void InteractEarthquake_Implementation();
+	virtual void InteractAttack_Implementation(FVector HitLoc);
 	
 private:
 	// Character Movement Input

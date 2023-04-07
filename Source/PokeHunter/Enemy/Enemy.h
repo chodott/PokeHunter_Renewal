@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "GenericTeamAgentInterface.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
+#include "PokeHunter/Base/EnemyInteractInterface.h"
 #include "Enemy.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
@@ -28,7 +29,7 @@ enum class EEnemyState : uint8
 
 
 UCLASS()
-class POKEHUNTER_API AEnemy : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface
+class POKEHUNTER_API AEnemy : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface
 {
 	GENERATED_BODY()
 
@@ -76,6 +77,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackRange = 200.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float EarthquakeRange = 1000.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float StartBindingTime;

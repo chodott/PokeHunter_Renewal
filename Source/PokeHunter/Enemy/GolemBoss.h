@@ -36,6 +36,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
 	bool bCanGrab;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Range")
+	class UStaticMeshComponent* EarthquakeCollision;
+
+
 
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -54,6 +58,9 @@ public:
 	virtual void Attack(int AttackPattern);
 
 	virtual void LongAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void Earthquake();
 
 	UFUNCTION(BlueprintCallable)
 	void LaunchStone();

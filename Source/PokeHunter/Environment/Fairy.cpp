@@ -62,16 +62,31 @@ void AFairy::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveC
 	AItem* HitItem = Cast<AItem>(OtherActor);
 	if (HitItem)
 	{
-		//포획 아이템과 충돌 시
-		SetActorTickEnabled(false);
-		StaticMesh->SetStaticMesh(CaughtStaticMesh);
-		InteractionSphere->SetSimulatePhysics(true);
-		InteractionSphere->SetCollisionProfileName(FName("SmallItem"));
-		if (CaughtParticle)
+		//다른 아이템과 충돌 시
+		if (HitItem->ItemType == EItemType::Bullet) //정확하게 수정
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), CaughtParticle, GetActorTransform());
+			//죽음 처리
+			InteractionSphere->SetSimulatePhysics(true);
+			InteractionSphere->SetCollisionProfileName(FName("SmallItem"));
+
+
+			
 		}
-		bCaught = true;
+
+		//포획 아이템과 충돌 시
+		else
+		{
+			SetActorTickEnabled(false);
+			StaticMesh->SetStaticMesh(CaughtStaticMesh);
+			InteractionSphere->SetSimulatePhysics(true);
+			InteractionSphere->SetCollisionProfileName(FName("SmallItem"));
+
+			if (CaughtParticle)
+			{
+				//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), CaughtParticle, GetActorTransform());
+			}
+			bCaught = true;
+		}
 	}
 }
 

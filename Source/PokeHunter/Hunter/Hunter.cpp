@@ -237,6 +237,13 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		FPointDamageEvent& PointDamageEvent = (FPointDamageEvent&)DamageEvent;
+	
+	}
+	
+
 	if (bInvincible) return 0.0f;
 
 	HunterInfo.HunterHP -= DamageAmount;
@@ -367,7 +374,7 @@ void AHunter::SpaceDown()
 
 void AHunter::MoveForward(float Val)
 {
-	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install) return;
+	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install || bGrabbed) return;
 	if (Val != 0.0f)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -381,7 +388,7 @@ void AHunter::MoveForward(float Val)
 
 void AHunter::MoveRight(float Val)
 {
-	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install) return;
+	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install || bGrabbed) return;
 	
 	if (Val != 0.0f)
 	{
@@ -410,6 +417,7 @@ void AHunter::LookUp(float NewAxisValue)
 
 void AHunter::LShiftDown()
 {
+	if (bBound) return;
 	ServerSprint(this, true);
 }
 
@@ -421,7 +429,7 @@ void AHunter::LShiftUp()
 
 void AHunter::LMBDown()
 {
-	if (CurState == EPlayerState::Dive) return;
+	if (CurState == EPlayerState::Dive || bBound) return;
 
 	if (bPartnerMode)
 	{
@@ -522,6 +530,7 @@ void AHunter::LMBDown()
 
 void AHunter::RMBDown()
 {
+	if (bBound) return;
 	ServerZoom(this,true);
 }
 
@@ -738,6 +747,23 @@ void AHunter::InteractHealArea_Implementation()
 void AHunter::OutHealArea_Implementation()
 {
 	HealPerSecondAmount -= 10.f;
+}
+
+void AHunter::InteractEarthquake_Implementation()
+{
+	if (GetCharacterMovement()->IsFalling()) return;
+	LaunchCharacter(FVector(0, 0, 1000), false, false);
+}
+
+void AHunter::InteractAttack_Implementation(FVector HitLoc)
+{
+	FVector CurLoc = GetActorLocation();
+
+	FVector DirectionVec = CurLoc - HitLoc;
+	DirectionVec.Z = 0;
+	DirectionVec.Normalize();
+
+	LaunchCharacter(DirectionVec * 1000.f,false,false);
 }
 
 void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)

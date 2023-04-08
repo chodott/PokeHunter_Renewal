@@ -1,6 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+
+#include "Kismet/GameplayStatics.h"
+#include "PokeHunter/Base/BaseInstance.h"
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
@@ -9,7 +12,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class POKEHUNTER_API UPartyServerManager : public UObject
 {
 	GENERATED_BODY()
@@ -17,7 +20,8 @@ class POKEHUNTER_API UPartyServerManager : public UObject
 public:
 	UPartyServerManager();
 
+	UBaseInstance* gameinstance;
+
 	UFUNCTION(BlueprintCallable)
 		bool GetPartyList();
-
 };

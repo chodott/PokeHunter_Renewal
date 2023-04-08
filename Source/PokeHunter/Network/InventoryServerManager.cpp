@@ -11,11 +11,9 @@ UInventoryServerManager::UInventoryServerManager()
 
 bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer)
 {
-	if (nullptr == gameinstance->gSocket)
-		return false;
+	if (nullptr == gameinstance->gSocket) return false;
 
 	int32 bSize{};
-
 	CS_QUEST_INVENTORY_PACK quest_item;
 	quest_item.size = sizeof(CS_QUEST_INVENTORY_PACK);
 	quest_item.type = CS_QUEST_INVENTORY;
@@ -24,36 +22,17 @@ bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer)
 	AHunter* hunter = Cast<AHunter>(myPlayer);
 	
 	SC_ITEM_INFO_PACK item_info{};
-
-
 	for (int i = 0; ; ++i) {
 		memset(&item_info, 0, sizeof(SC_ITEM_INFO_PACK));
 		gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&item_info), sizeof(SC_ITEM_INFO_PACK), bSize);
 		FName msg_name = item_info._name;
 		int msg_cnt = item_info._cnt;
+		if (msg_name == "theEnd") break;
 
-		if (msg_name == "theEnd") {
-			// for (int j = i; j < MyHunter->Inventory->InfoArray.Num(); ++j)  MyHunter->Inventory->InfoArray[j].cnt = 0;
-			break;
-		}
-
-		// UE_LOG(LogTemp, Warning, TEXT("[Item name] : %s"), msg_name);
+		UE_LOG(LogTemp, Warning, TEXT("[Item name] : %s"), *msg_name.ToString());
 		UE_LOG(LogTemp, Warning, TEXT("[Item cnt] : %d"), msg_cnt);
 
-		/*
-		TArray<AActor*> Aactors;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADatabaseActor::StaticClass(), Aactors);
-		UItemData* item_buf = NewObject<UItemData>();
-		item_buf->ItemInfo.ID = msg_name;
-		item_buf->ItemInfo.ItemAmount = msg_cnt;
-		dynamic_cast<ADatabaseActor*>(Aactors[0])->ItemDataObjectMap.Add(item_buf->ItemInfo.ID, item_buf);
-		*/
-		
 		hunter->Inventory->InfoArray.Add(FItemCnter{ msg_name, msg_cnt });
-		/*if (hunter->Inventory->InfoArray.IsEmpty()) break;
-		else hunter->Inventory->InfoArray[i].ItemID = msg_name;*/
-
-		// MyHunter->Inventory->InfoArray[i].cnt =	msg_cnt;
 	}
 	return true;
 }

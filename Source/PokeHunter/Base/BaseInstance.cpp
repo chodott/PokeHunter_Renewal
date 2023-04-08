@@ -1,15 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BaseInstance.h"
 #include "Json.h"
 #include "JsonUtilities.h"
+#include "Kismet/GameplayStatics.h"
 #include "PokeHunter/MainMenu/TextReaderComponent.h"
 
 UBaseInstance::UBaseInstance()
 {
-	// gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
-	// addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-
 	UTextReaderComponent* TextReader = CreateDefaultSubobject<UTextReaderComponent>(TEXT("TextReaderComp"));
 	ApiUrl = TextReader->ReadFile("Urls/ApiUrl.txt");
 	HttpModule = &FHttpModule::Get();
@@ -33,7 +31,7 @@ bool UBaseInstance::ConnectToServer(FString server_addr)
 	}
 }
 
-// Å¬¶óÀÌ¾ðÆ® Á¾·á½Ã¿¡ È£ÃâµÇ´Â ÇÔ¼ö
+// í´ë¼ì´ì–¸íŠ¸ ì¢…ë£Œì‹œì— í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
 void UBaseInstance::Shutdown()
 {
 	Super::Shutdown();
@@ -50,6 +48,12 @@ void UBaseInstance::Shutdown()
 
 void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken)
 {
+	FString LevelName = GetWorld()->GetName();
+	if ("MyHome" != LevelName) {
+		FString levelName = L"/Game/Map/Lobby/MyHome";
+		UGameplayStatics::OpenLevel(GetWorld(), *levelName);
+	}
+
 	NewAccessToken.ReplaceInline(TEXT("\n"), TEXT(""));
 	AccessToken = NewAccessToken;
 
@@ -63,7 +67,7 @@ void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken,
 	UE_LOG(LogTemp, Warning, TEXT("[O]IdToken token: %s"), *IdToken);
 	UE_LOG(LogTemp, Warning, TEXT("refresh token: %s"), *RefreshToken);
 
-	// World Timer¿¡ µî·ÏÇÏ±â
+	// World Timerì— ë“±ë¡í•˜ê¸°
 	GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UBaseInstance::RetrieveNewTokens, 1.0f, false, 60.0f);
 }
 

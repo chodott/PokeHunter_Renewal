@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -106,4 +106,8 @@ private:
 		void RetrieveNewTokens();
 
 	void OnRetrieveNewTokensResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		TMap<FName, int> PartyListMap;
 };

@@ -100,9 +100,11 @@ void UMainMenuWidget::OnExchangeCodeForTokensResponseReceived(FHttpRequestPtr Re
 						// Client의 AWS::Cognito 접속성공 후 레벨을 이동
 						// ★★★ Level 이동후에도 SetCognitoTokens()함수가 정상적으로 작동하는지 확인 필요 ★★★
 						
-						// WebBrowser->SetVisibility(ESlateVisibility::Hidden);
-						// FString levelName = L"/Game/Map/Stage/SurvivalArea";
-						// UGameplayStatics::OpenLevel(GetWorld(), *levelName);
+						WebBrowser->SetVisibility(ESlateVisibility::Hidden);
+						/*
+						FString levelName = L"/Game/Map/Stage/SurvivalArea";
+						UGameplayStatics::OpenLevel(GetWorld(), *levelName);
+						*/
 					}
 				}
 			}

@@ -12,7 +12,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class POKEHUNTER_API UPartyListUI : public UUserWidget
 {
 	GENERATED_BODY()

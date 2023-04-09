@@ -10,11 +10,29 @@
 #include "Runtime/Sockets/Public/SocketSubsystem.h"
 #include "../../../../PH-Server/IOCPServer/protocol.h"
 #include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
+#include "PokeHunter/Item/ItemData.h"
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "BaseInstance.generated.h"
 
+UENUM(BlueprintType)
+enum class PLAYER_STATE : uint8
+{
+	ST_HOME = 0 UMETA(DisplayName = "State Home"),
+	ST_NOTREADY UMETA(DisplayName = "State Not Ready"),
+	ST_READY	UMETA(DisplayName = "State Ready"),
+	ST_STAGE	UMETA(DisplayName = "State Stage")
+};
+
+UENUM(BlueprintType)
+enum class PLAYER_PET : uint8
+{
+	P_DOG = 0	UMETA(DisplayName = "Pet Dog"),
+	p_BIRD		UMETA(DisplayName = "Pet Bird"),
+	p_TEST01	UMETA(DisplayName = "Pet Test01"),
+	p_TEST02	UMETA(DisplayName = "Pet Test02")
+};
 /**
  * 
  */
@@ -92,6 +110,12 @@ public:
 
 	UPROPERTY()
 		FTimerHandle RetrieveNewTokensHandle;
+
+	UPROPERTY()
+		FTimerHandle PartyInfoHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FItemCnter> InstanceInfoArray;
 
 	UFUNCTION()
 		void SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken);

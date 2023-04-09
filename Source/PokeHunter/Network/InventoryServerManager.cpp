@@ -20,7 +20,8 @@ bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer)
 	gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&quest_item), quest_item.size, bSize);
 
 	AHunter* hunter = Cast<AHunter>(myPlayer);
-	
+	hunter->Inventory->InfoArray.Empty();
+
 	SC_ITEM_INFO_PACK item_info{};
 	for (int i = 0; ; ++i) {
 		memset(&item_info, 0, sizeof(SC_ITEM_INFO_PACK));

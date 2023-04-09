@@ -95,16 +95,6 @@ void UMainMenuWidget::OnExchangeCodeForTokensResponseReceived(FHttpRequestPtr Re
 					UBaseInstance* ServerIntance = Cast<UBaseInstance>(GameInstance);
 					if (ServerIntance != nullptr) {
 						ServerIntance->SetCognitoTokens(JsonObject->GetStringField("access_token"), JsonObject->GetStringField("id_token"), JsonObject->GetStringField("refresh_token"));
-
-						// [OPEN LEVEL] -> MyHome
-						// Client의 AWS::Cognito 접속성공 후 레벨을 이동
-						// ★★★ Level 이동후에도 SetCognitoTokens()함수가 정상적으로 작동하는지 확인 필요 ★★★
-						
-						WebBrowser->SetVisibility(ESlateVisibility::Hidden);
-						/*
-						FString levelName = L"/Game/Map/Stage/SurvivalArea";
-						UGameplayStatics::OpenLevel(GetWorld(), *levelName);
-						*/
 					}
 				}
 			}

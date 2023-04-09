@@ -86,10 +86,7 @@ void UBaseInstance::RetrieveNewTokens()
 			RetrieveNewTokensRequest->SetURL(ApiUrl + "/retrievenewtokens");
 			RetrieveNewTokensRequest->SetVerb("POST");
 			RetrieveNewTokensRequest->SetHeader("Content-Type", "application/json");
-			
-			// RetrieveNewTokensRequest->SetHeader("Authorization", AccessToken);
 			RetrieveNewTokensRequest->SetHeader("Authorization", IdToken);
-			
 			RetrieveNewTokensRequest->SetContentAsString(RequestBody);
 			RetrieveNewTokensRequest->ProcessRequest();
 		}

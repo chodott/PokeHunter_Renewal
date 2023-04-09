@@ -6,7 +6,6 @@
 bool UPartyListUI::GetPartyList()
 {
 	gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
-
 	if (0 == gameinstance->PartyListMap.Num()) return false;
 
 	

@@ -8,59 +8,6 @@ UPartyServerManager::UPartyServerManager()
 	gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
 }
 
-bool IsUTF8(const char* str)
-{
-    int str_bytes = 0;
-    if (str == NULL) {
-        return false;
-    }
-    str_bytes = (int)strlen(str);
-
-    bool isUtf8(true);
-
-    int index = 0;
-    while (index < str_bytes && isUtf8)
-    {
-        char achar = str[index];
-        int supplemental_bytes = 0;
-
-        if ((achar & 0x80) == 0) {
-            // 0xxxxxxx
-            ++index;
-        }
-        else if ((achar & 0xF8) == 0xF0) {
-            // 11110uuu 10uuzzzz 10yyyyyy 10xxxxxx
-            ++index;
-            supplemental_bytes = 3;
-        }
-        else if ((achar & 0xE0) == 0xE0) {
-            // 1110zzzz 10yyyyyy 10xxxxxx
-            ++index;
-            supplemental_bytes = 2;
-        }
-        else if ((achar & 0xE0) == 0xC0) {
-            // 110yyyyy 10xxxxxx
-            ++index;
-            supplemental_bytes = 1;
-        }
-        else {
-            isUtf8 = false;
-        }
-
-        while (isUtf8 && supplemental_bytes--)
-        {
-            if (index >= str_bytes) {
-                isUtf8 = false;
-            }
-            else if ((str[index++] & 0xC0) != 0x80) {
-                // 10uuzzzz
-                isUtf8 = false;
-            }
-        }
-    }
-    return isUtf8;
-}
-
 bool UPartyServerManager::GetPartyList()
 {
 	if (nullptr == gameinstance->gSocket) return false;
@@ -76,11 +23,13 @@ bool UPartyServerManager::GetPartyList()
 	gameinstance->PartyListMap.Reset();
 
 	SC_PARTIES_INFO_PACK party_list_pack;
+	bool retVal;
 	for (int i = 0; ; ++i) {
 		memset(&party_list_pack, 0, sizeof(SC_PARTIES_INFO_PACK));
-		gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&party_list_pack), sizeof(SC_PARTIES_INFO_PACK), bSize);
+		retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&party_list_pack), sizeof(SC_PARTIES_INFO_PACK), bSize);
+		if (false == retVal)		break;
         FName msg_name = party_list_pack._name;
-        if (msg_name == "theEnd") break;
+        if (msg_name == "theEnd")	break;
 
         TCHAR MBTWBuffer[128];
         memset(MBTWBuffer, NULL, 128);
@@ -93,7 +42,7 @@ bool UPartyServerManager::GetPartyList()
 		gameinstance->PartyListMap.Add(msg_name, msg_cnt);
 	}
 
-	// 현재 World Timer에 GetPartyList() 함수 호출을 등록하여 일정시간마다 PartyListMap을 갱신
+	// 현재 World Timer에 GetPartyList() 함수 호출을 등록하여 일정시간마다 PartyListMap을 갱신?
 	// GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UBaseInstance::RetrieveNewTokens, 1.0f, false, 60.0f);
 
 	return true;

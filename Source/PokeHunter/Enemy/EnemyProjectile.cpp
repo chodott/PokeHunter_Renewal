@@ -50,7 +50,7 @@ void AEnemyProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAct
 	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 }
 
-void AEnemyProjectile::FireInDirection(const FVector& DirectionVec, const FVector& InitialPos, const FVector& EndPos)
+void AEnemyProjectile::FireInDirection(FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos)
 {
 	FVector Velocity = FVector::ZeroVector;
 
@@ -70,6 +70,17 @@ void AEnemyProjectile::FireInDirection(const FVector& DirectionVec, const FVecto
 	UGameplayStatics::PredictProjectilePath(this, predictParams, result);*/
 	ProjectileMovement->UpdateComponentVelocity();
 	StaticMesh->AddImpulse(Velocity, FName(""), true);
+}
+
+void AEnemyProjectile::FireInDirection(FVector Direction)
+{
+	FVector Velocity = Direction * 10000.f;
+	ProjectileMovement->Velocity = Direction * 10000;
+	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
+	ProjectileMovement->UpdateComponentVelocity();
+	SetLifeSpan(TimeLimit);
+	StaticMesh->AddImpulse(Velocity, FName(""), true);
+
 }
 
 void AEnemyProjectile::ServerApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)

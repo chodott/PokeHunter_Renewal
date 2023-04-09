@@ -133,6 +133,11 @@ void AEnemy::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) 
 	OutRotation = GetMesh()->GetSocketRotation("Head");
 }
 
+FGenericTeamId AEnemy::GetGenericTeamId() const
+{
+	return TeamID;
+}
+
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -238,6 +243,7 @@ void AEnemy::SeeNewTarget(AActor* Actor)
 	{
 		SetTarget(Actor);
 		CurState = EEnemyState::Chase;
+		EnemyAnim->StopCombatMontage(0.2f);
 	}
 	
 }

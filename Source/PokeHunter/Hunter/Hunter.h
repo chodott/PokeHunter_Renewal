@@ -143,10 +143,17 @@ public:
 	bool bPartnerMode;
 	
 	//TeamID
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
 	FGenericTeamId TeamID;
 
 	//
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float ReloadTime{};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	float StartShotTime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bCanShot;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bInvincible{ false};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float InvincibleTime{ 1.f };
@@ -172,6 +179,9 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+
+	//Perception
+	FGenericTeamId GetGenericTeamId()const override;
 
 	//Replicated
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;

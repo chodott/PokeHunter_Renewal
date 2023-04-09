@@ -17,10 +17,8 @@ EBTNodeResult::Type UBTTask_EnemyPlayMontage::ExecuteTask(UBehaviorTreeComponent
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
-	UEnemyAnimInstance* EnemyAnim = Enemy->EnemyAnim;
+	Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	if (Enemy == NULL) return EBTNodeResult::Failed;
-	if (EnemyAnim == NULL) return EBTNodeResult::Failed;
 
 	bPlaying = true;
 
@@ -41,11 +39,11 @@ void UBTTask_EnemyPlayMontage::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 	AEnemyController* Controller = Cast<AEnemyController>(OwnerComp.GetAIOwner());
 	if (Controller->FindAgroActor() == true)
 	{
-		AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
-		
+
 		Enemy->CurState = EEnemyState::Roar;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
+
 
 	//if (!bPlaying)
 	//{

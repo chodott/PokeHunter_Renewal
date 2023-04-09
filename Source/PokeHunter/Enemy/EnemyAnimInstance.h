@@ -40,5 +40,6 @@ public:
 	UAnimMontage* CombatMontage;
 
 public:
+	void StopCombatMontage(float BlendTime);
 	bool PlayCombatMontage(FName Section, bool interuupt = false);
 };

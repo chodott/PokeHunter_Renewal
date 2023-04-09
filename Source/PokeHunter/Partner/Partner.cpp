@@ -48,6 +48,11 @@ void APartner::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+FGenericTeamId APartner::GetGenericTeamId() const
+{
+	return TeamID;
+}
+
 void APartner::ServerPlayMontage_Implementation(FName Section)
 {
 	MultiPlayMontage(Section);

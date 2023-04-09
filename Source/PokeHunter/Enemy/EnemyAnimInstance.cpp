@@ -30,24 +30,50 @@ void UEnemyAnimInstance::UpdateAnimationProperties()
 	}
 }
 
+void UEnemyAnimInstance::StopCombatMontage(float BlendTime)
+{
+	Montage_Stop(BlendTime, CombatMontage);
+}
+
 bool UEnemyAnimInstance::PlayCombatMontage(FName Section, bool bInterrupt)
 {
 	//if (Section == FName("Die") || Section == FName("Hit"))
 	if(bInterrupt)
 	{
-		bPlaying = true;
-		Montage_Play(CombatMontage, 1.0f);
-		Montage_JumpToSection(Section, CombatMontage);
+		
+		if (Section == FName("Patrol"))
+		{
+			float StartTime = FMath::RandRange(13.f,20.f);
+			bPlaying = true;
+			Montage_Play(CombatMontage, 1.0f);
+			Montage_SetPosition(CombatMontage, StartTime);
+		}
+		else
+		{
+			bPlaying = true;
+			Montage_Play(CombatMontage, 1.0f);
+			Montage_JumpToSection(Section, CombatMontage);
+		}
+		
 
 		return true;
 	}
 	else if (!bPlaying)
 	{
+		if (Section == FName("Patrol"))
+		{
+			float StartTime = FMath::RandRange(13.f,20.f);
+			bPlaying = true;
+			Montage_Play(CombatMontage, 1.0f);
+			Montage_SetPosition(CombatMontage, StartTime);
+		}
 
-		bPlaying = true;
-		Montage_Play(CombatMontage, 1.0f);
-		Montage_JumpToSection(Section, CombatMontage);
-
+		else
+		{
+			bPlaying = true;
+			Montage_Play(CombatMontage, 1.0f);
+			Montage_JumpToSection(Section, CombatMontage);
+		}
 		return true;
 	}
 	return false;

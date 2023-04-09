@@ -42,5 +42,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiApplyDamage(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass);
 
-	virtual void FireInDirection(const FVector& DirectionVec, const FVector& InitialPos, const FVector& EndPos);
+	virtual void FireInDirection(FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos);
+	virtual void FireInDirection(FVector Direction);
 };

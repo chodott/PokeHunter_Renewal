@@ -217,6 +217,17 @@ void AHunter::Tick(float DeltaTime)
 			SetHP(NewHP);
 		}
 	}
+
+	//Reload
+	if (!bCanShot)
+	{
+		float ElapsedTime = GetWorld()->TimeSeconds - StartShotTime;
+		float TimeLeft = ReloadTime - ElapsedTime;
+		if (TimeLeft <= 0.0f)
+		{
+			bCanShot = true;
+		}
+	}
 }
 
 void AHunter::PostInitializeComponents()
@@ -249,6 +260,11 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	HunterInfo.HunterHP -= DamageAmount;
 
 	return DamageAmount;
+}
+
+FGenericTeamId AHunter::GetGenericTeamId()const
+{
+	return TeamID;
 }
 
 void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -456,10 +472,12 @@ void AHunter::LMBDown()
 			auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 			
 			//ZoomMode
+			if (!bCanShot) return;
 			if (CurState == EPlayerState::Zoom)
 			{
-				TSubclassOf<ABullet> BulletClass = ItemClass;
-				if (BulletClass == NULL) return;
+				bool bIsBullet = ItemClass->IsChildOf(ABullet::StaticClass());
+				if (!bIsBullet) return;
+				//TSubclassOf<ABullet> BulletClass = ItemClass;
 				FVector StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle"));
 				FHitResult* HitResult = new FHitResult();
 				FVector EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
@@ -478,7 +496,7 @@ void AHunter::LMBDown()
 					EndTrace = HitResult->Location;
 				}
 
-				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, StartTrace, GetControlRotation());
+				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(ItemClass, StartTrace, GetControlRotation());
 				Bullet->UseItem(this, StartTrace, EndTrace);
 
 				//ServerSpawnItem(ItemClass, StartTrace, EndTrace, GetControlRotation());
@@ -508,6 +526,9 @@ void AHunter::LMBDown()
 				}
 				
 			}
+
+			bCanShot = false;
+			StartShotTime = GetWorld()->GetTimeSeconds();
 
 			//인벤토리 처리
 			QuickSlotArray[CurQuickKey].cnt--;

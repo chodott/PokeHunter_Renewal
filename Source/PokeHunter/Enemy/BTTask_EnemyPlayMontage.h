@@ -18,7 +18,11 @@ public:
 	UBTTask_EnemyPlayMontage();
 	void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
+
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory);
+
+public:
+	class AEnemy* Enemy;
 	bool bPlayOnce;
 	bool bPlaying;
 };

@@ -35,16 +35,44 @@ bool UBaseInstance::SendIdToken()
 {
 	if (NULL == gSocket) return false;
 
+	bool retVal = false;
 	int32 bSize = 0;
 	CS_AWS_TOKEN_PACK token_pack;
-	token_pack.size = sizeof(CS_AWS_TOKEN_PACK);
+	token_pack.size = (char)sizeof(CS_AWS_TOKEN_PACK);
 	token_pack.type = CS_AWS_TOKEN;
-	token_pack.Token_size = IdToken.Len();
 
-	FString TestBuf = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATHEEND";
-	WideCharToMultiByte(CP_ACP, 0, *TestBuf, TestBuf.Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
+	short last_index = IdToken.Len();
 
-	bool retVal = false;
+	for (int i = 0; i < 2000; i += 100) {
+		if (last_index < i) {
+			strcpy(token_pack.Token, "theEnd");
+			retVal = gSocket->Send(reinterpret_cast<const uint8*>(&token_pack), token_pack.size, bSize);
+			break;
+		}
+
+		if (100 > last_index - i) {
+			token_pack.Token_size = IdToken.Mid(i, last_index).Len();
+			WideCharToMultiByte(CP_ACP, 0, *IdToken.Mid(i, last_index), IdToken.Mid(i, last_index).Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
+		}
+		else {
+			// token_pack.Token_size = IdToken.Mid(i, i + 100).Len();
+			token_pack.Token_size = 100;
+			WideCharToMultiByte(CP_ACP, 0, *IdToken.Mid(i, i + 100), IdToken.Mid(i, i + 100).Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
+		}
+		
+		retVal = gSocket->Send(reinterpret_cast<const uint8*>(&token_pack), token_pack.size, bSize);
+		if (false == retVal) {
+			UE_LOG(LogTemp, Warning, TEXT("Token Send Fail"));
+			int32 ErrorCode = GetLastError();
+			UE_LOG(LogTemp, Error, TEXT("Socket error: %d"), ErrorCode);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Token Send Success"));
+		}
+	}
+
+	/*WideCharToMultiByte(CP_ACP, 0, *IdToken.Mid(100, 200), IdToken.Mid(100, 200).Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
+	retVal = false;
 	retVal = gSocket->Send(reinterpret_cast<const uint8*>(&token_pack), token_pack.size, bSize);
 	if (false == retVal) {
 		UE_LOG(LogTemp, Warning, TEXT("Token Send Fail"));
@@ -53,7 +81,7 @@ bool UBaseInstance::SendIdToken()
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Token Send Success"));
-	}
+	}*/
 
 	return true;
 }

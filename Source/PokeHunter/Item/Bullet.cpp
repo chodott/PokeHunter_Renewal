@@ -44,7 +44,7 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 	{
 		ApplyAbillity(OtherActor, OtherComponent);
 	}
-	Destroy();
+
 }
 
 void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)

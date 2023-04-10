@@ -29,6 +29,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
 	bool bPlaying;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
+	bool bJumping;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
 	class AEnemy* Enemy;
 
@@ -37,5 +40,6 @@ public:
 	UAnimMontage* CombatMontage;
 
 public:
+	void StopCombatMontage(float BlendTime);
 	bool PlayCombatMontage(FName Section, bool interuupt = false);
 };

@@ -23,36 +23,67 @@ void AItemDropActor::BeginPlay()
 	if (RaritySum != 0) BaseProbability = int32(100 / RaritySum);
 }
 
+void AItemDropActor::CreateItemArray(TArray<FName>& ItemArray)
+{
+	for (int i = 0; i < ItemArray.Num() - 1; ++i)
+	{
+		FItemCnter ItemCnter;
+		ItemCnter.ItemID = ItemArray[i];
+		DropItemArray.Add(ItemCnter);
+	}
+	
+}
+
 void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 {
 	Master = Hunter;
 
-	DropCnt =  FMath::RandRange(0, 100);
+	//DropCnt =  FMath::RandRange(0, 100);
 
-	for (int32 i = 0; i < DropCnt; ++i)
+	//for (int32 i = 0; i < DropCnt; ++i)
+	//{
+	//	int32 Probability = FMath::RandRange(0, 100);
+	//	int32 StartProbability = 0;
+	//	
+	//	//아이템 데이터 클래스
+	//	for (auto& DropItem : DropItemMap)
+	//	{
+	//		if (Probability >= StartProbability && Probability < StartProbability + BaseProbability * DropItem.Key)
+	//		{
+	//			//���� ���ϱ�
+	//			int32 ItemCnt = FMath::RandRange(1, 5);
+	//		bool bAddSuccess = Master->Inventory->AddItemData(DropItem.Value, ItemCnt);
+	//			if (bAddSuccess) 
+	//			{ 
+	//				this->Destroy();
+	//				return;
+	//			}
+	//			else {
+	//				//Full Inventory
+	//				return;
+	//			}
+	//		}
+	//		StartProbability += BaseProbability * DropItem.Key;
+	//	}
+	//}
+
+	DropCnt = FMath::RandRange(1, 5);
+	for (int i = 0; i < DropCnt; ++i)
 	{
-		int32 Probability = FMath::RandRange(0, 100);
-		int32 StartProbability = 0;
-		
-		//아이템 데이터 클래스
-		for (auto& DropItem : DropItemMap)
-		{
-			if (Probability >= StartProbability && Probability < StartProbability + BaseProbability * DropItem.Key)
-			{
-				//���� ���ϱ�
-				int32 ItemCnt = FMath::RandRange(1, 5);
-				bool bAddSuccess = Master->Inventory->AddItemData(DropItem.Value, ItemCnt);
-				if (bAddSuccess) 
-				{ 
-					this->Destroy();
-					return;
-				}
-				else {
-					//Full Inventory
-					return;
-				}
-			}
-			StartProbability += BaseProbability * DropItem.Key;
-		}
+		int RandIndex = FMath::RandRange(0, DropItemArray.Num() - 1);
+		DropItemArray[RandIndex].cnt += 1;
 	}
+
+	for (int i = 0; i < DropItemArray.Num() - 1; ++i)
+	{
+		bool bAddSuccess = Master->Inventory->AddItemData(DropItemArray[i]);
+		if (!bAddSuccess)
+		{
+			return;
+		}
+		
+	}
+	//획득 처리 모션 추가 필요
+	this->Destroy();
+	return;
 }

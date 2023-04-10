@@ -76,6 +76,10 @@ AHunter::AHunter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
+	DestinationMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DestinationMesh"));
+	DestinationMesh->SetupAttachment(GetRootComponent());
+	DestinationMesh->SetVisibility(false);
+
 	//Collision
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
@@ -213,6 +217,17 @@ void AHunter::Tick(float DeltaTime)
 			SetHP(NewHP);
 		}
 	}
+
+	//Reload
+	if (!bCanShot)
+	{
+		float ElapsedTime = GetWorld()->TimeSeconds - StartShotTime;
+		float TimeLeft = ReloadTime - ElapsedTime;
+		if (TimeLeft <= 0.0f)
+		{
+			bCanShot = true;
+		}
+	}
 }
 
 void AHunter::PostInitializeComponents()
@@ -227,6 +242,29 @@ void AHunter::PostInitializeComponents()
 void AHunter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+}
+
+float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		FPointDamageEvent& PointDamageEvent = (FPointDamageEvent&)DamageEvent;
+	
+	}
+	
+
+	if (bInvincible) return 0.0f;
+
+	HunterInfo.HunterHP -= DamageAmount;
+
+	return DamageAmount;
+}
+
+FGenericTeamId AHunter::GetGenericTeamId()const
+{
+	return TeamID;
 }
 
 void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -352,7 +390,7 @@ void AHunter::SpaceDown()
 
 void AHunter::MoveForward(float Val)
 {
-	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install) return;
+	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install || bGrabbed) return;
 	if (Val != 0.0f)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -366,7 +404,7 @@ void AHunter::MoveForward(float Val)
 
 void AHunter::MoveRight(float Val)
 {
-	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install) return;
+	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install || bGrabbed) return;
 	
 	if (Val != 0.0f)
 	{
@@ -395,17 +433,19 @@ void AHunter::LookUp(float NewAxisValue)
 
 void AHunter::LShiftDown()
 {
+	if (bBound) return;
 	ServerSprint(this, true);
 }
 
 void AHunter::LShiftUp()
 {
+	if(CurState != EPlayerState::Zoom)
 	ServerSprint(this, false);
 }
 
 void AHunter::LMBDown()
 {
-	if (CurState == EPlayerState::Dive) return;
+	if (CurState == EPlayerState::Dive || bBound) return;
 
 	if (bPartnerMode)
 	{
@@ -432,10 +472,12 @@ void AHunter::LMBDown()
 			auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 			
 			//ZoomMode
+			if (!bCanShot) return;
 			if (CurState == EPlayerState::Zoom)
 			{
-				TSubclassOf<ABullet> BulletClass = ItemClass;
-				if (BulletClass == NULL) return;
+				bool bIsBullet = ItemClass->IsChildOf(ABullet::StaticClass());
+				if (!bIsBullet) return;
+				//TSubclassOf<ABullet> BulletClass = ItemClass;
 				FVector StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle"));
 				FHitResult* HitResult = new FHitResult();
 				FVector EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
@@ -454,7 +496,7 @@ void AHunter::LMBDown()
 					EndTrace = HitResult->Location;
 				}
 
-				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, StartTrace, GetControlRotation());
+				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(ItemClass, StartTrace, GetControlRotation());
 				Bullet->UseItem(this, StartTrace, EndTrace);
 
 				//ServerSpawnItem(ItemClass, StartTrace, EndTrace, GetControlRotation());
@@ -464,7 +506,7 @@ void AHunter::LMBDown()
 			else
 			{
 				//ServerSpawnItem(ItemClass, GetActorLocation(), FVector::ZeroVector, GetControlRotation());
-				AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(), GetControlRotation());
+				AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(),FRotator::ZeroRotator);
 				switch (Item->ItemType)
 				{
 				case EItemType::Potion:
@@ -484,6 +526,9 @@ void AHunter::LMBDown()
 				}
 				
 			}
+
+			bCanShot = false;
+			StartShotTime = GetWorld()->GetTimeSeconds();
 
 			//인벤토리 처리
 			QuickSlotArray[CurQuickKey].cnt--;
@@ -506,6 +551,7 @@ void AHunter::LMBDown()
 
 void AHunter::RMBDown()
 {
+	if (bBound) return;
 	ServerZoom(this,true);
 }
 
@@ -596,6 +642,7 @@ void AHunter::CtrlDown()
 {
 	if (Partner == NULL) return;
 	bPartnerMode = true;
+	DestinationMesh->SetVisibility(true);
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	FInputModeGameAndUI InputMode;
 	InputMode.SetHideCursorDuringCapture(false);
@@ -607,6 +654,7 @@ void AHunter::CtrlUp()
 {
 	if (Partner == NULL) return;
 	bPartnerMode = false;
+	DestinationMesh->SetVisibility(false);
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	PlayerController->bShowMouseCursor = false;
 	PlayerController->SetInputMode(FInputModeGameOnly());
@@ -720,6 +768,23 @@ void AHunter::InteractHealArea_Implementation()
 void AHunter::OutHealArea_Implementation()
 {
 	HealPerSecondAmount -= 10.f;
+}
+
+void AHunter::InteractEarthquake_Implementation()
+{
+	if (GetCharacterMovement()->IsFalling()) return;
+	LaunchCharacter(FVector(0, 0, 1000), false, false);
+}
+
+void AHunter::InteractAttack_Implementation(FVector HitLoc)
+{
+	FVector CurLoc = GetActorLocation();
+
+	FVector DirectionVec = CurLoc - HitLoc;
+	DirectionVec.Z = 0;
+	DirectionVec.Normalize();
+
+	LaunchCharacter(DirectionVec * 1000.f,false,false);
 }
 
 void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)

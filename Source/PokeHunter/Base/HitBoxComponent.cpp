@@ -3,6 +3,12 @@
 
 #include "HitBoxComponent.h"
 
+UHitBoxComponent::UHitBoxComponent()
+{
+	SetGenerateOverlapEvents(true);
+}
+
+
 void UHitBoxComponent::TakeDamage(float DamageAmount)
 {
 	PartHP -= DamageAmount;
@@ -10,6 +16,8 @@ void UHitBoxComponent::TakeDamage(float DamageAmount)
 	{
 		bDestroyed = true;
 	}
+	
+	
 }
 
 bool UHitBoxComponent::CheckBurning(float DeltaTime)
@@ -36,6 +44,5 @@ bool UHitBoxComponent::CheckBurning(float DeltaTime)
 			return true;
 		}
 	}
-
 
 }

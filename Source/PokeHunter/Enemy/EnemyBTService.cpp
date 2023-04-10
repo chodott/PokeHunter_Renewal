@@ -15,4 +15,6 @@ void UEnemyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 	OwnerComp.GetBlackboardComponent()->SetValueAsEnum(FName("State"), (uint8)Enemy->CurState);
 	OwnerComp.GetBlackboardComponent()->SetValueAsVector(FName("TargetPos"), Enemy->TargetPos);
 	OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName("WaitingAgro"), Enemy->bWaitingAgro);
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName("Binding"), Enemy->bBinding);
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName("Died"), Enemy->bDied);
 }

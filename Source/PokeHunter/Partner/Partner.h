@@ -59,8 +59,11 @@ public:
 	bool bOrdered;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bUsingSkill;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bGrabbed;
 
 	//TeamID
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
 	FGenericTeamId TeamID;
 
 protected:
@@ -71,6 +74,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	//Perception
+	FGenericTeamId GetGenericTeamId()const override;
 
 	//Animation
 	UFUNCTION(Server, Reliable)

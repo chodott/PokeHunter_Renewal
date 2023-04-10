@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "GenericTeamAgentInterface.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
+#include "PokeHunter/Base/EnemyInteractInterface.h"
 #include "Enemy.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
@@ -17,7 +18,6 @@ enum class EEnemyState : uint8
 	Patrol UMETA(DisplayName = "Patrol"),
 	Chase UMETA(DisplayName = "Chase"),
 	Hit UMETA(DisplayName = "Hit"),
-	Binding UMETA(DisplayName = "Binding"),
 	Die UMETA(DisplayName = "Die"),
 	Roar UMETA(DisplayName = "Roar"),
 	Attention UMETA(DisplayName = "Attention"),
@@ -29,7 +29,7 @@ enum class EEnemyState : uint8
 
 
 UCLASS()
-class POKEHUNTER_API AEnemy : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface
+class POKEHUNTER_API AEnemy : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface
 {
 	GENERATED_BODY()
 
@@ -37,60 +37,76 @@ public:
 	// Sets default values for this pawn's properties
 	AEnemy();
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float HP{30};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float HP{ 30 };
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
-	class AActor* Target;
+		class AActor* Target;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class AActor* AgroTarget;
+		class AActor* AgroTarget;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bWaitingAgro;
+		bool bWaitingAgro;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "DropItem")
+		TSubclassOf <class AInteractActor> DropItemBoxClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "DropItem")
+		TArray<FName> DropItemID_Array;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<AActor*> TargetArray;
+		TArray<AActor*> TargetArray;
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
-	FVector TargetPos;
+		FVector TargetPos;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UEnemyAnimInstance* EnemyAnim;
+		class UEnemyAnimInstance* EnemyAnim;
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
-	EEnemyState CurState{EEnemyState::Patrol};
+		EEnemyState CurState {
+		EEnemyState::Patrol
+	};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf <class AEnemyProjectile> ProjectileClass;
+		TSubclassOf <class AEnemyProjectile> ProjectileClass;
 
 	FOnMontageEndDelegate OnMontageEnd;
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable)
-	FOnDamageDelegate OnDamage;
+		FOnDamageDelegate OnDamage;
 
 	//TeamID
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
 	FGenericTeamId TeamID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float AttackRange = 200.f;
+		float AttackRange = 200.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float EarthquakeRange = 1000.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float StartBindingTime;
+		float StartBindingTime;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float BindingTime;
+		float BindingTime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		bool bBinding{ false };
 
 	//상태 이상
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bPoisoned{ false };
+		bool bPoisoned{ false };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float PoisonedTime{};
+		float PoisonedTime{};
 	float StartPoisonedTime;
 	int PoisonSaveTime{};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bBurning{ false };
+		bool bBurning{ false };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float BurningTime{};
+		float BurningTime{};
 	float StartBurningTime;
 	int BurningSaveTime{};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		bool bDied{ false };
 
 protected:
 	// Called when the game starts or when spawned
@@ -105,9 +121,13 @@ public:
 
 	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
 
+	FGenericTeamId GetGenericTeamId()const override;
+
+
 	//CollisionFunction
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(BlueprintCallable)
 	bool IsJumping();
 
 	//Replication
@@ -145,6 +165,12 @@ public:
 	virtual void Patrol();
 	UFUNCTION(BlueprintCallable)
 	virtual void JumpAttack();
+	UFUNCTION(BlueprintCallable)
+	virtual void LaunchToTarget();
+	UFUNCTION(BlueprintCallable)
+	virtual void Die();
+	UFUNCTION(BlueprintCallable)
+	virtual void SpawnItem();
 	
 
 	//Animation Function
@@ -157,6 +183,5 @@ public:
 	virtual void InteractBindTrap_Implementation();
 
 public:
-	bool bFirstHit{ true};
 	bool bFirstMeet{ true };
 };

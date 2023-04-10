@@ -28,7 +28,7 @@ AGolemBoss::AGolemBoss()
 	PartHitBox.AddUnique(RightArmHitBox);
 
 	UHitBoxComponent* LeftArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftArmHitBox"));
-	LeftArmHitBox->SetupAttachment(GetMesh(), FName("LeftArm"));
+	LeftArmHitBox->SetupAttachment(GetMesh(), FName("LeftHand"));
 	LeftArmHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
 	PartHitBox.AddUnique(LeftArmHitBox);
 
@@ -43,8 +43,15 @@ AGolemBoss::AGolemBoss()
 	PartHitBox.AddUnique(LeftLegHitBox);
 
 
-
 	AttackRange = 1000.f;
+
+	//Earthquake Collision
+	EarthquakeCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("EarthquakeCollision"));
+	EarthquakeCollision->SetupAttachment(GetRootComponent());
+	EarthquakeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+
+
 }
 
 void AGolemBoss::Tick(float DeltaTime)
@@ -68,6 +75,8 @@ void AGolemBoss::BeginPlay()
 
 	for (int i = 0; i < PartHitBox.Num() - 1; ++i)
 	{
+		PartHitBox[i]->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+		//PartHitBox[i]->OnComponentHit.AddDynamic(this, &AGolemBoss::OnHit);
 		PartHitBox[i]->BurningTime = BurningTime;
 	}
 }
@@ -110,6 +119,8 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 {
 	APawn::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+
+
 	FVector HitLoc;
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{
@@ -130,6 +141,47 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	return DamageAmount;
 }
 
+void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UHitBoxComponent* OverlapHitBox = Cast<UHitBoxComponent>(OverlappedComp);
+	 
+	if (OverlapHitBox)
+	{
+		if (bCanGrab)
+		{
+			FName PartName = OverlapHitBox->GetAttachSocketName();
+			if (PartName == FName("LeftHand") || PartName == FName("RightHand"))
+			{
+				ACharacter* GrabbedCharacter = Cast<ACharacter>(OtherActor);
+				if (GrabbedCharacter)
+				{
+					OtherActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GrabSocket"));
+					GrabbedTarget = GrabbedCharacter;
+				}
+				return;
+			}
+		}
+
+		if (IEnemyInteractInterface* EnemyInteractInterface = Cast<IEnemyInteractInterface>(OtherActor))
+		{
+			EnemyInteractInterface->Execute_InteractAttack(OtherActor, OverlappedComp->GetComponentLocation());
+		}
+
+		UGameplayStatics::ApplyPointDamage(OtherActor, OverlapHitBox->Damage, SweepResult.Normal, SweepResult, GetController(), this, UDamageType::StaticClass());
+
+	}
+}
+
+void AGolemBoss::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	UHitBoxComponent* OverlapHitBox = Cast<UHitBoxComponent>(HitComponent);
+	if (OverlapHitBox)
+	{
+		UGameplayStatics::ApplyPointDamage(OtherActor, OverlapHitBox->Damage, Hit.ImpactNormal, Hit, GetController(), this, UDamageType::StaticClass());
+
+	}
+}
+
 void AGolemBoss::Attack(int AttackPattern)
 {
 	switch (AttackPattern)
@@ -145,5 +197,34 @@ void AGolemBoss::Attack(int AttackPattern)
 		ServerPlayMontage(this, FName("Attack_Punch"));
 		break;
 
+	case 2:
+		ServerPlayMontage(this, FName("Attack_Grab"));
+		break;
+
+	case 3:
+		ServerPlayMontage(this, FName("Attack_Bind"));
+		break;
 	}
+}
+
+void AGolemBoss::Earthquake()
+{
+	FHitResult HitResult;
+	FVector LocVec = GetActorLocation();
+	FVector DownVec = (-1) * GetActorUpVector();
+	float HalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+	FVector StartTrace = LocVec + DownVec * HalfHeight;
+
+		TArray<AActor*> OverlapActors;
+		EarthquakeCollision->GetOverlappingActors(OverlapActors);
+		for (auto OverlapActor : OverlapActors)
+		{
+			IEnemyInteractInterface* ApplyActor = Cast<IEnemyInteractInterface>(OverlapActor);
+			if (ApplyActor)
+			{
+				Execute_InteractEarthquake(OverlapActor);
+
+			}
+		}
 }

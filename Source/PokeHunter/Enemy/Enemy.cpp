@@ -8,6 +8,7 @@
 #include "components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PokeHunter/Item/Item.h"
+#include "PokeHunter/Base/ItemDropActor.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "PokeHunter/Partner/Partner.h"
 
@@ -47,12 +48,13 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CurState == EEnemyState::Binding)
+	if (bBinding)
 	{
 		float ElapsedTime = GetWorld()->TimeSeconds - StartBindingTime;
 		float TimeLeft = BindingTime - ElapsedTime;
 		if (TimeLeft <= 0.0f)
 		{
+			bBinding = false;
 			CurState = EEnemyState::Chase;
 		}
 
@@ -116,6 +118,16 @@ void AEnemy::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	if (bDied)
+	{
+		FVector CurScale = GetActorScale();
+		SetActorScale3D(CurScale - DeltaTime * FVector(1.f, 1.f, 1.f));
+		if (GetActorScale().Length() < 0.2f)
+		{
+			Die();
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -127,55 +139,68 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
 {
-	OutLocation = GetMesh()->GetSocketLocation("HeadSocket");
-	OutRotation = GetMesh()->GetSocketRotation("HeadSocket");
+	OutLocation = GetMesh()->GetSocketLocation("Head");
+	OutRotation = GetMesh()->GetSocketRotation("Head");
+}
+
+FGenericTeamId AEnemy::GetGenericTeamId() const
+{
+	return TeamID;
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (HP <= 0) return 0;
 
-	//Hit Anim
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	HP -= DamageAmount;
+	//Item Hit
 	AItem* HitItem = Cast<AItem>(DamageCauser);
+	FVector HitLoc;
+
+	
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
+		HitLoc = PointDamageEvent.HitInfo.Location;
+		FVector DirectionVec = -1.f * PointDamageEvent.HitInfo.ImpactNormal;
+		//DirectionVec.Z = 0.f;
+		//DirectionVec.Normalize();
+		//GetCharacterMovement()->Launch(DirectionVec * 1000.f);
+		//LaunchCharacter(DirectionVec * 1000000.f, true,true);
+	}
+	else
+	{
+		HitLoc = GetActorLocation();
+	}
+
+	//피격 애니메이션 처리
 	if (HitItem)
 	{
-		if (HP <= 0 && CurState != EEnemyState::Die)
+		if (HP <= 0)
 		{
 			CurState = EEnemyState::Die;
 			EnemyAnim->PlayCombatMontage(FName("Die"), true);
 		}
 		else
 		{
+			EnemyAnim->PlayCombatMontage(FName("Hit"), true);
 			if (Target == NULL)
 			{
-				EnemyAnim->PlayCombatMontage(FName("Hit"), true);
 				if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
 				{
 					Hunter->SetPartnerTarget(this);
 				}
 				Target = HitItem->ThisOwner;
 				CurState = EEnemyState::Hit;
-				bFirstHit = false;
 			}
 		}
-		//HitItem->Destroy();
 	}
-
-	//Damage and UI
-	FVector HitLoc;
-	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
-	{
-		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
-		HitLoc = PointDamageEvent.HitInfo.Location;
-	}
-	else
-	{
-		HitLoc = GetActorLocation();
-	}
-	HP -= DamageAmount;
-	OnDamage.Broadcast(DamageAmount, HitLoc);
 
 	
+	
+	//Damage and UI
+	OnDamage.Broadcast(DamageAmount, HitLoc);
 
 	return DamageAmount;
 }
@@ -212,7 +237,7 @@ void AEnemy::ServerStartBinding_Implementation()
 
 void AEnemy::MultiStartBinding_Implementation()
 {
-	CurState = EEnemyState::Binding;
+	bBinding = true;
 	StartBindingTime = GetWorld()->TimeSeconds;
 }
 
@@ -236,6 +261,7 @@ void AEnemy::SeeNewTarget(AActor* Actor)
 	{
 		SetTarget(Actor);
 		CurState = EEnemyState::Chase;
+		EnemyAnim->StopCombatMontage(0.2f);
 	}
 	
 }
@@ -283,12 +309,33 @@ void AEnemy::Patrol()
 void AEnemy::JumpAttack()
 {
 	CurState = EEnemyState::JumpAttack;
+	ServerPlayMontage(this, FName("Attack_Jump"));
+	
+}
+
+
+void AEnemy::LaunchToTarget()
+{
 	float Distance = GetDistanceTo(Target);
 	FVector LookVec = Target->GetActorLocation() - GetActorLocation();
 	LookVec.Normalize();
 	LookVec.Z = 0.3f;
 	FVector Velocity = LookVec * Distance;
 	GetCharacterMovement()->Launch(Velocity);
+}
+
+void AEnemy::Die()
+{
+	SpawnItem();
+	Destroy();
+}
+
+void AEnemy::SpawnItem()
+{
+	FVector SpawnLoc = GetActorLocation();
+	SpawnLoc.Z += 50.f;
+	AItemDropActor* ItemBox = GetWorld()->SpawnActor<AItemDropActor>(DropItemBoxClass, SpawnLoc, GetActorRotation());
+	ItemBox->CreateItemArray(DropItemID_Array);
 }
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -314,6 +361,6 @@ void AEnemy::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
 
 void AEnemy::InteractBindTrap_Implementation()
 {
-	CurState = EEnemyState::Binding;
+	bBinding = true;
 	StartBindingTime = GetWorld()->TimeSeconds;
 }

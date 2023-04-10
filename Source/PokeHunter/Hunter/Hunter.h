@@ -10,6 +10,7 @@
 #include "PokeHunter/Item/ItemData.h"
 #include "PokeHunter/Base/SkillData.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
+#include "PokeHunter/Base/EnemyInteractInterface.h"
 #include "Hunter.generated.h"
 
 //Dynamic 
@@ -51,7 +52,7 @@ public:
 };
 
 UCLASS()
-class POKEHUNTER_API AHunter : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface
+class POKEHUNTER_API AHunter : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface
 {
 	GENERATED_BODY()
 
@@ -65,6 +66,10 @@ public:
 	//Inventory Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
 		class UInventoryComponent* Inventory{};
+
+	//
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
+	class UStaticMeshComponent* DestinationMesh;
 
 	//HunterInfo
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HunterStatus")
@@ -138,10 +143,17 @@ public:
 	bool bPartnerMode;
 	
 	//TeamID
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
 	FGenericTeamId TeamID;
 
 	//
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float ReloadTime{};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	float StartShotTime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bCanShot;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bInvincible{ false};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float InvincibleTime{ 1.f };
@@ -150,7 +162,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float HealPerSecondAmount;
 	int SaveSecond;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bGrabbed;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bBound;
 
 protected:
 	// Sets default values for this character's properties
@@ -163,6 +178,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void PostInitializeComponents() override;
 	virtual void PossessedBy(AController* NewController) override;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+
+	//Perception
+	FGenericTeamId GetGenericTeamId()const override;
 
 	//Replicated
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
@@ -263,6 +282,10 @@ public:
 	//ItemInterface Function
 	virtual void InteractHealArea_Implementation();
 	virtual void OutHealArea_Implementation();
+
+	//EnemyInterface Function
+	virtual void InteractEarthquake_Implementation();
+	virtual void InteractAttack_Implementation(FVector HitLoc);
 	
 private:
 	// Character Movement Input

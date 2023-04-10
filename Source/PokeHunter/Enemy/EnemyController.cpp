@@ -28,13 +28,13 @@ AEnemyController::AEnemyController()
 
 	ConfigSight = CreateOptionalDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 	ConfigSight->DetectionByAffiliation.bDetectEnemies = true;
-	ConfigSight->DetectionByAffiliation.bDetectFriendlies = true;
-	ConfigSight->DetectionByAffiliation.bDetectNeutrals = true;
+	ConfigSight->DetectionByAffiliation.bDetectFriendlies = false;
+	ConfigSight->DetectionByAffiliation.bDetectNeutrals = false;
 
 	ConfigHearing = CreateOptionalDefaultSubobject<UAISenseConfig_Hearing>(TEXT("Hearing Config"));
 	ConfigHearing->DetectionByAffiliation.bDetectEnemies = true;
-	ConfigHearing->DetectionByAffiliation.bDetectFriendlies = true;
-	ConfigHearing->DetectionByAffiliation.bDetectNeutrals = true;
+	ConfigHearing->DetectionByAffiliation.bDetectFriendlies = false;
+	ConfigHearing->DetectionByAffiliation.bDetectNeutrals = false;
 
 	GetPerceptionComponent()->SetDominantSense(*ConfigSight->GetSenseImplementation());
 	GetPerceptionComponent()->ConfigureSense(*ConfigSight);
@@ -60,11 +60,14 @@ void AEnemyController::OnPossess(APawn* pawn)
 
 void AEnemyController::OnPerception(AActor* Actor, FAIStimulus Stimulus)
 {
-
+	IGenericTeamAgentInterface* TeamAgent = Cast<IGenericTeamAgentInterface>(Actor);
 	switch (Stimulus.Type)
 	{
 	case 0:
-		Enemy->SeeNewTarget(Actor);
+		if (TeamAgent && TeamAgent->GetGenericTeamId() != Enemy->GetGenericTeamId())
+		{
+			Enemy->SeeNewTarget(Actor);
+		}
 		break;
 	case 1:
 		FVector SoundLoc = Stimulus.StimulusLocation;

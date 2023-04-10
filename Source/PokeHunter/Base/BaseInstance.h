@@ -99,7 +99,7 @@ public:
 		bool ConnectToServer(FString server_addr ="127.0.0.1"); // Default Addr = 127.0.0.1
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
-		bool SendIdToken();
+		bool SendAccessToken();
 
 	virtual void Shutdown() override;
 

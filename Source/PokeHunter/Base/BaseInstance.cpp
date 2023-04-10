@@ -31,7 +31,7 @@ bool UBaseInstance::ConnectToServer(FString server_addr)
 	}
 }
 
-bool UBaseInstance::SendIdToken()
+bool UBaseInstance::SendAccessToken()
 {
 	if (NULL == gSocket) return false;
 
@@ -41,7 +41,7 @@ bool UBaseInstance::SendIdToken()
 	token_pack.size = (char)sizeof(CS_AWS_TOKEN_PACK);
 	token_pack.type = CS_AWS_TOKEN;
 
-	short last_index = IdToken.Len();
+	short last_index = AccessToken.Len();
 
 	for (int i = 0; i < 2000; i += 100) {
 		if (last_index < i) {
@@ -51,13 +51,12 @@ bool UBaseInstance::SendIdToken()
 		}
 
 		if (100 > last_index - i) {
-			token_pack.Token_size = IdToken.Mid(i, last_index).Len();
-			WideCharToMultiByte(CP_ACP, 0, *IdToken.Mid(i, last_index), IdToken.Mid(i, last_index).Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
+			token_pack.Token_size = AccessToken.Mid(i, last_index).Len();
+			WideCharToMultiByte(CP_ACP, 0, *AccessToken.Mid(i, last_index), AccessToken.Mid(i, last_index).Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
 		}
 		else {
-			// token_pack.Token_size = IdToken.Mid(i, i + 100).Len();
 			token_pack.Token_size = 100;
-			WideCharToMultiByte(CP_ACP, 0, *IdToken.Mid(i, i + 100), IdToken.Mid(i, i + 100).Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
+			WideCharToMultiByte(CP_ACP, 0, *AccessToken.Mid(i, i + 100), AccessToken.Mid(i, i + 100).Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
 		}
 		
 		retVal = gSocket->Send(reinterpret_cast<const uint8*>(&token_pack), token_pack.size, bSize);

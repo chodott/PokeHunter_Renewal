@@ -37,8 +37,8 @@ bool UBaseInstance::SendAccessToken()
 
 	bool retVal = false;
 	int32 bSize = 0;
-	CS_AWS_TOKEN_PACK token_pack;
-	token_pack.size = (char)sizeof(CS_AWS_TOKEN_PACK);
+	CS_LOGIN_PACK token_pack;
+	token_pack.size = (char)sizeof(CS_LOGIN_PACK);
 	token_pack.type = CS_AWS_TOKEN;
 
 	short last_index = AccessToken.Len();

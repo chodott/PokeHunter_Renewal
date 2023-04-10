@@ -31,6 +31,33 @@ bool UBaseInstance::ConnectToServer(FString server_addr)
 	}
 }
 
+bool UBaseInstance::SendIdToken()
+{
+	if (NULL == gSocket) return false;
+
+	int32 bSize = 0;
+	CS_AWS_TOKEN_PACK token_pack;
+	token_pack.size = sizeof(CS_AWS_TOKEN_PACK);
+	token_pack.type = CS_AWS_TOKEN;
+	token_pack.Token_size = IdToken.Len();
+
+	FString TestBuf = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATHEEND";
+	WideCharToMultiByte(CP_ACP, 0, *TestBuf, TestBuf.Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
+
+	bool retVal = false;
+	retVal = gSocket->Send(reinterpret_cast<const uint8*>(&token_pack), token_pack.size, bSize);
+	if (false == retVal) {
+		UE_LOG(LogTemp, Warning, TEXT("Token Send Fail"));
+		int32 ErrorCode = GetLastError();
+		UE_LOG(LogTemp, Error, TEXT("Socket error: %d"), ErrorCode);
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Token Send Success"));
+	}
+
+	return true;
+}
+
 // 클라이언트 종료시에 호출되는 함수
 void UBaseInstance::Shutdown()
 {

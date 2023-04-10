@@ -9,6 +9,7 @@
 #include "Runtime/Sockets/Public/Sockets.h"
 #include "Runtime/Sockets/Public/SocketSubsystem.h"
 #include "../../../../PH-Server/IOCPServer/protocol.h"
+#include "Windows/WindowsPlatformMisc.h"
 #include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
 #include "PokeHunter/Item/ItemData.h"
 
@@ -96,6 +97,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		bool ConnectToServer(FString server_addr ="127.0.0.1"); // Default Addr = 127.0.0.1
+
+	UFUNCTION(BlueprintCallable, Category = "Socket")
+		bool SendIdToken();
 
 	virtual void Shutdown() override;
 

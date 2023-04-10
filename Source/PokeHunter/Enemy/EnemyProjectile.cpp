@@ -74,8 +74,8 @@ void AEnemyProjectile::FireInDirection(FVector DirectionVec, const FVector& Init
 
 void AEnemyProjectile::FireInDirection(FVector Direction)
 {
-	FVector Velocity = Direction * 10000.f;
-	ProjectileMovement->Velocity = Direction * 10000;
+	FVector Velocity = Direction * 5000.f;
+	ProjectileMovement->Velocity = Direction * 5000;
 	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
 	ProjectileMovement->UpdateComponentVelocity();
 	SetLifeSpan(TimeLimit);

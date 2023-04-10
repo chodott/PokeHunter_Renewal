@@ -118,6 +118,16 @@ void AEnemy::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	if (bDied)
+	{
+		FVector CurScale = GetActorScale();
+		SetActorScale3D(CurScale - DeltaTime * FVector(1.f, 1.f, 1.f));
+		if (GetActorScale().Length() < 0.2f)
+		{
+			Die();
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -140,49 +150,57 @@ FGenericTeamId AEnemy::GetGenericTeamId() const
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (HP <= 0) return 0;
 
-	//Hit Anim
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	HP -= DamageAmount;
+	//Item Hit
 	AItem* HitItem = Cast<AItem>(DamageCauser);
+	FVector HitLoc;
+
+	
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
+		HitLoc = PointDamageEvent.HitInfo.Location;
+		FVector DirectionVec = -1.f * PointDamageEvent.HitInfo.ImpactNormal;
+		//DirectionVec.Z = 0.f;
+		//DirectionVec.Normalize();
+		//GetCharacterMovement()->Launch(DirectionVec * 1000.f);
+		//LaunchCharacter(DirectionVec * 1000000.f, true,true);
+	}
+	else
+	{
+		HitLoc = GetActorLocation();
+	}
+
+	//피격 애니메이션 처리
 	if (HitItem)
 	{
-		if (HP <= 0 && CurState != EEnemyState::Die)
+		if (HP <= 0)
 		{
 			CurState = EEnemyState::Die;
 			EnemyAnim->PlayCombatMontage(FName("Die"), true);
 		}
 		else
 		{
+			EnemyAnim->PlayCombatMontage(FName("Hit"), true);
 			if (Target == NULL)
 			{
-				EnemyAnim->PlayCombatMontage(FName("Hit"), true);
 				if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
 				{
 					Hunter->SetPartnerTarget(this);
 				}
 				Target = HitItem->ThisOwner;
 				CurState = EEnemyState::Hit;
-				bFirstHit = false;
 			}
 		}
-		//HitItem->Destroy();
 	}
-
-	//Damage and UI
-	FVector HitLoc;
-	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
-	{
-		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
-		HitLoc = PointDamageEvent.HitInfo.Location;
-	}
-	else
-	{
-		HitLoc = GetActorLocation();
-	}
-	HP -= DamageAmount;
-	OnDamage.Broadcast(DamageAmount, HitLoc);
 
 	
+	
+	//Damage and UI
+	OnDamage.Broadcast(DamageAmount, HitLoc);
 
 	return DamageAmount;
 }

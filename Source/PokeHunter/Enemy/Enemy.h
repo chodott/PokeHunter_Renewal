@@ -183,6 +183,5 @@ public:
 	virtual void InteractBindTrap_Implementation();
 
 public:
-	bool bFirstHit{ true};
 	bool bFirstMeet{ true };
 };

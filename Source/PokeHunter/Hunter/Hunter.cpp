@@ -781,7 +781,7 @@ void AHunter::InteractAttack_Implementation(FVector HitLoc)
 	FVector CurLoc = GetActorLocation();
 
 	FVector DirectionVec = CurLoc - HitLoc;
-	DirectionVec.Z = 0;
+	if (DirectionVec.Z < 0.f) DirectionVec.Z *= -1;
 	DirectionVec.Normalize();
 
 	LaunchCharacter(DirectionVec * 1000.f,false,false);

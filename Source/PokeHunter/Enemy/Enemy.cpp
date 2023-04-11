@@ -316,12 +316,15 @@ void AEnemy::JumpAttack()
 
 void AEnemy::LaunchToTarget()
 {
-	float Distance = GetDistanceTo(Target);
-	FVector LookVec = Target->GetActorLocation() - GetActorLocation();
-	LookVec.Normalize();
-	LookVec.Z = 0.3f;
-	FVector Velocity = LookVec * Distance;
-	GetCharacterMovement()->Launch(Velocity);
+	if (Target)
+	{
+		float Distance = GetDistanceTo(Target);
+		FVector LookVec = Target->GetActorLocation() - GetActorLocation();
+		LookVec.Normalize();
+		LookVec.Z = 0.3f;
+		FVector Velocity = LookVec * Distance;
+		GetCharacterMovement()->Launch(Velocity);
+	}
 }
 
 void AEnemy::Die()

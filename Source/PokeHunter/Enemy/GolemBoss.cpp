@@ -12,35 +12,35 @@
 
 AGolemBoss::AGolemBoss()
 {
-	UHitBoxComponent* HeadHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("HeadHitBox"));
+	HeadHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("HeadHitBox"));
 	HeadHitBox->SetupAttachment(GetMesh(), FName("Head"));
 	HeadHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
-	PartHitBox.AddUnique(HeadHitBox);
+	//PartHitBox.AddUnique(HeadHitBox);
 
-	UHitBoxComponent* BodyHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("BodyHitBox"));
+	BodyHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("BodyHitBox"));
 	BodyHitBox->SetupAttachment(GetMesh(), FName("Spine"));
 	BodyHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
-	PartHitBox.AddUnique(BodyHitBox);
+	//PartHitBox.AddUnique(BodyHitBox);
 
-	UHitBoxComponent* RightArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightArmHitBox"));
-	RightArmHitBox->SetupAttachment(GetMesh(), FName("RightArm"));
+	RightArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightArmHitBox"));
+	RightArmHitBox->SetupAttachment(GetMesh(), FName("RightHand"));
 	RightArmHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
-	PartHitBox.AddUnique(RightArmHitBox);
+	//PartHitBox.AddUnique(RightArmHitBox);
 
-	UHitBoxComponent* LeftArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftArmHitBox"));
+	LeftArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftArmHitBox"));
 	LeftArmHitBox->SetupAttachment(GetMesh(), FName("LeftHand"));
 	LeftArmHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
-	PartHitBox.AddUnique(LeftArmHitBox);
+	//PartHitBox.AddUnique(LeftArmHitBox);
 
-	UHitBoxComponent* RightLegHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightLegHitBox"));
+	RightLegHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightLegHitBox"));
 	RightLegHitBox->SetupAttachment(GetMesh(), FName("RightLeg"));
 	RightLegHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
-	PartHitBox.AddUnique(RightLegHitBox);
+	//PartHitBox.AddUnique(RightLegHitBox);
 
-	UHitBoxComponent* LeftLegHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftLegHitBox"));
+	LeftLegHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftLegHitBox"));
 	LeftLegHitBox->SetupAttachment(GetMesh(), FName("LeftLeg"));
 	LeftLegHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
-	PartHitBox.AddUnique(LeftLegHitBox);
+	//PartHitBox.AddUnique(LeftLegHitBox);
 
 
 	AttackRange = 1000.f;
@@ -58,14 +58,57 @@ void AGolemBoss::Tick(float DeltaTime)
 {
 	APawn::Tick(DeltaTime);
 
-	for (int i = 0; i < PartHitBox.Num()-1; ++i)
+	//for (int i = 0; i < PartHitBox.Num()-1; ++i)
+	//{
+	//	if (PartHitBox[i]->CheckBurning(DeltaTime))
+	//	{
+	//		float DamageAmount = 1;
+	//		HP -= DamageAmount;
+	//		OnDamage.Broadcast(DamageAmount, PartHitBox[i]->GetComponentLocation());
+	//	}
+	//}
+
+	//Head
+	if (HeadHitBox->CheckBurning(DeltaTime))
 	{
-		if (PartHitBox[i]->CheckBurning(DeltaTime))
-		{
-			float DamageAmount = 1;
-			HP -= DamageAmount;
-			OnDamage.Broadcast(DamageAmount, PartHitBox[i]->GetComponentLocation());
-		}
+		float DamageAmount = 1;
+		HP -= DamageAmount;
+		OnDamage.Broadcast(DamageAmount, HeadHitBox->GetComponentLocation());
+	}
+
+	if (BodyHitBox->CheckBurning(DeltaTime))
+	{
+		float DamageAmount = 1;
+		HP -= DamageAmount;
+		OnDamage.Broadcast(DamageAmount, BodyHitBox->GetComponentLocation());
+	}
+
+	if (LeftArmHitBox->CheckBurning(DeltaTime))
+	{
+		float DamageAmount = 1;
+		HP -= DamageAmount;
+		OnDamage.Broadcast(DamageAmount, LeftArmHitBox->GetComponentLocation());
+	}
+
+	if (RightArmHitBox->CheckBurning(DeltaTime))
+	{
+		float DamageAmount = 1;
+		HP -= DamageAmount;
+		OnDamage.Broadcast(DamageAmount, RightArmHitBox->GetComponentLocation());
+	}
+
+	if (RightLegHitBox->CheckBurning(DeltaTime))
+	{
+		float DamageAmount = 1;
+		HP -= DamageAmount;
+		OnDamage.Broadcast(DamageAmount, RightLegHitBox->GetComponentLocation());
+	}
+
+	if (LeftLegHitBox->CheckBurning(DeltaTime))
+	{
+		float DamageAmount = 1;
+		HP -= DamageAmount;
+		OnDamage.Broadcast(DamageAmount, LeftLegHitBox->GetComponentLocation());
 	}
 }
 
@@ -73,12 +116,29 @@ void AGolemBoss::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (int i = 0; i < PartHitBox.Num() - 1; ++i)
+	/*for (int i = 0; i < PartHitBox.Num() - 1; ++i)
 	{
 		PartHitBox[i]->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
-		//PartHitBox[i]->OnComponentHit.AddDynamic(this, &AGolemBoss::OnHit);
 		PartHitBox[i]->BurningTime = BurningTime;
-	}
+	}*/
+
+	HeadHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+	HeadHitBox->BurningTime = BurningTime;
+
+	BodyHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+	BodyHitBox->BurningTime = BurningTime;
+
+	LeftArmHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+	LeftArmHitBox->BurningTime = BurningTime;
+
+	RightArmHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+	RightArmHitBox->BurningTime = BurningTime;
+
+	LeftLegHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+	LeftLegHitBox->BurningTime = BurningTime;
+
+	RightLegHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+	RightLegHitBox->BurningTime = BurningTime;
 }
 
 void AGolemBoss::LongAttack()
@@ -127,7 +187,11 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
 		HitLoc = PointDamageEvent.HitInfo.Location;
 		UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(PointDamageEvent.HitInfo.GetComponent());
-		HitBox->TakeDamage(DamageAmount);
+		if (HitBox->TakeDamage(DamageAmount))
+		{
+			FName PartName = HitBox->GetAttachSocketName();
+			DestroyPart(PartName);
+		}
 		HP -= DamageAmount;
 	}
 	else
@@ -156,6 +220,7 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 				if (GrabbedCharacter)
 				{
 					OtherActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GrabSocket"));
+					GrabbedCharacter->SetActorEnableCollision(false);
 					GrabbedTarget = GrabbedCharacter;
 				}
 				return;
@@ -180,6 +245,11 @@ void AGolemBoss::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UP
 		UGameplayStatics::ApplyPointDamage(OtherActor, OverlapHitBox->Damage, Hit.ImpactNormal, Hit, GetController(), this, UDamageType::StaticClass());
 
 	}
+}
+
+void AGolemBoss::DestroyPart_Implementation(FName PartName)
+{
+
 }
 
 void AGolemBoss::Attack(int AttackPattern)

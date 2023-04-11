@@ -38,7 +38,7 @@ void AItem::Tick(float DeltaTime)
 
 }
 
-void AItem::UseItem(APawn* ItemOwner)
+void AItem::UseItem_Implementation(APawn* ItemOwner)
 {
 
 }

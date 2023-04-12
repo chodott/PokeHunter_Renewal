@@ -8,6 +8,7 @@
 #include "Runtime/Networking/Public/Interfaces/IPv4/IPv4Address.h"
 #include "Runtime/Sockets/Public/Sockets.h"
 #include "Runtime/Sockets/Public/SocketSubsystem.h"
+#include "Runtime/Online/HTTP/Public/Http.h"
 #include "../../../../PH-Server/IOCPServer/protocol.h"
 #include "Windows/WindowsPlatformMisc.h"
 #include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
@@ -75,6 +76,8 @@ class POKEHUNTER_API UBaseInstance : public UGameInstance
 public:
 	UBaseInstance();
 
+	virtual void Init() override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString Player_Name;
 
@@ -116,24 +119,37 @@ public:
 		FTimerHandle RetrieveNewTokensHandle;
 
 	UPROPERTY()
+		FTimerHandle GetResponseTimeHandle;
+
+	UPROPERTY()
 		FTimerHandle PartyInfoHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<FItemCnter> InstanceInfoArray;
 
+	TDoubleLinkedList<float> PlayerLatencies;
+
 	UFUNCTION()
 		void SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken);
 
-private:
+	UPROPERTY()
+		FString JoinTicketId;
+
 	FHttpModule* HttpModule;
+
 
 	UPROPERTY()
 		FString ApiUrl;
 
+	UPROPERTY()
+		FString RegionCode;
+
+private:
 	UFUNCTION()
 		void RetrieveNewTokens();
 
 	void OnRetrieveNewTokensResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void OnGetResponseTimeResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

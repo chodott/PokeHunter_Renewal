@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
+#include "PokeHunter/Base/BaseInstance.h"
 #include "MainMenuWidget.generated.h"
 
 class UWebBrowser;
@@ -25,8 +26,8 @@ public:
 protected:
 	virtual void NativeConstruct() override;
 
-private:
-	FHttpModule* HttpModule;
+public:
+	UBaseInstance* gameinstance = nullptr;
 
 	UPROPERTY()
 		FString LoginUrl;
@@ -34,6 +35,7 @@ private:
 	UPROPERTY()
 		FString ApiUrl;
 
+private:
 	UPROPERTY()
 		FString CallbackUrl;
 

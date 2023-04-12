@@ -36,7 +36,7 @@ void UInventoryComponent::BeginPlay()
 }
 
 // AItemDropActor::Interact_Implementation(AHunter* Hunter) 함수에서 호출
-bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
+// bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
 bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 {
 	int NullNum = -1;

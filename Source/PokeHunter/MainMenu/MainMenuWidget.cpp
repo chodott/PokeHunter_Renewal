@@ -21,7 +21,7 @@ UMainMenuWidget::UMainMenuWidget(const FObjectInitializer& ObjectInitializer) : 
 	ApiUrl = TextReader->ReadFile("Urls/ApiUrl.txt");
 	CallbackUrl = TextReader->ReadFile("Urls/CallbackUrl.txt");
 
-	HttpModule = &FHttpModule::Get();
+	gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
 }
 
 void UMainMenuWidget::NativeConstruct() {
@@ -69,7 +69,7 @@ void UMainMenuWidget::HandleLoginUrlChange()
 					TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
 
 					if (FJsonSerializer::Serialize(RequestObj.ToSharedRef(), Writer)) {
-						TSharedRef<IHttpRequest> ExchangeCodeForTokensRequest = HttpModule->CreateRequest();
+						TSharedRef<IHttpRequest> ExchangeCodeForTokensRequest = gameinstance->HttpModule->CreateRequest();
 						ExchangeCodeForTokensRequest->OnProcessRequestComplete().BindUObject(this, &UMainMenuWidget::OnExchangeCodeForTokensResponseReceived);
 						ExchangeCodeForTokensRequest->SetURL(ApiUrl + "/exchangecodefortokens");
 						ExchangeCodeForTokensRequest->SetVerb("POST");
@@ -89,12 +89,25 @@ void UMainMenuWidget::OnExchangeCodeForTokensResponseReceived(FHttpRequestPtr Re
 		TSharedPtr<FJsonObject> JsonObject;
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
-			if (!JsonObject->HasField("error")) {
+			if (JsonObject->HasField("access_token") && JsonObject->HasField("id_token") && JsonObject->HasField("refresh_token")) {
 				UGameInstance* GameInstance = GetGameInstance();
 				if (GameInstance != nullptr) {
 					UBaseInstance* ServerIntance = Cast<UBaseInstance>(GameInstance);
 					if (ServerIntance != nullptr) {
-						ServerIntance->SetCognitoTokens(JsonObject->GetStringField("access_token"), JsonObject->GetStringField("id_token"), JsonObject->GetStringField("refresh_token"));
+						FString AccessToken = JsonObject->GetStringField("access_token");
+						FString IdToken = JsonObject->GetStringField("id_token");
+						FString RefreshToken = JsonObject->GetStringField("refresh_token");
+						ServerIntance->SetCognitoTokens(AccessToken, IdToken, RefreshToken);
+
+						/*
+						TSharedRef<IHttpRequest> GetPlayerDataRequest = gameinstance->HttpModule->CreateRequest();
+						GetPlayerDataRequest->OnProcessRequestComplete().BindUObject(this, &UMainMenuWidget::OnGetPlayerDataResponseReceived);
+						GetPlayerDataRequest->SetURL(ApiUrl + "/getplayerdata");
+						GetPlayerDataRequest->SetVerb("GET");
+						GetPlayerDataRequest->SetHeader("Content-Type", "application/json");
+						GetPlayerDataRequest->SetHeader("Authorization", AccessToken);
+						GetPlayerDataRequest->ProcessRequest();
+						*/
 					}
 				}
 			}

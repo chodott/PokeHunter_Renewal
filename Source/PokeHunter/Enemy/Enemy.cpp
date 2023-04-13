@@ -327,6 +327,26 @@ void AEnemy::LaunchToTarget()
 	}
 }
 
+void AEnemy::Block()
+{
+	bReflecting = true;
+}
+
+void AEnemy::Reflect()
+{
+	//반격 시 변수 초기화
+	FVector ExplosionLocation = GetActorLocation();
+	float DamageRadius = 500.f;
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(this);
+	UGameplayStatics::ApplyRadialDamage(GetWorld(), ReflectDamgeAmount, ExplosionLocation, DamageRadius, UDamageType::StaticClass(), IgnoreActors, GetController(), false);
+
+	UE_LOG(LogTemp, Warning, TEXT("%f"), ReflectDamgeAmount);
+
+	bReflecting = false;
+	ReflectDamgeAmount = 0.f;
+}
+
 void AEnemy::Die()
 {
 	SpawnItem();

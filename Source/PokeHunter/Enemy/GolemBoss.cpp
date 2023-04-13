@@ -179,11 +179,10 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 {
 	APawn::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-
-
 	FVector HitLoc;
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
-	{
+	{	//Point Damage 처리
+
 		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
 		HitLoc = PointDamageEvent.HitInfo.Location;
 		UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(PointDamageEvent.HitInfo.GetComponent());
@@ -196,8 +195,14 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	}
 	else
 	{
+		//일반 데미지 처리
 		HP -= DamageAmount;
 		HitLoc = GetActorLocation();
+	}
+
+	if (bReflecting)
+	{	//반격 패턴 데미지 저장
+		ReflectDamgeAmount += DamageAmount;
 	}
 
 	OnDamage.Broadcast(DamageAmount, HitLoc);
@@ -273,6 +278,10 @@ void AGolemBoss::Attack(int AttackPattern)
 
 	case 3:
 		ServerPlayMontage(this, FName("Attack_Bind"));
+		break;
+	case 4:
+		ServerPlayMontage(this, FName("Block"));
+		Block();
 		break;
 	}
 }

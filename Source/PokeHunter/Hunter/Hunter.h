@@ -262,6 +262,7 @@ public:
 	//Partner
 	UFUNCTION(BlueprintCallable)
 	void SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum);
+	UFUNCTION(BlueprintCallable)
 	void SetPartnerTarget(AActor* setTarget);
 	void SetPartner(class APartner* SelectedPartner) { Partner = SelectedPartner; };
 

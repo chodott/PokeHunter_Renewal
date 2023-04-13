@@ -42,8 +42,11 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if (OtherActor->Implements<UItemInteractInterface>())
 	{
+		//아이템 효과를 받는 액터와 충돌
 		ApplyAbillity(OtherActor, OtherComponent);
+		return;
 	}
+	//아이템 효과를 받지 않는 액터와 충돌
 	OnHitNotEnemy(Hit.Location);
 }
 

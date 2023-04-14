@@ -11,6 +11,8 @@ UPartyServerManager::UPartyServerManager()
 bool UPartyServerManager::GetPartyList()
 {
 	if (nullptr == gameinstance->gSocket) return false;
+	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
+	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;
 
 	int32 bSize = 0;
 

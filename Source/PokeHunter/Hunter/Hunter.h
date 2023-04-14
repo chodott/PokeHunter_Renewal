@@ -34,7 +34,7 @@ struct FHunterInfo
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
-	int HunterNum;
+		int32 HunterNum {};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
 	float HunterHP{100};
@@ -43,7 +43,7 @@ public:
 	float HunterStamina{ 100 };
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, category = "Status")
-	bool bCanCombat;
+	bool bCanCombat = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Partner Skill")
 	TArray<ESkillID> PartnerSkillArray;

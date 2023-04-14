@@ -18,11 +18,11 @@
 	],
 	"Plugins": [
 		{
-			"Name": "GameLiftServerSDK",
+			"Name": "WebBrowserWidget",
 			"Enabled": true
 		},
 		{
-			"Name": "WebBrowserWidget",
+			"Name": "GameLiftServerSDK",
 			"Enabled": true
 		}
 	]

@@ -10,7 +10,7 @@ public class PokeHunter : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "AIModule", "GameplayTasks", "NavigationSystem", "Niagara",
                                                             "HeadMountedDisplay",
-                                                            "GameLiftServerSDK", "UMG", "SlateCore", "Http", "Json", "JsonUtilities", "WebBrowserWidget", "Slate",
+                                                            "GameLiftServerSDK", "UMG", "SlateCore", "HTTP", "Json", "JsonUtilities", "WebBrowserWidget", "Slate",
                                                             "Networking", "Sockets"});
 
         bEnableUndefinedIdentifierWarnings = false;

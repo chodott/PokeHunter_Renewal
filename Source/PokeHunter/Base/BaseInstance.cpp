@@ -42,6 +42,8 @@ bool UBaseInstance::ConnectToServer(FString server_addr)
 bool UBaseInstance::SendAccessToken()
 {
 	if (NULL == gSocket) return false;
+	if (ESocketConnectionState::SCS_NotConnected == gSocket->GetConnectionState()) return false;
+	if (ESocketConnectionState::SCS_ConnectionError == gSocket->GetConnectionState()) return false;
 
 	bool retVal = false;
 	int32 bSize = 0;
@@ -53,7 +55,7 @@ bool UBaseInstance::SendAccessToken()
 
 	for (int i = 0; i < 2000; i += 100) {
 		if (last_index < i) {
-			strcpy(token_pack.Token, "theEnd");
+			strncpy_s(token_pack.Token, "theEnd", strlen("theEnd"));
 			retVal = gSocket->Send(reinterpret_cast<const uint8*>(&token_pack), token_pack.size, bSize);
 			break;
 		}

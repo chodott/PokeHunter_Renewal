@@ -12,6 +12,8 @@ UInventoryServerManager::UInventoryServerManager()
 bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer)
 {
 	if (nullptr == gameinstance->gSocket) return false;
+	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
+	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;
 
 	int32 bSize{};
 	CS_QUEST_INVENTORY_PACK quest_item;
@@ -20,7 +22,9 @@ bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer)
 	gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&quest_item), quest_item.size, bSize);
 
 	AHunter* hunter = Cast<AHunter>(myPlayer);
-	hunter->Inventory->InfoArray.Empty();
+	if (false == hunter->Inventory->InfoArray.IsEmpty()) {
+		hunter->Inventory->InfoArray.Empty();
+	}
 
 	SC_ITEM_INFO_PACK item_info{};
 	for (int i = 0; ; ++i) {
@@ -39,7 +43,10 @@ bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer)
 }
 
 bool UInventoryServerManager::SaveInventoryDB()
-{ 
+{
+	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
+	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;
+
 	CS_SAVE_INVENTORY_PACK save_pack;
 	save_pack.size = sizeof(CS_SAVE_INVENTORY_PACK);
 	save_pack.type = CS_SAVE_INVENTORY;

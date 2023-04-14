@@ -25,10 +25,10 @@ public:
 	TArray<FName> OfferingItemID;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-	UTexture2D* Icon;
+	UTexture2D* Icon = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-	int ItemAmount;
+		int32 ItemAmount {};
 };
 
 /////////////

@@ -89,6 +89,8 @@ bool UPartyInfoUI::SendClientState()	// Send this client State
 {
 	if (nullptr == gameinstance)				return false;
 	if (0 == gameinstance->PartyListMap.Num())	return false;
+	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
+	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;
 
 	bool retVal = false;
 	int32 bSize;
@@ -105,6 +107,8 @@ bool UPartyInfoUI::SendClientState()	// Send this client State
 bool UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 {
 	if (nullptr == gameinstance)				return false;
+	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
+	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;
 	if (0 == gameinstance->PartyListMap.Num())	return false;
 	if (-1 == SelctPartyNumber)					return false;
 
@@ -150,6 +154,8 @@ bool UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 bool UPartyInfoUI::RecvClientJoin()	// [Tick으로 Call!!!] Client에서 AWS GameLift로 접속하라는 신호를 여기로 받음
 {
 	if (nullptr == gameinstance)	return false;
+	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
+	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;
 	if (-1 == SelctPartyNumber)		return false;
 	bool retVal = false;
 	int32 bSize;

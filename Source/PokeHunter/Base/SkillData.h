@@ -43,7 +43,7 @@ public:
 	FText ToolTip {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-	UTexture2D* Icon;
+	UTexture2D* Icon = nullptr;
 };
 
 

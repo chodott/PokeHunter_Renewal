@@ -42,6 +42,7 @@ USTRUCT(BlueprintType)
 struct FU_SC_LOGIN_INFO_PACK {
 	GENERATED_USTRUCT_BODY()
 
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString _name;
 
@@ -57,15 +58,17 @@ struct FU_SC_LOGIN_INFO_PACK {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString _q_skill;
 };
+
 USTRUCT(BlueprintType)
 struct FU_SC_ITEM_INFO_PACK {
 	GENERATED_USTRUCT_BODY()
 
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FName _name;
+		FName _name {};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int cnt;
+		int32 cnt {};
 };
 
 UCLASS()

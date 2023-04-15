@@ -33,6 +33,7 @@ public:
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 	
 	virtual void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos);
+	void ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherComponent);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnHitNotEnemy(const FVector& HitVec);

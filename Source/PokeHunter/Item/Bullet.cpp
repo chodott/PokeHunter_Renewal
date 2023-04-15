@@ -74,6 +74,11 @@ void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 	StaticMesh->AddImpulse(Velocity, FName(""),true);
 }
 
+void ABullet::ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherComponent)
+{
+	Destroy();
+}
+
 void ABullet::OnHitNotEnemy_Implementation(const FVector& HitVec)
 {
 	Destroy();

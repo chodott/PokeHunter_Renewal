@@ -17,7 +17,7 @@ AEnemyProjectile::AEnemyProjectile()
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 
 	SetRootComponent(StaticMesh);
-	StaticMesh->SetCollisionProfileName("WorldDynamic");
+	StaticMesh->SetCollisionProfileName("EnemyProjectile");
 
 	//Movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));

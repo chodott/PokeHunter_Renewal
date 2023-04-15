@@ -163,8 +163,8 @@ void AHunter::Tick(float DeltaTime)
 
 	if (CurState == EPlayerState::Zoom)
 	{
-		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength,ArmLengthTo, DeltaTime, ArmSpeed);
-		CameraBoom->SetRelativeLocation(FVector(0,FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, CameraZoomTo, DeltaTime, ArmSpeed),0));
+		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, ArmLengthTo, DeltaTime, ArmSpeed);
+		CameraBoom->SetRelativeLocation(FVector(0, FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, CameraZoomTo, DeltaTime, ArmSpeed), 0));
 	}
 
 	else
@@ -178,14 +178,14 @@ void AHunter::Tick(float DeltaTime)
 	}
 
 	//Stamina
-		if (GetCharacterMovement()->GetMaxSpeed() > 600.f)
+	if (GetCharacterMovement()->GetMaxSpeed() > 600.f)
+	{
+		if (HunterInfo.HunterStamina > 0) HunterInfo.HunterStamina -= DeltaTime * 1;
+		else
 		{
-			if (HunterInfo.HunterStamina > 0) HunterInfo.HunterStamina -= DeltaTime * 1;
-			else
-			{
-				HunterInfo.HunterStamina = 0;
-				GetCharacterMovement()->MaxWalkSpeed = 600.f;
-			}
+			HunterInfo.HunterStamina = 0;
+			GetCharacterMovement()->MaxWalkSpeed = 600.f;
+		}
 	}
 
 
@@ -228,6 +228,19 @@ void AHunter::Tick(float DeltaTime)
 			bCanShot = true;
 		}
 	}
+
+	//bFalling
+	if (bNoCollision)
+	{
+		float ElapsedTime = GetWorld()->TimeSeconds - StartNoCollisionTime;
+		float TimeLeft = NoCollisionTime - ElapsedTime;
+		if (TimeLeft <= 0.0f)
+		{
+			bNoCollision = false;
+			SetActorEnableCollision(true);
+		}
+	}
+
 }
 
 void AHunter::PostInitializeComponents()
@@ -776,15 +789,17 @@ void AHunter::InteractEarthquake_Implementation()
 	LaunchCharacter(FVector(0, 0, 1000), false, false);
 }
 
-void AHunter::InteractAttack_Implementation(FVector HitLoc)
+void AHunter::InteractAttack_Implementation(FVector HitDirection)
 {
-	FVector CurLoc = GetActorLocation();
+	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
 
-	FVector DirectionVec = CurLoc - HitLoc;
-	if (DirectionVec.Z < 0.f) DirectionVec.Z *= -1;
-	DirectionVec.Normalize();
+	LaunchCharacter(HitDirection * 1000.f,false,false);
+}
 
-	LaunchCharacter(DirectionVec * 1000.f,false,false);
+void AHunter::InteractGrabAttack_Implementation()
+{
+	bNoCollision = true;
+	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 }
 
 void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)

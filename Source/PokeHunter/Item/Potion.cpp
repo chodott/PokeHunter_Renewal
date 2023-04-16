@@ -9,7 +9,7 @@ APotion::APotion()
 	ItemType = EItemType::Potion;
 }
 
-void APotion::UseItem(APawn* ItemOwner)
+void APotion::UseItem_Implementation(APawn* ItemOwner)
 {
 	AHunter* Hunter = Cast<AHunter>(ItemOwner);
 	if (Hunter) Hunter->HunterInfo.HunterHP += HealAmount;

@@ -62,8 +62,12 @@ void UHunterAnimInstance::PlayCombatMontage(FName Section)
 {	
 	float PlayRate = 1.0f;
 	float MaxSpeed = 800.f;
-	if (Section == FName("Dive")) PlayRate += MovementSpeed / MaxSpeed;
-	Montage_Play(CombatMontage,PlayRate);
+	if (Section == FName("Dive"))
+	{
+		PlayRate += MovementSpeed / MaxSpeed;
+		Hunter->SetDiveCurveTime(PlayRate);
+	}
+		Montage_Play(CombatMontage,PlayRate);
 	Montage_JumpToSection(Section, CombatMontage);
 }
 

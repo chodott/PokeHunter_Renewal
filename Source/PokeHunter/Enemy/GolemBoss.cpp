@@ -236,7 +236,7 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 		{
 			FVector HitDirection = OtherActor->GetActorLocation() - OverlappedComp->GetComponentLocation();
 			HitDirection.Normalize();
-			EnemyInteractInterface->Execute_InteractAttack(OtherActor, HitDirection);
+			EnemyInteractInterface->Execute_InteractAttack(OtherActor, HitDirection, OverlapHitBox->Damage);
 		}
 
 		UGameplayStatics::ApplyPointDamage(OtherActor, OverlapHitBox->Damage, SweepResult.Normal, SweepResult, GetController(), this, UDamageType::StaticClass());

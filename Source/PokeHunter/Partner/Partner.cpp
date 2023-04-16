@@ -79,8 +79,43 @@ void APartner::Attack()
 		//PartnerAnim->PlayCombatMontage(TEXT("Attack"));
 	}
 
-
 	
+	
+}
+
+void APartner::SlashAttack()
+{
+	if (Target)
+	{
+		FVector TargetLocation = Target->GetActorLocation();
+		FVector Offset = GetActorLocation() - TargetLocation;
+		FVector DirectionVec = Offset;
+		DirectionVec.Normalize();
+
+		float SafeDistance = GetCapsuleComponent()->GetScaledCapsuleRadius() + Target->GetCapsuleComponent()->GetScaledCapsuleRadius();
+
+		FVector StartLocation = GetActorLocation();
+		FVector EndLocation = TargetLocation + DirectionVec * SafeDistance;
+		FVector DesiredMovement = Offset + DirectionVec * SafeDistance;
+
+		FHitResult HitResult;
+		bool bHit = GetCapsuleComponent()->MoveComponent(DesiredMovement, GetActorRotation().Quaternion(), true, &HitResult);
+
+		if (bHit)
+		{
+			bHit = GetWorld()->LineTraceSingleByChannel(HitResult, EndLocation + FVector(0, 0, 100), EndLocation + FVector(0, 0, -100), ECollisionChannel::ECC_Pawn);
+			FVector NewLocation = HitResult.Location + FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+			if (bHit) SetActorLocation(NewLocation);
+			else SetActorLocation(StartLocation);
+			//실패 구현 필요
+		}
+
+		else
+		{
+			SetActorLocation(EndLocation);
+		}
+		ServerPlayMontage(FName("Attack"));
+	}
 }
 
 void APartner::Howling()
@@ -119,6 +154,9 @@ void APartner::UseNormalSkill(ESkillID SkillID)
 		CurState = EPartnerState::Howling;
 
 		break;
+
+	case ESkillID:: Slash:
+		CurState = EPartnerState::SlashAttack;
 
 	default:
 		break;

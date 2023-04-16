@@ -79,9 +79,14 @@ public:
 	FGenericTeamId TeamID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float AttackRange = 200.f;
+	float AttackRange = 200.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float EarthquakeRange = 1000.f;
+	float EarthquakeRange = 1000.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float ReflectDamgeAmount{ 0.f};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bReflecting{ false };
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		float StartBindingTime;
@@ -92,21 +97,23 @@ public:
 
 	//상태 이상
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		bool bPoisoned{ false };
+	bool bPoisoned{ false };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		float PoisonedTime{};
+	float PoisonedTime{};
 	float StartPoisonedTime;
 	int PoisonSaveTime{};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		bool bBurning{ false };
+	bool bBurning{ false };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		float BurningTime{};
+	float BurningTime{};
 	float StartBurningTime;
 	int BurningSaveTime{};
 
+
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		bool bDied{ false };
+	bool bDied{ false };
 
 protected:
 	// Called when the game starts or when spawned
@@ -167,6 +174,10 @@ public:
 	virtual void JumpAttack();
 	UFUNCTION(BlueprintCallable)
 	virtual void LaunchToTarget();
+	UFUNCTION(BlueprintCallable)
+	virtual void Block();
+	UFUNCTION(BlueprintCallable)
+	virtual void Reflect();
 	UFUNCTION(BlueprintCallable)
 	virtual void Die();
 	UFUNCTION(BlueprintCallable)

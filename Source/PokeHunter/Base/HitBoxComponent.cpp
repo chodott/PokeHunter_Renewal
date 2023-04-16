@@ -9,15 +9,17 @@ UHitBoxComponent::UHitBoxComponent()
 }
 
 
-void UHitBoxComponent::TakeDamage(float DamageAmount)
+bool UHitBoxComponent::TakeDamage(float DamageAmount)
 {
+	if (bDestroyed) return false;
 	PartHP -= DamageAmount;
 	if (PartHP <= 0)
 	{
 		bDestroyed = true;
+		return true;
 	}
 	
-	
+	return false;
 }
 
 bool UHitBoxComponent::CheckBurning(float DeltaTime)
@@ -45,4 +47,8 @@ bool UHitBoxComponent::CheckBurning(float DeltaTime)
 		}
 	}
 
+}
+
+void UHitBoxComponent::OnDestroyPart_Implementation()
+{
 }

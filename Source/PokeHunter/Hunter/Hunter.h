@@ -166,6 +166,12 @@ public:
 	bool bGrabbed;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bBound;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bNoCollision;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float NoCollisionTime{ 0.5f };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battle")
+	float StartNoCollisionTime;
 
 protected:
 	// Sets default values for this character's properties
@@ -262,6 +268,7 @@ public:
 	//Partner
 	UFUNCTION(BlueprintCallable)
 	void SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum);
+	UFUNCTION(BlueprintCallable)
 	void SetPartnerTarget(AActor* setTarget);
 	void SetPartner(class APartner* SelectedPartner) { Partner = SelectedPartner; };
 
@@ -286,6 +293,7 @@ public:
 	//EnemyInterface Function
 	virtual void InteractEarthquake_Implementation();
 	virtual void InteractAttack_Implementation(FVector HitLoc);
+	virtual void InteractGrabAttack_Implementation();
 	
 private:
 	// Character Movement Input

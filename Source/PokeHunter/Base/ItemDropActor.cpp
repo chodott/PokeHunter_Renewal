@@ -8,6 +8,41 @@
 AItemDropActor::AItemDropActor()
 {
 	InteractionSphere->SetSphereRadius(80.f);
+	PrimaryActorTick.bCanEverTick = true;
+}
+
+void AItemDropActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (bInteracting)
+	{
+		FVector CurPointVec = CalculatePoint(DeltaTime);
+		SetActorLocation(CurPointVec);
+
+		if (RunningTime >= TotalTime)
+		{
+			DropCnt = FMath::RandRange(1, 5);
+			for (int i = 0; i < DropCnt; ++i)
+			{
+				int RandIndex = FMath::RandRange(0, DropItemArray.Num() - 1);
+				DropItemArray[RandIndex].cnt += 1;
+			}
+
+			for (int i = 0; i < DropItemArray.Num() - 1; ++i)
+			{
+				bool bAddSuccess = Master->Inventory->AddItemData(DropItemArray[i]);
+				if (!bAddSuccess)
+				{
+					return;
+				}
+
+			}
+			//획득 처리 모션 추가 필요
+			this->Destroy();
+			return;
+		}
+	}
 }
 
 void AItemDropActor::BeginPlay()
@@ -34,9 +69,30 @@ void AItemDropActor::CreateItemArray(TArray<FName>& ItemArray)
 	
 }
 
+FVector AItemDropActor::CalculatePoint(float DeltaTimes)
+{
+	FVector EndPointVec = Master->GetActorLocation();
+
+	float RemainTime = TotalTime - RunningTime;
+
+	FVector CurPointVec = RemainTime * RemainTime * StartPointVec + 2 * RemainTime * RunningTime * TurningPointVec + RunningTime * RunningTime * EndPointVec;
+
+	RunningTime += DeltaTimes;
+
+	return CurPointVec;
+}
+
 void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 {
 	Master = Hunter;
+
+	StartPointVec = GetActorLocation();
+	TurningPointVec = Master->GetActorLocation() + FVector(0,100,50);
+
+	bInteracting = true;
+	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetActorTickEnabled(true);
+	
 
 	//DropCnt =  FMath::RandRange(0, 100);
 
@@ -67,23 +123,5 @@ void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 	//	}
 	//}
 
-	DropCnt = FMath::RandRange(1, 5);
-	for (int i = 0; i < DropCnt; ++i)
-	{
-		int RandIndex = FMath::RandRange(0, DropItemArray.Num() - 1);
-		DropItemArray[RandIndex].cnt += 1;
-	}
-
-	for (int i = 0; i < DropItemArray.Num() - 1; ++i)
-	{
-		bool bAddSuccess = Master->Inventory->AddItemData(DropItemArray[i]);
-		if (!bAddSuccess)
-		{
-			return;
-		}
-		
-	}
-	//획득 처리 모션 추가 필요
-	this->Destroy();
-	return;
+	
 }

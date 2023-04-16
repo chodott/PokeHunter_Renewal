@@ -38,14 +38,18 @@ void ABullet::BeginPlay()
 
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-
+	
 	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if (OtherActor->Implements<UItemInteractInterface>())
 	{
+		//아이템 효과를 받는 액터와 충돌
 		ApplyAbillity(OtherActor, OtherComponent);
+		return;
 	}
-
+	//아이템 효과를 받지 않는 액터와 충돌
+	OnHitNotEnemy(Hit.Location);
 }
+
 
 void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 {
@@ -68,6 +72,16 @@ void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 	UGameplayStatics::PredictProjectilePath(this, predictParams, result);*/
 	ProjectileMovement->UpdateComponentVelocity();
 	StaticMesh->AddImpulse(Velocity, FName(""),true);
+}
+
+void ABullet::ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherComponent)
+{
+	Destroy();
+}
+
+void ABullet::OnHitNotEnemy_Implementation(const FVector& HitVec)
+{
+	Destroy();
 }
 
 

@@ -50,6 +50,7 @@ public:
 	FVector LookTargetVec;
 	FVector AttackPoint;
 	AActor* Target;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
 	float HP{ 100.f};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")

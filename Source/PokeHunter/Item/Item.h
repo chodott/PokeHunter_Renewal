@@ -42,7 +42,9 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-	virtual void UseItem(APawn* ItemOwner);
+	UFUNCTION(BlueprintNativeEvent)
+	void UseItem(APawn* ItemOwner);
+	virtual void UseItem_Implementation(APawn* ItemOwner);
 	virtual void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherComponent);

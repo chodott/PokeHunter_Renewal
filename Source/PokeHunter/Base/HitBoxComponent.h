@@ -37,7 +37,10 @@ public:
 
 public:
 	UHitBoxComponent();
-	void TakeDamage(float DamageAmount);
+	bool TakeDamage(float DamageAmount);
 	bool CheckBurning(float DeltaTime);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnDestroyPart();
 
 };

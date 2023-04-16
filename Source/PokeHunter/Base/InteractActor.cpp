@@ -41,7 +41,6 @@ void AInteractActor::BeginPlay()
 void AInteractActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AInteractActor::Interact_Implementation(AHunter* Hunter)

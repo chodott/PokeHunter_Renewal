@@ -17,9 +17,11 @@ class POKEHUNTER_API AGolemBoss : public AEnemy
 
 public:
 	AGolemBoss();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-	TArray<class UHitBoxComponent*> PartHitBox;
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	TArray<class UHitBoxComponent*> PartHitBox;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* HeadHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* BodyHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* LeftArmHitBox;
@@ -28,7 +30,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* RightArmHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-	class UHitBoxComponent* RightLegHitBox;*/
+	class UHitBoxComponent* RightLegHitBox;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class ACharacter* GrabbedTarget;
@@ -52,6 +54,8 @@ public:
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep = true, const FHitResult& SweepResult = FHitResult(1.f));
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION(BlueprintNativeEvent)
+	void DestroyPart(FName PartName);
 
 	//BTTask
 

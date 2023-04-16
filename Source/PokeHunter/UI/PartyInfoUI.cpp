@@ -55,7 +55,9 @@ void UPartyInfoUI::NativeConstruct()
 		GetPlayerDataRequest->OnProcessRequestComplete().BindUObject(this, &UPartyInfoUI::OnGetPlayerDataResponseReceived);
 		GetPlayerDataRequest->SetURL(PokeHunterGameInstance->ApiUrl + "/getplayerdata");
 		GetPlayerDataRequest->SetVerb("GET");
-		GetPlayerDataRequest->SetHeader("Content-Type", "application/json");
+		
+		// GetPlayerDataRequest->SetHeader("Content-Type", "application/json");
+		
 		GetPlayerDataRequest->SetHeader("Authorization", AccessToken);
 		GetPlayerDataRequest->ProcessRequest();
 	}
@@ -282,6 +284,8 @@ void UPartyInfoUI::OnJoinButtonClicked()
 
 void UPartyInfoUI::PollMatchmaking()
 {
+	UE_LOG(LogTemp, Warning, TEXT("PollMatchmaking Function"));
+
 	FString AccessToken;
 	FString MatchmakingTicketId;
 	UGameInstance* GameInstance = GetGameInstance();
@@ -290,8 +294,10 @@ void UPartyInfoUI::PollMatchmaking()
 	if (GameInstance != nullptr) {
 		PokeHunterGameInstance = Cast<UBaseInstance>(GameInstance);
 		if (PokeHunterGameInstance != nullptr) {
+
 			// AccessToken = PokeHunterGameInstance->AccessToken;
 			AccessToken = PokeHunterGameInstance->IdToken;
+
 			MatchmakingTicketId = PokeHunterGameInstance->JoinTicketId;
 		}
 	}
@@ -344,9 +350,7 @@ void UPartyInfoUI::OnStartMatchmakingResponseReceived(FHttpRequestPtr Request, F
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
 			if (JsonObject->HasField("ticketId")) {
-			// if (JsonObject->HasField("ticket")) { // Test If
 				FString MatchmakingTicketId = JsonObject->GetStringField("ticketId");
-				// FString MatchmakingTicketId = JsonObject->GetStringField("ticket");
 
 				UGameInstance* GameInstance = GetGameInstance();
 				if (GameInstance != nullptr) {
@@ -354,7 +358,7 @@ void UPartyInfoUI::OnStartMatchmakingResponseReceived(FHttpRequestPtr Request, F
 					if (GameLiftTutorialGameInstance != nullptr) {
 						GameLiftTutorialGameInstance->JoinTicketId = MatchmakingTicketId;
 
-						GetWorld()->GetTimerManager().SetTimer(PollMatchmakingHandle, this, &UPartyInfoUI::PollMatchmaking, 1.0f, true, 1.0f);
+						GetWorld()->GetTimerManager().SetTimer(PollMatchmakingHandle, this, &UPartyInfoUI::PollMatchmaking, 1.0f, true);
 						SearchingForGame = true;
 
 						UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
@@ -396,7 +400,6 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 				FString TicketType = Ticket->GetObjectField("Type")->GetStringField("S");
 
 				if (TicketType.Len() > 0) {
-					GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
 					
 					// SearchingForGame = false;
 
@@ -413,6 +416,7 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 					if (TicketType.Equals("MatchmakingSucceeded")) {
 						
 						// MatchmakingSucceeded 일 경우에만 실행
+						GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
 						SearchingForGame = false;
 						
 						JoinButton->SetIsEnabled(false);
@@ -429,7 +433,7 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 
 						FString LevelName = IpAddress + ":" + Port;
 						const FString& Options = "?PlayerSessionId=" + PlayerSessionId + "?PlayerId=" + PlayerId;
-						//UE_LOG(LogTemp, Warning, TEXT("options: %s"), *Options);
+						UE_LOG(LogTemp, Warning, TEXT("options: %s"), *Options);
 
 						UGameplayStatics::OpenLevel(GetWorld(), FName(*LevelName), false, Options);
 					}

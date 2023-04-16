@@ -64,7 +64,7 @@ class ABasePokeHunterGameMode : public AGameModeBase
 	GENERATED_BODY()
 	
 public:
-	ABasePokeHunterGameMode();
+	ABasePokeHunterGameMode(); 
 
 protected:
 	virtual void BeginPlay() override;
@@ -81,4 +81,5 @@ private:
 
 	UPROPERTY()
 		FHealthCheckState HealthCheckState;
+
 };

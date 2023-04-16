@@ -17,8 +17,6 @@ UBaseInstance::UBaseInstance()
 void UBaseInstance::Init()
 {
 	Super::Init();
-
-	// GetWorld()->GetTimerManager().SetTimer(GetResponseTimeHandle, this, &UBaseInstance::GetResponseTime, 1.0f, true, 1.0f);
 }
 
 bool UBaseInstance::ConnectToServer(FString server_addr)
@@ -49,7 +47,7 @@ bool UBaseInstance::SendAccessToken()
 	int32 bSize = 0;
 	CS_LOGIN_PACK token_pack;
 	token_pack.size = (char)sizeof(CS_LOGIN_PACK);
-	token_pack.type = CS_AWS_TOKEN;
+	token_pack.type = CS_LOGIN;
 
 	short last_index = AccessToken.Len();
 
@@ -79,19 +77,6 @@ bool UBaseInstance::SendAccessToken()
 			UE_LOG(LogTemp, Warning, TEXT("Token Send Success"));
 		}
 	}
-
-	/*WideCharToMultiByte(CP_ACP, 0, *IdToken.Mid(100, 200), IdToken.Mid(100, 200).Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
-	retVal = false;
-	retVal = gSocket->Send(reinterpret_cast<const uint8*>(&token_pack), token_pack.size, bSize);
-	if (false == retVal) {
-		UE_LOG(LogTemp, Warning, TEXT("Token Send Fail"));
-		int32 ErrorCode = GetLastError();
-		UE_LOG(LogTemp, Error, TEXT("Socket error: %d"), ErrorCode);
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Token Send Success"));
-	}*/
-
 	return true;
 }
 

@@ -26,7 +26,13 @@ void UEnemyAnimInstance::UpdateAnimationProperties()
 		MovementSpeed = XYspeed.Size();
 		bJumping = Enemy->IsJumping();
 
-		Direction = CalculateDirection(Speed, Enemy->GetActorRotation());
+		XYspeed.Normalize();
+		Direction = FMath::Atan2(Speed.Y, Speed.X) * 180.f / PI;
+
+		//Target Loc
+		AActor* Target = Enemy->Target;
+		if (Target) TargetLoc = Target->GetActorLocation();
+
 	}
 }
 

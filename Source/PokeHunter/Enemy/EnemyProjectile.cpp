@@ -48,6 +48,8 @@ void AEnemyProjectile::Tick(float DeltaTime)
 void AEnemyProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+
+	Destroy();
 }
 
 void AEnemyProjectile::FireInDirection(FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos)

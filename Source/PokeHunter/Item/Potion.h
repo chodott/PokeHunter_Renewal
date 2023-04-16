@@ -24,5 +24,5 @@ public:
 
 public:
 
-	virtual void UseItem(APawn* ItemOwner);
+	void UseItem_Implementation(APawn* ItemOwner)override;
 };

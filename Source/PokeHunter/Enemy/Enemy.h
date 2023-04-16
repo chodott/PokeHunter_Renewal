@@ -193,6 +193,11 @@ public:
 	virtual void InteractFire_Implementation(UPrimitiveComponent* HitComponent);
 	virtual void InteractBindTrap_Implementation();
 
+	//EnemyInterface
+	virtual void InteractEarthquake_Implementation();
+	virtual void InteractAttack_Implementation(FVector HitDirection, float Damage);
+	virtual void InteractGrabAttack_Implementation();
+
 public:
 	bool bFirstMeet{ true };
 };

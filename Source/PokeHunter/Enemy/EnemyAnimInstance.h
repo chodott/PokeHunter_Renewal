@@ -32,6 +32,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
 	bool bJumping;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
+	FVector TargetLoc;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")
 	class AEnemy* Enemy;
 

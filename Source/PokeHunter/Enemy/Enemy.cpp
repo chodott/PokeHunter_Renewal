@@ -187,12 +187,12 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			EnemyAnim->PlayCombatMontage(FName("Hit"), true);
 			if (Target == NULL)
 			{
-				if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
-				{
-					Hunter->SetPartnerTarget(this);
-				}
 				Target = HitItem->ThisOwner;
 				CurState = EEnemyState::Hit;
+			}
+			if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
+			{
+				Hunter->SetPartnerTarget(this);
 			}
 		}
 	}
@@ -386,4 +386,23 @@ void AEnemy::InteractBindTrap_Implementation()
 {
 	bBinding = true;
 	StartBindingTime = GetWorld()->TimeSeconds;
+}
+
+void AEnemy::InteractEarthquake_Implementation()
+{
+}
+
+void AEnemy::InteractAttack_Implementation(FVector HitDirection, float Damage)
+{
+	if (Damage <= 0.f)
+	{
+		return;
+	}
+	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
+
+	LaunchCharacter(HitDirection * 1000.f, false, false);
+}
+
+void AEnemy::InteractGrabAttack_Implementation()
+{
 }

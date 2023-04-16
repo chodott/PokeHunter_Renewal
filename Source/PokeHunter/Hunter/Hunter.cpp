@@ -385,17 +385,21 @@ void AHunter::SpaceDown()
 {
 	if(CurState == EPlayerState::Idle)
 	{
-		CurState = EPlayerState::Dive;
-		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-		ServerPlayMontage(this, FName("Dive"));
 		FVector Speed = GetVelocity();
 		FVector XYspeed = FVector(Speed.X, Speed.Y, 0.f);
-		LastInput = GetCharacterMovement()->GetLastInputVector();
-		if (XYspeed.Size() <= 300.f) LastSpeed = 300.0f;
-		else 
+		if (XYspeed.Size() <= 0.f) return;
+		else if (XYspeed.Size() <= 300.f) LastSpeed = 300.0f;
+		else
 		{
 			LastSpeed = XYspeed.Size();
 		}
+
+		CurState = EPlayerState::Dive;
+		LastInput = GetCharacterMovement()->GetLastInputVector();
+
+		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
+		ServerPlayMontage(this, FName("Dive"));
+	
 		ServerStartInvincibility();
 		DiveTimeline.PlayFromStart();
 	}
@@ -522,6 +526,11 @@ void AHunter::LMBDown()
 				AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(),FRotator::ZeroRotator);
 				switch (Item->ItemType)
 				{
+				case EItemType::Bullet:
+					Item->Destroy();
+					return;
+					break;
+
 				case EItemType::Potion:
 					ServerPlayMontage(this, FName("Drink"));
 					Item->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
@@ -713,6 +722,7 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (CurState == EPlayerState::Dive) 
 	{
+		bInvincible = false;
 		CurState = EPlayerState::Idle;
 	}
 	else if (CurState == EPlayerState::Install)
@@ -773,6 +783,11 @@ void AHunter::DiveInterpReturn(float Value)
 	AddMovementInput(LastInput, 1.0f);
 }
 
+void AHunter::SetDiveCurveTime(float length)
+{
+	DiveTimeline.SetPlayRate(length);
+}
+
 void AHunter::InteractHealArea_Implementation()
 {
 	HealPerSecondAmount += 10.f;
@@ -789,8 +804,12 @@ void AHunter::InteractEarthquake_Implementation()
 	LaunchCharacter(FVector(0, 0, 1000), false, false);
 }
 
-void AHunter::InteractAttack_Implementation(FVector HitDirection)
+void AHunter::InteractAttack_Implementation(FVector HitDirection, float Damage)
 {
+	if (Damage <= 0.f)
+	{
+		return;
+	}
 	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
 
 	LaunchCharacter(HitDirection * 1000.f,false,false);
@@ -810,7 +829,7 @@ void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)
 	}
 }
 
-void AHunter::SetPartnerTarget(AActor* setTarget)
+void AHunter::SetPartnerTarget(ACharacter* setTarget)
 {
 	if (Partner != NULL)
 	{

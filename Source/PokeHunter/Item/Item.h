@@ -34,7 +34,7 @@ public:
 	class UStaticMeshComponent* StaticMesh;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Type")
-	EItemType ItemType;
+	EItemType ItemType; 
 
 protected:
 	// Called when the game starts or when spawned

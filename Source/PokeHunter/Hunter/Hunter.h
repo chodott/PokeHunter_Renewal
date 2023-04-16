@@ -269,7 +269,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum);
 	UFUNCTION(BlueprintCallable)
-	void SetPartnerTarget(AActor* setTarget);
+	void SetPartnerTarget(ACharacter* setTarget);
 	void SetPartner(class APartner* SelectedPartner) { Partner = SelectedPartner; };
 
 	//Collision Function
@@ -285,6 +285,7 @@ public:
 	//Timeline Function
 	UFUNCTION()
 	void DiveInterpReturn(float Value);
+	void SetDiveCurveTime(float length);
 
 	//ItemInterface Function
 	virtual void InteractHealArea_Implementation();
@@ -292,7 +293,7 @@ public:
 
 	//EnemyInterface Function
 	virtual void InteractEarthquake_Implementation();
-	virtual void InteractAttack_Implementation(FVector HitLoc);
+	virtual void InteractAttack_Implementation(FVector HitDirection, float Damage);
 	virtual void InteractGrabAttack_Implementation();
 	
 private:

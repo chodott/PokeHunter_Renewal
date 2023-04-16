@@ -22,9 +22,17 @@ enum class EPartnerState : uint8
 
 	//Leave State
 	Rushing,
+	SlashAttack,
 	Howling,
 	IceShard,
 	MakingStorm
+};
+
+UENUM(BlueprintType)
+enum class EPartnerType : uint8
+{
+	WolfPartner,
+	GolemPartner
 };
 
 UCLASS()
@@ -32,46 +40,51 @@ class POKEHUNTER_API APartner : public ACharacter, public IGenericTeamAgentInter
 {
 	GENERATED_BODY()
 
+private:
+	UPROPERTY(EditDefaultsOnly)
+	EPartnerType Type;
+
 public:
 	// Sets default values for this character's properties
 	APartner();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
-	class AHunter* Hunter;
+		class AHunter* Hunter;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UPartnerAnimInstance* PartnerAnim;
+		class UPartnerAnimInstance* PartnerAnim;
 
 	FOnMontageEndDelegate OnMontageEnd;
 
 	EPartnerState CurState;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FVector TargetPos;
 	FVector LookTargetVec;
 	FVector AttackPoint;
-	AActor* Target;
+	ACharacter* Target;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
-	float HP{ 100.f};
+		float HP{ 100.f };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
-	float HealPerSecondAmount{1.f};
+		float HealPerSecondAmount{ 1.f };
 	bool bPosing;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool bOrdered;
+		bool bOrdered;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool bUsingSkill;
+		bool bUsingSkill;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
-	bool bGrabbed;
+		bool bGrabbed;
 
 	//TeamID
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
-	FGenericTeamId TeamID;
+		FGenericTeamId TeamID;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -81,18 +94,21 @@ public:
 
 	//Animation
 	UFUNCTION(Server, Reliable)
-	void ServerPlayMontage(FName Section);
+		void ServerPlayMontage(FName Section);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiPlayMontage(FName Section);
-	
+		void MultiPlayMontage(FName Section);
+
+	UFUNCTION(BlueprintCallable)
+	inline EPartnerType GetType() { return Type; }
 
 	UFUNCTION()
 	virtual void Attack();
+	virtual void SlashAttack();
 	virtual void Howling();
 	virtual void StopSkill();
 	virtual void UseNormalSkill(ESkillID SkillID);
 	virtual void UseSpecialSkill(ESkillID SkillID);
-	inline void SetTarget(AActor* setTarget) { Target = setTarget;  };
+	inline void SetTarget(ACharacter* setTarget) { Target = setTarget;  };
 
 	void FollowHunter(class AHunter* Hunter);
 

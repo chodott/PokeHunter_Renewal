@@ -100,7 +100,6 @@ void UBaseInstance::Shutdown()
 {
 	GetWorld()->GetTimerManager().ClearTimer(RetrieveNewTokensHandle);
 	GetWorld()->GetTimerManager().ClearTimer(GetResponseTimeHandle);
-	// Super::Shutdown();
 
 	if (AccessToken.Len() > 0) {
 		TSharedRef<IHttpRequest> InvalidateTokensRequest = HttpModule->CreateRequest();

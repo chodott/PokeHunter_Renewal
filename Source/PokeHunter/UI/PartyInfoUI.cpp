@@ -38,43 +38,42 @@ void UPartyInfoUI::NativeConstruct()
 
 	FString AccessToken;
 	UGameInstance* GameInstance = GetGameInstance();
+	UBaseInstance* PokeHunterGameInstance = nullptr;
 	if (GameInstance != nullptr) {
-		UBaseInstance* PokeHunterGameInstance = Cast<UBaseInstance>(GameInstance);
+		PokeHunterGameInstance = Cast<UBaseInstance>(GameInstance);
 		if (PokeHunterGameInstance != nullptr) {
 			AccessToken = PokeHunterGameInstance->AccessToken;
 
 			// Id Access이 아닌 Access Token이 사용된다.
 			// AccessToken = PokeHunterGameInstance->IdToken;
+		}
+	}
 
-			// AccessToken 이 유효한 경우
-			if (AccessToken.Len() > 0) {
-				// HttpModule Empty
-
-				TSharedRef<IHttpRequest> GetPlayerDataRequest = gameinstance->HttpModule->CreateRequest();
-				GetPlayerDataRequest->OnProcessRequestComplete().BindUObject(this, &UPartyInfoUI::OnGetPlayerDataResponseReceived);
-				GetPlayerDataRequest->SetURL(PokeHunterGameInstance->ApiUrl + "/getplayerdata");
-				GetPlayerDataRequest->SetVerb("GET");
-				// GetPlayerDataRequest->SetHeader("Content-Type", "application/json");
-				GetPlayerDataRequest->SetHeader("Authorization", AccessToken);
-				GetPlayerDataRequest->ProcessRequest();
-			}
-			else {
-				/*
-				IWebBrowserSingleton* WebBrowserSingleton = IWebBrowserModule::Get().GetSingleton();
-				if (WebBrowserSingleton != nullptr) {
-					TOptional<FString> DefaultContext;
-					TSharedPtr<IWebBrowserCookieManager> CookieManager = WebBrowserSingleton->GetCookieManager(DefaultContext);
-					if (CookieManager.IsValid()) {
-						CookieManager->DeleteCookies();
-					}
-				}
-				WebBrowser->LoadURL(LoginUrl);
-				FScriptDelegate LoginDelegate;
-				LoginDelegate.BindUFunction(this, "HandleLoginUrlChange");
-				WebBrowser->OnUrlChanged.Add(LoginDelegate);
-				*/
+	// AccessToken 이 유효한 경우
+	if (AccessToken.Len() > 0 && nullptr != PokeHunterGameInstance) {
+		TSharedRef<IHttpRequest> GetPlayerDataRequest = gameinstance->HttpModule->CreateRequest();
+		GetPlayerDataRequest->OnProcessRequestComplete().BindUObject(this, &UPartyInfoUI::OnGetPlayerDataResponseReceived);
+		GetPlayerDataRequest->SetURL(PokeHunterGameInstance->ApiUrl + "/getplayerdata");
+		GetPlayerDataRequest->SetVerb("GET");
+		GetPlayerDataRequest->SetHeader("Content-Type", "application/json");
+		GetPlayerDataRequest->SetHeader("Authorization", AccessToken);
+		GetPlayerDataRequest->ProcessRequest();
+	}
+	else {
+		/*
+		IWebBrowserSingleton* WebBrowserSingleton = IWebBrowserModule::Get().GetSingleton();
+		if (WebBrowserSingleton != nullptr) {
+			TOptional<FString> DefaultContext;
+			TSharedPtr<IWebBrowserCookieManager> CookieManager = WebBrowserSingleton->GetCookieManager(DefaultContext);
+			if (CookieManager.IsValid()) {
+				CookieManager->DeleteCookies();
 			}
 		}
+		WebBrowser->LoadURL(LoginUrl);
+		FScriptDelegate LoginDelegate;
+		LoginDelegate.BindUFunction(this, "HandleLoginUrlChange");
+		WebBrowser->OnUrlChanged.Add(LoginDelegate);
+		*/
 	}
 }
 
@@ -218,8 +217,8 @@ void UPartyInfoUI::OnJoinButtonClicked()
 		GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
 		SearchingForGame = false;
 
-		if (nullptr != PokeHunterGameInstance
-			&& AccessToken.Len() > 0 && JoinTicketId.Len() > 0) {
+		// if (nullptr != PokeHunterGameInstance && AccessToken.Len() > 0 && JoinTicketId.Len() > 0) {
+		if (AccessToken.Len() > 0 && JoinTicketId.Len() > 0) {
 			TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
 			RequestObj->SetStringField("ticketId", JoinTicketId);
 
@@ -297,8 +296,8 @@ void UPartyInfoUI::PollMatchmaking()
 		}
 	}
 
-	if (nullptr != PokeHunterGameInstance
-		&& AccessToken.Len() > 0 && MatchmakingTicketId.Len() > 0 && SearchingForGame) {
+	// if (nullptr != PokeHunterGameInstance && AccessToken.Len() > 0 && MatchmakingTicketId.Len() > 0 && SearchingForGame) {
+	if (AccessToken.Len() > 0 && MatchmakingTicketId.Len() > 0 && SearchingForGame) {
 		TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
 		RequestObj->SetStringField("ticketId", MatchmakingTicketId);
 
@@ -345,7 +344,9 @@ void UPartyInfoUI::OnStartMatchmakingResponseReceived(FHttpRequestPtr Request, F
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
 			if (JsonObject->HasField("ticketId")) {
+			// if (JsonObject->HasField("ticket")) { // Test If
 				FString MatchmakingTicketId = JsonObject->GetStringField("ticketId");
+				// FString MatchmakingTicketId = JsonObject->GetStringField("ticket");
 
 				UGameInstance* GameInstance = GetGameInstance();
 				if (GameInstance != nullptr) {
@@ -358,7 +359,6 @@ void UPartyInfoUI::OnStartMatchmakingResponseReceived(FHttpRequestPtr Request, F
 
 						UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
 						ButtonTextBlock->SetText(FText::FromString("Cancel"));
-						// JoinEventTextBlock->SetText(FText::FromString("Currently looking for a match"));
 					}
 				}
 			}
@@ -378,8 +378,9 @@ void UPartyInfoUI::OnStopMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 	}
 
 	UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
-	ButtonTextBlock->SetText(FText::FromString("READY"));
-	JoinEventTextBlock->SetText(FText::FromString("Re READY")); // ->????
+	ButtonTextBlock->SetText(FText::FromString("Stop, READY"));
+	// ButtonTextBlock->SetText(FText::FromString("READY"));
+	// JoinEventTextBlock->SetText(FText::FromString("Stop READY")); // ->????
 
 	JoinButton->SetIsEnabled(true);
 }
@@ -396,7 +397,8 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 
 				if (TicketType.Len() > 0) {
 					GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
-					SearchingForGame = false;
+					
+					// SearchingForGame = false;
 
 					UGameInstance* GameInstance = GetGameInstance();
 					if (GameInstance != nullptr) {
@@ -406,7 +408,13 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 						}
 					}
 
+					UE_LOG(LogTemp, Warning, TEXT("matchmaking event type: %s"), *TicketType);
+
 					if (TicketType.Equals("MatchmakingSucceeded")) {
+						
+						// MatchmakingSucceeded 일 경우에만 실행
+						SearchingForGame = false;
+						
 						JoinButton->SetIsEnabled(false);
 						JoinEventTextBlock->SetText(FText::FromString("Successfully found a match. Now connecting to the server..."));
 
@@ -428,8 +436,8 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 					else {
 						// AWS GameLift Dedicated server 접속에 실패하였음.
 
-						UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
-						ButtonTextBlock->SetText(FText::FromString("READY"));
+						// UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
+						// ButtonTextBlock->SetText(FText::FromString("FreREADY"));
 						
 						// JoinEventTextBlock->SetText(FText::FromString(TicketType + ". Please try again"));
 					}

@@ -5,6 +5,8 @@
 #include "PartnerProjectile.h"
 #include "PartnerAnimInstance.h"
 #include "Components/StaticMeshComponent.h"
+#include "PokeHunter/Enemy/Enemy.h"
+#include "Kismet/GameplayStatics.h"
 
 AWolfPartner::AWolfPartner()
 {
@@ -17,10 +19,51 @@ AWolfPartner::AWolfPartner()
 		IceShardClass = TempIceShardClass.Class;
 	}
 
-	//스톰 범위 컴포넌트 추가
+	//스킬 범위 컴포넌트
 	StormCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("StormCollision"));
+	StormCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BreathCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("BreathCollision"));
+	BreathCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BreathCollision->SetupAttachment(GetMesh(), FName("HeadSocket"));
+	BreathCollision->SetVisibility(false);
+
 }
 
+
+void AWolfPartner::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+
+	if (bBreathe)
+	{
+		TArray<AActor*> OverlapActors;
+		BreathCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
+		for (auto Enemy : OverlapActors)
+		{
+			UGameplayStatics::ApplyDamage(Enemy, BreathDamage, GetController(), this, UDamageType::StaticClass());
+		}
+
+		float ElapsedTime = GetWorld()->TimeSeconds - BreathStartTime;
+		if (ElapsedTime > BreathTime)
+		{
+			bBreathe = false;
+			BreathCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			BreathCollision->SetVisibility(false);
+		}
+		
+	}
+
+	if (bOnStorm)
+	{
+		TArray<AActor*> OverlapActors;
+		BreathCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
+		for (auto Enemy : OverlapActors)
+		{
+			UGameplayStatics::ApplyDamage(Enemy, StormDamage, GetController(), this, UDamageType::StaticClass());
+		}
+	}
+}
 
 void AWolfPartner::BeginPlay()
 {
@@ -29,6 +72,7 @@ void AWolfPartner::BeginPlay()
 	//StormCollision->OnComponentBeginOverlap.AddDynamic(this, &AWolfPartner::IntoStorm);
 	//StormCollision->OnComponentEndOverlap.AddDynamic(this, &AWolfPartner::OutStorm);
 }
+
 
 void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 {
@@ -45,7 +89,11 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 
 	case ESkillID::IceStorm:
 		CurState = EPartnerState::MakingStorm;
+		break;
 
+	case ESkillID::IceBreath:
+		CurState = EPartnerState::IceBreath;
+		break;
 	default:
 		break;
 	}
@@ -57,6 +105,15 @@ void AWolfPartner::LaunchIceShard()
 	{
 		PartnerAnim->PlayCombatMontage(TEXT("Attack"));
 	}
+}
+
+void AWolfPartner::IceBreathe()
+{
+	BreathStartTime = GetWorld()->GetTimeSeconds();
+	bBreathe = true;
+	BreathCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	BreathCollision->SetVisibility(true);
+	PartnerAnim->PlayCombatMontage(TEXT("Attack"));
 }
 
 void AWolfPartner::MakeIceShard()

@@ -25,7 +25,8 @@ enum class EPartnerState : uint8
 	SlashAttack,
 	Howling,
 	IceShard,
-	MakingStorm
+	MakingStorm,
+	IceBreath
 };
 
 UENUM(BlueprintType)
@@ -94,9 +95,9 @@ public:
 
 	//Animation
 	UFUNCTION(Server, Reliable)
-		void ServerPlayMontage(FName Section);
+	void ServerPlayMontage(FName Section);
 	UFUNCTION(NetMulticast, Reliable)
-		void MultiPlayMontage(FName Section);
+	void MultiPlayMontage(FName Section);
 
 	UFUNCTION(BlueprintCallable)
 	inline EPartnerType GetType() { return Type; }
@@ -108,7 +109,7 @@ public:
 	virtual void StopSkill();
 	virtual void UseNormalSkill(ESkillID SkillID);
 	virtual void UseSpecialSkill(ESkillID SkillID);
-	inline void SetTarget(ACharacter* setTarget) { Target = setTarget;  };
+	void SetTarget(ACharacter* setTarget);
 
 	void FollowHunter(class AHunter* Hunter);
 

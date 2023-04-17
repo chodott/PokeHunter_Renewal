@@ -190,6 +190,11 @@ void APartner::UseSpecialSkill(ESkillID SkillID)
 	}
 }
 
+void APartner::SetTarget(ACharacter* setTarget)
+{
+	Target = setTarget;
+}
+
 void APartner::FollowHunter(AHunter* Master)
 {
 	Hunter = Master;

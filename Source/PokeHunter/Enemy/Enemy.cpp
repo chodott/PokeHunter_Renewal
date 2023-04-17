@@ -139,8 +139,8 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
 {
-	OutLocation = GetMesh()->GetSocketLocation("Head");
-	OutRotation = GetMesh()->GetSocketRotation("Head");
+	OutLocation = GetMesh()->GetSocketLocation("HeadSocket");
+	OutRotation = GetMesh()->GetSocketRotation("HeadSocket");
 }
 
 FGenericTeamId AEnemy::GetGenericTeamId() const
@@ -204,10 +204,11 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 					Target = HitItem->ThisOwner;
 					CurState = EEnemyState::Hit;
 				}
-				if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
-				{
-					Hunter->SetPartnerTarget(this);
-				}
+				
+			}
+			if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
+			{
+				Hunter->SetPartnerTarget(this);
 			}
 		}
 	}

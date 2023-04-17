@@ -4,6 +4,7 @@
 #include "ItemDropActor.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "PokeHunter/Hunter/InventoryComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 AItemDropActor::AItemDropActor()
 {
@@ -19,6 +20,7 @@ void AItemDropActor::Tick(float DeltaTime)
 	{
 		FVector CurPointVec = CalculatePoint(DeltaTime);
 		SetActorLocation(CurPointVec);
+		StaticMesh->SetWorldLocation(CurPointVec);
 
 		if (RunningTime >= TotalTime)
 		{
@@ -87,7 +89,7 @@ void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 	Master = Hunter;
 
 	StartPointVec = GetActorLocation();
-	TurningPointVec = Master->GetActorLocation() + FVector(0,100,50);
+	TurningPointVec = Master->GetActorLocation() + FVector(0,300,200);
 
 	bInteracting = true;
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);

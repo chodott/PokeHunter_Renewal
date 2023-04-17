@@ -31,6 +31,21 @@ void ABasePokeHunterGameMode::BeginPlay() {
 		auto OnUpdateGameSession = [](Aws::GameLift::Server::Model::UpdateGameSession UpdateGameSessionObj, void* Params)
 		{
 			FUpdateGameSessionState* State = (FUpdateGameSessionState*)Params;
+
+			auto Reason = UpdateGameSessionObj.GetUpdateReason();
+
+			if (Reason == Aws::GameLift::Server::Model::UpdateReason::MATCHMAKING_DATA_UPDATED) {
+
+			}
+			else if (Reason == Aws::GameLift::Server::Model::UpdateReason::BACKFILL_CANCELLED) {
+				State->Reason = EUpdateReason::BACKFILL_CANCELLED;
+			}
+			else if (Reason == Aws::GameLift::Server::Model::UpdateReason::BACKFILL_FAILED) {
+				State->Reason = EUpdateReason::BACKFILL_FAILED;
+			}
+			else if (Reason == Aws::GameLift::Server::Model::UpdateReason::BACKFILL_TIMED_OUT) {
+				State->Reason = EUpdateReason::BACKFILL_TIMED_OUT;
+			}
 		};
 
 		auto OnProcessTerminate = [](void* Params)
@@ -96,4 +111,52 @@ void ABasePokeHunterGameMode::BeginPlay() {
 		auto ProcessReadyOutcome = Aws::GameLift::Server::ProcessReady(*Params);
 	}
 #endif
+	GetWorldTimerManager().SetTimer(HandleGameSessionUpdateHandle, this, &ABasePokeHunterGameMode::HandleGameSessionUpdate, 1.0f, true, 5.0f);
+	GetWorldTimerManager().SetTimer(HandleProcessTerminationHandle, this, &ABasePokeHunterGameMode::HandleProcessTermination, 1.0f, true, 5.0f);
+
+}
+
+void ABasePokeHunterGameMode::HandleProcessTermination()
+{
+	if (ProcessTerminateState.Status) {
+		GetWorldTimerManager().ClearTimer(HandleProcessTerminationHandle);
+		GetWorldTimerManager().ClearTimer(HandleGameSessionUpdateHandle);
+		
+		// GetWorldTimerManager().ClearTimer(SuspendBackfillHandle);
+
+#if WITH_GAMELIFT
+	/*if (LatestBackfillTicketId.Len() > 0) {
+		auto GameSessionIdOutcome = Aws::GameLift::Server::GetGameSessionId();
+		if (GameSessionIdOutcome.IsSuccess()) {
+			FString GameSessionArn = FString(GameSessionIdOutcome.GetResult());
+			FString MatchmakingConfigurationArn = StartGameSessionState.MatchmakingConfigurationArn;
+			StopBackfillRequest(GameSessionArn, MatchmakingConfigurationArn, LatestBackfillTicketId);
+		}
+	}*/
+#endif
+
+		FString ProcessInterruptionMessage;
+
+		if (ProcessTerminateState.TerminationTime <= 0L) {
+			ProcessInterruptionMessage = "Server process could shut down at any time";
+		}
+		else {
+			long TimeLeft = (long)(ProcessTerminateState.TerminationTime - FDateTime::Now().ToUnixTimestamp());
+			ProcessInterruptionMessage = FString::Printf(TEXT("Server process scheduled to terminate in %ld seconds"), TimeLeft);
+		}
+
+		if (GameState != nullptr) {
+			ABasePokeHunterGameMode* PokeHunterGameState = Cast<ABasePokeHunterGameMode>(GameState);
+			if (PokeHunterGameState != nullptr) {
+				PokeHunterGameState->LatestEvent = ProcessInterruptionMessage;
+			}
+		}
+
+		GetWorldTimerManager().SetTimer(EndGameHandle, this, &ABasePokeHunterGameMode::EndGame, 1.0f, false, 10.0f);
+	}
+}
+
+void ABasePokeHunterGameMode::HandleGameSessionUpdate()
+{
+
 }

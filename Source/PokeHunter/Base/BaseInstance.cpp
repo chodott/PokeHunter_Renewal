@@ -71,12 +71,33 @@ bool UBaseInstance::SendAccessToken()
 		if (false == retVal) {
 			UE_LOG(LogTemp, Warning, TEXT("Token Send Fail"));
 			int32 ErrorCode = GetLastError();
-			UE_LOG(LogTemp, Error, TEXT("Socket error: %d"), ErrorCode);
+			// UE_LOG(LogTemp, Error, TEXT("Socket error: %d"), ErrorCode);
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("Token Send Success"));
 		}
 	}
+
+	SC_LOGIN_SUCCESS_PACK ok_pack;
+	retVal = gSocket->Recv(reinterpret_cast<uint8*>(&ok_pack), sizeof(SC_LOGIN_SUCCESS_PACK), bSize);
+
+	if (false == retVal) {
+		UE_LOG(LogTemp, Warning, TEXT("Login Fail!"));
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Login Succcccccccccccccesssssssssssssss!!!!!!"));
+
+		SC_LOGIN_INFO_PACK info_pack;
+		retVal = gSocket->Recv(reinterpret_cast<uint8*>(&info_pack), sizeof(SC_LOGIN_INFO_PACK), bSize);
+		if (retVal) {
+
+			UE_LOG(LogTemp, Warning, TEXT("Fail get player infomation!"));
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Successssssss get player infomation!"));
+		}
+	}
+
 	return true;
 }
 
@@ -119,6 +140,12 @@ void UBaseInstance::Shutdown()
 		InvalidateTokensRequest->SetHeader("Authorization", AccessToken);
 		InvalidateTokensRequest->ProcessRequest();
 	}
+
+	int32 bSize = 0;
+	CS_LOGOUT_PACK logout_pack;
+	logout_pack.size = sizeof(CS_LOGOUT_PACK);
+	logout_pack.type = CS_LOGOUT;
+	gSocket->Send(reinterpret_cast<const uint8*>(&logout_pack), logout_pack.size, bSize);
 
 	Super::Shutdown();
 }

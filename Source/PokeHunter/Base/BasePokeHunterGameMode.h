@@ -66,6 +66,13 @@ class ABasePokeHunterGameMode : public AGameModeBase
 public:
 	ABasePokeHunterGameMode(); 
 
+public:
+	UPROPERTY()
+		FTimerHandle HandleProcessTerminationHandle;
+
+	UPROPERTY()
+		FTimerHandle HandleGameSessionUpdateHandle;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -82,4 +89,9 @@ private:
 	UPROPERTY()
 		FHealthCheckState HealthCheckState;
 
+	UFUNCTION()
+		void HandleProcessTermination();
+
+	UFUNCTION()
+		void HandleGameSessionUpdate();
 };

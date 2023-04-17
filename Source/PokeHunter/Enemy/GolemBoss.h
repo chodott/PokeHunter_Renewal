@@ -17,8 +17,10 @@ class POKEHUNTER_API AGolemBoss : public AEnemy
 
 public:
 	AGolemBoss();
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-	TArray<class UHitBoxComponent*> PartHitBox;*/
+
+	//HitBox
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	TArray<class UHitBoxComponent*> PartHitBoxs;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* HeadHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
@@ -29,6 +31,8 @@ public:
 	class UHitBoxComponent* LeftHandHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* LeftLegHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* RightShoulderHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* RightArmHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")

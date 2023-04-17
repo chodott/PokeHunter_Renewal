@@ -154,6 +154,13 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	HP -= DamageAmount;
+	SavedDamage += DamageAmount;
+	if (GrogyDamage <= SavedDamage)
+	{
+		bGrogy = true;
+		CurState = EEnemyState::Grogy;
+		EnemyAnim->PlayCombatMontage(FName("Grogy"), true);
+	}
 	//Item Hit
 	AItem* HitItem = Cast<AItem>(DamageCauser);
 	FVector HitLoc;
@@ -179,24 +186,31 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	{
 		if (HP <= 0)
 		{
+			//사망 애니메이션
 			CurState = EEnemyState::Die;
 			EnemyAnim->PlayCombatMontage(FName("Die"), true);
 		}
 		else
 		{
-			EnemyAnim->PlayCombatMontage(FName("Hit"), true);
-			if (Target == NULL)
+			if (bGrogy)
 			{
-				Target = HitItem->ThisOwner;
-				CurState = EEnemyState::Hit;
+				//그로기 시 애니메이션 생략
 			}
-			if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
+			else
 			{
-				Hunter->SetPartnerTarget(this);
+				EnemyAnim->PlayCombatMontage(FName("Hit"), true);
+				if (Target == NULL)
+				{
+					Target = HitItem->ThisOwner;
+					CurState = EEnemyState::Hit;
+				}
+				if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
+				{
+					Hunter->SetPartnerTarget(this);
+				}
 			}
 		}
 	}
-
 	
 	
 	//Damage and UI

@@ -18,6 +18,7 @@ enum class EEnemyState : uint8
 	Patrol UMETA(DisplayName = "Patrol"),
 	Chase UMETA(DisplayName = "Chase"),
 	Hit UMETA(DisplayName = "Hit"),
+	Grogy UMETA(DisplayName = "Grogy"),
 	Die UMETA(DisplayName = "Die"),
 	Roar UMETA(DisplayName = "Roar"),
 	Attention UMETA(DisplayName = "Attention"),
@@ -96,6 +97,12 @@ public:
 		bool bBinding{ false };
 
 	//상태 이상
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SavedDamage{0};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float GrogyDamage{};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bGrogy{ false };
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bPoisoned{ false };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)

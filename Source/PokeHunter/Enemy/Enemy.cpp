@@ -273,6 +273,25 @@ void AEnemy::HearSound(FVector SoundLoc, AActor* AgroActor)
 	bWaitingAgro = true;
 }
 
+void AEnemy::ChangeTarget()
+{
+	int NearestTargetNum = 0;
+	int ShortestDistance = 100000000;
+	for(int i=0;i<TargetArray.Num(); ++i)
+	{
+		FVector DirectionVec = TargetArray[i]->GetActorLocation() - GetActorLocation();
+		DirectionVec.Z = 0;
+		float Distance = DirectionVec.Size();
+
+		if (Distance < ShortestDistance)
+		{
+			ShortestDistance = Distance;
+			NearestTargetNum = i;
+		}
+
+	}
+}
+
 void AEnemy::Attack(int AttackPattern)
 {
 	if (Target != NULL)

@@ -26,9 +26,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* LeftArmHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* LeftHandHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* LeftLegHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* RightArmHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* RightHandHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* RightLegHitBox;
 

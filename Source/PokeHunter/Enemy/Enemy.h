@@ -163,6 +163,9 @@ public:
 	void HearSound(FVector SoundLoc, AActor* AgroTarget);
 
 	UFUNCTION(BlueprintCallable)
+	void ChangeTarget();
+
+	UFUNCTION(BlueprintCallable)
 	virtual void Attack(int AttackPattern);
 	UFUNCTION(BlueprintCallable)
 	virtual void LongAttack();

@@ -165,6 +165,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bGrabbed;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bDamaged;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bBound;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bNoCollision;

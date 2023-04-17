@@ -23,13 +23,21 @@ AGolemBoss::AGolemBoss()
 	//PartHitBox.AddUnique(BodyHitBox);
 
 	RightArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightArmHitBox"));
-	RightArmHitBox->SetupAttachment(GetMesh(), FName("RightHand"));
+	RightArmHitBox->SetupAttachment(GetMesh(), FName("RightArm"));
 	RightArmHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
+
+	RightHandHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightHandHitBox"));
+	RightHandHitBox->SetupAttachment(GetMesh(), FName("RightHand"));
+	RightHandHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
 	//PartHitBox.AddUnique(RightArmHitBox);
 
 	LeftArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftArmHitBox"));
-	LeftArmHitBox->SetupAttachment(GetMesh(), FName("LeftHand"));
+	LeftArmHitBox->SetupAttachment(GetMesh(), FName("LeftArm"));
 	LeftArmHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
+
+	LeftHandHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftHandHitBox"));
+	LeftHandHitBox->SetupAttachment(GetMesh(), FName("LeftHand"));
+	LeftHandHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
 	//PartHitBox.AddUnique(LeftArmHitBox);
 
 	RightLegHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightLegHitBox"));
@@ -128,11 +136,17 @@ void AGolemBoss::BeginPlay()
 	BodyHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
 	BodyHitBox->BurningTime = BurningTime;
 
+	LeftHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+	LeftHandHitBox->BurningTime = BurningTime;
+
 	LeftArmHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
 	LeftArmHitBox->BurningTime = BurningTime;
 
 	RightArmHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
 	RightArmHitBox->BurningTime = BurningTime;
+
+	RightHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+	RightHandHitBox->BurningTime = BurningTime;
 
 	LeftLegHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
 	LeftLegHitBox->BurningTime = BurningTime;
@@ -246,10 +260,34 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 
 void AGolemBoss::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UHitBoxComponent* OverlapHitBox = Cast<UHitBoxComponent>(HitComponent);
-	if (OverlapHitBox)
+	UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(HitComponent);
+	if (HitBox)
 	{
-		UGameplayStatics::ApplyPointDamage(OtherActor, OverlapHitBox->Damage, Hit.ImpactNormal, Hit, GetController(), this, UDamageType::StaticClass());
+		if (bCanGrab)
+		{
+			FName PartName = HitBox->GetAttachSocketName();
+			if (PartName == FName("LeftHand") || PartName == FName("RightHand"))
+			{
+				ACharacter* GrabbedCharacter = Cast<ACharacter>(OtherActor);
+				if (GrabbedCharacter)
+				{
+					OtherActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GrabSocket"));
+					GrabbedCharacter->SetActorEnableCollision(false);
+					GrabbedTarget = GrabbedCharacter;
+				}
+				return;
+			}
+		}
+
+		if (IEnemyInteractInterface* EnemyInteractInterface = Cast<IEnemyInteractInterface>(OtherActor))
+		{
+			
+			EnemyInteractInterface->Execute_InteractAttack(OtherActor, Hit.Normal, HitBox->Damage);
+
+
+		}
+
+		UGameplayStatics::ApplyPointDamage(OtherActor, HitBox->Damage, Hit.ImpactNormal, Hit, GetController(), this, UDamageType::StaticClass());
 
 	}
 }

@@ -27,7 +27,7 @@ void AItemDropActor::Tick(float DeltaTime)
 			DropCnt = FMath::RandRange(1, 5);
 			for (int i = 0; i < DropCnt; ++i)
 			{
-				int RandIndex = FMath::RandRange(0, DropItemArray.Num() - 1);
+				int RandIndex = FMath::RandRange(0, DropItemArray.Num()-1);
 				DropItemArray[RandIndex].cnt += 1;
 			}
 
@@ -62,7 +62,7 @@ void AItemDropActor::BeginPlay()
 
 void AItemDropActor::CreateItemArray(TArray<FName>& ItemArray)
 {
-	for (int i = 0; i < ItemArray.Num() - 1; ++i)
+	for (int i = 0; i < ItemArray.Num(); ++i)
 	{
 		FItemCnter ItemCnter;
 		ItemCnter.ItemID = ItemArray[i];

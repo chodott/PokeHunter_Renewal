@@ -64,6 +64,7 @@ public:
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION(BlueprintNativeEvent)
 	void DestroyPart(FName PartName);
+	virtual void Die();
 
 	//BTTask
 

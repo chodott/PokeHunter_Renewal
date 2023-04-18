@@ -80,6 +80,8 @@ public:
 	FGenericTeamId TeamID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AttackDamage = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackRange = 200.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float EarthquakeRange = 1000.f;

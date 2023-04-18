@@ -95,6 +95,20 @@ void AGolemBoss::BeginPlay()
 	}
 }
 
+void AGolemBoss::Die()
+{
+	TArray<USceneComponent*> ChildComponents;
+	GetMesh()->GetChildrenComponents(true, ChildComponents);
+	for (auto Component : ChildComponents)
+	{
+		auto PrimitiveComponent = Cast<UPrimitiveComponent>(Component);
+		PrimitiveComponent->DetachFromParent(true);
+		PrimitiveComponent->SetSimulatePhysics(true);
+		PrimitiveComponent->SetCollisionProfileName(FName("Destructible"));
+		PrimitiveComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+}
+
 void AGolemBoss::LongAttack()
 {
 	if (EnemyAnim)
@@ -140,8 +154,9 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
 		HitLoc = PointDamageEvent.HitInfo.Location;
 		UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(PointDamageEvent.HitInfo.GetComponent());
-		if (HitBox->TakeDamage(DamageAmount))
+		if (HitBox)
 		{
+			HitBox->TakeDamage(DamageAmount);
 			FName PartName = HitBox->GetAttachSocketName();
 			DestroyPart(PartName);
 		}
@@ -153,6 +168,8 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		HP -= DamageAmount;
 		HitLoc = GetActorLocation();
 	}
+
+	if (HP <= 0) Die();
 
 	if (bReflecting)
 	{	//반격 패턴 데미지 저장

@@ -17,8 +17,10 @@ class POKEHUNTER_API AGolemBoss : public AEnemy
 
 public:
 	AGolemBoss();
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-	TArray<class UHitBoxComponent*> PartHitBox;*/
+
+	//HitBox
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	TArray<class UHitBoxComponent*> PartHitBoxs;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* HeadHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
@@ -26,9 +28,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* LeftArmHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* LeftHandHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* LeftLegHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* RightShoulderHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* RightArmHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* RightHandHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* RightLegHitBox;
 
@@ -56,6 +64,7 @@ public:
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION(BlueprintNativeEvent)
 	void DestroyPart(FName PartName);
+	virtual void Die();
 
 	//BTTask
 

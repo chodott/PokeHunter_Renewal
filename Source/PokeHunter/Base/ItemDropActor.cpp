@@ -4,6 +4,7 @@
 #include "ItemDropActor.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "PokeHunter/Hunter/InventoryComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 AItemDropActor::AItemDropActor()
 {
@@ -19,13 +20,14 @@ void AItemDropActor::Tick(float DeltaTime)
 	{
 		FVector CurPointVec = CalculatePoint(DeltaTime);
 		SetActorLocation(CurPointVec);
+		StaticMesh->SetWorldLocation(CurPointVec);
 
 		if (RunningTime >= TotalTime)
 		{
 			DropCnt = FMath::RandRange(1, 5);
 			for (int i = 0; i < DropCnt; ++i)
 			{
-				int RandIndex = FMath::RandRange(0, DropItemArray.Num() - 1);
+				int RandIndex = FMath::RandRange(0, DropItemArray.Num()-1);
 				DropItemArray[RandIndex].cnt += 1;
 			}
 
@@ -60,7 +62,7 @@ void AItemDropActor::BeginPlay()
 
 void AItemDropActor::CreateItemArray(TArray<FName>& ItemArray)
 {
-	for (int i = 0; i < ItemArray.Num() - 1; ++i)
+	for (int i = 0; i < ItemArray.Num(); ++i)
 	{
 		FItemCnter ItemCnter;
 		ItemCnter.ItemID = ItemArray[i];
@@ -87,7 +89,7 @@ void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 	Master = Hunter;
 
 	StartPointVec = GetActorLocation();
-	TurningPointVec = Master->GetActorLocation() + FVector(0,100,50);
+	TurningPointVec = Master->GetActorLocation() + FVector(0,300,200);
 
 	bInteracting = true;
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);

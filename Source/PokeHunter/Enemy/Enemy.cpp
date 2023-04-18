@@ -139,8 +139,8 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
 {
-	OutLocation = GetMesh()->GetSocketLocation("Head");
-	OutRotation = GetMesh()->GetSocketRotation("Head");
+	OutLocation = GetMesh()->GetSocketLocation("HeadSocket");
+	OutRotation = GetMesh()->GetSocketRotation("HeadSocket");
 }
 
 FGenericTeamId AEnemy::GetGenericTeamId() const
@@ -154,6 +154,13 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	HP -= DamageAmount;
+	SavedDamage += DamageAmount;
+	if (GrogyDamage <= SavedDamage)
+	{
+		bGrogy = true;
+		CurState = EEnemyState::Grogy;
+		EnemyAnim->PlayCombatMontage(FName("Grogy"), true);
+	}
 	//Item Hit
 	AItem* HitItem = Cast<AItem>(DamageCauser);
 	FVector HitLoc;
@@ -179,16 +186,25 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	{
 		if (HP <= 0)
 		{
+			//사망 애니메이션
 			CurState = EEnemyState::Die;
 			EnemyAnim->PlayCombatMontage(FName("Die"), true);
 		}
 		else
 		{
-			EnemyAnim->PlayCombatMontage(FName("Hit"), true);
-			if (Target == NULL)
+			if (bGrogy)
 			{
-				Target = HitItem->ThisOwner;
-				CurState = EEnemyState::Hit;
+				//그로기 시 애니메이션 생략
+			}
+			else
+			{
+				EnemyAnim->PlayCombatMontage(FName("Hit"), true);
+				if (Target == NULL)
+				{
+					Target = HitItem->ThisOwner;
+					CurState = EEnemyState::Hit;
+				}
+				
 			}
 			if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
 			{
@@ -196,7 +212,6 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			}
 		}
 	}
-
 	
 	
 	//Damage and UI
@@ -271,6 +286,25 @@ void AEnemy::HearSound(FVector SoundLoc, AActor* AgroActor)
 	TargetPos = SoundLoc;
 	AgroTarget = AgroActor;
 	bWaitingAgro = true;
+}
+
+void AEnemy::ChangeTarget()
+{
+	int NearestTargetNum = 0;
+	int ShortestDistance = 100000000;
+	for(int i=0;i<TargetArray.Num(); ++i)
+	{
+		FVector DirectionVec = TargetArray[i]->GetActorLocation() - GetActorLocation();
+		DirectionVec.Z = 0;
+		float Distance = DirectionVec.Size();
+
+		if (Distance < ShortestDistance)
+		{
+			ShortestDistance = Distance;
+			NearestTargetNum = i;
+		}
+
+	}
 }
 
 void AEnemy::Attack(int AttackPattern)

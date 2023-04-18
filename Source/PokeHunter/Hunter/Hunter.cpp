@@ -410,6 +410,7 @@ void AHunter::MoveForward(float Val)
 	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install || bGrabbed) return;
 	if (Val != 0.0f)
 	{
+		bDamaged = false;
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
@@ -806,13 +807,16 @@ void AHunter::InteractEarthquake_Implementation()
 
 void AHunter::InteractAttack_Implementation(FVector HitDirection, float Damage)
 {
-	if (Damage <= 0.f)
+	if (Damage <= 0.f || bDamaged)
 	{
 		return;
 	}
 	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
-
+	bDamaged = true;
 	LaunchCharacter(HitDirection * 1000.f,false,false);
+	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
+	bNoCollision = true;
+	SetActorEnableCollision(false);
 }
 
 void AHunter::InteractGrabAttack_Implementation()

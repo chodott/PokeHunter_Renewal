@@ -18,6 +18,7 @@ enum class EEnemyState : uint8
 	Patrol UMETA(DisplayName = "Patrol"),
 	Chase UMETA(DisplayName = "Chase"),
 	Hit UMETA(DisplayName = "Hit"),
+	Grogy UMETA(DisplayName = "Grogy"),
 	Die UMETA(DisplayName = "Die"),
 	Roar UMETA(DisplayName = "Roar"),
 	Attention UMETA(DisplayName = "Attention"),
@@ -79,6 +80,8 @@ public:
 	FGenericTeamId TeamID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AttackDamage = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackRange = 200.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float EarthquakeRange = 1000.f;
@@ -96,6 +99,12 @@ public:
 		bool bBinding{ false };
 
 	//상태 이상
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SavedDamage{0};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float GrogyDamage{};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bGrogy{ false };
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bPoisoned{ false };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -161,6 +170,9 @@ public:
 	void SetTarget(AActor* NewTarget) { Target = NewTarget; };
 	void SeeNewTarget(AActor* Actor);
 	void HearSound(FVector SoundLoc, AActor* AgroTarget);
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeTarget();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Attack(int AttackPattern);

@@ -23,15 +23,35 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* StormCollision;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UStaticMeshComponent* BreathCollision;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
+	float BreathStartTime{5.0f};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	float BreathTime{ 5.0f };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
+	float BreathDamage{};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	bool bBreathe{ false };
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
+	float StormDamage{};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	bool bOnStorm{ false };
+
 protected:
-	// Called when the game starts or when spawned
+	virtual void Tick(float DeltaTime)override;
 	virtual void BeginPlay() override;
 
 	
 public:
 
+	void ApplyDamage();
 	virtual void UseSpecialSkill(ESkillID SkillID);
 	void LaunchIceShard();
+	void IceBreathe();
 	UFUNCTION(BlueprintCallable)
 	void MakeIceShard();
 	void MakeStorm();

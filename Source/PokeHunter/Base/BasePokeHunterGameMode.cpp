@@ -20,6 +20,8 @@ ABasePokeHunterGameMode::ABasePokeHunterGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 		PlayerControllerClass = PlayerControllerBPClass.Class;
+		PlayerStateClass = AHunterState::StaticClass();
+		GameStateClass = APokeHunterStateBase::StaticClass();
 	}
 
 	RemainingGameTime = 240;

@@ -63,7 +63,7 @@ void AFairy::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveC
 	if (HitItem)
 	{
 		//다른 아이템과 충돌 시
-		if (HitItem->ItemType == EItemType::Bullet) //정확하게 수정
+		if (HitItem->ItemType != EItemType::Bullet) //정확하게 수정
 		{
 			//죽음 처리
 			InteractionSphere->SetSimulatePhysics(true);

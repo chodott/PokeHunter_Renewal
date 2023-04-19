@@ -435,6 +435,10 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 						const FString& Options = "?PlayerSessionId=" + PlayerSessionId + "?PlayerId=" + PlayerId;
 						UE_LOG(LogTemp, Warning, TEXT("options: %s"), *Options);
 
+						// SetInputModeGameOnly();
+
+						NativeDestruct();
+
 						UGameplayStatics::OpenLevel(GetWorld(), FName(*LevelName), false, Options);
 					}
 					else {

@@ -71,7 +71,6 @@ bool UBaseInstance::SendAccessToken()
 		if (false == retVal) {
 			UE_LOG(LogTemp, Warning, TEXT("Token Send Fail"));
 			int32 ErrorCode = GetLastError();
-			// UE_LOG(LogTemp, Error, TEXT("Socket error: %d"), ErrorCode);
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("Token Send Success"));
@@ -108,15 +107,6 @@ void UBaseInstance::Shutdown()
 	GetWorld()->GetTimerManager().ClearTimer(GetResponseTimeHandle);
 
 	if (AccessToken.Len() > 0) {
-		TSharedRef<IHttpRequest> InvalidateTokensRequest = HttpModule->CreateRequest();
-		InvalidateTokensRequest->SetURL(ApiUrl + "/invalidatetokens");
-		InvalidateTokensRequest->SetVerb("GET");
-		InvalidateTokensRequest->SetHeader("Content-Type", "application/json");
-		InvalidateTokensRequest->SetHeader("Authorization", IdToken);
-		InvalidateTokensRequest->ProcessRequest();
-	}
-
-	if (AccessToken.Len() > 0) {
 		if (JoinTicketId.Len() > 0) {
 			TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
 			RequestObj->SetStringField("ticketId", JoinTicketId);
@@ -141,11 +131,14 @@ void UBaseInstance::Shutdown()
 		InvalidateTokensRequest->ProcessRequest();
 	}
 
-	int32 bSize = 0;
-	CS_LOGOUT_PACK logout_pack;
-	logout_pack.size = sizeof(CS_LOGOUT_PACK);
-	logout_pack.type = CS_LOGOUT;
-	gSocket->Send(reinterpret_cast<const uint8*>(&logout_pack), logout_pack.size, bSize);
+	if ((NULL != gSocket) && (ESocketConnectionState::SCS_NotConnected != gSocket->GetConnectionState()) && (ESocketConnectionState::SCS_ConnectionError != gSocket->GetConnectionState()))
+	{
+		int32 bSize = 0;
+		CS_LOGOUT_PACK logout_pack;
+		logout_pack.size = sizeof(CS_LOGOUT_PACK);
+		logout_pack.type = CS_LOGOUT;
+		gSocket->Send(reinterpret_cast<const uint8*>(&logout_pack), logout_pack.size, bSize);
+	}
 
 	Super::Shutdown();
 }
@@ -153,7 +146,7 @@ void UBaseInstance::Shutdown()
 void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken)
 {
 	FString LevelName = GetWorld()->GetName();
-	if ("Title" == LevelName && "SurvivalArea" != LevelName) {
+	if ("Title" == LevelName && "L_Field0" != LevelName) {
 		FString levelName = L"/Game/Map/Lobby/MyHome";
 		UGameplayStatics::OpenLevel(GetWorld(), *levelName);
 	}
@@ -173,6 +166,37 @@ void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken,
 
 	// World Timer에 등록하기
 	GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UBaseInstance::RetrieveNewTokens, 1.0f, false, 3300.0f);
+}
+
+bool UBaseInstance::returnMyHome()
+{
+	// GetWorld()->GetTimerManager().ClearTimer(RetrieveNewTokensHandle);
+	// GetWorld()->GetTimerManager().ClearTimer(GetResponseTimeHandle);
+
+	if (AccessToken.Len() > 0) {
+		if (JoinTicketId.Len() > 0) {
+			TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
+			RequestObj->SetStringField("ticketId", JoinTicketId);
+
+			FString RequestBody;
+			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
+			if (FJsonSerializer::Serialize(RequestObj.ToSharedRef(), Writer)) {
+				TSharedRef<IHttpRequest> StopMatchmakingRequest = HttpModule->CreateRequest();
+				StopMatchmakingRequest->SetURL(ApiUrl + "/stopmatchmaking");
+				StopMatchmakingRequest->SetVerb("POST");
+				StopMatchmakingRequest->SetHeader("Content-Type", "application/json");
+				StopMatchmakingRequest->SetHeader("Authorization", AccessToken);
+				StopMatchmakingRequest->SetContentAsString(RequestBody);
+				StopMatchmakingRequest->ProcessRequest();
+
+				return true;
+			}
+
+		}
+		
+	}
+
+	return false;
 }
 
 void UBaseInstance::RetrieveNewTokens()

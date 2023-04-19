@@ -16,6 +16,7 @@ ABasePokeHunterGameMode::ABasePokeHunterGameMode()
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Hunter/Blueprint/NewHunter"));
 	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerBPClass(TEXT("/Game/Hunter/Blueprint/BP_HunterController"));
+
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
@@ -71,12 +72,7 @@ void ABasePokeHunterGameMode::BeginPlay() {
 				State->TerminationTime = GetTerminationTimeOutcome.GetResult();
 			}
 
-			auto ProcessEndingOutcome = Aws::GameLift::Server::ProcessEnding();
-
-			if (ProcessEndingOutcome.IsSuccess()) {
-				State->Status = true;
-				FGenericPlatformMisc::RequestExit(false);
-			}
+			State->Status = true;
 		};
 
 		auto OnHealthCheck = [](void* Params)
@@ -158,13 +154,16 @@ FString ABasePokeHunterGameMode::InitNewPlayer(APlayerController* NewPlayerContr
 {
 	FString InitializedString = Super::InitNewPlayer(NewPlayerController, UniqueId, Options, Portal);
 
+#if WITH_GAMELIFT
 	const FString& PlayerSessionId = UGameplayStatics::ParseOption(Options, "PlayerSessionId");
 	const FString& PlayerId = UGameplayStatics::ParseOption(Options, "PlayerId");
-	/*
+
 	if (NewPlayerController != nullptr) {
 		APlayerState* PlayerState = NewPlayerController->PlayerState;
+
+		/*
 		if (PlayerState != nullptr) {
-			AGameLiftTutorialPlayerState* PokeHunterPlayerState = Cast<ABasePokeHunterGameMode>(PlayerState);
+			AHunterState* PokeHunterPlayerState = Cast<AHunterState>(PlayerState);
 			if (PokeHunterPlayerState != nullptr) {
 				PokeHunterPlayerState->PlayerSessionId = *PlayerSessionId;
 				PokeHunterPlayerState->MatchmakingPlayerId = *PlayerId;
@@ -185,9 +184,9 @@ FString ABasePokeHunterGameMode::InitNewPlayer(APlayerController* NewPlayerContr
 				}
 			}
 		}
+		*/
 	}
-	*/
-
+#endif
 	return InitializedString;
 }
 

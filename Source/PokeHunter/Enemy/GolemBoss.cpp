@@ -8,7 +8,7 @@
 #include "PokeHunter/Hunter/Hunter.h"
 #include "EnemyAnimInstance.h"
 #include "EnemyProjectile.h"
-
+#include "Kismet/GameplayStatics.h"
 
 AGolemBoss::AGolemBoss()
 {
@@ -93,6 +93,8 @@ void AGolemBoss::BeginPlay()
 		PartHitBoxs[i]->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
 		PartHitBoxs[i]->BurningTime = BurningTime;
 	}
+
+	isDie = false;
 }
 
 void AGolemBoss::Die()
@@ -107,6 +109,8 @@ void AGolemBoss::Die()
 		PrimitiveComponent->SetCollisionProfileName(FName("Destructible"));
 		PrimitiveComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
+
+	isDie = true;
 }
 
 void AGolemBoss::LongAttack()
@@ -142,6 +146,16 @@ void AGolemBoss::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
 		HitBox->StartBurningTime = GetWorld()->TimeSeconds;
 	}
 }
+
+void AGolemBoss::OpenLevelHome()
+{
+	FString LevelName = GetWorld()->GetName();
+	if ("L_Field0" == LevelName && "MyHome" != LevelName) {
+		FString levelName = L"/Game/Map/Lobby/MyHome";
+		UGameplayStatics::OpenLevel(GetWorld(), *levelName);
+	}
+}
+
 
 float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {

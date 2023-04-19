@@ -135,6 +135,9 @@ public:
 	UFUNCTION()
 		void SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken);
 
+	UFUNCTION(BlueprintCallable, Category = "Home")
+		bool returnMyHome();
+
 	UPROPERTY()
 		FString JoinTicketId;
 
@@ -157,4 +160,8 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		TMap<FName, int> PartyListMap;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int PartnerNumber = -1;
 };

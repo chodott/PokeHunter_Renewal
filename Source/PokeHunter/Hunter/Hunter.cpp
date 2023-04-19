@@ -10,6 +10,7 @@
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components\SphereComponent.h"
@@ -352,6 +353,7 @@ void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
 // Called to bind functionality to input
 void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	check(PlayerInputComponent);
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("MoveForward", this, &AHunter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AHunter::MoveRight);
@@ -431,7 +433,7 @@ void AHunter::MoveRight(float Val)
 
 		//���� ����
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		 AddMovementInput(Direction, Val);
+		AddMovementInput(Direction, Val);
 	}
 }
 

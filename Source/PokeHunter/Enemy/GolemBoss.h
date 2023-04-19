@@ -66,6 +66,8 @@ public:
 	void DestroyPart(FName PartName);
 	virtual void Die();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Life")
+		bool isDie = false;
 	//BTTask
 
 	virtual void Attack(int AttackPattern);
@@ -81,4 +83,8 @@ public:
 	//ItemInteractInterface
 	virtual void InteractFire_Implementation(UPrimitiveComponent* HitComponent);
 
+	// Return Home
+	FTimerHandle ReHomeTimerHandle;
+	void OpenLevelHome();
+	// GetWorldTimerManager().SetTimer(TimerHandle, this, &AMyActor::MyFunction, 2.0f, false);
 };

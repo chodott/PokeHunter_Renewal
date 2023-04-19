@@ -102,6 +102,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	inline EPartnerType GetType() { return Type; }
 
+	UFUNCTION(BlueprintCallable)
+	inline void SetHP(float ChangedHP) { HP = ChangedHP;};
+	UFUNCTION(BlueprintCallable)
+	float GetHP() { return HP; };
+
 	UFUNCTION()
 	virtual void Attack();
 	virtual void SlashAttack();
@@ -118,6 +123,7 @@ public:
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 	//ItemInteractInterface
+	virtual void InteractPotion_Implementation(float HealAmount);
 	virtual void InteractHealArea_Implementation();
 	virtual void OutHealArea_Implementation();
 

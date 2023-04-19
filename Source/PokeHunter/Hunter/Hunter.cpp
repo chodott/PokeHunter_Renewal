@@ -810,6 +810,11 @@ void AHunter::OutHealArea_Implementation()
 	HealPerSecondAmount = 1.f;
 }
 
+void AHunter::InteractPotion_Implementation(float HealAmount)
+{
+	SetHP(GetHP() + HealAmount);
+}
+
 void AHunter::InteractEarthquake_Implementation()
 {
 	if (GetCharacterMovement()->IsFalling()) return;

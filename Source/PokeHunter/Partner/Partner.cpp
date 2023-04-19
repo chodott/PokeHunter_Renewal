@@ -210,6 +210,11 @@ void APartner::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 
 }
 
+void APartner::InteractPotion_Implementation(float HealAmount)
+{
+	SetHP(GetHP() + HealAmount);
+}
+
 void APartner::InteractHealArea_Implementation()
 {
 	HealPerSecondAmount += 10.f;

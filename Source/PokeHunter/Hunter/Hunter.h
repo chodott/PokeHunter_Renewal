@@ -292,6 +292,7 @@ public:
 	//ItemInterface Function
 	virtual void InteractHealArea_Implementation();
 	virtual void OutHealArea_Implementation();
+	virtual void InteractPotion_Implementation(float HealAmount);
 
 	//EnemyInterface Function
 	virtual void InteractEarthquake_Implementation();

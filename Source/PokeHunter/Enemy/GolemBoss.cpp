@@ -22,30 +22,33 @@ AGolemBoss::AGolemBoss()
 	BodyHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
 	PartHitBoxs.AddUnique(BodyHitBox);
 
-	RightShoulderHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightShoulderHitBox"));
-	RightShoulderHitBox->SetupAttachment(GetMesh(), FName("RightShoulder"));
-	RightShoulderHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
-	PartHitBoxs.AddUnique(RightShoulderHitBox);
-
-	RightArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightArmHitBox"));
-	RightArmHitBox->SetupAttachment(GetMesh(), FName("RightArm"));
-	RightArmHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
-	PartHitBoxs.AddUnique(RightArmHitBox);
-
 	RightHandHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightHandHitBox"));
 	RightHandHitBox->SetupAttachment(GetMesh(), FName("RightHand"));
 	RightHandHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
 	PartHitBoxs.AddUnique(RightHandHitBox);
 
-	LeftArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftArmHitBox"));
-	LeftArmHitBox->SetupAttachment(GetMesh(), FName("LeftArm"));
-	LeftArmHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
-	PartHitBoxs.AddUnique(LeftArmHitBox);
+	RightArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightArmHitBox"));
+	RightArmHitBox->SetupAttachment(GetMesh(), FName("RightArm"));
+	RightArmHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
+	RightArmHitBox->SetChild(RightHandHitBox);
+	PartHitBoxs.AddUnique(RightArmHitBox);
+
+	RightShoulderHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightShoulderHitBox"));
+	RightShoulderHitBox->SetupAttachment(GetMesh(), FName("RightShoulder"));
+	RightShoulderHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
+	RightShoulderHitBox->SetChild(RightArmHitBox);
+	PartHitBoxs.AddUnique(RightShoulderHitBox);
 
 	LeftHandHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftHandHitBox"));
 	LeftHandHitBox->SetupAttachment(GetMesh(), FName("LeftHand"));
 	LeftHandHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
 	PartHitBoxs.AddUnique(LeftHandHitBox);
+
+	LeftArmHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftArmHitBox"));
+	LeftArmHitBox->SetupAttachment(GetMesh(), FName("LeftArm"));
+	LeftArmHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
+	LeftArmHitBox->SetChild(LeftHandHitBox);
+	PartHitBoxs.AddUnique(LeftArmHitBox);
 
 	RightLegHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("RightLegHitBox"));
 	RightLegHitBox->SetupAttachment(GetMesh(), FName("RightLeg"));
@@ -107,6 +110,8 @@ void AGolemBoss::Die()
 		PrimitiveComponent->SetCollisionProfileName(FName("Destructible"));
 		PrimitiveComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
+
+	
 }
 
 void AGolemBoss::LongAttack()
@@ -156,9 +161,12 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(PointDamageEvent.HitInfo.GetComponent());
 		if (HitBox)
 		{
-			HitBox->TakeDamage(DamageAmount);
-			FName PartName = HitBox->GetAttachSocketName();
-			DestroyPart(PartName);
+			if (HitBox->TakeDamage(DamageAmount))
+			{
+				FName PartName = HitBox->GetAttachSocketName();
+				DestroyPart(PartName);
+				HitBox->DestroyPart();
+			}
 		}
 		HP -= DamageAmount;
 	}

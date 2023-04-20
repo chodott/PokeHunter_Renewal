@@ -49,6 +49,16 @@ bool UHitBoxComponent::CheckBurning(float DeltaTime)
 
 }
 
-void UHitBoxComponent::OnDestroyPart_Implementation()
+void UHitBoxComponent::SetChild(UHitBoxComponent* ChildBox)
 {
+	ChildHitBox = ChildBox;
+}
+
+void UHitBoxComponent::DestroyPart()
+{
+	if (ChildHitBox)
+	{
+		ChildHitBox->DestroyPart();
+	}
+	DestroyComponent();
 }

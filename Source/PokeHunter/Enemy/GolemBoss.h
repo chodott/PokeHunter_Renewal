@@ -20,7 +20,7 @@ public:
 
 	//HitBox
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-	TArray<class UHitBoxComponent*> PartHitBoxs;
+	TMap<FName, class UHitBoxComponent*> HitBoxMap;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* HeadHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
@@ -64,6 +64,7 @@ public:
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION(BlueprintNativeEvent)
 	void DestroyPart(FName PartName);
+	void DeleteHitBox(FName PartName);
 	virtual void Die();
 
 	//BTTask

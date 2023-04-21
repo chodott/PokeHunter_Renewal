@@ -17,7 +17,7 @@ class POKEHUNTER_API UHitBoxComponent : public UBoxComponent
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
-		class UHitBoxComponent* ChildHitBox{NULL};
+	class UHitBoxComponent* ChildHitbox;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Part")
 	float PartHP;
@@ -46,5 +46,6 @@ public:
 
 	void SetChild(class UHitBoxComponent* ChildBox);
 	void DestroyPart();
+	void DestroyPart(class AGolemBoss* Golem);
 
 };

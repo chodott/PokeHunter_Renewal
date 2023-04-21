@@ -47,8 +47,8 @@ void UHunterAnimInstance::UpdateAnimationProperties()
 		FVector XYspeed = FVector(Speed.X, Speed.Y, 0.f);
 		MovementSpeed = XYspeed.Size();
 
-		UInputComponent* Input = Hunter->InputComponent;
-		Direction = CalculateDirection(Speed, Hunter->GetActorRotation());
+		XYspeed.Normalize();
+		Direction = FMath::Atan2(Speed.Y, Speed.X) * 180.f / PI;
 
 		//Upper
 		bUpperOnly = Hunter->bUpperOnly;

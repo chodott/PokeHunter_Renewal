@@ -18,5 +18,6 @@ bool UBTDecorator_TargetInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 	float AttackRange = Enemy->AttackRange;
 
 	bResult = (Enemy->Target->GetDistanceTo(Enemy) <= AttackRange);
+
 	return bResult;	
 }

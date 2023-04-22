@@ -32,7 +32,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
 	bool bJumping;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Aim")
+	bool bLookAt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Aim")
 	FVector TargetLoc;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Movement")

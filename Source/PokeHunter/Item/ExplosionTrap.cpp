@@ -3,26 +3,26 @@
 
 #include "ExplosionTrap.h"
 #include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "PokeHunter/Enemy/Enemy.h"
 
 AExplosionTrap::AExplosionTrap()
 {
-	ExplosionCollision = CreateDefaultSubobject<USphereComponent>(FName("ExplosionCollision"));
-	ExplosionCollision->SetupAttachment(GetRootComponent());
-	ExplosionCollision->OnComponentBeginOverlap.AddDynamic(this, &AExplosionTrap::OnExplosionOverlap);
-	ExplosionCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CollisionBox->SetCollisionProfileName(FName("Trap"));
 	
 	Damage = 50.f;
 }
 
-void AExplosionTrap::OnExplosionOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AExplosionTrap::BeginPlay()
 {
-	if (OtherActor->IsA<AEnemy>())
-	{
-		ServerApplyDamage(OtherActor, Damage, NULL, this, UDamageType::StaticClass());
-	}
+	Super::BeginPlay();
 }
+
+void AExplosionTrap::Explode_Implementation()
+{
+}
+
 
 void AExplosionTrap::ServerApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, class AController* ItemOwner, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)
 {
@@ -34,11 +34,15 @@ void AExplosionTrap::MultiApplyDamage_Implementation(AActor* DamagedActor, int D
 	UGameplayStatics::ApplyDamage(DamagedActor, DamageAmount,	ItemOwner, DamageCauser, DamageTypeClass);
 }
 
+float AExplosionTrap::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Explode();
+
+	return DamageAmount;
+}
+
 void AExplosionTrap::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ExplosionCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	/*if (OtherActor->IsA<AEnemy>() || OtherActor->IsA<ABullet>())
-	{
-		this->Destroy();
-	}*/
+	Explode();
+
 }

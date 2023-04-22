@@ -41,6 +41,8 @@ void AEnemy::BeginPlay()
 	EnemyAnim = Cast<UEnemyAnimInstance>(GetMesh()->GetAnimInstance());
 	EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
 
+	BaseLocation = GetActorLocation();
+	ComeBackHome();
 }
 
 // Called every frame
@@ -286,6 +288,25 @@ void AEnemy::HearSound(FVector SoundLoc, AActor* AgroActor)
 	TargetPos = SoundLoc;
 	AgroTarget = AgroActor;
 	bWaitingAgro = true;
+}
+
+void AEnemy::ComeBackHome()
+{
+	Target = NULL;
+	TargetPos = BaseLocation;
+	CurState = EEnemyState::Patrol;
+}
+
+bool AEnemy::CheckInMoveRange()
+{
+	float Distance = FVector::Dist2D(BaseLocation, GetActorLocation());
+	bool bResult = Distance <= MoveRange;
+	if (bResult) return true;
+	else
+	{
+		ComeBackHome();
+		return false;
+	}
 }
 
 void AEnemy::ChangeTarget()

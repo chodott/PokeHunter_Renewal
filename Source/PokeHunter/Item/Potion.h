@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Item.h"
+#include "Bullet.h"
 #include "Potion.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class POKEHUNTER_API APotion : public AItem
+class POKEHUNTER_API APotion : public ABullet
 {
 	GENERATED_BODY()
 	
@@ -25,4 +25,6 @@ public:
 public:
 
 	void UseItem_Implementation(APawn* ItemOwner)override;
+	void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)override;
+	void ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherComponent);
 };

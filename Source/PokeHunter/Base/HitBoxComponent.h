@@ -15,6 +15,10 @@ class POKEHUNTER_API UHitBoxComponent : public UBoxComponent
 	GENERATED_BODY()
 	
 public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
+	class UHitBoxComponent* ChildHitbox;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Part")
 	float PartHP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
@@ -40,7 +44,8 @@ public:
 	bool TakeDamage(float DamageAmount);
 	bool CheckBurning(float DeltaTime);
 
-	UFUNCTION(BlueprintNativeEvent)
-	void OnDestroyPart();
+	void SetChild(class UHitBoxComponent* ChildBox);
+	void DestroyPart();
+	void DestroyPart(class AGolemBoss* Golem);
 
 };

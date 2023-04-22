@@ -27,6 +27,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void InteractFire(UPrimitiveComponent* HitComponent);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
+	void InteractPotion(float HealAmount);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void InteractBindTrap();
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void InteractHealArea();

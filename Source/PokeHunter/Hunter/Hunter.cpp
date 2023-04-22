@@ -544,9 +544,20 @@ void AHunter::LMBDown()
 
 				case EItemType::Trap:
 					ServerPlayMontage(this, FName("Install"));
-					Item->SetActorLocation((GetActorLocation() + GetActorForwardVector() * 100.f));
-					CurState = EPlayerState::Install;
-					Item->UseItem(this);
+					FHitResult* HitResult = new FHitResult();
+					FVector SpawnLoc = GetActorLocation() + GetActorForwardVector() * 200;
+					if (GetWorld()->LineTraceSingleByChannel(*HitResult, SpawnLoc, SpawnLoc + FVector(0, 0, -100), ECollisionChannel::ECC_Pawn))
+					{
+						Item->SetActorLocation(HitResult->Location);
+						CurState = EPlayerState::Install;
+						Item->UseItem(this);
+					}
+					else
+					{
+						//실패 처리 필요
+						Item->Destroy();
+						return;
+					}
 					break;
 				}
 				
@@ -793,12 +804,17 @@ void AHunter::SetDiveCurveTime(float length)
 
 void AHunter::InteractHealArea_Implementation()
 {
-	HealPerSecondAmount += 10.f;
+	HealPerSecondAmount = 10.f;
 }
 
 void AHunter::OutHealArea_Implementation()
 {
-	HealPerSecondAmount -= 10.f;
+	HealPerSecondAmount = 1.f;
+}
+
+void AHunter::InteractPotion_Implementation(float HealAmount)
+{
+	SetHP(GetHP() + HealAmount);
 }
 
 void AHunter::InteractEarthquake_Implementation()

@@ -17,14 +17,13 @@ class POKEHUNTER_API ATrap : public AItem
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Collision")
 	class UBoxComponent* CollisionBox;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-	float Damage;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Duration")
 	float LifeTime{ 5.f };
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Duration")
 	float StartTime;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Duration")
-	bool bHavingLife{ false };;
+	bool bHavingLife{ false };
 
 protected:
 	virtual void BeginPlay() override;
@@ -35,5 +34,7 @@ public:
 	UFUNCTION()
 	virtual void OnBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	void CheckLifeTime(float DeltaTime);
+
+
 
 };

@@ -79,6 +79,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
 	FGenericTeamId TeamID;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FVector BaseLocation;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float MoveRange;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackDamage = 10.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -92,11 +96,11 @@ public:
 	bool bReflecting{ false };
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		float StartBindingTime;
+	float StartBindingTime;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		float BindingTime;
+	float BindingTime;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		bool bBinding{ false };
+	bool bBinding{ false };
 
 	//상태 이상
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -170,6 +174,9 @@ public:
 	void SetTarget(AActor* NewTarget) { Target = NewTarget; };
 	void SeeNewTarget(AActor* Actor);
 	void HearSound(FVector SoundLoc, AActor* AgroTarget);
+
+	void ComeBackHome();
+	bool CheckInMoveRange();
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeTarget();

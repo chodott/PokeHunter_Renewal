@@ -34,6 +34,7 @@ ATrap::ATrap()
 void ATrap::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 	CheckLifeTime(DeltaTime);
 
 }

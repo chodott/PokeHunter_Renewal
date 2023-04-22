@@ -2,6 +2,7 @@
 
 
 #include "HitBoxComponent.h"
+#include "PokeHunter/Enemy/GolemBoss.h"
 
 UHitBoxComponent::UHitBoxComponent()
 {
@@ -49,6 +50,34 @@ bool UHitBoxComponent::CheckBurning(float DeltaTime)
 
 }
 
-void UHitBoxComponent::OnDestroyPart_Implementation()
+void UHitBoxComponent::SetChild(UHitBoxComponent* ChildBox )
 {
+	ChildHitbox = ChildBox;
+}
+
+void UHitBoxComponent::DestroyPart()
+{
+	AGolemBoss* Golem = Cast<AGolemBoss>(GetOwner());
+	if (Golem)
+	{
+		if (ChildHitbox)
+		{
+			ChildHitbox->DestroyPart(Golem);
+		}
+
+		Golem->DeleteHitBox(GetAttachSocketName());
+
+		DestroyComponent();
+	}
+}
+
+void UHitBoxComponent::DestroyPart(AGolemBoss* Golem)
+{
+	if (ChildHitbox)
+	{
+		ChildHitbox->DestroyPart(Golem);
+	}
+	Golem->DeleteHitBox(GetAttachSocketName());
+
+	DestroyComponent();
 }

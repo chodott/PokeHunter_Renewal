@@ -47,7 +47,7 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 		return;
 	}
 	//아이템 효과를 받지 않는 액터와 충돌
-	OnHitNotEnemy(Hit.Location);
+	else OnHitNotEnemy(Hit.Location);
 }
 
 
@@ -72,11 +72,6 @@ void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 	UGameplayStatics::PredictProjectilePath(this, predictParams, result);*/
 	ProjectileMovement->UpdateComponentVelocity();
 	StaticMesh->AddImpulse(Velocity, FName(""),true);
-}
-
-void ABullet::ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherComponent)
-{
-	Destroy();
 }
 
 void ABullet::OnHitNotEnemy_Implementation(const FVector& HitVec)

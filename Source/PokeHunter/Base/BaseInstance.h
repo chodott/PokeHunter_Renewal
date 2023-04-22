@@ -30,7 +30,8 @@ enum class PLAYER_STATE : uint8
 UENUM(BlueprintType)
 enum class PLAYER_PET : uint8
 {
-	P_DOG = 0	UMETA(DisplayName = "Pet Dog"),
+	P_NONE = 0	UMETA(DisplayName = "Pet None"),
+	P_DOG		UMETA(DisplayName = "Pet Dog"),
 	p_BIRD		UMETA(DisplayName = "Pet Bird"),
 	p_TEST01	UMETA(DisplayName = "Pet Test01"),
 	p_TEST02	UMETA(DisplayName = "Pet Test02")

@@ -44,14 +44,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
 		TArray<PLAYER_STATE> PartyMemberState;
 
+	UPROPERTY()
+		FTimerHandle TH_Partyinfo;
+
 	UFUNCTION(BlueprintCallable, Category = "Party info")
 		bool SendClientState();
 
 	UFUNCTION(BlueprintCallable, Category = "Party info")
-		bool TickSendPartyInfo();
+		bool SendEnterParty();
+
+	UFUNCTION(BlueprintCallable, Category = "Party info")
+		void TickSendPartyInfo();
 
 	UFUNCTION(BlueprintCallable, Category = "Party info")
 		bool RecvClientJoin();
+
+	UFUNCTION(BlueprintCallable, Category = "Party info")
+		bool LeaveParty();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")

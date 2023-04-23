@@ -88,12 +88,25 @@ bool UBaseInstance::SendAccessToken()
 
 		SC_LOGIN_INFO_PACK info_pack;
 		retVal = gSocket->Recv(reinterpret_cast<uint8*>(&info_pack), sizeof(SC_LOGIN_INFO_PACK), bSize);
-		if (retVal) {
+		if (false == retVal) {
 
 			UE_LOG(LogTemp, Warning, TEXT("Fail get player infomation!"));
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("Successssssss get player infomation!"));
+			// 안전하게 uint8 -> EPartnerType 로 변환
+			TCHAR MBTWBuffer[128];
+			memset(MBTWBuffer, NULL, 128);
+			MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._pet_num, -1, MBTWBuffer, strlen(info_pack._pet_num));
+
+			uint8 partner_number = atoi(TCHAR_TO_ANSI(MBTWBuffer));
+
+			if (partner_number <= (sizeof(EPartnerType) / sizeof(uint8))) {
+				myPartner = static_cast<EPartnerType>(partner_number);
+				UE_LOG(LogTemp, Warning, TEXT("Successssssss get player infomation! %d"), partner_number);
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("Fail Get Partner number: %d"), partner_number);
+			}
 		}
 	}
 

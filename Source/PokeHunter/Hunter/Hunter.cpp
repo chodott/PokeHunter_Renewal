@@ -125,6 +125,8 @@ AHunter::AHunter()
 
 	TeamID = FGenericTeamId(0);
 
+	// Set Game instance
+	gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
 }
 
 // Called when the game starts or when spawned
@@ -152,6 +154,24 @@ void AHunter::BeginPlay()
 	{
 		DiveTimeline.AddInterpFloat(DiveCurve, DiveInterpCallback);
 		DiveTimeline.SetTimelineLength(1.63f);
+	}
+
+	FString LevelName = GetWorld()->GetName();
+	if (("MyHome" == LevelName) && (EPartnerType::NonePartner != gameinstance->myPartner)) {
+		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
+		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
+		// TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(EPartnerType::GolemPartner);
+
+		// Set Partner Location
+		FVector Loc = GetActorLocation();
+		Loc += FVector(0, 0, 100);
+
+		APartner* myPartner = GetWorld()->SpawnActor<APartner>(partnerClass, Loc, GetActorRotation());
+		if (myPartner)
+		{
+			SetPartner(myPartner);
+			UE_LOG(LogTemp, Warning, TEXT("spawn success"));
+		}
 	}
 }
 

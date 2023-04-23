@@ -29,6 +29,10 @@ void ADatabaseActor::BeginPlay()
 		SkillData->SkillInfo = SkillInfo;
 		SkillDataObjectMap.Add(SkillInfo.ID, SkillData);
 	}
+
+	// BP_DatabaseActor의 상세페이지에서 직접 넣었음.
+	//PartnerDataObjectMap.Add(EPartnerType::WolfPartner, APartner::StaticClass());
+	//PartnerDataObjectMap.Add(EPartnerType::GolemPartner, APartner::StaticClass());
 }
 
 // Called every frame
@@ -40,19 +44,18 @@ void ADatabaseActor::Tick(float DeltaTime)
 
 UItemData* ADatabaseActor::FindItem(FName ItemID)
 {
-	if (ItemID == "None")							return NULL;
-	if (ItemDataClassMap.IsEmpty())					return NULL;
-	if (ItemDataObjectMap.IsEmpty())				return NULL;
-	if (0 == ItemDataClassMap.Num())				return NULL;
-	if (0 == ItemDataObjectMap.Num())				return NULL;
-	if (nullptr == ItemDataClassMap.Find(ItemID))	return NULL;
-	if (nullptr == ItemDataObjectMap.Find(ItemID))	return NULL;
-
+	if (ItemID == "None")							return nullptr;
+	if (ItemDataClassMap.IsEmpty())					return nullptr;
+	if (ItemDataObjectMap.IsEmpty())				return nullptr;
+	if (0 == ItemDataClassMap.Num())				return nullptr;
+	if (0 == ItemDataObjectMap.Num())				return nullptr;
+	if (nullptr == ItemDataClassMap.Find(ItemID))	return nullptr;
+	if (nullptr == ItemDataObjectMap.Find(ItemID))	return nullptr;
 
 	UItemData* ItemData = *ItemDataObjectMap.Find(ItemID);
 
 	if (ItemData != nullptr)						return ItemData;
-	else											return NULL;
+	else											return nullptr;
 }
 
 FSkillInfo ADatabaseActor::FindSkill(ESkillID SkillID)
@@ -69,5 +72,17 @@ FSkillInfo ADatabaseActor::FindSkill(ESkillID SkillID)
 	FSkillInfo info;
 	return info;
 
+}
+
+TSubclassOf<APartner> ADatabaseActor::FindPartner(EPartnerType input_type)
+{
+	if (PartnerDataObjectMap.IsEmpty())						return nullptr;
+	if (0 == PartnerDataObjectMap.Num())					return nullptr;
+	if (nullptr == PartnerDataObjectMap.Find(input_type))	return nullptr;
+
+	auto get_partner = *PartnerDataObjectMap.Find(input_type);
+
+	if (get_partner != nullptr)								return get_partner;
+	else													return nullptr;
 }
 

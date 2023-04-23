@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "PokeHunter/Item/ItemData.h"
 #include "PokeHunter/Base/SkillData.h"
+#include "PokeHunter/Partner/Partner.h"
 #include "DatabaseActor.generated.h"
 
 UCLASS()
@@ -26,8 +27,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SkillData")
 		TArray<FSkillInfo> SkillInfoArray;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SkillData")
 		TMap<ESkillID, class USkillData*> SkillDataObjectMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PartnerData")
+		TMap<EPartnerType, TSubclassOf<class APartner>> PartnerDataObjectMap;
 
 protected:
 	// Called when the game starts or when spawned
@@ -42,4 +46,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FSkillInfo FindSkill(ESkillID SkillID);
+
+	UFUNCTION(BlueprintCallable)
+	TSubclassOf<APartner> FindPartner(EPartnerType input_type);
 };

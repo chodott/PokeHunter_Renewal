@@ -7,6 +7,7 @@
 #include "GenericTeamAgentInterface.h"
 #include "PokeHunter/Base/SkillData.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
+#include "PokeHunter/Base/BaseInstance.h"
 #include "Partner.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
@@ -29,12 +30,12 @@ enum class EPartnerState : uint8
 	IceBreath
 };
 
-UENUM(BlueprintType)
-enum class EPartnerType : uint8
-{
-	WolfPartner,
-	GolemPartner
-};
+//UENUM(BlueprintType)
+//enum class EPartnerType : uint8
+//{
+//	WolfPartner,
+//	GolemPartner
+//};
 
 UCLASS()
 class POKEHUNTER_API APartner : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface

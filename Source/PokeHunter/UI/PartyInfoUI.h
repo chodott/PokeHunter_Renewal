@@ -39,7 +39,7 @@ public:
 		TArray<FName> PlayerName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
-		TArray<PLAYER_PET> PlayerPetName;
+		TArray<EPartnerType> PlayerPetName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
 		TArray<PLAYER_STATE> PartyMemberState;

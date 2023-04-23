@@ -186,7 +186,12 @@ void UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 		
 		// 기존 파티 멤버의 준비상태 표시용
 		PlayerName.Add(FName(MBTWBuffer));
-		PlayerPetName.Add(PLAYER_PET(info_pack._mem_pet));		// 작동이 안될 경우, TArray의 자료형을 변경
+
+		memset(MBTWBuffer, NULL, 128);
+		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._mem_pet, -1, MBTWBuffer, strlen(info_pack._mem_pet));
+
+		uint8 pet_number = atoi(TCHAR_TO_ANSI(MBTWBuffer));
+		PlayerPetName.Add(EPartnerType(pet_number));		// 작동이 안될 경우, TArray의 자료형을 변경
 		PartyMemberState.Add(PLAYER_STATE(info_pack._mem_state));
 	}
 

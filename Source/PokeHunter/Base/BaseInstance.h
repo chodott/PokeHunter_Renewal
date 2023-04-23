@@ -21,21 +21,20 @@
 UENUM(BlueprintType)
 enum class PLAYER_STATE : uint8
 {
-	ST_HOME = 0 UMETA(DisplayName = "State Home"),
-	ST_NOTREADY UMETA(DisplayName = "State Not Ready"),
-	ST_READY	UMETA(DisplayName = "State Ready"),
-	ST_STAGE	UMETA(DisplayName = "State Stage")
+	ST_HOME = 0		UMETA(DisplayName = "State Home"),
+	ST_NOTREADY		UMETA(DisplayName = "State Not Ready"),
+	ST_READY		UMETA(DisplayName = "State Ready"),
+	ST_STAGE		UMETA(DisplayName = "State Stage")
 };
 
 UENUM(BlueprintType)
-enum class PLAYER_PET : uint8
+enum class EPartnerType : uint8
 {
-	P_NONE = 0	UMETA(DisplayName = "Pet None"),
-	P_DOG		UMETA(DisplayName = "Pet Dog"),
-	p_BIRD		UMETA(DisplayName = "Pet Bird"),
-	p_TEST01	UMETA(DisplayName = "Pet Test01"),
-	p_TEST02	UMETA(DisplayName = "Pet Test02")
+	NonePartner = 0 UMETA(DisplayName = "None"),
+	WolfPartner		UMETA(DisplayName = "Wolf"),
+	GolemPartner	UMETA(DisplayName = "Golem")
 };
+
 /**
  * 
  */
@@ -96,6 +95,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString Quick_Skill;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EPartnerType myPartner = EPartnerType::NonePartner;
 
 	FSocket* gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
 	TSharedRef<FInternetAddr>addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();

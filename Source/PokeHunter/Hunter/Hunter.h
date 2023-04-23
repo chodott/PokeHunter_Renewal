@@ -11,6 +11,7 @@
 #include "PokeHunter/Base/SkillData.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
 #include "PokeHunter/Base/EnemyInteractInterface.h"
+#include "PokeHunter/Base/BaseInstance.h"
 #include "Hunter.generated.h"
 
 //Dynamic 
@@ -182,6 +183,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UBaseInstance* gameinstance = nullptr;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void PostInitializeComponents() override;

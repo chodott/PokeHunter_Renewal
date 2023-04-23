@@ -34,8 +34,8 @@ bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer)
 		int msg_cnt = item_info._cnt;
 		if (msg_name == "theEnd") break;
 
-		UE_LOG(LogTemp, Warning, TEXT("[Item name] : %s"), *msg_name.ToString());
-		UE_LOG(LogTemp, Warning, TEXT("[Item cnt] : %d"), msg_cnt);
+		// UE_LOG(LogTemp, Warning, TEXT("[Item name] : %s"), *msg_name.ToString());
+		// UE_LOG(LogTemp, Warning, TEXT("[Item cnt] : %d"), msg_cnt);
 
 		hunter->Inventory->InfoArray.Add(FItemCnter{ msg_name, msg_cnt });
 	}

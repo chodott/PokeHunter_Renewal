@@ -271,6 +271,8 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	if (bInvincible) return 0.0f;
 
 	HunterInfo.HunterHP -= DamageAmount;
+	HunterAnim->StopAllMontages(1.0f);
+	CurState = EPlayerState::Idle;
 
 	return DamageAmount;
 }
@@ -383,6 +385,8 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AHunter::SpaceDown()
 {
+	if (GetCharacterMovement()->IsFalling()) return;
+
 	if(CurState == EPlayerState::Idle)
 	{
 		FVector Speed = GetVelocity();
@@ -650,7 +654,7 @@ void AHunter::EKeyDown()
 
 		else
 		{
-			//아마 npc
+			//npc
 			ServerSprint(this, false);
 		}
 
@@ -818,6 +822,9 @@ void AHunter::InteractPotion_Implementation(float HealAmount)
 void AHunter::InteractEarthquake_Implementation()
 {
 	if (GetCharacterMovement()->IsFalling()) return;
+
+	if (bInvincible) return;
+
 	LaunchCharacter(FVector(0, 0, 1000), false, false);
 }
 
@@ -827,7 +834,12 @@ void AHunter::InteractAttack_Implementation(FVector HitDirection, float Damage)
 	{
 		return;
 	}
+
+	if (bInvincible) return;
+
 	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
+	
+
 	bDamaged = true;
 	LaunchCharacter(HitDirection * 1000.f,false,false);
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();

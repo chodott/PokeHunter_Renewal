@@ -51,20 +51,20 @@ bool UBaseInstance::SendAccessToken()
 
 	short last_index = AccessToken.Len();
 
-	for (int i = 0; i < 2000; i += 100) {
+	for (int i = 0; i < 2000; i += 50) {
 		if (last_index < i) {
 			strncpy_s(token_pack.Token, "theEnd", strlen("theEnd"));
 			retVal = gSocket->Send(reinterpret_cast<const uint8*>(&token_pack), token_pack.size, bSize);
 			break;
 		}
 
-		if (100 > last_index - i) {
+		if (50 > last_index - i) {
 			token_pack.Token_size = AccessToken.Mid(i, last_index).Len();
 			WideCharToMultiByte(CP_ACP, 0, *AccessToken.Mid(i, last_index), AccessToken.Mid(i, last_index).Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
 		}
 		else {
-			token_pack.Token_size = 100;
-			WideCharToMultiByte(CP_ACP, 0, *AccessToken.Mid(i, i + 100), AccessToken.Mid(i, i + 100).Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
+			token_pack.Token_size = 50;
+			WideCharToMultiByte(CP_ACP, 0, *AccessToken.Mid(i, i + 50), AccessToken.Mid(i, i + 50).Len(), token_pack.Token, sizeof(token_pack.Token), NULL, NULL);
 		}
 		
 		retVal = gSocket->Send(reinterpret_cast<const uint8*>(&token_pack), token_pack.size, bSize);

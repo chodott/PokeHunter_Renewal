@@ -139,7 +139,6 @@ void AFairy::SinMove(float DeltaTime)
 	if (TotalDistance > Distance)
 	{
 		SetRandMove();
-		UE_LOG(LogTemp, Warning, TEXT("ima!"));
 	}
 	
 }

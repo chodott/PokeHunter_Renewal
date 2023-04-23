@@ -10,8 +10,7 @@ UPartyServerManager::UPartyServerManager()
 
 bool UPartyServerManager::GetPartyList()
 {
-	if (nullptr == gameinstance->gSocket) return false;
-	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
+	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState())	return false;
 	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;
 
 	int32 bSize = 0;
@@ -21,7 +20,6 @@ bool UPartyServerManager::GetPartyList()
 	searching_pack.type = CS_PARTY_SEARCHING;
 	gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&searching_pack), searching_pack.size, bSize);
 
-	// 기존 파티 정보 제거하기.
 	gameinstance->PartyListMap.Reset();
 
 	SC_PARTIES_INFO_PACK party_list_pack;
@@ -39,13 +37,10 @@ bool UPartyServerManager::GetPartyList()
         msg_name = MBTWBuffer;
         int msg_cnt = party_list_pack._staff_count;
 
-        UE_LOG(LogTemp, Warning, TEXT("[Party name] : %s"), *msg_name.ToString());
-		UE_LOG(LogTemp, Warning, TEXT("[member cnt] : %d"), msg_cnt);
+        // UE_LOG(LogTemp, Warning, TEXT("[Party name] : %s"), *msg_name.ToString());
+		// UE_LOG(LogTemp, Warning, TEXT("[member cnt] : %d"), msg_cnt);
 		gameinstance->PartyListMap.Add(msg_name, msg_cnt);
 	}
-
-	// 현재 World Timer에 GetPartyList() 함수 호출을 등록하여 일정시간마다 PartyListMap을 갱신?
-	// GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UBaseInstance::RetrieveNewTokens, 1.0f, false, 60.0f);
 
 	return true;
 }

@@ -17,8 +17,18 @@ class POKEHUNTER_API UPartyListUI : public UUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
+
 public:
 	UBaseInstance* gameinstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
+		TArray<FName> Name_PartyList;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
+		TArray<int32> Count_PartyList;
 
 	UFUNCTION(BlueprintCallable, Category = "Party")
 		bool GetPartyList();

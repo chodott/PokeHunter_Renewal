@@ -24,6 +24,9 @@ void UPartyInfoUI::NativeConstruct()
 	Super::NativeConstruct();
 
 	gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
+	SendEnterParty();
+	// TickSendPartyInfo();
+	GetWorld()->GetTimerManager().SetTimer(TH_Partyinfo, this, &UPartyInfoUI::TickSendPartyInfo, 0.1f, true, 0.f);
 
 	// Join Blueprint UI widget 추가 필요
 	JoinButton = (UButton*)GetWidgetFromName(TEXT("BTN_READY"));
@@ -81,6 +84,7 @@ void UPartyInfoUI::NativeConstruct()
 
 void UPartyInfoUI::NativeDestruct()
 {
+	GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
 	GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
 	GetWorld()->GetTimerManager().ClearTimer(SetAveragePlayerLatencyHandle);
 	Super::NativeDestruct();
@@ -88,9 +92,9 @@ void UPartyInfoUI::NativeDestruct()
 
 bool UPartyInfoUI::SendClientState()	// Send this client State
 {
-	if (nullptr == gameinstance)				return false;
-	if (0 == gameinstance->PartyListMap.Num())	return false;
-	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
+	if (false == IsValid(gameinstance))																return false;
+	if (0 == gameinstance->PartyListMap.Num())														return false;
+	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState())	return false;
 	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;
 
 	bool retVal = false;
@@ -102,21 +106,58 @@ bool UPartyInfoUI::SendClientState()	// Send this client State
 	retVal = gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&ready_pack), ready_pack.size, bSize);
 	if (false == retVal) return false;
 
+	SC_PARTY_JOIN_RESULT_PACK result_pack;
+	retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&result_pack), sizeof(SC_PARTY_JOIN_RESULT_PACK), bSize);
+	if (false == retVal) return false;
+
+	if (-1 != result_pack._result) {
+		UE_LOG(LogTemp, Warning, TEXT("Starttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"));
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("fail...................."));
+		return false;
+	}
+
 	return true;
 }
 
-bool UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
+bool UPartyInfoUI::SendEnterParty()
 {
-	if (nullptr == gameinstance)				return false;
-	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
+	if (nullptr == gameinstance)																	return false;
+	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState())	return false;
 	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;
-	if (0 == gameinstance->PartyListMap.Num())	return false;
-	if (-1 == SelctPartyNumber)					return false;
+	if (0 == gameinstance->PartyListMap.Num())														return false;
+	if (-1 == SelctPartyNumber)																		return false;
+
+	bool retVal = false;
+	int32 bSize;
+
+	CS_PARTY_ENTER_PACK enter_pack;
+	enter_pack.size = sizeof(CS_PARTY_ENTER_PACK);
+	enter_pack.type = CS_PARTY_ENTER;
+	enter_pack.party_num = SelctPartyNumber;
+	retVal = gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&enter_pack), enter_pack.size, bSize);
+	if (false == retVal) return false;
+
+	SC_PARTY_ENTER_OK_PACK ok_pack;
+	retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&ok_pack), sizeof(SC_PARTY_ENTER_OK_PACK), bSize);
+	if (false == retVal) return false;
+
+	return true;
+}
+
+void UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
+{
+	if (nullptr == gameinstance)																	return;
+	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState())	return;
+	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return;
+	if (0 == gameinstance->PartyListMap.Num())														return;
+	if (-1 == SelctPartyNumber)																		return;
 
 	// 새로운 파티 정보를 위해서 기존의 정보를 전부 지운다.
-	PlayerName.Empty();
-	PlayerPetName.Empty();
-	PartyMemberState.Empty();
+	if(false == PlayerName.IsEmpty())		PlayerName.Empty();
+	if(false == PlayerPetName.IsEmpty())	PlayerPetName.Empty();
+	if(false == PartyMemberState.IsEmpty())	PartyMemberState.Empty();
 
 	bool retVal = false;
 	int32 bSize;
@@ -126,7 +167,7 @@ bool UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 	quest_pack.type = CS_PARTY_INFO;
 	quest_pack.party_num = SelctPartyNumber;
 	retVal = gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&quest_pack), quest_pack.size, bSize);
-	if (false == retVal) return false;
+	if (false == retVal) return;
 
 	SC_PARTY_INFO_PACK info_pack;
 	for (int i = 0; i < 4; ++i) {	// 최대 플레이어 수 만큼만 반복한다.
@@ -134,10 +175,10 @@ bool UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 		retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&info_pack), sizeof(SC_PARTY_INFO_PACK), bSize);
 
 		// 오류/종료 범위가 큰 순서로 검사
-		if (false == retVal)									return false;	// 소켓 통신의 실패
-		if (0 == strcmp(info_pack._mem, "theEnd"))				break;			// 파티멤버 수신 종료
-		if (i == 0 && (0 == strcmp(info_pack._mem, "Empty")))	break;			// 첫 번째 멤버부터 비어있음
-		if (i > 0 && (0 == strcmp(info_pack._mem, "Empty")))	break;			// 두 번째 멤버 이후 비어있음
+		if (false == retVal)									return;	// 소켓 통신의 실패
+		if (0 == strcmp(info_pack._mem, "theEnd"))				break;	// 파티멤버 수신 종료
+		if (i == 0 && (0 == strcmp(info_pack._mem, "Empty")))	break;	// 첫 번째 멤버부터 비어있음
+		if (i > 0 && (0 == strcmp(info_pack._mem, "Empty")))	break;	// 두 번째 멤버 이후 비어있음
 
 		TCHAR MBTWBuffer[128];
 		memset(MBTWBuffer, NULL, 128);
@@ -149,7 +190,7 @@ bool UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 		PartyMemberState.Add(PLAYER_STATE(info_pack._mem_state));
 	}
 
-	return true;
+	return;
 }
 
 bool UPartyInfoUI::RecvClientJoin()	// [Tick으로 Call!!!] Client에서 AWS GameLift로 접속하라는 신호를 여기로 받음
@@ -159,10 +200,10 @@ bool UPartyInfoUI::RecvClientJoin()	// [Tick으로 Call!!!] Client에서 AWS GameLif
 	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;
 	if (-1 == SelctPartyNumber)		return false;
 	bool retVal = false;
-	int32 bSize;
+	int32 bSize{};
 
-	SC_PARTY_JOIN_SUCCESS_PACK start_party_pack;
-	retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&start_party_pack), sizeof(SC_PARTY_JOIN_SUCCESS_PACK), bSize);
+	/*SC_PARTY_JOIN_SUCCESS_PACK start_party_pack;
+	retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&start_party_pack), sizeof(SC_PARTY_JOIN_SUCCESS_PACK), bSize);*/
 
 	if (true == retVal) {
 		// AWS 실행
@@ -172,6 +213,45 @@ bool UPartyInfoUI::RecvClientJoin()	// [Tick으로 Call!!!] Client에서 AWS GameLif
 
 	// Clinet에서 명령 실행 대기
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Recv] IOCP server...")));
+
+	return true;
+}
+
+bool UPartyInfoUI::LeaveParty()
+{
+	// GetWorld()->GetTimerManager().PauseTimer(TH_Partyinfo);
+
+	bool retVal = false;
+	int32 bSize;
+
+	CS_PARTY_LEAVE_PACK leave_pack;
+	leave_pack.size = sizeof(CS_PARTY_LEAVE_PACK);
+	leave_pack.type = CS_PARTY_LEAVE;
+	retVal = gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&leave_pack), leave_pack.size, bSize);
+
+	SC_PARTY_LEAVE_SUCCESS_PACK ok_pack;
+	ok_pack.size = sizeof(SC_PARTY_LEAVE_SUCCESS_PACK);
+	ok_pack.type = SC_PARTY_LEAVE_SUCCESS;
+
+	retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&ok_pack), sizeof(SC_PARTY_LEAVE_SUCCESS_PACK), bSize);
+	if (false == retVal) {
+		// GetWorld()->GetTimerManager().UnPauseTimer(TH_Partyinfo);
+		return false;
+	}
+
+	int32 leave_cnt = PlayerName.Find(FName(ok_pack._mem));
+
+	if (-1 != leave_cnt) {
+		PlayerName.RemoveAt(leave_cnt);
+		PlayerPetName.RemoveAt(leave_cnt);
+		PartyMemberState.RemoveAt(leave_cnt);
+		// GetWorld()->GetTimerManager().UnPauseTimer(TH_Partyinfo);
+		GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
+	}
+	else {
+		// GetWorld()->GetTimerManager().UnPauseTimer(TH_Partyinfo);
+		return false;
+	}
 
 	return true;
 }
@@ -196,6 +276,15 @@ void UPartyInfoUI::SetAveragePlayerLatency() {
 void UPartyInfoUI::OnJoinButtonClicked()
 {
 	JoinButton->SetIsEnabled(false);
+
+	if (true == SendClientState()) {
+		UE_LOG(LogTemp, Warning, TEXT("[Success] OnJoinButtonClicked()	--->>>	 SendClientState()"));
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("[Fail] OnJoinButtonClicked()		--->>>	 SendClientState()"));
+		JoinButton->SetIsEnabled(true);
+		return;
+	}
 
 	FString AccessToken;
 	FString JoinTicketId;

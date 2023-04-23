@@ -20,7 +20,7 @@ class POKEHUNTER_API UPartyServerManager : public UObject
 public:
 	UPartyServerManager();
 
-	UBaseInstance* gameinstance;
+	UBaseInstance* gameinstance = nullptr;
 
 	UFUNCTION(BlueprintCallable)
 		bool GetPartyList();

@@ -105,7 +105,7 @@ public:
 
 	//Partner
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
-	class APartner* Partner;
+		class APartner* Partner{};
 
 	//Delegate
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
@@ -275,7 +275,7 @@ public:
 	void SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum);
 	UFUNCTION(BlueprintCallable)
 	void SetPartnerTarget(ACharacter* setTarget);
-	void SetPartner(class APartner* SelectedPartner) { Partner = SelectedPartner; };
+	void SetPartner(class APartner* SelectedPartner);
 
 	//Collision Function
 	UFUNCTION()

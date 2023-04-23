@@ -159,7 +159,7 @@ void UBaseInstance::Shutdown()
 void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken)
 {
 	FString LevelName = GetWorld()->GetName();
-	if ("Title" == LevelName && "L_Field0" != LevelName) {
+	if ("Title" == LevelName) {
 		FString levelName = L"/Game/Map/Lobby/MyHome";
 		UGameplayStatics::OpenLevel(GetWorld(), *levelName);
 	}

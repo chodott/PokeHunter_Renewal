@@ -30,23 +30,15 @@ enum class EPartnerState : uint8
 	IceBreath
 };
 
-//UENUM(BlueprintType)
-//enum class EPartnerType : uint8
-//{
-//	WolfPartner,
-//	GolemPartner
-//};
-
 UCLASS()
 class POKEHUNTER_API APartner : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface
 {
 	GENERATED_BODY()
 
-private:
-	UPROPERTY(EditDefaultsOnly)
-	EPartnerType Type;
-
 public:
+	UPROPERTY(EditAnywhere)
+		EPartnerType Type = EPartnerType::NonePartner;
+
 	// Sets default values for this character's properties
 	APartner();
 

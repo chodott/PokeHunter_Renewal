@@ -283,10 +283,10 @@ void UPartyInfoUI::OnJoinButtonClicked()
 	JoinButton->SetIsEnabled(false);
 
 	if (true == SendClientState()) {
-		UE_LOG(LogTemp, Warning, TEXT("[Success] OnJoinButtonClicked()	--->>>	 SendClientState()"));
+		UE_LOG(LogTemp, Warning, TEXT("[Success] OnJoinButtonClicked()"));
 	}
 	else {
-		UE_LOG(LogTemp, Warning, TEXT("[Fail] OnJoinButtonClicked()		--->>>	 SendClientState()"));
+		UE_LOG(LogTemp, Warning, TEXT("[Fail] OnJoinButtonClicked()"));
 		JoinButton->SetIsEnabled(true);
 		return;
 	}
@@ -525,7 +525,7 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 						FString PlayerSessionId = Player->GetObjectField("PlayerSessionId")->GetStringField("S");
 						FString PlayerId = Player->GetObjectField("PlayerId")->GetStringField("S");
 
-						FString LevelName = IpAddress + ":" + Port;
+						gameinstance->GameLiftLevelName = IpAddress + ":" + Port;
 						const FString& Options = "?PlayerSessionId=" + PlayerSessionId + "?PlayerId=" + PlayerId;
 						UE_LOG(LogTemp, Warning, TEXT("options: %s"), *Options);
 
@@ -533,7 +533,7 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 
 						NativeDestruct();
 
-						UGameplayStatics::OpenLevel(GetWorld(), FName(*LevelName), false, Options);
+						UGameplayStatics::OpenLevel(GetWorld(), FName(gameinstance->GameLiftLevelName), false, Options);
 					}
 					else {
 						// AWS GameLift Dedicated server 접속에 실패하였음.

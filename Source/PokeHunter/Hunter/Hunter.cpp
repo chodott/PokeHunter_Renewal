@@ -157,19 +157,18 @@ void AHunter::BeginPlay()
 	}
 
 	FString LevelName = GetWorld()->GetName();
-	if (("MyHome" == LevelName) && (EPartnerType::NonePartner != gameinstance->myPartner)) {
+	if ((gameinstance->GameLiftLevelName == LevelName)) {
 		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
 		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
-		// TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(EPartnerType::GolemPartner);
 
-		// Set Partner Location
 		FVector Loc = GetActorLocation();
-		Loc += FVector(0, 0, 100);
+		Loc += FVector(0, 0, 200);
 
 		APartner* myPartner = GetWorld()->SpawnActor<APartner>(partnerClass, Loc, GetActorRotation());
 		if (myPartner)
 		{
 			SetPartner(myPartner);
+			myPartner->FollowHunter(this);
 			UE_LOG(LogTemp, Warning, TEXT("spawn success"));
 		}
 	}
@@ -878,6 +877,12 @@ void AHunter::SetPartnerTarget(ACharacter* setTarget)
 		Partner->SetTarget(setTarget);
 	}
 	
+}
+
+void AHunter::SetPartner(APartner* SelectedPartner)
+{
+	Partner = SelectedPartner;
+	gameinstance->myPartner = SelectedPartner->Type;
 }
 
 void AHunter::ServerStartInvincibility_Implementation()

@@ -105,7 +105,7 @@ public:
 	int reval;
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
-		bool ConnectToServer(FString server_addr ="127.0.0.1"); // Default Addr = 127.0.0.1
+		bool ConnectToServer(FString server_addr ="172.30.160.1"); // Default Addr = 172.30.160.1
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		bool SendAccessToken();
@@ -134,6 +134,9 @@ public:
 		TArray<FItemCnter> InstanceInfoArray;
 
 	TDoubleLinkedList<float> PlayerLatencies;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString GameLiftLevelName = "SurvivalArea";
 
 	UFUNCTION()
 		void SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken);

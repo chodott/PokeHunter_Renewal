@@ -272,7 +272,7 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 
 	HunterInfo.HunterHP -= DamageAmount;
 	HunterAnim->StopAllMontages(1.0f);
-	CurState = EPlayerState::Idle;
+	SetInstallMode();
 
 	return DamageAmount;
 }
@@ -340,13 +340,7 @@ void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
 	{
 		if (CurState == EPlayerState::Zoom)
 		{
-			bUseControllerRotationYaw = false;
-			bUseControllerRotationPitch = false;
-			GetCharacterMovement()->bOrientRotationToMovement = true;
-			CurState = EPlayerState::Idle;
-
-			SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
-			Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 600.0f;
+			SetInstallMode();
 		}
 	}
 }
@@ -418,9 +412,11 @@ void AHunter::MoveForward(float Val)
 		FVector EndLocation = GetActorLocation() + GetActorForwardVector() * 50;
 		FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
 		TraceParams.AddIgnoredActor(this);
-		GetWorld()->SweepSingleByProfile(HitResult, GetActorLocation(), EndLocation, FQuat::Identity, FName("Player"), GetCapsuleComponent()->GetCollisionShape(), TraceParams);
+		GetWorld()->LineTraceSingleByProfile(HitResult, GetActorLocation(), EndLocation, FName("Player"), TraceParams);
+		//GetWorld()->SweepSingleByProfile(HitResult, GetActorLocation(), EndLocation, FQuat::Identity, FName("Player"), GetCapsuleComponent()->GetCollisionShape(), TraceParams);
 		if (HitResult.bBlockingHit)
 		{
+			DrawDebugLine(GetWorld(), GetActorLocation(), EndLocation, FColor::Red,false, 10.f, 0U , 3.f);
 			return;
 		}
 		
@@ -894,6 +890,16 @@ void AHunter::MultiStartInvincibility_Implementation()
 void AHunter::StartInvincibility()
 {
 	ServerStartInvincibility();
+}
+
+void AHunter::SetInstallMode()
+{
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationPitch = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	CurState = EPlayerState::Idle;
+	SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
+	Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 600.0f;
 }
 
 //void AHunter::ServerSpawnItem_Implementation(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)

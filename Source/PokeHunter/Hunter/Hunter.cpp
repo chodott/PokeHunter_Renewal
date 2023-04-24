@@ -291,6 +291,8 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	if (bInvincible) return 0.0f;
 
 	HunterInfo.HunterHP -= DamageAmount;
+	HunterAnim->StopAllMontages(1.0f);
+	SetInstallMode();
 
 	return DamageAmount;
 }
@@ -358,13 +360,7 @@ void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
 	{
 		if (CurState == EPlayerState::Zoom)
 		{
-			bUseControllerRotationYaw = false;
-			bUseControllerRotationPitch = false;
-			GetCharacterMovement()->bOrientRotationToMovement = true;
-			CurState = EPlayerState::Idle;
-
-			SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
-			Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 600.0f;
+			SetInstallMode();
 		}
 	}
 }
@@ -404,6 +400,8 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AHunter::SpaceDown()
 {
+	if (GetCharacterMovement()->IsFalling()) return;
+
 	if(CurState == EPlayerState::Idle)
 	{
 		FVector Speed = GetVelocity();
@@ -431,6 +429,18 @@ void AHunter::MoveForward(float Val)
 	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install || bGrabbed) return;
 	if (Val != 0.0f)
 	{
+		FHitResult HitResult;
+		FVector EndLocation = GetActorLocation() + GetActorForwardVector() * 50;
+		FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
+		TraceParams.AddIgnoredActor(this);
+		GetWorld()->LineTraceSingleByProfile(HitResult, GetActorLocation(), EndLocation, FName("Player"), TraceParams);
+		//GetWorld()->SweepSingleByProfile(HitResult, GetActorLocation(), EndLocation, FQuat::Identity, FName("Player"), GetCapsuleComponent()->GetCollisionShape(), TraceParams);
+		if (HitResult.bBlockingHit)
+		{
+			DrawDebugLine(GetWorld(), GetActorLocation(), EndLocation, FColor::Red,false, 10.f, 0U , 3.f);
+			return;
+		}
+		
 		bDamaged = false;
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
@@ -671,7 +681,7 @@ void AHunter::EKeyDown()
 
 		else
 		{
-			//아마 npc
+			//npc
 			ServerSprint(this, false);
 		}
 
@@ -839,6 +849,9 @@ void AHunter::InteractPotion_Implementation(float HealAmount)
 void AHunter::InteractEarthquake_Implementation()
 {
 	if (GetCharacterMovement()->IsFalling()) return;
+
+	if (bInvincible) return;
+
 	LaunchCharacter(FVector(0, 0, 1000), false, false);
 }
 
@@ -848,7 +861,12 @@ void AHunter::InteractAttack_Implementation(FVector HitDirection, float Damage)
 	{
 		return;
 	}
+
+	if (bInvincible) return;
+
 	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
+	
+
 	bDamaged = true;
 	LaunchCharacter(HitDirection * 1000.f,false,false);
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
@@ -899,6 +917,16 @@ void AHunter::MultiStartInvincibility_Implementation()
 void AHunter::StartInvincibility()
 {
 	ServerStartInvincibility();
+}
+
+void AHunter::SetInstallMode()
+{
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationPitch = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	CurState = EPlayerState::Idle;
+	SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
+	Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 600.0f;
 }
 
 //void AHunter::ServerSpawnItem_Implementation(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)

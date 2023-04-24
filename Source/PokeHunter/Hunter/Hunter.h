@@ -218,6 +218,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartInvincibility();
 
+	void SetInstallMode();
+
 	//UFUNCTION(Server, Reliable)
 	//void ServerSpawnItem(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
 	//UFUNCTION(NetMulticast, Reliable)

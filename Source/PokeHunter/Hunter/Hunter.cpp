@@ -414,6 +414,16 @@ void AHunter::MoveForward(float Val)
 	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install || bGrabbed) return;
 	if (Val != 0.0f)
 	{
+		FHitResult HitResult;
+		FVector EndLocation = GetActorLocation() + GetActorForwardVector() * 50;
+		FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
+		TraceParams.AddIgnoredActor(this);
+		GetWorld()->SweepSingleByProfile(HitResult, GetActorLocation(), EndLocation, FQuat::Identity, FName("Player"), GetCapsuleComponent()->GetCollisionShape(), TraceParams);
+		if (HitResult.bBlockingHit)
+		{
+			return;
+		}
+		
 		bDamaged = false;
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);

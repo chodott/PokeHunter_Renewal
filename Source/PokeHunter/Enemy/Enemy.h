@@ -38,8 +38,8 @@ public:
 	// Sets default values for this pawn's properties
 	AEnemy();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float HP{ 30 };
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite)
+	float HP{ 30 };
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
 		class AActor* Target;
@@ -165,10 +165,6 @@ public:
 	void StartBinding();
 	UFUNCTION(BlueprintCallable)
 	void StartPoison();
-	//UFUNCTION(Server, Reliable)
-	//void ServerTakeDamage(AEnemy* Enemy, FName Section);
-	//UFUNCTION(NetMulticast, Reliable)
-	//void MultiTakeDamage(AEnemy* Enemy);
 
 
 	void SetTarget(AActor* NewTarget) { Target = NewTarget; };

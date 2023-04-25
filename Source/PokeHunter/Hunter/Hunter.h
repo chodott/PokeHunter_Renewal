@@ -35,13 +35,7 @@ struct FHunterInfo
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
-		int32 HunterNum {};
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
-	float HunterHP{100};
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
-	float HunterStamina{ 100 };
+	int32 HunterNum {};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, category = "Status")
 	bool bCanCombat = false;
@@ -66,15 +60,21 @@ public:
 	class UCameraComponent* FollowCamera;
 	//Inventory Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
-		class UInventoryComponent* Inventory{};
+	class UInventoryComponent* Inventory{};
 
 	//
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
 	class UStaticMeshComponent* DestinationMesh;
 
 	//HunterInfo
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HunterStatus")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
 	FHunterInfo HunterInfo;
+
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Status")
+	float HunterHP{ 100 };
+
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Status")
+	float HunterStamina{ 100 };
 	
 	//
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
@@ -220,18 +220,20 @@ public:
 
 	void SetInstallMode();
 
-	//UFUNCTION(Server, Reliable)
-	//void ServerSpawnItem(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
-	//UFUNCTION(NetMulticast, Reliable)
-	//void MultiSpawnItem(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnItem(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnBullet(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiUsePotion(AItem* Potion);
 
 	//Status
 	UFUNCTION(BlueprintCallable)
-	void SetHP(float HP) { HunterInfo.HunterHP = HP; };
+	void SetHP(float HP) { HunterHP = HP; };
 	UFUNCTION(BlueprintCallable)
-	float GetHP() { return HunterInfo.HunterHP; };
+	float GetHP() { return HunterHP; };
 	UFUNCTION(BlueprintCallable)
-	void SetStamina(float Stamina) { HunterInfo.HunterStamina = Stamina; };
+	void SetStamina(float Stamina) { HunterStamina = Stamina; };
 
 
 	// Called to bind functionality to input

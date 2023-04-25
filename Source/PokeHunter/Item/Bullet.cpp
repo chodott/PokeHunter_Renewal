@@ -24,7 +24,10 @@ ABullet::ABullet()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 
-	StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
+	}
 	//StaticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnHit);
 
 	ItemType = EItemType::Bullet;
@@ -39,12 +42,12 @@ void ABullet::BeginPlay()
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	
-	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+	UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+	//ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if (OtherActor->Implements<UItemInteractInterface>())
 	{
 		//아이템 효과를 받는 액터와 충돌
 		ApplyAbillity(OtherActor, OtherComponent);
-		return;
 	}
 	//아이템 효과를 받지 않는 액터와 충돌
 	else OnHitNotEnemy(Hit.Location);
@@ -74,6 +77,28 @@ void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 	StaticMesh->AddImpulse(Velocity, FName(""),true);
 }
 
+void ABullet::MultiLaunchBullet_Implementation(FVector InitialPos, FVector EndPos)
+{
+	FVector Velocity = FVector::ZeroVector;
+
+	UGameplayStatics::SuggestProjectileVelocity(this, Velocity, InitialPos, EndPos,
+		ProjectileMovement->InitialSpeed, false, 0.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::DoNotTrace);
+	//UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, Velocity, InitialPos, EndPos, GetWorld()->GetGravityZ(), 1.f);
+	ProjectileMovement->Velocity = Velocity;
+	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
+	SetLifeSpan(TimeLimit);
+
+	//경로 디버그 용
+	/*FPredictProjectilePathParams predictParams(20.0f, InitialPos, Velocity, 15.0f);
+	predictParams.DrawDebugTime = 15.0f;
+	predictParams.DrawDebugType = EDrawDebugTrace::Type::ForDuration;
+	predictParams.OverrideGravityZ = GetWorld()->GetGravity3Z();
+	FPredictProjectilePathResult result;
+	UGameplayStatics::PredictProjectilePath(this, predictParams, result);*/
+	ProjectileMovement->UpdateComponentVelocity();
+	StaticMesh->AddImpulse(Velocity, FName(""), true);
+}
+
 void ABullet::OnHitNotEnemy_Implementation(const FVector& HitVec)
 {
 	Destroy();
@@ -87,5 +112,7 @@ void ABullet::ServerApplyDamage_Implementation(AActor* DamagedActor, int DamageA
 
 void ABullet::MultiApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)
 {
+	FDamageEvent DamageEvent;
+	//DamagedActor->TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	UGameplayStatics::ApplyPointDamage(DamagedActor, DamageAmount, Direction, HitInfo, NULL, DamageCauser, DamageTypeClass);
 }

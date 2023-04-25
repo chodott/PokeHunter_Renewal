@@ -193,17 +193,17 @@ void AHunter::Tick(float DeltaTime)
 		float temp = FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, 0.f, DeltaTime, ArmSpeed);
 		CameraBoom->SetRelativeLocation(FVector(0.f, temp, 0.f));
 
-		if (HunterInfo.HunterStamina < 100) HunterInfo.HunterStamina += DeltaTime * 1;
-		else HunterInfo.HunterStamina = 100;
+		if (HunterStamina < 100) HunterStamina += DeltaTime * 1;
+		else HunterStamina = 100;
 	}
 
 	//Stamina
 	if (GetCharacterMovement()->GetMaxSpeed() > 600.f)
 	{
-		if (HunterInfo.HunterStamina > 0) HunterInfo.HunterStamina -= DeltaTime * 1;
+		if (HunterStamina > 0) HunterStamina -= DeltaTime * 1;
 		else
 		{
-			HunterInfo.HunterStamina = 0;
+			HunterStamina = 0;
 			GetCharacterMovement()->MaxWalkSpeed = 600.f;
 		}
 	}
@@ -290,8 +290,9 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 
 	if (bInvincible) return 0.0f;
 
-	HunterInfo.HunterHP -= DamageAmount;
+	HunterHP -= DamageAmount;
 	HunterAnim->StopAllMontages(1.0f);
+	StartInvincibility();
 	SetInstallMode();
 
 	return DamageAmount;
@@ -306,6 +307,9 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+
+	DOREPLIFETIME(AHunter, HunterHP);
+	DOREPLIFETIME(AHunter, HunterStamina);
 	DOREPLIFETIME(AHunter, CurState);
 }
 
@@ -544,52 +548,52 @@ void AHunter::LMBDown()
 					);*/
 					EndTrace = HitResult->Location;
 				}
-
-				ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(ItemClass, StartTrace, GetControlRotation());
-				Bullet->UseItem(this, StartTrace, EndTrace);
-
-				//ServerSpawnItem(ItemClass, StartTrace, EndTrace, GetControlRotation());
-				ServerPlayMontage(this, FName("Shot"));	
+				ServerSpawnBullet(ItemClass, StartTrace, EndTrace, GetControlRotation());
+				
 			}
 			//NormalMode
 			else
 			{
-				//ServerSpawnItem(ItemClass, GetActorLocation(), FVector::ZeroVector, GetControlRotation());
-				AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(),FRotator::ZeroRotator);
-				switch (Item->ItemType)
+				if (ItemClass->IsChildOf(APotion::StaticClass()))
 				{
-				case EItemType::Bullet:
-					Item->Destroy();
-					return;
-					break;
 
-				case EItemType::Potion:
-					ServerPlayMontage(this, FName("Drink"));
-					Item->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
-					CurItem = Item;
-					CurState = EPlayerState::Drink;
-					bUpperOnly = true;
-					break;
-
-				case EItemType::Trap:
-					ServerPlayMontage(this, FName("Install"));
-					FHitResult* HitResult = new FHitResult();
-					FVector SpawnLoc = GetActorLocation() + GetActorForwardVector() * 200;
-					if (GetWorld()->LineTraceSingleByChannel(*HitResult, SpawnLoc, SpawnLoc + FVector(0, 0, -100), ECollisionChannel::ECC_Pawn))
-					{
-						Item->SetActorLocation(HitResult->Location);
-						CurState = EPlayerState::Install;
-						Item->UseItem(this);
-					}
-					else
-					{
-						//실패 처리 필요
-						Item->Destroy();
-						return;
-					}
-					break;
 				}
-				
+				ServerSpawnItem(this, ItemClass, GetActorLocation(), FVector::ZeroVector, GetControlRotation());
+				//AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(),FRotator::ZeroRotator);
+				//switch (Item->ItemType)
+				//{
+				//case EItemType::Bullet:
+				//	Item->Destroy();
+				//	return;
+				//	break;
+
+				//case EItemType::Potion:
+				//	ServerPlayMontage(this, FName("Drink"));
+				//	Item->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
+				//	CurItem = Item;
+				//	CurState = EPlayerState::Drink;
+				//	bUpperOnly = true;
+				//	break;
+
+				//case EItemType::Trap:
+				//	ServerPlayMontage(this, FName("Install"));
+				//	FHitResult* HitResult = new FHitResult();
+				//	FVector SpawnLoc = GetActorLocation() + GetActorForwardVector() * 200;
+				//	if (GetWorld()->LineTraceSingleByChannel(*HitResult, SpawnLoc, SpawnLoc + FVector(0, 0, -100), ECollisionChannel::ECC_Pawn))
+				//	{
+				//		Item->SetActorLocation(HitResult->Location);
+				//		CurState = EPlayerState::Install;
+				//		Item->UseItem(this);
+				//	}
+				//	else
+				//	{
+				//		//실패 처리 필요
+				//		Item->Destroy();
+				//		return;
+				//	}
+				//	break;
+				//}
+				//
 			}
 
 			bCanShot = false;
@@ -929,32 +933,53 @@ void AHunter::SetInstallMode()
 	Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 600.0f;
 }
 
-//void AHunter::ServerSpawnItem_Implementation(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
-//{
-//	MultiSpawnItem(SpawnItemClass, StartLoc, EndLoc, Rotation);
-//}
-//
-//void AHunter::MultiSpawnItem_Implementation(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
-//{
-//	auto SpawnedItem = GetWorld()->SpawnActor<AItem>(SpawnItemClass, StartLoc, Rotation);
-//	switch (SpawnedItem->ItemType)
-//	{
-//		case EItemType::Bullet:
-//			SpawnedItem->UseItem(this, StartLoc, EndLoc);
-//			ServerPlayMontage(this, FName("Shot"));
-//			break;
-//		case EItemType::Potion:
-//			ServerPlayMontage(this, FName("Drink"));
-//			SpawnedItem->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
-//			CurItem = SpawnedItem;
-//			CurState = EPlayerState::Drink;
-//			bUpperOnly = true;
-//			break;
-//		case EItemType::Trap:
-//			ServerPlayMontage(this, FName("Install"));
-//			SpawnedItem->SetActorLocation((GetActorLocation() + GetActorForwardVector() * 100.f));
-//			SpawnedItem->UseItem(this);;
-//			CurState = EPlayerState::Install;
-//			break;
-//	}
-//}
+void AHunter::ServerSpawnBullet_Implementation(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
+{
+	ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(SpawnItemClass, StartLoc, Rotation);
+	Bullet->MultiLaunchBullet(StartLoc, EndLoc);
+	//MultiPlayMontage(NULL, FName("Drink"));
+}
+
+void AHunter::MultiUsePotion_Implementation(AItem* Potion)
+{
+	//포션이 null값으로 들어온다
+
+	Potion->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
+	CurItem = Potion;
+	CurState = EPlayerState::Drink;
+	bUpperOnly = true;
+}
+
+void AHunter::ServerSpawnItem_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
+{
+	UE_LOG(LogTemp, Warning, TEXT("spawn item"));
+
+	AItem* SpawnedItem = GetWorld()->SpawnActor<AItem>(SpawnItemClass, StartLoc, FRotator::ZeroRotator);
+	switch (SpawnedItem->ItemType)
+	{
+	case EItemType::Bullet:
+		SpawnedItem->Destroy();
+		break;
+	case EItemType::Potion:
+		MultiPlayMontage(OwnerHunter, FName("Drink"));
+		MultiUsePotion(SpawnedItem);
+
+		break;
+	case EItemType::Trap:
+		MultiPlayMontage(OwnerHunter, FName("Install"));
+		FHitResult* HitResult = new FHitResult();
+		FVector SpawnLoc = StartLoc + OwnerHunter->GetActorForwardVector() * 200;
+		if (GetWorld()->LineTraceSingleByChannel(*HitResult, SpawnLoc, SpawnLoc + FVector(0, 0, -100), ECollisionChannel::ECC_Pawn))
+		{
+			SpawnedItem->SetActorLocation(HitResult->Location);
+			OwnerHunter->CurState = EPlayerState::Install;
+			SpawnedItem->UseItem(OwnerHunter);
+		}
+		else
+		{
+			//실패 처리 필요
+			SpawnedItem->Destroy();
+		}
+		break;
+	}
+}

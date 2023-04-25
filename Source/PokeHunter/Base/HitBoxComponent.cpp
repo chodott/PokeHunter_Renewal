@@ -3,10 +3,22 @@
 
 #include "HitBoxComponent.h"
 #include "PokeHunter/Enemy/GolemBoss.h"
+#include "Net/UnrealNetwork.h"
 
 UHitBoxComponent::UHitBoxComponent()
 {
 	SetGenerateOverlapEvents(true);
+	SetIsReplicatedByDefault(true);
+}
+
+void UHitBoxComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UHitBoxComponent, PartHP);
+	DOREPLIFETIME(UHitBoxComponent, bDestroyed);
+	DOREPLIFETIME(UHitBoxComponent, bDestroyed);
+
 }
 
 
@@ -53,6 +65,27 @@ bool UHitBoxComponent::CheckBurning(float DeltaTime)
 void UHitBoxComponent::SetChild(UHitBoxComponent* ChildBox )
 {
 	ChildHitbox = ChildBox;
+}
+
+void UHitBoxComponent::ServerDestroyPart_Implementation()
+{
+	MultiDestroyPart();
+}
+
+void UHitBoxComponent::MultiDestroyPart_Implementation()
+{
+	AGolemBoss* Golem = Cast<AGolemBoss>(GetOwner());
+	if (Golem)
+	{
+		if (ChildHitbox)
+		{
+			ChildHitbox->DestroyPart(Golem);
+		}
+
+		Golem->DeleteHitBox(GetAttachSocketName());
+
+		DestroyComponent();
+	}
 }
 
 void UHitBoxComponent::DestroyPart()

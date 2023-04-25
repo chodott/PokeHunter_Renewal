@@ -156,7 +156,7 @@ void AHunter::BeginPlay()
 		DiveTimeline.SetTimelineLength(1.63f);
 	}
 
-	FString LevelName = GetWorld()->GetName();
+	/*FString LevelName = GetWorld()->GetName();
 	if ((gameinstance->GameLiftLevelName == LevelName)) {
 		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
 		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
@@ -171,7 +171,7 @@ void AHunter::BeginPlay()
 			myPartner->FollowHunter(this);
 			UE_LOG(LogTemp, Warning, TEXT("spawn success"));
 		}
-	}
+	}*/
 }
 
 // Called every frame

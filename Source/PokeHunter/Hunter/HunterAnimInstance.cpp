@@ -6,16 +6,7 @@
 
 UHunterAnimInstance::UHunterAnimInstance()
 {
-	//CombatMontage Init
-	ConstructorHelpers::FObjectFinder<UAnimMontage> CombatMontageObj(TEXT("/Game/Hunter/Blueprint/CombatMontage.CombatMontage"));
-	if(CombatMontageObj.Succeeded()) CombatMontage = CombatMontageObj.Object;
-	MovementSpeed = 0.0f;
 
-	//InteractMontage Init
-	ConstructorHelpers::FObjectFinder<UAnimMontage> InteractMontageObj(TEXT("/Game/Hunter/Blueprint/InteractMontage.InteractMontage"));
-	if (CombatMontageObj.Succeeded()) InteractMontage = InteractMontageObj.Object;
-
-	
 }
 
 void UHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)

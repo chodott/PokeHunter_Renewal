@@ -48,9 +48,9 @@ public:
 	class AHunter* Hunter;
 
 	//Montage
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, category = "Combat" )
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Combat" )
 	UAnimMontage* CombatMontage;
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, category = "Interact")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Interact")
 	UAnimMontage* InteractMontage;
 
 public:

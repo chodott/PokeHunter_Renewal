@@ -17,7 +17,6 @@ void UHitBoxComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(UHitBoxComponent, PartHP);
 	DOREPLIFETIME(UHitBoxComponent, bDestroyed);
-	DOREPLIFETIME(UHitBoxComponent, bDestroyed);
 
 }
 

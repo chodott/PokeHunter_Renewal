@@ -39,3 +39,13 @@ void APotion::ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherCompon
 	Destroy();
 }
 
+void APotion::MultiLaunchBullet_Implementation(FVector InitialPos, FVector EndPos)
+{
+	StaticMesh->SetSimulatePhysics(true);
+	StaticMesh->SetEnableGravity(true);
+	StaticMesh->SetCollisionProfileName(FName("Bullet"));
+	ProjectileMovement->ProjectileGravityScale = 1.f;
+	ProjectileMovement->Activate();
+	ABullet::MultiLaunchBullet_Implementation(InitialPos, EndPos);
+}
+

@@ -7,6 +7,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
+#include "PokeHunter/Base/HitBoxComponent.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "PokeHunter/Partner/Partner.h"
 #include "PokeHunter/Enemy/Enemy.h"
@@ -24,10 +25,9 @@ ABullet::ABullet()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 
-	if (GetLocalRole() == ROLE_Authority)
-	{
-		StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
-	}
+	
+	StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
+
 	//StaticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnHit);
 
 	ItemType = EItemType::Bullet;
@@ -41,9 +41,10 @@ void ABullet::BeginPlay()
 
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	
-	UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
-	//ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+	if(OtherComponent->IsA<UHitBoxComponent>())
+	UE_LOG(LogTemp, Warning, TEXT("HitBox Hit"), );
+	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if (OtherActor->Implements<UItemInteractInterface>())
 	{
 		//아이템 효과를 받는 액터와 충돌
@@ -112,7 +113,7 @@ void ABullet::ServerApplyDamage_Implementation(AActor* DamagedActor, int DamageA
 
 void ABullet::MultiApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)
 {
-	FDamageEvent DamageEvent;
+	FPointDamageEvent DamageEvent(DamageAmount, HitInfo, HitInfo.Normal, UDamageType::StaticClass());
 	//DamagedActor->TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	UGameplayStatics::ApplyPointDamage(DamagedActor, DamageAmount, Direction, HitInfo, NULL, DamageCauser, DamageTypeClass);
 }

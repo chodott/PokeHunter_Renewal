@@ -105,7 +105,7 @@ public:
 
 	//Partner
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
-		class APartner* Partner{};
+	class APartner* Partner{};
 
 	//Delegate
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
@@ -223,7 +223,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnItem(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnBullet(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
+	void ServerSpawnBullet(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiUsePotion(AItem* Potion);
 

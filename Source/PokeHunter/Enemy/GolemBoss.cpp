@@ -67,6 +67,7 @@ AGolemBoss::AGolemBoss()
 	LeftLegHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("LeftLegHitBox"));
 	LeftLegHitBox->SetupAttachment(GetMesh(), PartName);
 	LeftLegHitBox->SetCollisionProfileName(FName("EnemyHitBox"));
+	LeftLegHitBox->SetIsReplicated(true);
 	HitBoxMap.Add(PartName, LeftLegHitBox);
 
 
@@ -97,11 +98,14 @@ void AGolemBoss::Tick(float DeltaTime)
 
 	for (auto Hitbox : HitBoxMap)
 	{
-		if (Hitbox.Value->CheckBurning(DeltaTime))
+		if (!Hitbox.Value)
 		{
-			float DamageAmount = 1;
-			HP -= DamageAmount;
-			OnDamage.Broadcast(DamageAmount, Hitbox.Value->GetComponentLocation());
+			if (Hitbox.Value->CheckBurning(DeltaTime))
+			{
+				float DamageAmount = 1;
+				HP -= DamageAmount;
+				OnDamage.Broadcast(DamageAmount, Hitbox.Value->GetComponentLocation());
+			}
 		}
 	}
 }
@@ -188,13 +192,14 @@ void AGolemBoss::OpenLevelHome()
 
 float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (HP <= 0) return 0;
 	APawn::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	
 
 	FVector HitLoc;
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
-	{	//Point Damage ó��
+	{	//Point Damage
 
 		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
 		HitLoc = PointDamageEvent.HitInfo.Location;
@@ -205,7 +210,7 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 			{
 				FName PartName = HitBox->GetAttachSocketName();
 				DestroyPart(PartName);
-				HitBox->DestroyPart();
+				HitBox->ServerDestroyPart();
 			}
 		}
 		HP -= DamageAmount;
@@ -221,6 +226,7 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	{
 		ServerPlayMontage(this, FName("Die"));
 		bDied = true;
+		SetActorTickEnabled(false);
 		//Die();
 	}
 

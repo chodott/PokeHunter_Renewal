@@ -190,7 +190,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		{
 			//사망 애니메이션
 			CurState = EEnemyState::Die;
-			EnemyAnim->PlayCombatMontage(FName("Die"), true);
+			ServerPlayMontage(this, FName("Die"));
 		}
 		else
 		{
@@ -200,7 +200,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			}
 			else
 			{
-				EnemyAnim->PlayCombatMontage(FName("Hit"), true);
+				ServerPlayMontage(this, FName("Hit"));
 				if (Target == NULL)
 				{
 					Target = HitItem->ThisOwner;
@@ -231,6 +231,7 @@ void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(AEnemy, HP);
 	DOREPLIFETIME(AEnemy, CurState);
 	DOREPLIFETIME(AEnemy, Target);
 

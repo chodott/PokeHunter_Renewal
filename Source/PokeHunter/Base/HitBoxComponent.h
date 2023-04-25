@@ -19,12 +19,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* ChildHitbox;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Part")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Replicated, Category = "Part")
 	float PartHP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	float Damage;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Part")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "Part")
 	bool bDestroyed;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PartBurning")
@@ -34,17 +34,26 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PartBurning")
 	float BurningTime;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PartBurning")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated, Category = "PartBurning")
 	bool bBurning;
 
 	
 
 public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
+
 	UHitBoxComponent();
 	bool TakeDamage(float DamageAmount);
 	bool CheckBurning(float DeltaTime);
 
 	void SetChild(class UHitBoxComponent* ChildBox);
+
+
+	//Replication
+	UFUNCTION(Server, Reliable)
+	void ServerDestroyPart();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiDestroyPart();
 	void DestroyPart();
 	void DestroyPart(class AGolemBoss* Golem);
 

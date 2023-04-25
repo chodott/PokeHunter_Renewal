@@ -34,6 +34,9 @@ public:
 	
 	virtual void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiLaunchBullet(FVector InitialPos, FVector EndPos);
+
 	UFUNCTION(BlueprintNativeEvent)
 	void OnHitNotEnemy(const FVector& HitVec);
 	

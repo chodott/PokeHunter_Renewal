@@ -103,6 +103,11 @@ public:
 	TSubclassOf <UUserWidget> StorageUIClass;
 	class UUserWidget* StorageUI;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+		TSubclassOf <UUserWidget> LogoutUIClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+		class UUserWidget* LogoutUI;
+
 	//Partner
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
 		class APartner* Partner{};
@@ -260,7 +265,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EKeyDown();
 	UFUNCTION(BlueprintCallable)
-	void GKeyDown();
+	void ESCKeyDown();
 	UFUNCTION(BlueprintCallable)
 	void CtrlDown();
 	UFUNCTION(BlueprintCallable)

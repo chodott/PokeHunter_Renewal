@@ -112,6 +112,9 @@ public:
 
 	virtual void Shutdown() override;
 
+	UFUNCTION(BlueprintCallable, Category = "LogoutGame")
+		bool LogoutGame();
+
 	UPROPERTY()
 		FString AccessToken;
 

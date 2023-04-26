@@ -98,6 +98,12 @@ AHunter::AHunter()
 		MainUIClass = TempMainClass.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<UUserWidget>TempLogoutClass(TEXT("/Game/UI/MainMenu/UI_LogoutMenu"));
+	if (TempLogoutClass.Succeeded())
+	{
+		LogoutUIClass = TempLogoutClass.Class;
+	}
+
 	//Using Controller Rotation
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
@@ -148,6 +154,9 @@ void AHunter::BeginPlay()
 	MainUI = CreateWidget(GetWorld(), MainUIClass, TEXT("MainUI"));
 	MainUI->AddToViewport();
 
+	LogoutUI = CreateWidget(GetWorld(), LogoutUIClass, TEXT("LogoutUI"));
+	// LogoutUI->AddToViewport();
+
 	//Timeline
 	DiveInterpCallback.BindUFunction(this, FName("DiveInterpReturn"));
 	if (DiveCurve)
@@ -156,8 +165,11 @@ void AHunter::BeginPlay()
 		DiveTimeline.SetTimelineLength(1.63f);
 	}
 
-	/*FString LevelName = GetWorld()->GetName();
-	if ((gameinstance->GameLiftLevelName == LevelName)) {
+	FString LevelName = GetWorld()->GetName();
+	if (nullptr == gameinstance) return;
+	if ((gameinstance->GameLiftLevelName == LevelName)
+		&& (ESocketConnectionState::SCS_ConnectionError != gameinstance->gSocket->GetConnectionState())
+		&& (ESocketConnectionState::SCS_NotConnected != gameinstance->gSocket->GetConnectionState())) {
 		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
 		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
 
@@ -169,9 +181,9 @@ void AHunter::BeginPlay()
 		{
 			SetPartner(myPartner);
 			myPartner->FollowHunter(this);
-			UE_LOG(LogTemp, Warning, TEXT("spawn success"));
+			// UE_LOG(LogTemp, Warning, TEXT("spawn success"));
 		}
-	}*/
+	}
 }
 
 // Called every frame
@@ -393,7 +405,7 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("RMB", IE_Released, this, &AHunter::RMBUp);
 	PlayerInputComponent->BindAction("I_Key", IE_Pressed, this, &AHunter::OpenInventory);
 	PlayerInputComponent->BindAction("E_Key", IE_Pressed, this, &AHunter::EKeyDown);
-	PlayerInputComponent->BindAction("G_Key", IE_Pressed, this, &AHunter::GKeyDown);
+	PlayerInputComponent->BindAction("Escape", IE_Pressed, this, &AHunter::ESCKeyDown);
 	PlayerInputComponent->BindAction("Ctrl", IE_Pressed, this, &AHunter::CtrlDown);
 	PlayerInputComponent->BindAction("Ctrl", IE_Released, this, &AHunter::CtrlUp);
 	PlayerInputComponent->BindAction("1_Key", IE_Pressed, this, &AHunter::Use1Skill);
@@ -694,17 +706,9 @@ void AHunter::EKeyDown()
 	}
 }
 
-void AHunter::GKeyDown()
+void AHunter::ESCKeyDown()
 {
-	FHitResult HitResult;
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-	PlayerController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1,0,HitResult);
-	//HitResult.Location;
-	if (HitResult.bBlockingHit)
-	{
-		Partner->TargetPos = HitResult.Location;
-		Partner->bOrdered = true;
-	}
+	
 }
 
 void AHunter::CtrlDown()

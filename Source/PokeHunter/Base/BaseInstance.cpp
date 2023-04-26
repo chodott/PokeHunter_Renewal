@@ -156,6 +156,66 @@ void UBaseInstance::Shutdown()
 	Super::Shutdown();
 }
 
+bool UBaseInstance::LogoutGame()
+{
+	GetWorld()->GetTimerManager().ClearTimer(RetrieveNewTokensHandle);
+	GetWorld()->GetTimerManager().ClearTimer(GetResponseTimeHandle);
+
+	if (AccessToken.Len() > 0) {
+		if (JoinTicketId.Len() > 0) {
+			TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
+			RequestObj->SetStringField("ticketId", JoinTicketId);
+
+			FString RequestBody;
+			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
+			if (FJsonSerializer::Serialize(RequestObj.ToSharedRef(), Writer)) {
+				TSharedRef<IHttpRequest> StopMatchmakingRequest = HttpModule->CreateRequest();
+				StopMatchmakingRequest->SetURL(ApiUrl + "/stopmatchmaking");
+				StopMatchmakingRequest->SetVerb("POST");
+				StopMatchmakingRequest->SetHeader("Content-Type", "application/json");
+				StopMatchmakingRequest->SetHeader("Authorization", AccessToken);
+				StopMatchmakingRequest->SetContentAsString(RequestBody);
+				StopMatchmakingRequest->ProcessRequest();
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("stopmatchmaking Lambda Function Error!"));
+				return false;
+			}
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("JoinTicketId Error!"));
+			return false;
+		}
+
+		TSharedRef<IHttpRequest> InvalidateTokensRequest = HttpModule->CreateRequest();
+		InvalidateTokensRequest->SetURL(ApiUrl + "/invalidatetokens");
+		InvalidateTokensRequest->SetVerb("GET");
+		InvalidateTokensRequest->SetHeader("Content-Type", "application/json");
+		InvalidateTokensRequest->SetHeader("Authorization", AccessToken);
+		InvalidateTokensRequest->ProcessRequest();
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("AccessToken Error!"));
+		return false;
+	}
+
+	if ((NULL != gSocket) && (ESocketConnectionState::SCS_NotConnected != gSocket->GetConnectionState()) && (ESocketConnectionState::SCS_ConnectionError != gSocket->GetConnectionState()))
+	{
+		int32 bSize = 0;
+		CS_LOGOUT_PACK logout_pack;
+		logout_pack.size = sizeof(CS_LOGOUT_PACK);
+		logout_pack.type = CS_LOGOUT;
+		gSocket->Send(reinterpret_cast<const uint8*>(&logout_pack), logout_pack.size, bSize);
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("FSocket Error!"));
+		return false;
+	}
+
+
+	return true;
+}
+
 void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken)
 {
 	FString LevelName = GetWorld()->GetName();

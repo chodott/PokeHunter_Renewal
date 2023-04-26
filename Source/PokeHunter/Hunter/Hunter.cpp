@@ -37,22 +37,6 @@ AHunter::AHunter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//  Mesh
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_HUNTER(TEXT("/Game/Hunter/Asset/YBot/Y_Bot.Y_Bot"));
-	if (SK_HUNTER.Succeeded())
-	{
-		GetMesh()->SetSkeletalMesh(SK_HUNTER.Object);
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
-	}
-
-	// Animation
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_HUNTER(TEXT("/Game/Hunter/Blueprint/BP_HunterAnimInstance"));
-	if (ANIM_HUNTER.Succeeded()) 
-	{
-		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		GetMesh()->SetAnimInstanceClass(ANIM_HUNTER.Class);
-	}
-
 	//Timeline
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>DIVE_CURVE(TEXT("/Game/Hunter/Blueprint/DiveCurve.DiveCurve"));
 	if (DIVE_CURVE.Succeeded())
@@ -173,9 +157,12 @@ void AHunter::BeginPlay()
 		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
 		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
 
-		FVector Loc = GetActorLocation();
-		Loc += FVector(0, 0, 200);
+	//Debug Partner set
+	ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
+	TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(EPartnerType::WolfPartner);
 
+	FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
+	ServerSpawnPartner(this, partnerClass, SpawnLocation);
 		APartner* myPartner = GetWorld()->SpawnActor<APartner>(partnerClass, Loc, GetActorRotation());
 		if (myPartner)
 		{
@@ -356,6 +343,7 @@ void AHunter::ServerPlayMontage_Implementation(AHunter* Hunter ,FName Session)
 void AHunter::ServerZoom_Implementation(AHunter* Hunter, bool bZoom)
 {
 	MultiZoom(Hunter, bZoom);
+	if(bZoom) MultiPlayMontage(Hunter, FName("Zoom"));
 }
 
 void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
@@ -370,6 +358,7 @@ void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
 			GetCharacterMovement()->bOrientRotationToMovement = false;
 
 			GetCharacterMovement()->MaxWalkSpeed = 300.f;
+
 		}
 	}
 	else
@@ -520,8 +509,7 @@ void AHunter::LMBDown()
 		//HitResult.Location;
 		if (HitResult.bBlockingHit)
 		{
-			Partner->TargetPos = HitResult.Location;
-			Partner->bOrdered = true;
+			Partner->ServerSetPosition(HitResult.Location);
 		}
 		return;
 	}
@@ -560,7 +548,7 @@ void AHunter::LMBDown()
 					);*/
 					EndTrace = HitResult->Location;
 				}
-				ServerSpawnBullet(ItemClass, StartTrace, EndTrace, GetControlRotation());
+				ServerSpawnBullet(this, ItemClass, StartTrace, EndTrace, GetControlRotation());
 				
 			}
 			//NormalMode
@@ -568,9 +556,13 @@ void AHunter::LMBDown()
 			{
 				if (ItemClass->IsChildOf(APotion::StaticClass()))
 				{
-
+					bUpperOnly = true;
+					ServerUsePotion(this, ItemClass);
 				}
-				ServerSpawnItem(this, ItemClass, GetActorLocation(), FVector::ZeroVector, GetControlRotation());
+				else
+				{
+					ServerSpawnItem(this, ItemClass, GetActorLocation(), FVector::ZeroVector, GetControlRotation());
+				}
 				//AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(),FRotator::ZeroRotator);
 				//switch (Item->ItemType)
 				//{
@@ -633,6 +625,7 @@ void AHunter::LMBDown()
 void AHunter::RMBDown()
 {
 	if (bBound) return;
+	bUpperOnly = true;
 	ServerZoom(this,true);
 }
 
@@ -792,7 +785,6 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 
 void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//if (OverlappedComp == GetCapsuleComponent()) UE_LOG(LogTemp, Warning, TEXT("OverlapBegin"));
 	if (InteractingActor == nullptr)
 	{
 		if (OtherActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
@@ -808,7 +800,6 @@ void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AAct
 	{
 		if (InteractingActor == Cast<AInteractActor>(OtherActor))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("OverlapEnd"));
 			InteractingActor = NULL;
 		}
 		else return;
@@ -874,8 +865,9 @@ void AHunter::InteractAttack_Implementation(FVector HitDirection, float Damage)
 
 	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
 	
+	UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), HitDirection.X, HitDirection.Y, HitDirection.Z);
 
-	bDamaged = true;
+	//bDamaged = true;
 	LaunchCharacter(HitDirection * 1000.f,false,false);
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	bNoCollision = true;
@@ -908,7 +900,7 @@ void AHunter::SetPartnerTarget(ACharacter* setTarget)
 void AHunter::SetPartner(APartner* SelectedPartner)
 {
 	Partner = SelectedPartner;
-	gameinstance->myPartner = SelectedPartner->Type;
+	//gameinstance->myPartner = EPartnerType::WolfPartner;
 }
 
 void AHunter::ServerStartInvincibility_Implementation()
@@ -929,29 +921,54 @@ void AHunter::StartInvincibility()
 
 void AHunter::SetInstallMode()
 {
+	bUpperOnly = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	CurState = EPlayerState::Idle;
-	SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
 	Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 600.0f;
+	if (CurState == EPlayerState::Zoom)
+	{
+		SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
+	}
+	
+	//shot or zoom start shut down/ BlendTime Option
+	HunterAnim->StopAllMontages(0.2f);
+	CurState = EPlayerState::Idle;
+	
 }
 
-void AHunter::ServerSpawnBullet_Implementation(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
+void AHunter::ServerSpawnPartner_Implementation(AHunter* OwnerHunter, TSubclassOf<APartner> SpawnPartnerClass, const FVector& SpawnLoc)
+{
+	APartner* NewPartner = GetWorld()->SpawnActor<APartner>(SpawnPartnerClass, SpawnLoc, FRotator::ZeroRotator);
+	NewPartner->MultiSetHunter(OwnerHunter);
+	MultiSetPartner(NewPartner);
+
+}
+
+void AHunter::MultiSetPartner_Implementation (APartner* NewPartner)
+{
+	SetPartner(NewPartner);
+}
+
+void AHunter::ServerUsePotion_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass)
+{
+	APotion* Potion = GetWorld()->SpawnActor<APotion>(SpawnItemClass,FVector(0,0,0), FRotator::ZeroRotator);
+	Potion->MultiAttachPotion(OwnerHunter);
+	MultiPlayMontage(OwnerHunter, FName("Drink"));
+	MultiUsePotion(Potion);
+}
+
+void AHunter::MultiUsePotion_Implementation(APotion* Potion)
+{
+	CurItem = Potion;
+	CurState = EPlayerState::Drink;
+}
+
+void AHunter::ServerSpawnBullet_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
 {
 	ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(SpawnItemClass, StartLoc, Rotation);
 	Bullet->MultiLaunchBullet(StartLoc, EndLoc);
-	//MultiPlayMontage(NULL, FName("Drink"));
-}
-
-void AHunter::MultiUsePotion_Implementation(AItem* Potion)
-{
-	//포션이 null값으로 들어온다
-
-	Potion->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
-	CurItem = Potion;
-	CurState = EPlayerState::Drink;
-	bUpperOnly = true;
+	MultiPlayMontage(OwnerHunter, FName("Shot"));
 }
 
 void AHunter::ServerSpawnItem_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
@@ -966,7 +983,6 @@ void AHunter::ServerSpawnItem_Implementation(AHunter* OwnerHunter, TSubclassOf<A
 		break;
 	case EItemType::Potion:
 		MultiPlayMontage(OwnerHunter, FName("Drink"));
-		MultiUsePotion(SpawnedItem);
 
 		break;
 	case EItemType::Trap:

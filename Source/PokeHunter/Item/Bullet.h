@@ -40,9 +40,13 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnHitNotEnemy(const FVector& HitVec);
 	
+	//Replicate
 
 	UFUNCTION(Server, Reliable)
 	void ServerApplyDamage(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiApplyDamage(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass);
+
+
+
 };

@@ -48,6 +48,18 @@ void APartner::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void APartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APartner, Hunter);
+	DOREPLIFETIME(APartner, CurState);
+	DOREPLIFETIME(APartner, Target);
+	DOREPLIFETIME(APartner, TargetPos);
+	DOREPLIFETIME(APartner, HP);
+	DOREPLIFETIME(APartner, bOrdered);
+}
+
 FGenericTeamId APartner::GetGenericTeamId() const
 {
 	return TeamID;
@@ -223,4 +235,20 @@ void APartner::InteractHealArea_Implementation()
 void APartner::OutHealArea_Implementation()
 {
 	HealPerSecondAmount -= 10.f;
+}
+
+void APartner::MultiSetHunter_Implementation(class AHunter* OwnerHunter)
+{
+	FollowHunter(OwnerHunter);
+}
+
+void APartner::MultiSetPosition_Implementation(const FVector& LocVec)
+{
+	TargetPos = LocVec;
+	bOrdered = true;
+}
+
+void APartner::ServerSetPosition_Implementation(const FVector& LocVec)
+{
+	MultiSetPosition(LocVec);
 }

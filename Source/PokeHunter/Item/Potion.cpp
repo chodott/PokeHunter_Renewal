@@ -39,3 +39,19 @@ void APotion::ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherCompon
 	Destroy();
 }
 
+void APotion::MultiAttachPotion_Implementation(AHunter* ItemOwner)
+{
+	ItemOwner->CurItem = this;
+	AttachToComponent(ItemOwner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
+}
+
+void APotion::MultiLaunchBullet_Implementation(FVector InitialPos, FVector EndPos)
+{
+	StaticMesh->SetSimulatePhysics(true);
+	StaticMesh->SetEnableGravity(true);
+	StaticMesh->SetCollisionProfileName(FName("Bullet"));
+	ProjectileMovement->ProjectileGravityScale = 1.f;
+	ProjectileMovement->Activate();
+	ABullet::MultiLaunchBullet_Implementation(InitialPos, EndPos);
+}
+

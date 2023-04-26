@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GenericTeamAgentInterface.h"
+#include "Net/UnrealNetwork.h"
 #include "PokeHunter/Base/SkillData.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
 #include "PokeHunter/Base/BaseInstance.h"
@@ -42,33 +43,38 @@ public:
 	// Sets default values for this character's properties
 	APartner();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
-		class AHunter* Hunter;
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "AI")
+	class AHunter* Hunter;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		class UPartnerAnimInstance* PartnerAnim;
+	class UPartnerAnimInstance* PartnerAnim;
 
 	FOnMontageEndDelegate OnMontageEnd;
 
-	EPartnerState CurState;
+	
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
 	FVector TargetPos;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	FVector LookTargetVec;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	FVector AttackPoint;
-	ACharacter* Target;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
-		float HP{ 100.f };
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "AI")
+	class ACharacter* Target;
+	
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "AI")
+	EPartnerState CurState;
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Status")
+	float HP{ 100.f };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
-		float HealPerSecondAmount{ 1.f };
+	float HealPerSecondAmount{ 1.f };
 	bool bPosing;
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
+	bool bOrdered;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		bool bOrdered;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		bool bUsingSkill;
+	bool bUsingSkill;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
-		bool bGrabbed;
+	bool bGrabbed;
 
 	//TeamID
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
@@ -82,6 +88,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
 
 	//Perception
 	FGenericTeamId GetGenericTeamId()const override;
@@ -119,5 +127,14 @@ public:
 	virtual void InteractPotion_Implementation(float HealAmount);
 	virtual void InteractHealArea_Implementation();
 	virtual void OutHealArea_Implementation();
+
+
+	//Replication
+	UFUNCTION(Server, Reliable)
+	void ServerSetPosition(const FVector& LocVec);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSetPosition(const FVector& LocVec);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSetHunter(class AHunter* OwnerHunter);
 
 };

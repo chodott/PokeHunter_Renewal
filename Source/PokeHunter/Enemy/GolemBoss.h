@@ -62,8 +62,6 @@ public:
 
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep = true, const FHitResult& SweepResult = FHitResult(1.f));
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION(BlueprintNativeEvent)
 	void DestroyPart(FName PartName);
 	void DeleteHitBox(FName PartName);
@@ -85,6 +83,9 @@ public:
 
 	//ItemInteractInterface
 	virtual void InteractFire_Implementation(UPrimitiveComponent* HitComponent);
+
+	//Replication
+	void MultiApplyDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);
 
 	// Return Home
 	FTimerHandle ReHomeTimerHandle;

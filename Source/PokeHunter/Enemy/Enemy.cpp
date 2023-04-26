@@ -259,6 +259,17 @@ void AEnemy::MultiStartBinding_Implementation()
 	StartBindingTime = GetWorld()->TimeSeconds;
 }
 
+void AEnemy::ServerApplyDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult)
+{
+	MultiApplyDamage(OtherActor, DamageAmount, HitDirection, DamageCauser, SweepResult);
+}
+
+void AEnemy::MultiApplyDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult)
+{
+	UGameplayStatics::ApplyPointDamage(OtherActor, DamageAmount, SweepResult.Normal, SweepResult, NULL, DamageCauser, UDamageType::StaticClass());
+
+}
+
 void AEnemy::StartBinding()
 {
 	ServerStartBinding();

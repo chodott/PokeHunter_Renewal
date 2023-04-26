@@ -166,6 +166,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartPoison();
 
+	//Replication
+	UFUNCTION(Server, Reliable)
+	void ServerApplyDamage(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiApplyDamage(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);
+
 
 	void SetTarget(AActor* NewTarget) { Target = NewTarget; };
 	void SeeNewTarget(AActor* Actor);

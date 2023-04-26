@@ -179,6 +179,19 @@ void AGolemBoss::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
 	}
 }
 
+void AGolemBoss::MultiApplyDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult)
+{
+	if (IEnemyInteractInterface* EnemyInteractInterface = Cast<IEnemyInteractInterface>(OtherActor))
+	{
+		
+		EnemyInteractInterface->Execute_InteractAttack(OtherActor, HitDirection, DamageAmount);
+	}
+
+	UGameplayStatics::ApplyPointDamage(OtherActor, DamageAmount, SweepResult.Normal, SweepResult, NULL, DamageCauser, UDamageType::StaticClass());
+
+}
+
+
 void AGolemBoss::OpenLevelHome()
 {
 	FString LevelName = GetWorld()->GetName();
@@ -240,7 +253,8 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	UHitBoxComponent* OverlapHitBox = Cast<UHitBoxComponent>(OverlappedComp);
-	 
+	FVector HitDirection;
+
 	if (OverlapHitBox)
 	{
 		if (bCanGrab)
@@ -259,51 +273,37 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 			}
 		}
 
-		if (IEnemyInteractInterface* EnemyInteractInterface = Cast<IEnemyInteractInterface>(OtherActor))
-		{
-			FVector HitDirection = OtherActor->GetActorLocation() - OverlappedComp->GetComponentLocation();
-			HitDirection.Normalize();
-			EnemyInteractInterface->Execute_InteractAttack(OtherActor, HitDirection, OverlapHitBox->Damage);
-		}
-
-		UGameplayStatics::ApplyPointDamage(OtherActor, OverlapHitBox->Damage, SweepResult.Normal, SweepResult, GetController(), this, UDamageType::StaticClass());
+		HitDirection = OtherActor->GetActorLocation() - OverlappedComp->GetComponentLocation();
+		HitDirection.Normalize();
+		ServerApplyDamage(OtherActor, OverlapHitBox->Damage, HitDirection, this,  SweepResult);
+	
 
 	}
 }
 
-void AGolemBoss::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
-{
-	UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(HitComponent);
-	if (HitBox)
-	{
-		if (bCanGrab)
-		{
-			FName PartName = HitBox->GetAttachSocketName();
-			if (PartName == FName("LeftHand") || PartName == FName("RightHand"))
-			{
-				ACharacter* GrabbedCharacter = Cast<ACharacter>(OtherActor);
-				if (GrabbedCharacter)
-				{
-					OtherActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GrabSocket"));
-					GrabbedCharacter->SetActorEnableCollision(false);
-					GrabbedTarget = GrabbedCharacter;
-				}
-				return;
-			}
-		}
-
-		if (IEnemyInteractInterface* EnemyInteractInterface = Cast<IEnemyInteractInterface>(OtherActor))
-		{
-			
-			EnemyInteractInterface->Execute_InteractAttack(OtherActor, Hit.Normal, HitBox->Damage);
-
-
-		}
-
-		UGameplayStatics::ApplyPointDamage(OtherActor, HitBox->Damage, Hit.ImpactNormal, Hit, GetController(), this, UDamageType::StaticClass());
-
-	}
-}
+//void AGolemBoss::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+//{
+//	UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(HitComponent);
+//	if (HitBox)
+//	{
+//		if (bCanGrab)
+//		{
+//			FName PartName = HitBox->GetAttachSocketName();
+//			if (PartName == FName("LeftHand") || PartName == FName("RightHand"))
+//			{
+//				ACharacter* GrabbedCharacter = Cast<ACharacter>(OtherActor);
+//				if (GrabbedCharacter)
+//				{
+//					OtherActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GrabSocket"));
+//					GrabbedCharacter->SetActorEnableCollision(false);
+//					GrabbedTarget = GrabbedCharacter;
+//				}
+//				return;
+//			}
+//		}
+//
+//		ServerApplyDamage()
+//}
 
 void AGolemBoss::DestroyPart_Implementation(FName PartName)
 {

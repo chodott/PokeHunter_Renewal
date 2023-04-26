@@ -104,7 +104,7 @@ public:
 	class UUserWidget* StorageUI;
 
 	//Partner
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner")
 	class APartner* Partner{};
 
 	//Delegate
@@ -217,15 +217,23 @@ public:
 	void MultiStartInvincibility();
 	UFUNCTION(BlueprintCallable)
 	void StartInvincibility();
-
 	void SetInstallMode();
 
+	//Partner RPC
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnPartner(AHunter* OwnerHunter, TSubclassOf <APartner> SpawnPartnerClass, const FVector& SpawnLoc);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSetPartner(APartner* NewPartner);
+
+	//Use Item RPC
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnItem(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnBullet(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
+	UFUNCTION(Server, Reliable)
+	void	ServerUsePotion(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiUsePotion(AItem* Potion);
+	void	MultiUsePotion(APotion* Potion);
 
 	//Status
 	UFUNCTION(BlueprintCallable)

@@ -28,5 +28,7 @@ public:
 	void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)override;
 	void ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherComponent);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiAttachPotion(class AHunter* ItemOwner);
 	void MultiLaunchBullet_Implementation(FVector InitialPos, FVector EndPos);
 };

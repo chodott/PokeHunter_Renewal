@@ -104,7 +104,7 @@ public:
 	class UUserWidget* StorageUI;
 
 	//Partner
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner")
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Partner")
 	class APartner* Partner{};
 
 	//Delegate

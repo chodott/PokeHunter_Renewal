@@ -145,8 +145,11 @@ void AHunter::BeginPlay()
 	ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
 	TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(EPartnerType::WolfPartner);
 
-	FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
-	ServerSpawnPartner(this, partnerClass, SpawnLocation);
+	if (HasAuthority())
+	{
+		FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
+		ServerSpawnPartner(this, partnerClass, SpawnLocation);
+	}
 }
 
 // Called every frame
@@ -655,11 +658,11 @@ void AHunter::EKeyDown()
 		{
 			if (sign <= 0)
 			{
-				AnimInstance->PlayInteractMontage(FName("RunLeftPickup"));
+				AnimInstance->PlayInteractMontage(FName("Pickup"));
 			}
 			else
 			{
-				AnimInstance->PlayInteractMontage(FName("RunRightPickup"));
+				AnimInstance->PlayInteractMontage(FName("Pickup"));
 			}
 			bUpperOnly = true;
 		}

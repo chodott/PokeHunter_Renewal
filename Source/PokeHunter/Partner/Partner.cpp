@@ -239,6 +239,7 @@ void APartner::OutHealArea_Implementation()
 
 void APartner::MultiSetHunter_Implementation(class AHunter* OwnerHunter)
 {
+	SetOwner(OwnerHunter);
 	FollowHunter(OwnerHunter);
 }
 

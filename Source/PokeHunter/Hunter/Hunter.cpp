@@ -264,12 +264,17 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		FPointDamageEvent& PointDamageEvent = (FPointDamageEvent&)DamageEvent;
 	
 	}
+
+	else
+	{
+		ServerPlayMontage(this, FName("NormalHit"));
+	}
 	
 
 	if (bInvincible) return 0.0f;
 
 	HunterHP -= DamageAmount;
-	HunterAnim->StopAllMontages(1.0f);
+	//HunterAnim->StopAllMontages(1.0f);
 	StartInvincibility();
 	SetInstallMode();
 
@@ -585,18 +590,27 @@ void AHunter::LMBDown()
 			StartShotTime = GetWorld()->GetTimeSeconds();
 
 			//인벤토리 처리
+			bool bEmpty = 0;
+			int SameItemCnt = 0;
 			QuickSlotArray[CurQuickKey].cnt--;
-			if (QuickSlotArray[CurQuickKey].cnt == 0)
+			for (auto & Info : Inventory->InfoArray)
 			{
-				for (auto& Info : Inventory->InfoArray)
+				if (Info.ItemID == ItemID)
 				{
-					if (Info.ItemID == ItemID)
+					SameItemCnt++;
+					Info.cnt -= 1;
+					if (Info.cnt == 0)
 					{
+						bEmpty = true;
 						Info.ItemID = FName("None");
-						Info.cnt = 0;
 					}
-					QuickSlotArray[CurQuickKey].ItemID = FName("None");
+					else break;
 				}
+			}
+			if (bEmpty && SameItemCnt == 1)
+			{
+				QuickSlotArray[CurQuickKey].ItemID = FName("None");
+				QuickSlotArray[CurQuickKey].cnt = 0;
 			}
 		}
 	}
@@ -632,8 +646,16 @@ void AHunter::ChangeQuickslot(float Val)
 
 void AHunter::SetQuickslot(FName ItemID, int index)
 {
+	int TotalCnt = 0;
+	for (auto& ItemCnt : Inventory->InfoArray)
+	{
+		if (ItemCnt.ItemID == ItemID)
+		{
+			TotalCnt += ItemCnt.cnt;
+		}
+	}
 	QuickSlotArray[index].ItemID = ItemID;
-	QuickSlotArray[index].cnt = 10;
+	QuickSlotArray[index].cnt = TotalCnt;
 }
 
 void AHunter::OpenInventory()
@@ -859,7 +881,10 @@ void AHunter::InteractAttack_Implementation(FVector HitDirection, float Damage)
 	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
 
 	//bDamaged = true;
-	ServerPlayMontage(this, FName("KnockBack"));
+	FVector TargetVec = FVector(HitDirection.X * -1, HitDirection.Y * -1, 0);
+	FRotator TargetRot = TargetVec.Rotation();
+	TargetRot.Pitch = 0;
+	SetActorRelativeRotation(TargetRot);
 	LaunchCharacter(HitDirection * 1000.f,false,false);
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	bNoCollision = true;
@@ -921,10 +946,11 @@ void AHunter::SetInstallMode()
 	if (CurState == EPlayerState::Zoom)
 	{
 		SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
+		HunterAnim->StopAllMontages(0.2f);
 	}
 	
 	//shot or zoom start shut down/ BlendTime Option
-	HunterAnim->StopAllMontages(0.2f);
+	
 	CurState = EPlayerState::Idle;
 	
 }

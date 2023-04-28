@@ -388,8 +388,10 @@ void AEnemy::LaunchToTarget()
 	{
 		float Distance = GetDistanceTo(Target);
 		FVector LookVec = Target->GetActorLocation() - GetActorLocation();
+		
 		LookVec.Normalize();
-		LookVec.Z = 0.3f;
+		LookVec.Z = 0.2f;
+		float LaunchSpeed = 500.f;
 		FVector Velocity = LookVec * Distance;
 		GetCharacterMovement()->Launch(Velocity);
 	}
@@ -446,6 +448,7 @@ void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 		EnemyAnim->bPlaying = false;
 		if (CurState == EEnemyState::Hit) CurState = EEnemyState::Roar;
 		OnMontageEnd.Broadcast();
+		
 	}
 }
 

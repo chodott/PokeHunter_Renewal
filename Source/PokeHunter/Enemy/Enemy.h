@@ -24,7 +24,9 @@ enum class EEnemyState : uint8
 	Attention UMETA(DisplayName = "Attention"),
 	NormalAttack UMETA(DisplayName = "NormalAttack"),
 	JumpAttack UMETA(DisplayName = "JumpAttack"),
-	LongAttack UMETA(DisplayName = "LongAttack")
+	LongAttack UMETA(DisplayName = "LongAttack"),
+	LeftDestroy UMETA(DisplayName = "LeftDestroy"),
+	RightDestroy UMETA(DisplayName = "RightDestroy")
 	
 };
 

@@ -137,7 +137,7 @@ void AHunter::BeginPlay()
 	if (DiveCurve)
 	{
 		DiveTimeline.AddInterpFloat(DiveCurve, DiveInterpCallback);
-		DiveTimeline.SetTimelineLength(1.63f);
+		DiveTimeline.SetTimelineLength(1.32f);
 	}
 
 
@@ -176,13 +176,13 @@ void AHunter::Tick(float DeltaTime)
 	}
 
 	//Stamina
-	if (GetCharacterMovement()->GetMaxSpeed() > 600.f)
+	if (GetCharacterMovement()->GetMaxSpeed() > 500.f)
 	{
 		if (HunterStamina > 0) HunterStamina -= DeltaTime * 1;
 		else
 		{
 			HunterStamina = 0;
-			GetCharacterMovement()->MaxWalkSpeed = 600.f;
+			GetCharacterMovement()->MaxWalkSpeed = 500.f;
 		}
 	}
 
@@ -259,6 +259,10 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	if (bInvincible) return 0;
+	HunterHP -= DamageAmount;
+	if (GetHP() <= 0) ServerPlayMontage(this, FName("Die"));
+	//입력 제한 필요
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{
 		FPointDamageEvent& PointDamageEvent = (FPointDamageEvent&)DamageEvent;
@@ -273,7 +277,7 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 
 	if (bInvincible) return 0.0f;
 
-	HunterHP -= DamageAmount;
+	
 	//HunterAnim->StopAllMontages(1.0f);
 	StartInvincibility();
 	SetInstallMode();
@@ -302,11 +306,11 @@ void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
 {
 	if (bSprinting && Hunter->CurState == EPlayerState::Idle)
 	{
-		Hunter->GetCharacterMovement()->MaxWalkSpeed = 1000.f;
+		Hunter->GetCharacterMovement()->MaxWalkSpeed = 700.f;
 	}
 	else if (!bSprinting)
 	{
-		Hunter->GetCharacterMovement()->MaxWalkSpeed = 600.f;
+		Hunter->GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	}
 }
 
@@ -742,6 +746,8 @@ void AHunter::Use1Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill1"));
 	if (Partner)
 	{
+		bUpperOnly = true;
+		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 0]);
 		//Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[0]);
 	}
@@ -752,6 +758,8 @@ void AHunter::Use2Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill2"));
 	if (Partner)
 	{
+		bUpperOnly = true;
+		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 1]);
 		//Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[1]);
 	}
@@ -762,6 +770,8 @@ void AHunter::Use3Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill3"));
 	if (Partner)
 	{
+		bUpperOnly = true;
+		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerSpecialSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 2]);
 		//Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[2]);
 	}
@@ -772,6 +782,8 @@ void AHunter::Use4Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill4"));
 	if (Partner)
 	{
+		bUpperOnly = true;
+		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerSpecialSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 3]);
 		//Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[3]);
 	}
@@ -942,7 +954,7 @@ void AHunter::SetInstallMode()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 600.0f;
+	Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 500.0f;
 	if (CurState == EPlayerState::Zoom)
 	{
 		SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));

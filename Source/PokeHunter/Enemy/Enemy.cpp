@@ -213,6 +213,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 				Hunter->SetPartnerTarget(this);
 			}
 		}
+		HitItem->ServerDestroy();
 	}
 	
 	
@@ -424,8 +425,18 @@ void AEnemy::SpawnItem()
 {
 	FVector SpawnLoc = GetActorLocation();
 	SpawnLoc.Z += 50.f;
+	if (HasAuthority())
+	{
+		ServerSpawnItemBox(SpawnLoc, DropItemBoxClass, DropItemID_Array);
+	}
+	/*AItemDropActor* ItemBox = GetWorld()->SpawnActor<AItemDropActor>(DropItemBoxClass, SpawnLoc, GetActorRotation());
+	ItemBox->CreateItemArray(DropItemID_Array);*/
+}
+
+void AEnemy::ServerSpawnItemBox_Implementation(const FVector& SpawnLoc, TSubclassOf<AInteractActor> SpawnClass, const TArray<FName>&ItemID_Array)
+{
 	AItemDropActor* ItemBox = GetWorld()->SpawnActor<AItemDropActor>(DropItemBoxClass, SpawnLoc, GetActorRotation());
-	ItemBox->CreateItemArray(DropItemID_Array);
+	ItemBox->CreateItemArray(ItemID_Array);
 }
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

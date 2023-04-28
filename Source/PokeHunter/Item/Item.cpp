@@ -48,6 +48,16 @@ void AItem::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 
 }
 
+void AItem::MultiDestroy_Implementation()
+{
+	Destroy();
+}
+
+void AItem::ServerDestroy_Implementation()
+{
+	MultiDestroy();
+}
+
 void AItem::ApplyAbillity_Implementation(AActor* OtherActor, UPrimitiveComponent* OtherComponent)
 {
 

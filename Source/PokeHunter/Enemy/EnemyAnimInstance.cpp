@@ -31,25 +31,29 @@ void UEnemyAnimInstance::UpdateAnimationProperties()
 
 		//Target Loc
 		AActor* Target = Enemy->Target;
-		if (Target)
+		if (Enemy->CurState == EEnemyState::Die) bLookAt = false;
+		else
 		{
-			FVector LookVec = Enemy->GetActorForwardVector();
-			FVector DirectionVec = Target->GetActorLocation() - Enemy->GetActorLocation();
-			DirectionVec.Normalize();
-			float DotProduct = FVector::DotProduct(LookVec, DirectionVec);
-			float Yaw = FMath::RadiansToDegrees(FMath::Atan2(DirectionVec.Y, DirectionVec.X) - FMath::Atan2(LookVec.Y,LookVec.X));
-			float Pitch = FMath::RadiansToDegrees(FMath::Atan2(DirectionVec.Z, FMath::Sqrt(DirectionVec.X * DirectionVec.X + DirectionVec.Y * DirectionVec.Y))
-																			- FMath::Atan2(LookVec.Z, FMath::Sqrt(LookVec.X * LookVec.X + LookVec.Y * LookVec.Y)));
-
-			if (Yaw <= 60.f && Yaw >= -60.f && Pitch <= 60.f && Pitch >= -60.f)
+			if (Target)
 			{
-				bLookAt = true;
-				TargetLoc = Target->GetActorLocation();
+				FVector LookVec = Enemy->GetActorForwardVector();
+				FVector DirectionVec = Target->GetActorLocation() - Enemy->GetActorLocation();
+				DirectionVec.Normalize();
+				float DotProduct = FVector::DotProduct(LookVec, DirectionVec);
+				float Yaw = FMath::RadiansToDegrees(FMath::Atan2(DirectionVec.Y, DirectionVec.X) - FMath::Atan2(LookVec.Y, LookVec.X));
+				float Pitch = FMath::RadiansToDegrees(FMath::Atan2(DirectionVec.Z, FMath::Sqrt(DirectionVec.X * DirectionVec.X + DirectionVec.Y * DirectionVec.Y))
+					- FMath::Atan2(LookVec.Z, FMath::Sqrt(LookVec.X * LookVec.X + LookVec.Y * LookVec.Y)));
+
+				if (Yaw <= 60.f && Yaw >= -60.f && Pitch <= 60.f && Pitch >= -60.f)
+				{
+					bLookAt = true;
+					TargetLoc = Target->GetActorLocation();
+				}
+
+
 			}
-
-
+			else bLookAt = false;
 		}
-		else bLookAt = false;
 	}
 }
 

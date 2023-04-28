@@ -40,7 +40,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, category = "Status")
 	bool bCanCombat = false;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Partner Skill")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner Skill")
 	TArray<ESkillID> PartnerSkillArray;
 
 	
@@ -77,7 +77,7 @@ public:
 	float HunterStamina{ 100 };
 	
 	//
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
+	UPROPERTY(VisibleAnywhere, Replicated,  BlueprintReadOnly, Category = "Interaction")
 	class AInteractActor* InteractingActor;
 
 	//QuickSlot
@@ -104,6 +104,8 @@ public:
 	class UUserWidget* StorageUI;
 
 	//Partner
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner")
+	EPartnerType PartnerType {EPartnerType::WolfPartner};
 	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Partner")
 	class APartner* Partner{};
 
@@ -224,6 +226,12 @@ public:
 	void ServerSpawnPartner(AHunter* OwnerHunter, TSubclassOf <APartner> SpawnPartnerClass, const FVector& SpawnLoc);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiSetPartner(APartner* NewPartner);
+	UFUNCTION(Server, Reliable)
+	void ServerSetPartnerPosition(APartner* MyPartner, const FVector& LocVec);
+	UFUNCTION(Server, Reliable)
+	void ServerUsePartnerNormalSkill(APartner* MyPartner, ESkillID SkillID);
+	UFUNCTION(Server, Reliable)
+	void ServerUsePartnerSpecialSkill(APartner* MyPartner, ESkillID SkillID);
 
 	//Use Item RPC
 	UFUNCTION(Server, Reliable)

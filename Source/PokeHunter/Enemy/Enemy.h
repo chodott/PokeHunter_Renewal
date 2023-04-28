@@ -205,6 +205,11 @@ public:
 	virtual void SpawnItem();
 	
 
+	//Replication
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnItemBox(const FVector& SpawnLoc, TSubclassOf<AInteractActor> SpawnClass, const TArray<FName>&ItemID_Array);
+
+
 	//Animation Function
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);

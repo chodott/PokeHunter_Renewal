@@ -289,6 +289,8 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AHunter, HunterHP);
 	DOREPLIFETIME(AHunter, HunterStamina);
 	DOREPLIFETIME(AHunter, CurState);
+	DOREPLIFETIME(AHunter, Partner);
+	DOREPLIFETIME(AHunter, InteractingActor);
 }
 
 void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
@@ -488,7 +490,7 @@ void AHunter::LMBDown()
 		//HitResult.Location;
 		if (HitResult.bBlockingHit)
 		{
-			Partner->ServerSetPosition(HitResult.Location);
+			ServerSetPartnerPosition(Partner, HitResult.Location);
 		}
 		return;
 	}
@@ -658,11 +660,11 @@ void AHunter::EKeyDown()
 		{
 			if (sign <= 0)
 			{
-				AnimInstance->PlayInteractMontage(FName("Pickup"));
+				ServerPlayMontage(this, FName("PickUp"));
 			}
 			else
 			{
-				AnimInstance->PlayInteractMontage(FName("Pickup"));
+				ServerPlayMontage(this, FName("PickUp"));
 			}
 			bUpperOnly = true;
 		}
@@ -718,7 +720,8 @@ void AHunter::Use1Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill1"));
 	if (Partner)
 	{
-		Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[0]);
+		ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 0]);
+		//Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[0]);
 	}
 }
 
@@ -727,7 +730,8 @@ void AHunter::Use2Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill2"));
 	if (Partner)
 	{
-		Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[1]);
+		ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 1]);
+		//Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[1]);
 	}
 }
 
@@ -736,7 +740,8 @@ void AHunter::Use3Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill3"));
 	if (Partner)
 	{
-		Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[2]);
+		ServerUsePartnerSpecialSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 2]);
+		//Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[2]);
 	}
 }
 
@@ -745,7 +750,8 @@ void AHunter::Use4Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill4"));
 	if (Partner)
 	{
-		Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[3]);
+		ServerUsePartnerSpecialSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 3]);
+		//Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[3]);
 	}
 }
 
@@ -851,10 +857,9 @@ void AHunter::InteractAttack_Implementation(FVector HitDirection, float Damage)
 	if (bInvincible) return;
 
 	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
-	
-	UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), HitDirection.X, HitDirection.Y, HitDirection.Z);
 
 	//bDamaged = true;
+	ServerPlayMontage(this, FName("KnockBack"));
 	LaunchCharacter(HitDirection * 1000.f,false,false);
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	bNoCollision = true;
@@ -924,6 +929,11 @@ void AHunter::SetInstallMode()
 	
 }
 
+void AHunter::ServerSetPartnerPosition_Implementation(APartner* MyPartner, const FVector& LocVec)
+{
+	MyPartner->MultiSetPosition(LocVec);
+}
+
 void AHunter::ServerSpawnPartner_Implementation(AHunter* OwnerHunter, TSubclassOf<APartner> SpawnPartnerClass, const FVector& SpawnLoc)
 {
 	APartner* NewPartner = GetWorld()->SpawnActor<APartner>(SpawnPartnerClass, SpawnLoc, FRotator::ZeroRotator);
@@ -954,7 +964,7 @@ void AHunter::MultiUsePotion_Implementation(APotion* Potion)
 void AHunter::ServerSpawnBullet_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
 {
 	ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(SpawnItemClass, StartLoc, Rotation);
-	Bullet->MultiLaunchBullet(StartLoc, EndLoc);
+	Bullet->MultiLaunchBullet(OwnerHunter, StartLoc, EndLoc);
 	MultiPlayMontage(OwnerHunter, FName("Shot"));
 }
 
@@ -989,4 +999,15 @@ void AHunter::ServerSpawnItem_Implementation(AHunter* OwnerHunter, TSubclassOf<A
 		}
 		break;
 	}
+}
+
+void AHunter::ServerUsePartnerNormalSkill_Implementation(APartner* MyPartner,ESkillID SkillID)
+{
+
+	MyPartner->MultiUseNormalSkill(SkillID);
+}
+
+void AHunter::ServerUsePartnerSpecialSkill_Implementation(APartner* MyPartner, ESkillID SkillID)
+{
+	MyPartner->MultiUseSpecialSkill(SkillID);
 }

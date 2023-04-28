@@ -49,4 +49,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherComponent);
 
+
+	//Replicate
+	UFUNCTION(Server, Reliable)
+	void ServerDestroy();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiDestroy();
 };

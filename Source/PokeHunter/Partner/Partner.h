@@ -69,9 +69,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
 	float HealPerSecondAmount{ 1.f };
 	bool bPosing;
-	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "AI")
 	bool bOrdered;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "AI")
 	bool bUsingSkill;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bGrabbed;
@@ -136,5 +136,10 @@ public:
 	void MultiSetPosition(const FVector& LocVec);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiSetHunter(class AHunter* OwnerHunter);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiUseNormalSkill(ESkillID SkillID);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiUseSpecialSkill(ESkillID SkillID);
+
 
 };

@@ -2,14 +2,20 @@
 
 
 #include "ItemDropActor.h"
+#include "Net/UnrealNetwork.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "PokeHunter/Hunter/InventoryComponent.h"
+#include "GameFramework/RotatingMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
 
 AItemDropActor::AItemDropActor()
 {
 	InteractionSphere->SetSphereRadius(80.f);
 	PrimaryActorTick.bCanEverTick = true;
+
+	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating Movement"));
+	AddOwnedComponent(RotatingMovement);
+
 }
 
 void AItemDropActor::Tick(float DeltaTime)
@@ -41,8 +47,11 @@ void AItemDropActor::Tick(float DeltaTime)
 
 			}
 			//획득 처리 모션 추가 필요
-			this->Destroy();
-			return;
+			if (HasAuthority())
+			{
+				ServerDestroy();
+				return;
+			}
 		}
 	}
 }
@@ -60,7 +69,7 @@ void AItemDropActor::BeginPlay()
 	if (RaritySum != 0) BaseProbability = int32(100 / RaritySum);
 }
 
-void AItemDropActor::CreateItemArray(TArray<FName>& ItemArray)
+void AItemDropActor::CreateItemArray(const TArray<FName>& ItemArray)
 {
 	for (int i = 0; i < ItemArray.Num(); ++i)
 	{
@@ -87,43 +96,43 @@ FVector AItemDropActor::CalculatePoint(float DeltaTimes)
 void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 {
 	Master = Hunter;
-
 	StartPointVec = GetActorLocation();
-	TurningPointVec = Master->GetActorLocation() + FVector(0,300,200);
-
 	bInteracting = true;
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	TurningPointVec = Master->GetActorLocation() + FVector(0, 300, 200);
+	ServerInteract(Hunter);
+}
+
+void AItemDropActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AItemDropActor, Master);
+	DOREPLIFETIME(AItemDropActor, bInteracting);
+	DOREPLIFETIME(AItemDropActor, DropItemArray);
+	DOREPLIFETIME(AItemDropActor, StartPointVec);
+	DOREPLIFETIME(AItemDropActor, TurningPointVec);
+}
+
+void AItemDropActor::ServerInteract_Implementation(AHunter* Hunter)
+{
+	MultiInteract(Hunter);
+}
+
+void AItemDropActor::MultiInteract_Implementation(AHunter* Hunter)
+{
+	
 	SetActorTickEnabled(true);
 	
-
-	//DropCnt =  FMath::RandRange(0, 100);
-
-	//for (int32 i = 0; i < DropCnt; ++i)
-	//{
-	//	int32 Probability = FMath::RandRange(0, 100);
-	//	int32 StartProbability = 0;
-	//	
-	//	//아이템 데이터 클래스
-	//	for (auto& DropItem : DropItemMap)
-	//	{
-	//		if (Probability >= StartProbability && Probability < StartProbability + BaseProbability * DropItem.Key)
-	//		{
-	//			//���� ���ϱ�
-	//			int32 ItemCnt = FMath::RandRange(1, 5);
-	//		bool bAddSuccess = Master->Inventory->AddItemData(DropItem.Value, ItemCnt);
-	//			if (bAddSuccess) 
-	//			{ 
-	//				this->Destroy();
-	//				return;
-	//			}
-	//			else {
-	//				//Full Inventory
-	//				return;
-	//			}
-	//		}
-	//		StartProbability += BaseProbability * DropItem.Key;
-	//	}
-	//}
-
 	
+}
+
+void AItemDropActor::ServerDestroy_Implementation()
+{
+	MultiDestroy();
+}
+
+void AItemDropActor::MultiDestroy_Implementation()
+{
+	Destroy();
 }

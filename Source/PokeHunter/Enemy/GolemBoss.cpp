@@ -141,7 +141,6 @@ void AGolemBoss::Die()
 		PrimitiveComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 
-	
 	isDie = true;
 }
 
@@ -223,6 +222,15 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 				HitBox->ServerDestroyPart();
 			}
 		}
+
+		AItem* HitItem = Cast<AItem>(DamageCauser);
+		if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
+		{
+			Hunter->SetPartnerTarget(this);
+		}
+		HitItem->ServerDestroy();
+
+
 		HP -= DamageAmount;
 	}
 	else

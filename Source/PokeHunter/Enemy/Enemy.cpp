@@ -213,6 +213,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 				Hunter->SetPartnerTarget(this);
 			}
 		}
+		HitItem->ServerDestroy();
 	}
 	
 	
@@ -387,8 +388,10 @@ void AEnemy::LaunchToTarget()
 	{
 		float Distance = GetDistanceTo(Target);
 		FVector LookVec = Target->GetActorLocation() - GetActorLocation();
+		
 		LookVec.Normalize();
-		LookVec.Z = 0.3f;
+		LookVec.Z = 0.2f;
+		float LaunchSpeed = 500.f;
 		FVector Velocity = LookVec * Distance;
 		GetCharacterMovement()->Launch(Velocity);
 	}
@@ -424,8 +427,18 @@ void AEnemy::SpawnItem()
 {
 	FVector SpawnLoc = GetActorLocation();
 	SpawnLoc.Z += 50.f;
+	if (HasAuthority())
+	{
+		ServerSpawnItemBox(SpawnLoc, DropItemBoxClass, DropItemID_Array);
+	}
+	/*AItemDropActor* ItemBox = GetWorld()->SpawnActor<AItemDropActor>(DropItemBoxClass, SpawnLoc, GetActorRotation());
+	ItemBox->CreateItemArray(DropItemID_Array);*/
+}
+
+void AEnemy::ServerSpawnItemBox_Implementation(const FVector& SpawnLoc, TSubclassOf<AInteractActor> SpawnClass, const TArray<FName>&ItemID_Array)
+{
 	AItemDropActor* ItemBox = GetWorld()->SpawnActor<AItemDropActor>(DropItemBoxClass, SpawnLoc, GetActorRotation());
-	ItemBox->CreateItemArray(DropItemID_Array);
+	ItemBox->CreateItemArray(ItemID_Array);
 }
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -435,6 +448,7 @@ void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 		EnemyAnim->bPlaying = false;
 		if (CurState == EEnemyState::Hit) CurState = EEnemyState::Roar;
 		OnMontageEnd.Broadcast();
+		
 	}
 }
 

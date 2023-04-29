@@ -78,10 +78,10 @@ void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 	StaticMesh->AddImpulse(Velocity, FName(""),true);
 }
 
-void ABullet::MultiLaunchBullet_Implementation(FVector InitialPos, FVector EndPos)
+void ABullet::MultiLaunchBullet_Implementation(AHunter* BulletOwner, FVector InitialPos, FVector EndPos)
 {
 	FVector Velocity = FVector::ZeroVector;
-
+	ThisOwner = BulletOwner;
 	UGameplayStatics::SuggestProjectileVelocity(this, Velocity, InitialPos, EndPos,
 		ProjectileMovement->InitialSpeed, false, 0.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::DoNotTrace);
 	//UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, Velocity, InitialPos, EndPos, GetWorld()->GetGravityZ(), 1.f);

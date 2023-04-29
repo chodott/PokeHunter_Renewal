@@ -58,6 +58,7 @@ void APartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	DOREPLIFETIME(APartner, TargetPos);
 	DOREPLIFETIME(APartner, HP);
 	DOREPLIFETIME(APartner, bOrdered);
+	DOREPLIFETIME(APartner, bUsingSkill);
 }
 
 FGenericTeamId APartner::GetGenericTeamId() const
@@ -237,8 +238,19 @@ void APartner::OutHealArea_Implementation()
 	HealPerSecondAmount -= 10.f;
 }
 
+void APartner::MultiUseNormalSkill_Implementation(ESkillID SkillID)
+{
+	UseNormalSkill(SkillID);
+}
+
+void APartner::MultiUseSpecialSkill_Implementation(ESkillID SkillID)
+{
+	UseSpecialSkill(SkillID);
+}
+
 void APartner::MultiSetHunter_Implementation(class AHunter* OwnerHunter)
 {
+	SetOwner(OwnerHunter);
 	FollowHunter(OwnerHunter);
 }
 

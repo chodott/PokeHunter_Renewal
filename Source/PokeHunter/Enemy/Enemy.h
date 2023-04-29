@@ -24,7 +24,9 @@ enum class EEnemyState : uint8
 	Attention UMETA(DisplayName = "Attention"),
 	NormalAttack UMETA(DisplayName = "NormalAttack"),
 	JumpAttack UMETA(DisplayName = "JumpAttack"),
-	LongAttack UMETA(DisplayName = "LongAttack")
+	LongAttack UMETA(DisplayName = "LongAttack"),
+	LeftDestroy UMETA(DisplayName = "LeftDestroy"),
+	RightDestroy UMETA(DisplayName = "RightDestroy")
 	
 };
 
@@ -204,6 +206,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void SpawnItem();
 	
+
+	//Replication
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnItemBox(const FVector& SpawnLoc, TSubclassOf<AInteractActor> SpawnClass, const TArray<FName>&ItemID_Array);
+
 
 	//Animation Function
 	UFUNCTION()

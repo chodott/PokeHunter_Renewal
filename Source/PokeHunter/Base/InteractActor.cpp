@@ -2,6 +2,7 @@
 
 
 #include "InteractActor.h"
+#include "Net/UnrealNetwork.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -41,6 +42,13 @@ void AInteractActor::BeginPlay()
 void AInteractActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AInteractActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AInteractActor, Master);
 }
 
 void AInteractActor::Interact_Implementation(AHunter* Hunter)

@@ -141,7 +141,6 @@ void AGolemBoss::Die()
 		PrimitiveComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 
-	
 	isDie = true;
 }
 
@@ -221,8 +220,28 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 				FName PartName = HitBox->GetAttachSocketName();
 				DestroyPart(PartName);
 				HitBox->ServerDestroyPart();
+				FString StringPartName = PartName.ToString();
+				if (StringPartName.Contains("Left"))
+				{
+					CurState = EEnemyState::LeftDestroy;
+					ServerPlayMontage(this, FName("LeftDestroy"));
+				}
+				else if(StringPartName.Contains("Right"))
+				{
+					CurState = EEnemyState::RightDestroy;
+					ServerPlayMontage(this, FName("RightDestroy"));
+				}
 			}
 		}
+
+		AItem* HitItem = Cast<AItem>(DamageCauser);
+		if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
+		{
+			Hunter->SetPartnerTarget(this);
+		}
+		HitItem->ServerDestroy();
+
+
 		HP -= DamageAmount;
 	}
 	else
@@ -276,7 +295,7 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 		HitDirection = OtherActor->GetActorLocation() - OverlappedComp->GetComponentLocation();
 		HitDirection.Normalize();
 		ServerApplyDamage(OtherActor, OverlapHitBox->Damage, HitDirection, this,  SweepResult);
-	
+		
 
 	}
 }

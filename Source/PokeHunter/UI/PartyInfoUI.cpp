@@ -111,10 +111,10 @@ bool UPartyInfoUI::SendClientState()	// Send this client State
 	if (false == retVal) return false;
 
 	if (-1 != result_pack._result) {
-		UE_LOG(LogTemp, Warning, TEXT("Starttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"));
+		// UE_LOG(LogTemp, Warning, TEXT("Starttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"));
 	}
 	else {
-		UE_LOG(LogTemp, Warning, TEXT("fail...................."));
+		// UE_LOG(LogTemp, Warning, TEXT("fail...................."));
 		return false;
 	}
 
@@ -198,7 +198,7 @@ void UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 	return;
 }
 
-bool UPartyInfoUI::RecvClientJoin()	// [Tick으로 Call!!!] Client에서 AWS GameLift로 접속하라는 신호를 여기로 받음
+bool UPartyInfoUI::RecvClientJoin()	// [CheckPoint]-Blueprint에서 호출되는 곳이 있나? -> 없으면 제거
 {
 	if (nullptr == gameinstance)	return false;
 	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
@@ -347,7 +347,9 @@ void UPartyInfoUI::OnJoinButtonClicked()
 	else {
 		// Player Latency를 연산하는 부분이지만 필요없음?
 
-		if (AccessToken.Len() > 0) {
+		if (AccessToken.Len() > 0 && false == StartMath) {
+			StartMath = true;
+
 			TSharedRef<FJsonObject> LatencyMapObj = MakeShareable(new FJsonObject);
 			LatencyMapObj->SetNumberField(PokeHunterGameInstance->RegionCode, AveragePlayerLatency);
 
@@ -494,7 +496,6 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 				FString TicketType = Ticket->GetObjectField("Type")->GetStringField("S");
 
 				if (TicketType.Len() > 0) {
-					
 					// SearchingForGame = false;
 
 					UGameInstance* GameInstance = GetGameInstance();
@@ -503,45 +504,46 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 						if (PokeHunterGameInstance != nullptr) {
 							PokeHunterGameInstance->JoinTicketId = "";
 						}
-					}
 
-					UE_LOG(LogTemp, Warning, TEXT("matchmaking event type: %s"), *TicketType);
+						UE_LOG(LogTemp, Warning, TEXT("matchmaking event type: %s"), *TicketType);
 
-					if (TicketType.Equals("MatchmakingSucceeded")) {
-						
-						// MatchmakingSucceeded 일 경우에만 실행
-						GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
-						SearchingForGame = false;
-						
-						JoinButton->SetIsEnabled(false);
-						JoinEventTextBlock->SetText(FText::FromString("Successfully found a match. Now connecting to the server..."));
+						if (TicketType.Equals("MatchmakingSucceeded")) {
 
-						TSharedPtr<FJsonObject> GameSessionInfo = Ticket->GetObjectField("GameSessionInfo")->GetObjectField("M");
-						FString IpAddress = GameSessionInfo->GetObjectField("IpAddress")->GetStringField("S");
-						FString Port = GameSessionInfo->GetObjectField("Port")->GetStringField("N");
+							// Set Player input Mode;
+							FInputModeGameOnly gameModeOnly;
+							PokeHunterGameInstance->cur_playerController->bShowMouseCursor = false;
+							PokeHunterGameInstance->cur_playerController->SetInputMode(gameModeOnly);
 
-						TArray<TSharedPtr<FJsonValue>> Players = Ticket->GetObjectField("Players")->GetArrayField("L");
-						TSharedPtr<FJsonObject> Player = Players[0]->AsObject()->GetObjectField("M");
-						FString PlayerSessionId = Player->GetObjectField("PlayerSessionId")->GetStringField("S");
-						FString PlayerId = Player->GetObjectField("PlayerId")->GetStringField("S");
+							// MatchmakingSucceeded 일 경우에만 실행
+							GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
+							SearchingForGame = false;
 
-						gameinstance->GameLiftLevelName = IpAddress + ":" + Port;
-						const FString& Options = "?PlayerSessionId=" + PlayerSessionId + "?PlayerId=" + PlayerId;
-						UE_LOG(LogTemp, Warning, TEXT("options: %s"), *Options);
+							JoinButton->SetIsEnabled(false);
+							JoinEventTextBlock->SetText(FText::FromString("Successfully found a match. Now connecting to the server..."));
 
-						// SetInputModeGameOnly();
+							TSharedPtr<FJsonObject> GameSessionInfo = Ticket->GetObjectField("GameSessionInfo")->GetObjectField("M");
+							FString IpAddress = GameSessionInfo->GetObjectField("IpAddress")->GetStringField("S");
+							FString Port = GameSessionInfo->GetObjectField("Port")->GetStringField("N");
 
-						NativeDestruct();
+							TArray<TSharedPtr<FJsonValue>> Players = Ticket->GetObjectField("Players")->GetArrayField("L");
+							TSharedPtr<FJsonObject> Player = Players[0]->AsObject()->GetObjectField("M");
+							FString PlayerSessionId = Player->GetObjectField("PlayerSessionId")->GetStringField("S");
+							FString PlayerId = Player->GetObjectField("PlayerId")->GetStringField("S");
 
-						UGameplayStatics::OpenLevel(GetWorld(), FName(gameinstance->GameLiftLevelName), false, Options);
-					}
-					else {
-						// AWS GameLift Dedicated server 접속에 실패하였음.
+							gameinstance->GameLiftLevelName = IpAddress + ":" + Port;
+							const FString& Options = "?PlayerSessionId=" + PlayerSessionId + "?PlayerId=" + PlayerId;
+							UE_LOG(LogTemp, Warning, TEXT("options: %s"), *Options);
 
-						// UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
-						// ButtonTextBlock->SetText(FText::FromString("FreREADY"));
-						
-						// JoinEventTextBlock->SetText(FText::FromString(TicketType + ". Please try again"));
+							// NativeDestruct();
+
+							UGameplayStatics::OpenLevel(GetWorld(), FName(gameinstance->GameLiftLevelName), false, Options);
+						}
+						else {
+							// AWS GameLift Dedicated server 접속에 실패하였음.
+							// UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
+							// ButtonTextBlock->SetText(FText::FromString("FreREADY"));
+							// JoinEventTextBlock->SetText(FText::FromString(TicketType + ". Please try again"));
+						}
 					}
 				}
 			}

@@ -153,24 +153,16 @@ void AHunter::BeginPlay()
 	if (nullptr == gameinstance) return;
 	if ((gameinstance->GameLiftLevelName == LevelName)
 		&& (ESocketConnectionState::SCS_ConnectionError != gameinstance->gSocket->GetConnectionState())
-		&& (ESocketConnectionState::SCS_NotConnected != gameinstance->gSocket->GetConnectionState())) {
+		&& (ESocketConnectionState::SCS_NotConnected != gameinstance->gSocket->GetConnectionState())) 
+	{
 		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
 		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
 
-	//Debug Partner set
-	ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
-	TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(EPartnerType::WolfPartner);
-
-	FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
-	ServerSpawnPartner(this, partnerClass, SpawnLocation);
-		APartner* myPartner = GetWorld()->SpawnActor<APartner>(partnerClass, Loc, GetActorRotation());
-		if (myPartner)
-		{
-			SetPartner(myPartner);
-			myPartner->FollowHunter(this);
-			// UE_LOG(LogTemp, Warning, TEXT("spawn success"));
-		}
+		FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
+		ServerSpawnPartner(this, partnerClass, SpawnLocation);
 	}
+
+	gameinstance->cur_playerController = Cast<APlayerController>(GetController());
 }
 
 // Called every frame

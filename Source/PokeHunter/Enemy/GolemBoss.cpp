@@ -107,7 +107,7 @@ void AGolemBoss::BeginPlay()
 	for (auto Hitbox : HitBoxMap)
 	{
 		Hitbox.Value->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
-		Hitbox.Value->BurningTime = BurningTime;
+		// Hitbox.Value->BurningTime = BurningTime;
 	}
 	isDie = false;
 }

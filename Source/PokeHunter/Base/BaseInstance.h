@@ -14,6 +14,8 @@
 #include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
 #include "PokeHunter/Item/ItemData.h"
 
+#include "GameFramework/Controller.h"
+
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "BaseInstance.generated.h"
@@ -148,7 +150,7 @@ public:
 		bool returnMyHome();
 
 	UPROPERTY()
-		FString JoinTicketId;
+		FString JoinTicketId = "";
 
 	FHttpModule* HttpModule;
 
@@ -158,6 +160,8 @@ public:
 
 	UPROPERTY()
 		FString RegionCode;
+
+	APlayerController* cur_playerController;
 
 private:
 	UFUNCTION()

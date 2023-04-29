@@ -62,6 +62,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Party info")
 		bool LeaveParty();
 
+	UPROPERTY()
+		bool StartMath = false;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
 		UButton* JoinButton;

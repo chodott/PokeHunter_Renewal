@@ -17,6 +17,9 @@ class POKEHUNTER_API ABullet : public AItem
 public:
 	ABullet();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
+		class UParticleSystem* ParticleSystem;
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Battle")
 	float Damage{5.f};
 
@@ -47,6 +50,5 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiApplyDamage(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass);
 
-
-
+	
 };

@@ -88,6 +88,18 @@ AHunter::AHunter()
 		LogoutUIClass = TempLogoutClass.Class;
 	}
 
+	// Particle System
+	Heal_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("HealParticle"));
+	Heal_Effect->SetupAttachment(GetRootComponent());
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> TempHealEffectClass(TEXT("/Game/Hunter/HealEffect/P_Heal_Circle.P_Heal_Circle"));
+	if (TempHealEffectClass.Succeeded())
+	{
+		Heal_Effect->SetTemplate(TempHealEffectClass.Object);
+		float characterFoot = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		Heal_Effect->SetRelativeLocation(FVector(0, 0, -characterFoot));
+		Heal_Effect->Deactivate();
+	}
+
 	//Using Controller Rotation
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
@@ -158,14 +170,11 @@ void AHunter::BeginPlay()
 		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
 		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
 
-		FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
-		ServerSpawnPartner(this, partnerClass, SpawnLocation);
-	}
-
-	if (HasAuthority())
-	{
-		FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
-		ServerSpawnPartner(this, partnerClass, SpawnLocation);
+		if (HasAuthority())
+		{
+			FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
+			ServerSpawnPartner(this, partnerClass, SpawnLocation);
+		}
 	}
 	gameinstance->cur_playerController = Cast<APlayerController>(GetController());
 }
@@ -256,7 +265,6 @@ void AHunter::Tick(float DeltaTime)
 			SetActorEnableCollision(true);
 		}
 	}
-
 }
 
 void AHunter::PostInitializeComponents()
@@ -286,7 +294,6 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		FPointDamageEvent& PointDamageEvent = (FPointDamageEvent&)DamageEvent;
 	
 	}
-
 	else
 	{
 		ServerPlayMontage(this, FName("NormalHit"));
@@ -813,6 +820,7 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	else if (CurState == EPlayerState::Drink)
 	{
 		CurItem->UseItem(this);
+		Heal_Effect->Activate();
 		if (CurItem != NULL) CurItem->Destroy();
 		CurState = EPlayerState::Idle;
 	}
@@ -1012,7 +1020,7 @@ void AHunter::MultiUsePotion_Implementation(APotion* Potion)
 void AHunter::ServerSpawnBullet_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
 {
 	ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(SpawnItemClass, StartLoc, Rotation);
-	Bullet->MultiLaunchBullet(OwnerHunter, StartLoc, EndLoc);
+	Bullet->MultiLaunchBullet_Implementation(OwnerHunter, StartLoc, EndLoc);
 	MultiPlayMontage(OwnerHunter, FName("Shot"));
 }
 

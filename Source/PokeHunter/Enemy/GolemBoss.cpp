@@ -104,11 +104,6 @@ void AGolemBoss::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (auto Hitbox : HitBoxMap)
-	{
-		Hitbox.Value->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
-		// Hitbox.Value->BurningTime = BurningTime;
-	}
 	isDie = false;
 }
 
@@ -119,13 +114,18 @@ void AGolemBoss::PostInitializeComponents()
 	HitBoxMap.Add(FName("HeadSocket"), HeadHitBox);
 	HitBoxMap.Add(FName("Body"), BodyHitBox);
 	HitBoxMap.Add(FName("RightHand"), RightHandHitBox);
-	 HitBoxMap.Add(FName("RightArm"), RightArmHitBox);
-	 HitBoxMap.Add(FName("RightShoulder"), RightShoulderHitBox);
-	 HitBoxMap.Add(FName("LeftYHand"), LeftHandHitBox);
-	 HitBoxMap.Add(FName("LeftArm"), LeftArmHitBox);
+	HitBoxMap.Add(FName("RightArm"), RightArmHitBox);
+	HitBoxMap.Add(FName("RightShoulder"), RightShoulderHitBox);
+	HitBoxMap.Add(FName("LeftHand"), LeftHandHitBox);
+	HitBoxMap.Add(FName("LeftArm"), LeftArmHitBox);
 	HitBoxMap.Add(FName("RightLeg"), RightLegHitBox);
 	HitBoxMap.Add(FName("LeftLeg"), LeftLegHitBox);
 
+	//for (auto& Hitbox : HitBoxMap)
+	//{
+	//	Hitbox.Value->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+	//	// Hitbox.Value->BurningTime = BurningTime;
+	//}
 }
 
 void AGolemBoss::Die()
@@ -271,7 +271,7 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 
 void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UHitBoxComponent* OverlapHitBox = Cast<UHitBoxComponent>(OverlappedComp);
+	/*UHitBoxComponent* OverlapHitBox = Cast<UHitBoxComponent>(OverlappedComp);
 	FVector HitDirection;
 
 	if (OverlapHitBox)
@@ -297,7 +297,7 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 		ServerApplyDamage(OtherActor, OverlapHitBox->Damage, HitDirection, this,  SweepResult);
 		
 
-	}
+	}*/
 }
 
 //void AGolemBoss::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)

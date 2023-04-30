@@ -30,7 +30,7 @@ void UPartyInfoUI::NativeConstruct()
 
 	// Join Blueprint UI widget 추가 필요
 	JoinButton = (UButton*)GetWidgetFromName(TEXT("BTN_READY"));
-	FScriptDelegate JoinDelegate;
+	FScriptDelegate JoinDelegate{};
 	JoinDelegate.BindUFunction(this, "OnJoinButtonClicked");
 	JoinButton->OnClicked.Add(JoinDelegate);
 
@@ -63,22 +63,6 @@ void UPartyInfoUI::NativeConstruct()
 		
 		GetPlayerDataRequest->SetHeader("Authorization", AccessToken);
 		GetPlayerDataRequest->ProcessRequest();
-	}
-	else {
-		/*
-		IWebBrowserSingleton* WebBrowserSingleton = IWebBrowserModule::Get().GetSingleton();
-		if (WebBrowserSingleton != nullptr) {
-			TOptional<FString> DefaultContext;
-			TSharedPtr<IWebBrowserCookieManager> CookieManager = WebBrowserSingleton->GetCookieManager(DefaultContext);
-			if (CookieManager.IsValid()) {
-				CookieManager->DeleteCookies();
-			}
-		}
-		WebBrowser->LoadURL(LoginUrl);
-		FScriptDelegate LoginDelegate;
-		LoginDelegate.BindUFunction(this, "HandleLoginUrlChange");
-		WebBrowser->OnUrlChanged.Add(LoginDelegate);
-		*/
 	}
 }
 
@@ -259,6 +243,11 @@ bool UPartyInfoUI::LeaveParty()
 	}
 
 	return true;
+}
+
+void UPartyInfoUI::LoadingScreenCall()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[Success] LoadingScreenCall() function called"));
 }
 
 void UPartyInfoUI::SetAveragePlayerLatency() {
@@ -535,6 +524,33 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 							UE_LOG(LogTemp, Warning, TEXT("options: %s"), *Options);
 
 							// NativeDestruct();
+
+
+							//=====================================================================================================================
+							UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+								TSubclassOf <UUserWidget> LoadingUIClass;
+							UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+								class UUserWidget* LoadingUI;
+
+							static ConstructorHelpers::FClassFinder<UUserWidget>TempLoadingClass(TEXT("/Game/UI/LoadingScreen/UI_LoadingScreen"));
+							if (TempLoadingClass.Succeeded())
+							{
+								LoadingUIClass = TempLoadingClass.Class;
+							}
+							LoadingUI = CreateWidget(GetWorld(), LoadingUIClass, TEXT("LogoutUI"));
+							LoadingUI->AddToViewport();
+
+
+							FTimerHandle DelayTimerHandle;
+							float DelayTime = 5.0f;
+
+							GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, this, &UPartyInfoUI::LoadingScreenCall, DelayTime, false);
+							while (GetWorld()->GetTimerManager().IsTimerActive(DelayTimerHandle) && !GetWorld()->IsPendingKill())
+							{
+								// 게임 엔진의 Tick 이벤트를 강제로 실행하여 Delay 타이머를 실행시킵니다.
+								GetWorld()->Tick(LEVELTICK_All, 0.0f);
+							}
+							//=====================================================================================================================
 
 							UGameplayStatics::OpenLevel(GetWorld(), FName(gameinstance->GameLiftLevelName), false, Options);
 						}

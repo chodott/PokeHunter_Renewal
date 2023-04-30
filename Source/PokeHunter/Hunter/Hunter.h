@@ -18,6 +18,9 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDynamicDele);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicDeleParam, float, val);
 
+// Particle
+class UParticleSystemComponent;
+
 UENUM(BlueprintType)
 enum class EPlayerState : uint8
 {
@@ -326,7 +329,12 @@ public:
 	virtual void InteractEarthquake_Implementation();
 	virtual void InteractAttack_Implementation(FVector HitDirection, float Damage);
 	virtual void InteractGrabAttack_Implementation();
-	
+
+
+public:	// Particle System
+	UPROPERTY(EditDefaultsOnly, Category = "Particle")
+		UParticleSystemComponent* Heal_Effect = nullptr;
+
 private:
 	// Character Movement Input
 	void MoveForward(float Val);

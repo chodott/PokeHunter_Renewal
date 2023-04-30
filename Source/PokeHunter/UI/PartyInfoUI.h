@@ -62,6 +62,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Party info")
 		bool LeaveParty();
 
+	UFUNCTION(BlueprintCallable, Category = "Loading Screen")
+		void LoadingScreenCall();
+
 	UPROPERTY()
 		bool StartMath = false;
 

@@ -11,6 +11,7 @@
 #include "PokeHunter/Hunter/Hunter.h"
 #include "PokeHunter/Partner/Partner.h"
 #include "PokeHunter/Enemy/Enemy.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 ABullet::ABullet()
 {
@@ -44,14 +45,19 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if(OtherComponent->IsA<UHitBoxComponent>())
 	UE_LOG(LogTemp, Warning, TEXT("HitBox Hit"), );
-	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+	ServerApplyDamage_Implementation(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if (OtherActor->Implements<UItemInteractInterface>())
 	{
 		//아이템 효과를 받는 액터와 충돌
 		ApplyAbillity(OtherActor, OtherComponent);
+
+		if (ParticleSystem)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleSystem, StaticMesh->GetComponentLocation());
+		}
 	}
 	//아이템 효과를 받지 않는 액터와 충돌
-	else OnHitNotEnemy(Hit.Location);
+	else OnHitNotEnemy_Implementation(Hit.Location);
 }
 
 
@@ -108,7 +114,7 @@ void ABullet::OnHitNotEnemy_Implementation(const FVector& HitVec)
 
 void ABullet::ServerApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)
 {
-	MultiApplyDamage(DamagedActor, DamageAmount, Direction, HitInfo, EventInstigator, DamageCauser, DamageTypeClass);
+	MultiApplyDamage_Implementation(DamagedActor, DamageAmount, Direction, HitInfo, EventInstigator, DamageCauser, DamageTypeClass);
 }
 
 void ABullet::MultiApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)

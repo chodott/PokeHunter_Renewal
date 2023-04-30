@@ -321,7 +321,8 @@ public:
 	virtual void InteractEarthquake_Implementation();
 	virtual void InteractAttack_Implementation(FVector HitDirection, float Damage);
 	virtual void InteractGrabAttack_Implementation();
-	
+	virtual void InteractWideAttack_Implementation(float Damage);
+
 private:
 	// Character Movement Input
 	void MoveForward(float Val);

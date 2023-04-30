@@ -217,9 +217,7 @@ Global
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Debug Editor|HoloLens.ActiveCfg = Invalid|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Debug Editor|Win64.ActiveCfg = Debug_Editor|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Debug Editor|Win64.Build.0 = Debug_Editor|x64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Debug Server|HoloLens.ActiveCfg = Debug_Server|arm64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Debug Server|HoloLens.Build.0 = Debug_Server|arm64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Debug Server|HoloLens.Deploy.0 = Debug_Server|arm64
+		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Debug Server|HoloLens.ActiveCfg = Invalid|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Debug Server|Win64.ActiveCfg = Debug_Server|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Debug Server|Win64.Build.0 = Debug_Server|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.DebugGame Client|HoloLens.ActiveCfg = Invalid|x64
@@ -227,9 +225,7 @@ Global
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.DebugGame Editor|HoloLens.ActiveCfg = Invalid|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.DebugGame Editor|Win64.ActiveCfg = DebugGame_Editor|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.DebugGame Editor|Win64.Build.0 = DebugGame_Editor|x64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.DebugGame Server|HoloLens.ActiveCfg = DebugGame_Server|arm64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.DebugGame Server|HoloLens.Build.0 = DebugGame_Server|arm64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.DebugGame Server|HoloLens.Deploy.0 = DebugGame_Server|arm64
+		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.DebugGame Server|HoloLens.ActiveCfg = Invalid|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.DebugGame Server|Win64.ActiveCfg = DebugGame_Server|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.DebugGame Server|Win64.Build.0 = DebugGame_Server|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.DebugGame|HoloLens.ActiveCfg = DebugGame|arm64
@@ -247,9 +243,7 @@ Global
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Development Editor|HoloLens.ActiveCfg = Invalid|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Development Editor|Win64.ActiveCfg = Development_Editor|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Development Editor|Win64.Build.0 = Development_Editor|x64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Development Server|HoloLens.ActiveCfg = Development_Server|arm64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Development Server|HoloLens.Build.0 = Development_Server|arm64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Development Server|HoloLens.Deploy.0 = Development_Server|arm64
+		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Development Server|HoloLens.ActiveCfg = Invalid|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Development Server|Win64.ActiveCfg = Development_Server|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Development Server|Win64.Build.0 = Development_Server|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Development|HoloLens.ActiveCfg = Development|arm64
@@ -259,9 +253,7 @@ Global
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Development|Win64.Build.0 = Development|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Shipping Client|HoloLens.ActiveCfg = Invalid|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Shipping Client|Win64.ActiveCfg = Invalid|x64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Shipping Server|HoloLens.ActiveCfg = Shipping_Server|arm64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Shipping Server|HoloLens.Build.0 = Shipping_Server|arm64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Shipping Server|HoloLens.Deploy.0 = Shipping_Server|arm64
+		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Shipping Server|HoloLens.ActiveCfg = Invalid|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Shipping Server|Win64.ActiveCfg = Shipping_Server|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Shipping Server|Win64.Build.0 = Shipping_Server|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Shipping|HoloLens.ActiveCfg = Shipping|arm64
@@ -271,9 +263,7 @@ Global
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Shipping|Win64.Build.0 = Shipping|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Test Client|HoloLens.ActiveCfg = Invalid|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Test Client|Win64.ActiveCfg = Invalid|x64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Test Server|HoloLens.ActiveCfg = Test_Server|arm64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Test Server|HoloLens.Build.0 = Test_Server|arm64
-		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Test Server|HoloLens.Deploy.0 = Test_Server|arm64
+		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Test Server|HoloLens.ActiveCfg = Invalid|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Test Server|Win64.ActiveCfg = Test_Server|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Test Server|Win64.Build.0 = Test_Server|x64
 		{8A745B3B-4D10-3503-A1FF-EEAA87ECF13C}.Test|HoloLens.ActiveCfg = Test|arm64

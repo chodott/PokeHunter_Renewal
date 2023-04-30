@@ -322,6 +322,24 @@ bool AEnemy::CheckInMoveRange()
 	}
 }
 
+void AEnemy::LeaveTarget(AActor* KilledTarget)
+{
+	for (int i = 0; i < TargetArray.Num(); ++i)
+	{
+		if (TargetArray[i] == KilledTarget)
+		{
+			TargetArray.RemoveAt(i);
+		}
+	}
+
+	if (KilledTarget == Target)
+	{
+		Target = NULL;
+		ChangeTarget();
+	}
+	
+}
+
 void AEnemy::ChangeTarget()
 {
 	int NearestTargetNum = 0;
@@ -337,8 +355,8 @@ void AEnemy::ChangeTarget()
 			ShortestDistance = Distance;
 			NearestTargetNum = i;
 		}
-
 	}
+	Target = TargetArray[NearestTargetNum];
 }
 
 void AEnemy::Attack(int AttackPattern)
@@ -381,6 +399,25 @@ void AEnemy::JumpAttack()
 	
 }
 
+void AEnemy::ChargeAttack()
+{
+	CurState = EEnemyState::ChargeAttack;
+	ServerPlayMontage(this, FName("ChargeAttack"));
+}
+
+
+void AEnemy::RushAttack()
+{
+	ServerPlayMontage(this, FName("Slide_Start"));
+	CurState = EEnemyState::RushAttack;
+}
+
+void AEnemy::WideAttack()
+{
+	ServerPlayMontage(this, FName("WideAttack"));
+	CurState = EEnemyState::WideAttack;
+
+}
 
 void AEnemy::LaunchToTarget()
 {

@@ -25,6 +25,9 @@ enum class EEnemyState : uint8
 	NormalAttack UMETA(DisplayName = "NormalAttack"),
 	JumpAttack UMETA(DisplayName = "JumpAttack"),
 	LongAttack UMETA(DisplayName = "LongAttack"),
+	ChargeAttack UMETA(DisplayName = "ChargeAttack"),
+	WideAttack UMETA(DisplayName = "WideAttack"),
+	RushAttack UMETA(DisplayName = "RushAttack"),
 	LeftDestroy UMETA(DisplayName = "LeftDestroy"),
 	RightDestroy UMETA(DisplayName = "RightDestroy")
 	
@@ -183,6 +186,8 @@ public:
 	bool CheckInMoveRange();
 
 	UFUNCTION(BlueprintCallable)
+	void LeaveTarget(AActor* KilledTarget);
+	UFUNCTION(BlueprintCallable)
 	void ChangeTarget();
 
 	UFUNCTION(BlueprintCallable)
@@ -195,6 +200,12 @@ public:
 	virtual void Patrol();
 	UFUNCTION(BlueprintCallable)
 	virtual void JumpAttack();
+	UFUNCTION(BlueprintCallable)
+	virtual void ChargeAttack();
+	UFUNCTION(BlueprintCallable)
+	virtual void RushAttack();
+	UFUNCTION(BlueprintCallable)
+	virtual void WideAttack();
 	UFUNCTION(BlueprintCallable)
 	virtual void LaunchToTarget();
 	UFUNCTION(BlueprintCallable)

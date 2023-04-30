@@ -121,7 +121,7 @@ void AGolemBoss::PostInitializeComponents()
 	HitBoxMap.Add(FName("RightHand"), RightHandHitBox);
 	 HitBoxMap.Add(FName("RightArm"), RightArmHitBox);
 	 HitBoxMap.Add(FName("RightShoulder"), RightShoulderHitBox);
-	 HitBoxMap.Add(FName("LeftYHand"), LeftHandHitBox);
+	 HitBoxMap.Add(FName("Left Hand"), LeftHandHitBox);
 	 HitBoxMap.Add(FName("LeftArm"), LeftArmHitBox);
 	HitBoxMap.Add(FName("RightLeg"), RightLegHitBox);
 	HitBoxMap.Add(FName("LeftLeg"), LeftLegHitBox);
@@ -166,6 +166,69 @@ void AGolemBoss::LaunchStone()
 
 	AEnemyProjectile* Stone = GetWorld()->SpawnActor<AEnemyProjectile>(ProjectileClass, InitialPos, DirectionVec.Rotation());
 	Stone->FireInDirection(DirectionVec, InitialPos, EndPos);
+}
+
+void AGolemBoss::SpawnBombs()
+{
+	FVector ForwardVec = GetActorForwardVector();
+	FVector UpVec = GetActorUpVector();
+	float Gap = 360.f / MaxBombCnt;
+	for (int i = 0; i < MaxBombCnt; ++i)
+	{
+		FRandomStream RandomStream(FMath::Rand());
+		float MinAngle = i * Gap;
+		float MaxAngle = MinAngle + Gap;
+		float RandomAngle = RandomStream.FRandRange(MinAngle, MaxAngle);
+		float RandomDistance = RandomStream.FRandRange(GetCapsuleComponent()->GetScaledCapsuleRadius() + 100, MaxBombRange);
+		FVector RandomPos = ForwardVec.RotateAngleAxis(RandomAngle, UpVec) * RandomDistance + GetActorLocation();
+		
+		int RandClassNum = RandomStream.FRandRange(0, BombClassArray.Num());
+		AEnemyProjectile* NewBomb = GetWorld()->SpawnActor<AEnemyProjectile>(BombClassArray[RandClassNum], RandomPos, FRotator::ZeroRotator);
+
+		FHitResult HitResult;
+		FVector TraceStart = RandomPos;
+		FVector TraceEnd = RandomPos - FVector(0.f, 0.f, 100.f);
+		FCollisionQueryParams TraceParams;
+		TraceParams.bTraceComplex = false;
+		TraceParams.bReturnPhysicalMaterial = false;
+		if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_WorldStatic, TraceParams))
+		{
+			FVector SpawnLocation = HitResult.ImpactPoint;
+			NewBomb->SetActorLocation(SpawnLocation);
+			NewBomb->ThisOwner = this;
+		}
+		BombArray.Add(NewBomb);
+	}
+}
+
+void AGolemBoss::CheckWideAttack()
+{
+	FVector CenterVec = GetActorLocation();
+	float MinRadius = (WideAttackCnt + 1) * WideAttackGap - WideAttackRadiusGap;
+	float MaxRadius = (WideAttackCnt + 1) * WideAttackGap + WideAttackRadiusGap;
+
+	FCollisionShape CapsuleShape = FCollisionShape::MakeCapsule(MaxRadius, 1000.f);
+	TArray<FHitResult> HitResults;
+
+	bool bHit = GetWorld()->SweepMultiByProfile(HitResults, CenterVec, CenterVec, FQuat::Identity, FName("EnemyHitBox"), CapsuleShape);
+	if (bHit)
+	{
+		for (const FHitResult& HitResult : HitResults)
+		{
+			float Distance = FVector::Dist2D(HitResult.ImpactPoint, GetActorLocation());
+			if (Distance > MinRadius)
+			{
+				AActor* HitActor = HitResult.GetActor();
+				if (HitActor->Implements<UEnemyInteractInterface>())
+				{
+					IEnemyInteractInterface::Execute_InteractWideAttack(HitActor, 50.f);
+				}
+			}
+		}
+	}
+
+	WideAttackCnt++;
+	if (WideAttackCnt == 3) WideAttackCnt = 0;
 }
 
 void AGolemBoss::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
@@ -336,6 +399,9 @@ void AGolemBoss::DeleteHitBox(FName PartName)
 
 void AGolemBoss::Attack(int AttackPattern)
 {
+	WideAttack();
+	return;
+
 	switch (AttackPattern)
 	{
 	case 0:

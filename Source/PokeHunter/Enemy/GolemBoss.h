@@ -49,6 +49,27 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Range")
 	class UStaticMeshComponent* EarthquakeCollision;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Timeline")
+	UCurveFloat* DiveCurve;
+
+	//Bomb Attack
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	TArray<TSubclassOf<class AEnemyProjectile>> BombClassArray;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	TArray<class AEnemyProjectile*> BombArray;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float MaxBombRange{ 1000.f };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	int MaxBombCnt{ 10 };
+
+	//Wide Attack
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float WideAttackGap{ 600.f };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float WideAttackRadiusGap{ 100.f };
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	int WideAttackCnt{ 0 };
+	
 
 
 public:
@@ -68,7 +89,7 @@ public:
 	virtual void Die();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Life")
-		bool isDie = false;
+	bool isDie = false;
 	//BTTask
 
 	virtual void Attack(int AttackPattern);
@@ -80,6 +101,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void LaunchStone();
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnBombs();
+
+	UFUNCTION(BlueprintCallable)
+	void CheckWideAttack();
 
 	//ItemInteractInterface
 	virtual void InteractFire_Implementation(UPrimitiveComponent* HitComponent);

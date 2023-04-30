@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PokeHunter/Base/EnemyInteractInterface.h"
 #include "EnemyProjectile.generated.h"
 
 UCLASS()
-class POKEHUNTER_API AEnemyProjectile : public AActor
+class POKEHUNTER_API AEnemyProjectile : public AActor, public IEnemyInteractInterface
 {
 	GENERATED_BODY()
 	
@@ -44,4 +45,6 @@ public:
 
 	virtual void FireInDirection(FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos);
 	virtual void FireInDirection(FVector Direction);
+
+	virtual void InteractChargeAttack_Implementation();
 };

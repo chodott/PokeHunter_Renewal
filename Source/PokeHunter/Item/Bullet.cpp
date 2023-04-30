@@ -45,10 +45,10 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if(OtherComponent->IsA<UHitBoxComponent>())
 	UE_LOG(LogTemp, Warning, TEXT("HitBox Hit"), );
-	ServerApplyDamage_Implementation(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if (OtherActor->Implements<UItemInteractInterface>())
 	{
-		//¾ÆÀÌÅÛ È¿°ú¸¦ ¹Þ´Â ¾×ÅÍ¿Í Ãæµ¹
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½ï¿½ï¿½ ï¿½Þ´ï¿½ ï¿½ï¿½ï¿½Í¿ï¿½ ï¿½æµ¹
 		ApplyAbillity(OtherActor, OtherComponent);
 
 		if (ParticleSystem)
@@ -56,8 +56,10 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleSystem, StaticMesh->GetComponentLocation());
 		}
 	}
-	//¾ÆÀÌÅÛ È¿°ú¸¦ ¹ÞÁö ¾Ê´Â ¾×ÅÍ¿Í Ãæµ¹
-	else OnHitNotEnemy_Implementation(Hit.Location);
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½ ï¿½ï¿½ï¿½Í¿ï¿½ ï¿½æµ¹
+	else OnHitNotEnemy(Hit.Location);
+
+	ServerDestroy();
 }
 
 
@@ -73,7 +75,7 @@ void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
 	SetLifeSpan(TimeLimit);
 
-	//°æ·Î µð¹ö±× ¿ë
+	//ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 	/*FPredictProjectilePathParams predictParams(20.0f, InitialPos, Velocity, 15.0f);   
 	predictParams.DrawDebugTime = 15.0f;    
 	predictParams.DrawDebugType = EDrawDebugTrace::Type::ForDuration; 
@@ -95,7 +97,7 @@ void ABullet::MultiLaunchBullet_Implementation(AHunter* BulletOwner, FVector Ini
 	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
 	SetLifeSpan(TimeLimit);
 
-	//°æ·Î µð¹ö±× ¿ë
+	//ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 	/*FPredictProjectilePathParams predictParams(20.0f, InitialPos, Velocity, 15.0f);
 	predictParams.DrawDebugTime = 15.0f;
 	predictParams.DrawDebugType = EDrawDebugTrace::Type::ForDuration;
@@ -114,7 +116,7 @@ void ABullet::OnHitNotEnemy_Implementation(const FVector& HitVec)
 
 void ABullet::ServerApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)
 {
-	MultiApplyDamage_Implementation(DamagedActor, DamageAmount, Direction, HitInfo, EventInstigator, DamageCauser, DamageTypeClass);
+	MultiApplyDamage(DamagedActor, DamageAmount, Direction, HitInfo, EventInstigator, DamageCauser, DamageTypeClass);
 }
 
 void ABullet::MultiApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)

@@ -9,6 +9,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "PokeHunter/Hunter/Hunter.h"
+#include "PokeHunter/Enemy/Enemy.h"
 
 // Sets default values
 APartner::APartner()
@@ -39,6 +40,26 @@ void APartner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bInvincible)
+	{
+		float ElapsedTime = GetWorld()->TimeSeconds - StartInvincibleTime;
+		float TimeLeft = InvincibleTime - ElapsedTime;
+		if (TimeLeft <= 0.0f)
+		{
+			bInvincible = false;
+		}
+	}
+
+	if (bNoCollision)
+	{
+		float ElapsedTime = GetWorld()->TimeSeconds - StartNoCollisionTime;
+		float TimeLeft = NoCollisionTime - ElapsedTime;
+		if (TimeLeft <= 0.0f)
+		{
+			bNoCollision = false;
+			SetActorEnableCollision(true);
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -61,6 +82,40 @@ void APartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	DOREPLIFETIME(APartner, bUsingSkill);
 }
 
+float APartner::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (bInvincible) return 0;
+	HP -= DamageAmount;
+	if (GetHP() <= 0)
+	{ //죽었을 때
+		//ServerPlayMontage(FName("Die"));
+		SetGenericTeamId(1);
+		AEnemy* DamageEnemy = Cast<AEnemy>(DamageCauser);
+		if(DamageEnemy) DamageEnemy->LeaveTarget(this);
+		return 0;
+	}
+	//입력 제한 필요
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		FPointDamageEvent& PointDamageEvent = (FPointDamageEvent&)DamageEvent;
+
+	}
+
+	else
+	{
+		//ServerPlayMontage( FName("NormalHit"));
+	}
+
+
+	if (bInvincible) return 0.0f;
+
+	ServerStartPartnerInvincibility();
+
+	return DamageAmount;
+}
+
 FGenericTeamId APartner::GetGenericTeamId() const
 {
 	return TeamID;
@@ -74,6 +129,12 @@ void APartner::ServerPlayMontage_Implementation(FName Section)
 void APartner::MultiPlayMontage_Implementation(FName Section)
 {
 	PartnerAnim->PlayCombatMontage(Section);
+}
+
+bool APartner::CheckFalling()
+{
+	bool bFalling = GetMovementComponent()->IsFalling();
+	return bFalling;
 }
 
 void APartner::Attack()
@@ -238,6 +299,17 @@ void APartner::OutHealArea_Implementation()
 	HealPerSecondAmount -= 10.f;
 }
 
+void APartner::ServerStartPartnerInvincibility_Implementation()
+{
+	MultiStartPartnerInvincibility();
+}
+
+void APartner::MultiStartPartnerInvincibility_Implementation()
+{
+	bInvincible = true;
+	StartInvincibleTime = GetWorld()->TimeSeconds;
+}
+
 void APartner::MultiUseNormalSkill_Implementation(ESkillID SkillID)
 {
 	UseNormalSkill(SkillID);
@@ -263,4 +335,36 @@ void APartner::MultiSetPosition_Implementation(const FVector& LocVec)
 void APartner::ServerSetPosition_Implementation(const FVector& LocVec)
 {
 	MultiSetPosition(LocVec);
+}
+
+void APartner::InteractAttack_Implementation(FVector HitDirection, float Damage)
+{
+	if (Damage <= 0.f)
+	{
+		return;
+	}
+
+	if (bInvincible) return;
+
+	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
+
+	//bDamaged = true;
+	FVector TargetVec = FVector(HitDirection.X * -1, HitDirection.Y * -1, 0);
+	FRotator TargetRot = TargetVec.Rotation();
+	CurState = EPartnerState::Knockback;
+	TargetRot.Pitch = 0;
+	SetActorRelativeRotation(TargetRot);
+	LaunchCharacter(HitDirection * 1000.f, false, false);
+	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
+	bNoCollision = true;
+	SetActorEnableCollision(false);
+}
+
+void APartner::InteractEarthquake_Implementation()
+{
+	if (GetCharacterMovement()->IsFalling()) return;
+
+	if (bInvincible) return;
+
+	LaunchCharacter(FVector(0, 0, 1000), false, false);
 }

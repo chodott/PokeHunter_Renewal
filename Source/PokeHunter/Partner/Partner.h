@@ -8,6 +8,7 @@
 #include "Net/UnrealNetwork.h"
 #include "PokeHunter/Base/SkillData.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
+#include "PokeHunter/Base/EnemyInteractInterface.h"
 #include "PokeHunter/Base/BaseInstance.h"
 #include "Partner.generated.h"
 
@@ -21,6 +22,7 @@ enum class EPartnerState : uint8
 	Posing,
 	Unselected,
 	MoveTarget,
+	Knockback,
 
 	//Leave State
 	Rushing,
@@ -32,7 +34,7 @@ enum class EPartnerState : uint8
 };
 
 UCLASS()
-class POKEHUNTER_API APartner : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface
+class POKEHUNTER_API APartner : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface 
 {
 	GENERATED_BODY()
 
@@ -76,6 +78,20 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bGrabbed;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bInvincible{ false };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float InvincibleTime{ 1.f };
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
+	float StartInvincibleTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bNoCollision;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float NoCollisionTime{ 0.5f };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battle")
+	float StartNoCollisionTime;
+
 	//TeamID
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
 		FGenericTeamId TeamID;
@@ -90,6 +106,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
 	//Perception
 	FGenericTeamId GetGenericTeamId()const override;
@@ -108,6 +125,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetHP() { return HP; };
 
+	UFUNCTION(BlueprintCallable)
+	bool CheckFalling();
+
 	UFUNCTION()
 	virtual void Attack();
 	virtual void SlashAttack();
@@ -123,6 +143,10 @@ public:
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	//EnemyInterface
+	virtual void InteractAttack_Implementation(FVector HitDirection, float Damage);
+	virtual void InteractEarthquake_Implementation();
+
 	//ItemInteractInterface
 	virtual void InteractPotion_Implementation(float HealAmount);
 	virtual void InteractHealArea_Implementation();
@@ -130,6 +154,11 @@ public:
 
 
 	//Replication
+	UFUNCTION(Server, Reliable)
+	void ServerStartPartnerInvincibility();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiStartPartnerInvincibility();
+
 	UFUNCTION(Server, Reliable)
 	void ServerSetPosition(const FVector& LocVec);
 	UFUNCTION(NetMulticast, Reliable)

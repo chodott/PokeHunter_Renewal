@@ -20,6 +20,7 @@
 #include "Blueprint/WidgetTree.h"
 #include "PokeHunter/Npc/Npc.h"
 #include "PokeHunter/Partner/Partner.h"
+#include "PokeHunter/Enemy/Enemy.h"
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Item/ItemData.h"
 #include "PokeHunter/Item/Potion.h"
@@ -287,8 +288,15 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 
 	if (bInvincible) return 0;
 	HunterHP -= DamageAmount;
-	if (GetHP() <= 0) ServerPlayMontage(this, FName("Die"));
-	//입력 제한 필요
+	if (GetHP() <= 0)
+	{ //죽었을 때
+		ServerPlayMontage(this, FName("Die"));
+		SetGenericTeamId(1);
+		AEnemy* DamageEnemy = Cast<AEnemy>(DamageCauser);
+		if(DamageEnemy) DamageEnemy->LeaveTarget(this);
+		return 0; 
+	}
+		//입력 제한 필요
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{
 		FPointDamageEvent& PointDamageEvent = (FPointDamageEvent&)DamageEvent;
@@ -925,6 +933,21 @@ void AHunter::InteractGrabAttack_Implementation()
 {
 	bNoCollision = true;
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
+}
+
+void AHunter::InteractWideAttack_Implementation(float Damage)
+{
+	if (Damage <= 0.f || bDamaged)
+	{
+		return;
+	}
+
+	if (bInvincible) return;
+
+	LaunchCharacter(FVector(0,0,1000), false, false);
+	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
+	bNoCollision = true;
+	SetActorEnableCollision(false);
 }
 
 void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)

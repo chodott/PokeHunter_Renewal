@@ -28,5 +28,8 @@ public:
 	void InteractAttack(FVector HitDirection, float Damage);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void InteractGrabAttack();
-
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
+	void InteractChargeAttack();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
+	void InteractWideAttack(float Damage);
 };

@@ -25,6 +25,7 @@ AEnemyProjectile::AEnemyProjectile()
 	ProjectileMovement->MaxSpeed = 500.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
+	ProjectileMovement->ProjectileGravityScale = 1.f;
 
 	StaticMesh->OnComponentHit.AddDynamic(this, &AEnemyProjectile::OnHit);
 
@@ -47,7 +48,8 @@ void AEnemyProjectile::Tick(float DeltaTime)
 
 void AEnemyProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+	//if(OtherActor->CanBeDamaged())
+	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, ThisOwner, UDamageType::StaticClass());
 
 	Destroy();
 }
@@ -83,6 +85,10 @@ void AEnemyProjectile::FireInDirection(FVector Direction)
 	SetLifeSpan(TimeLimit);
 	StaticMesh->AddImpulse(Velocity, FName(""), true);
 
+}
+
+void AEnemyProjectile::InteractChargeAttack_Implementation()
+{
 }
 
 void AEnemyProjectile::ServerApplyDamage_Implementation(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass)

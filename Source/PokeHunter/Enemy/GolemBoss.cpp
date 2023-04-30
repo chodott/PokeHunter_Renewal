@@ -399,8 +399,6 @@ void AGolemBoss::DeleteHitBox(FName PartName)
 
 void AGolemBoss::Attack(int AttackPattern)
 {
-	WideAttack();
-	return;
 
 	switch (AttackPattern)
 	{
@@ -425,6 +423,10 @@ void AGolemBoss::Attack(int AttackPattern)
 	case 4:
 		ServerPlayMontage(this, FName("Block"));
 		Block();
+		break;
+
+	case 5:
+		WideAttack();
 		break;
 	}
 }

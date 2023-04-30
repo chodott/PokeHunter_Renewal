@@ -124,11 +124,11 @@ public:
 	FVector LastInput;
 
 	//Camera Variable
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	float ArmLengthTo;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	float CameraZoomTo;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	float ArmSpeed;
 
 	//PlayerState
@@ -140,7 +140,7 @@ public:
 	class UHunterAnimInstance* HunterAnim;
 
 	//Bool
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "Animation")
 	bool bUpperOnly;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
 	bool bPartnerMode;

@@ -53,7 +53,10 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 	//아이템 효과를 받지 않는 액터와 충돌
 	else OnHitNotEnemy(Hit.Location);
 
-	ServerDestroy();
+	if (!bAttached)
+	{
+		ServerDestroy();
+	}
 }
 
 

@@ -52,6 +52,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Timeline")
 	UCurveFloat* DiveCurve;
 
+	//Cupcake Attack
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	TSubclassOf<class AActor> CupcakeClass;
+
 	//Bomb Attack
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	TArray<TSubclassOf<class AEnemyProjectile>> BombClassArray;
@@ -104,6 +108,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnBombs();
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnCupcake();
 
 	UFUNCTION(BlueprintCallable)
 	void CheckWideAttack();

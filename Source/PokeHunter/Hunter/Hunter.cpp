@@ -308,6 +308,7 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AHunter, CurState);
 	DOREPLIFETIME(AHunter, Partner);
 	DOREPLIFETIME(AHunter, InteractingActor);
+	DOREPLIFETIME(AHunter, bUpperOnly);
 }
 
 void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
@@ -352,7 +353,7 @@ void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
 		{
 			CurState = EPlayerState::Zoom;
 			bUseControllerRotationYaw = true;
-			bUseControllerRotationPitch = true;
+			//bUseControllerRotationPitch = true;
 			GetCharacterMovement()->bOrientRotationToMovement = false;
 
 			GetCharacterMovement()->MaxWalkSpeed = 300.f;
@@ -528,22 +529,23 @@ void AHunter::LMBDown()
 			{
 				bool bIsBullet = ItemClass->IsChildOf(ABullet::StaticClass());
 				if (!bIsBullet) return;
-				//TSubclassOf<ABullet> BulletClass = ItemClass;
 				FVector StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle"));
 				FHitResult* HitResult = new FHitResult();
 				FVector EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
 
-				if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility))
+				FCollisionQueryParams BulletTraceParams(FName("Bullet"), true, this);
+
+				if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
 				{
 					//Debug LineTrace
-					/*DrawDebugLine(
+					DrawDebugLine(
 						GetWorld(),
 						StartTrace,
 						HitResult->Location,
 						FColor(255, 0, 0),
 						false, 3, 0,
 						12.333
-					);*/
+					);
 					EndTrace = HitResult->Location;
 				}
 				ServerSpawnBullet(this, ItemClass, StartTrace, EndTrace, GetControlRotation());
@@ -692,6 +694,7 @@ void AHunter::EKeyDown()
 		float sign = FMath::Sign(cross.Z);
 		if (Cast<AItemDropActor>(InteractingActor))
 		{
+			bUpperOnly = true;
 			if (sign <= 0)
 			{
 				ServerPlayMontage(this, FName("PickUp"));
@@ -700,7 +703,7 @@ void AHunter::EKeyDown()
 			{
 				ServerPlayMontage(this, FName("PickUp"));
 			}
-			bUpperOnly = true;
+			
 		}
 
 		else

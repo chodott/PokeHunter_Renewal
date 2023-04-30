@@ -104,7 +104,7 @@ void AGolemBoss::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (auto Hitbox : HitBoxMap)
+	for (auto& Hitbox : HitBoxMap)
 	{
 		Hitbox.Value->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
 		Hitbox.Value->BurningTime = BurningTime;
@@ -198,6 +198,19 @@ void AGolemBoss::SpawnBombs()
 			NewBomb->ThisOwner = this;
 		}
 		BombArray.Add(NewBomb);
+	}
+}
+
+void AGolemBoss::SpawnCupcake()
+{
+	FVector SpawnLoc = Target->GetActorLocation();
+	FVector EndTrace = SpawnLoc - FVector(0, 0, 200);
+	FHitResult HitResult;
+	bool bHit = GetWorld()->LineTraceSingleByProfile(HitResult, SpawnLoc, EndTrace, FName("bCanStand"));
+	if (bHit)
+	{
+		SpawnLoc = EndTrace - FVector(0, 0, 500);
+		AActor* ASpawnedActor = GetWorld()->SpawnActor<AActor>(CupcakeClass, SpawnLoc, FRotator::ZeroRotator);
 	}
 }
 

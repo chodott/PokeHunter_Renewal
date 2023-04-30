@@ -213,7 +213,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 				Hunter->SetPartnerTarget(this);
 			}
 		}
-		HitItem->ServerDestroy();
+
 	}
 	
 	

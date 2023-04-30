@@ -302,7 +302,6 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		{
 			Hunter->SetPartnerTarget(this);
 		}
-		HitItem->ServerDestroy();
 
 
 		HP -= DamageAmount;

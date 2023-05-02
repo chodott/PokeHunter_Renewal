@@ -34,7 +34,7 @@ EBTNodeResult::Type UBTTask_EnemySpecialAttack::ExecuteTask(UBehaviorTreeCompone
 void UBTTask_EnemySpecialAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-	if (!bPlaying)
+	if (!bPlaying && !Enemy->IsJumping())
 	{
 		Enemy->CurState = EEnemyState::Chase;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

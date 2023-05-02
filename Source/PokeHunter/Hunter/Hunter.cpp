@@ -172,7 +172,7 @@ void AHunter::BeginPlay()
 	// Spawn my pet
 	FString LevelName = GetWorld()->GetName();
 	if (nullptr == gameinstance) return;
-	if (gameinstance->GameLiftLevelName.Contains(LevelName) || LevelName.Contains(gameinstance->GameLiftLevelName))
+	if (FString("L_Field0") == LevelName)
 	{
 		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
 		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);

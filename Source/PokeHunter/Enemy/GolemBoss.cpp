@@ -438,7 +438,8 @@ void AGolemBoss::Attack(int AttackPattern)
 
 void AGolemBoss::PatternAttack(int AttackPattern)
 {
-	
+	ServerPlayMontage(this, FName("JumpAttack"));
+	return; 
 	switch (AttackPattern)
 	{
 

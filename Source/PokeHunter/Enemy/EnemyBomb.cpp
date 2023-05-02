@@ -38,6 +38,11 @@ void AEnemyBomb::DropBomb()
 	StaticMesh->SetSimulatePhysics(true);
 }
 
+void AEnemyBomb::FirstUse(const FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos)
+{
+
+}
+
 void AEnemyBomb::InteractChargeAttack_Implementation()
 {
 	DropBomb();

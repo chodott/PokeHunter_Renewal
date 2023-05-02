@@ -22,19 +22,6 @@ EBTNodeResult::Type UBTTask_EnemyPlayMontage::ExecuteTask(UBehaviorTreeComponent
 
 	bPlaying = true;
 
-	//Patrol
-	Enemy->Patrol();
-
-	switch (Enemy->CurState)
-	{
-	case EEnemyState::LeftDestroy:
-		Enemy->ServerPlayMontage(Enemy, FName("LeftDestroy"));
-		break;
-	case EEnemyState::RightDestroy:
-		Enemy->ServerPlayMontage(Enemy, FName("RightDestroy"));
-		break;
-	}
-
 	Enemy->OnMontageEnd.AddLambda([this]() -> void {
 		bPlaying = false;
 		});
@@ -46,19 +33,10 @@ EBTNodeResult::Type UBTTask_EnemyPlayMontage::ExecuteTask(UBehaviorTreeComponent
 void UBTTask_EnemyPlayMontage::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-	AEnemyController* Controller = Cast<AEnemyController>(OwnerComp.GetAIOwner());
-	//Patrol 종료 조건
-	//if (Controller->FindAgroActor() == true)
-	//{
-
-	//	Enemy->CurState = EEnemyState::Chase;
-	//	FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	//}
-
 
 	if (!bPlaying)
 	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		Enemy->CurState = EEnemyState::Chase;
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

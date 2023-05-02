@@ -198,6 +198,9 @@ void AGolemBoss::SpawnBombs()
 			NewBomb->ThisOwner = this;
 		}
 		
+		FVector DirectionVec = RandomPos - GetActorLocation();
+		DirectionVec.Normalize();
+		ServerSpawnProjectile(BombClassArray[RandClassNum], RandomPos, FVector(0,0,0), DirectionVec);
 		BombArray.Add(NewBomb);
 	}
 }
@@ -289,13 +292,13 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 				FString StringPartName = PartName.ToString();
 				if (StringPartName.Contains("Left"))
 				{
-					CurState = EEnemyState::LeftDestroy;
 					ServerPlayMontage(this, FName("LeftDestroy"));
+					CurState = EEnemyState::LeftDestroy;
 				}
 				else if(StringPartName.Contains("Right"))
 				{
-					CurState = EEnemyState::RightDestroy;
 					ServerPlayMontage(this, FName("RightDestroy"));
+					CurState = EEnemyState::RightDestroy;
 				}
 			}
 		}

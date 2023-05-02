@@ -55,7 +55,7 @@ void UHunterAnimInstance::PlayCombatMontage(FName Section)
 	float MaxSpeed = 700.f;
 	if (Section == FName("Dive"))
 	{
-		PlayRate = 0.5f;
+		PlayRate = 0.14f;
 		PlayRate += MovementSpeed / MaxSpeed;
 		Hunter->SetDiveCurveTime(PlayRate);
 	}

@@ -161,7 +161,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	{
 		bGrogy = true;
 		CurState = EEnemyState::Grogy;
-		EnemyAnim->PlayCombatMontage(FName("Grogy"), true);
+		ServerPlayMontage(this, FName("Grogy"));
 	}
 	//Item Hit
 	AItem* HitItem = Cast<AItem>(DamageCauser);
@@ -235,6 +235,7 @@ void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 	DOREPLIFETIME(AEnemy, HP);
 	DOREPLIFETIME(AEnemy, CurState);
 	DOREPLIFETIME(AEnemy, Target);
+	DOREPLIFETIME(AEnemy, bDied);
 
 }
 
@@ -356,7 +357,17 @@ void AEnemy::ChangeTarget()
 			NearestTargetNum = i;
 		}
 	}
-	Target = TargetArray[NearestTargetNum];
+	if(!TargetArray.IsEmpty()) Target = TargetArray[NearestTargetNum];
+}
+
+int AEnemy::CheckInRange()
+{
+	return 0;
+}
+
+int AEnemy::CheckPattern()
+{
+	return 0;
 }
 
 void AEnemy::Attack(int AttackPattern)
@@ -367,6 +378,10 @@ void AEnemy::Attack(int AttackPattern)
 		ServerPlayMontage(this, FName("Attack"));
 		//EnemyAnim->PlayCombatMontage(TEXT("Attack"));
 	}
+}
+
+void AEnemy::PatternAttack(int AttackPattern)
+{
 }
 
 void AEnemy::LongAttack()
@@ -423,17 +438,14 @@ void AEnemy::LaunchToTarget()
 {
 	if (Target)
 	{
-		float Distance = GetDistanceTo(Target);
-		FVector LookVec = Target->GetActorLocation() - GetActorLocation();
+		FVector EndPos = Target->GetActorLocation();
+		FVector StartPos = GetActorLocation();
+		FVector LookVec = GetActorForwardVector();
+
 		
-		LookVec.Normalize();
-		LookVec.Z = 0.2f;
-		float LaunchSpeed = 500.f;
-		FVector Velocity = LookVec * Distance;
-		GetCharacterMovement()->Launch(Velocity);
+	
 	}
 }
-
 void AEnemy::Block()
 {
 	bReflecting = true;
@@ -476,6 +488,12 @@ void AEnemy::ServerSpawnItemBox_Implementation(const FVector& SpawnLoc, TSubclas
 {
 	AItemDropActor* ItemBox = GetWorld()->SpawnActor<AItemDropActor>(DropItemBoxClass, SpawnLoc, GetActorRotation());
 	ItemBox->CreateItemArray(ItemID_Array);
+}
+
+void AEnemy::ServerSpawnProjectile_Implementation(TSubclassOf<class AEnemyProjectile>SpawnClass, const FVector& SpawnLoc, const FVector& EndLoc, const FVector& DirectionVec)
+{
+	AEnemyProjectile* Projectile = GetWorld()->SpawnActor<AEnemyProjectile>(SpawnClass, SpawnLoc, DirectionVec.Rotation());
+	Projectile->FirstUse(DirectionVec, SpawnLoc, EndLoc);
 }
 
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

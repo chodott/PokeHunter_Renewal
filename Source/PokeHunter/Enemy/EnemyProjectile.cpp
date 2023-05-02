@@ -27,7 +27,10 @@ AEnemyProjectile::AEnemyProjectile()
 	ProjectileMovement->bShouldBounce = true;
 	ProjectileMovement->ProjectileGravityScale = 1.f;
 
-	StaticMesh->OnComponentHit.AddDynamic(this, &AEnemyProjectile::OnHit);
+	if (HasAuthority())
+	{
+		StaticMesh->OnComponentHit.AddDynamic(this, &AEnemyProjectile::OnHit);
+	}
 
 	bReplicates = true;
 }
@@ -36,7 +39,7 @@ AEnemyProjectile::AEnemyProjectile()
 void AEnemyProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -51,7 +54,22 @@ void AEnemyProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAct
 	//if(OtherActor->CanBeDamaged())
 	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, ThisOwner, UDamageType::StaticClass());
 
+	ServerDestroy();
+}
+
+void AEnemyProjectile::ServerDestroy_Implementation()
+{
+	MultiDestroy();
+}
+
+void AEnemyProjectile::MultiDestroy_Implementation()
+{
 	Destroy();
+}
+
+void AEnemyProjectile::FirstUse(const FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos)
+{
+	FireInDirection(DirectionVec, InitialPos, EndPos);
 }
 
 void AEnemyProjectile::FireInDirection(FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos)

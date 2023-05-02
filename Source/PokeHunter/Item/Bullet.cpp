@@ -26,8 +26,10 @@ ABullet::ABullet()
 	ProjectileMovement->bShouldBounce = true;
 
 	
-	StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
-
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
+	}
 	//StaticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnHit);
 
 	ItemType = EItemType::Bullet;
@@ -41,6 +43,7 @@ void ABullet::BeginPlay()
 
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
+
 	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if(OtherComponent->IsA<UHitBoxComponent>())
 	UE_LOG(LogTemp, Warning, TEXT("HitBox Hit"), );
@@ -83,7 +86,7 @@ void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 	StaticMesh->AddImpulse(Velocity, FName(""),true);
 }
 
-void ABullet::MultiLaunchBullet_Implementation(AHunter* BulletOwner, FVector InitialPos, FVector EndPos)
+void ABullet::MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector InitialPos, FVector EndPos)
 {
 	FVector Velocity = FVector::ZeroVector;
 	ThisOwner = BulletOwner;

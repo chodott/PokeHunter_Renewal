@@ -228,6 +228,8 @@ public:
 	void MultiSetPartner(APartner* NewPartner);
 	UFUNCTION(Server, Reliable)
 	void ServerSetPartnerPosition(APartner* MyPartner, const FVector& LocVec);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSetPartnerPosition(const FVector& LocVec);
 	UFUNCTION(Server, Reliable)
 	void ServerUsePartnerNormalSkill(APartner* MyPartner, ESkillID SkillID);
 	UFUNCTION(Server, Reliable)

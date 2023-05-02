@@ -10,6 +10,48 @@
 /**
  * 
  */
+
+USTRUCT(BlueprintType)
+struct FPatternInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
+		FName Name {};
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
+		float CoolTime{};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+		float	UsedTime{};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
+		int num;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+		bool	bReady;
+
+	void CheckReady(float CurTime)
+	{
+		if (CurTime - UsedTime > CoolTime)
+		{
+			UsedTime = CurTime;
+			bReady = true;
+		}
+	}
+
+	float UseSkill(float CurTime)
+	{
+		UsedTime = CurTime;
+		bReady = false;
+	}
+
+	bool GetReady() { return bReady; };
+
+};
+
 UCLASS()
 class POKEHUNTER_API AGolemBoss : public AEnemy
 {
@@ -41,7 +83,7 @@ public:
 	class UHitBoxComponent* RightLegHitBox;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
-	class ACharacter* GrabbedTarget;
+	TArray<class ACharacter*> GrabbedTargets;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
 	bool bCanGrab;
@@ -51,6 +93,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Timeline")
 	UCurveFloat* DiveCurve;
+
+	//Normal Attack
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	TArray<float> NormalAttackRange;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	TArray<FPatternInfo> PatternManageArray;
 
 	//Cupcake Attack
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
@@ -96,7 +144,11 @@ public:
 	bool isDie = false;
 	//BTTask
 
+	virtual int CheckInRange();
+	virtual int CheckPattern();
+
 	virtual void Attack(int AttackPattern);
+	virtual void PatternAttack(int AttackPattern);
 
 	virtual void LongAttack();
 

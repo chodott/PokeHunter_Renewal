@@ -22,6 +22,7 @@ enum class EEnemyState : uint8
 	Die UMETA(DisplayName = "Die"),
 	Roar UMETA(DisplayName = "Roar"),
 	Attention UMETA(DisplayName = "Attention"),
+	PatternAttack UMETA(DisplayName = "PatternAttack"),
 	NormalAttack UMETA(DisplayName = "NormalAttack"),
 	JumpAttack UMETA(DisplayName = "JumpAttack"),
 	LongAttack UMETA(DisplayName = "LongAttack"),
@@ -74,7 +75,7 @@ public:
 	};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		TSubclassOf <class AEnemyProjectile> ProjectileClass;
+	TSubclassOf <class AEnemyProjectile> ProjectileClass;
 
 	FOnMontageEndDelegate OnMontageEnd;
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable)
@@ -130,7 +131,7 @@ public:
 
 
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
 	bool bDied{ false };
 
 protected:
@@ -189,9 +190,15 @@ public:
 	void LeaveTarget(AActor* KilledTarget);
 	UFUNCTION(BlueprintCallable)
 	void ChangeTarget();
+	UFUNCTION(BlueprintCallable)
+	virtual int CheckInRange();
+	UFUNCTION(BlueprintCallable)
+	virtual int CheckPattern();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Attack(int AttackPattern);
+	UFUNCTION(BlueprintCallable)
+	virtual void PatternAttack(int AttackPattern);
 	UFUNCTION(BlueprintCallable)
 	virtual void LongAttack();
 	UFUNCTION(BlueprintCallable)
@@ -221,7 +228,8 @@ public:
 	//Replication
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnItemBox(const FVector& SpawnLoc, TSubclassOf<AInteractActor> SpawnClass, const TArray<FName>&ItemID_Array);
-
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnProjectile(TSubclassOf<class AEnemyProjectile>SpawnClass, const FVector& SpawnLoc, const FVector& EndLoc, const FVector& DirectionVec);
 
 	//Animation Function
 	UFUNCTION()
@@ -237,6 +245,5 @@ public:
 	virtual void InteractAttack_Implementation(FVector HitDirection, float Damage);
 	virtual void InteractGrabAttack_Implementation();
 
-public:
-	bool bFirstMeet{ true };
+
 };

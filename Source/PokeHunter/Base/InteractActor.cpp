@@ -55,3 +55,13 @@ void AInteractActor::Interact_Implementation(AHunter* Hunter)
 {
 	Master = Hunter;
 }
+
+void AInteractActor::ServerInteract_Implementation(AHunter* Hunter)
+{
+	MultiInteract(Hunter);
+}
+
+void AInteractActor::MultiInteract_Implementation(AHunter* Hunter)
+{
+	Interact_Implementation(Hunter);
+}

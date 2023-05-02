@@ -13,7 +13,7 @@
 AGolemBoss::AGolemBoss()
 {
 
-	AttackRange = 1000.f;
+	AttackRange = 1500.f;
 
 	FName PartName = FName("HeadSocket");
 	HeadHitBox = CreateDefaultSubobject<UHitBoxComponent>(FName("HeadHitBox"));
@@ -86,7 +86,7 @@ void AGolemBoss::Tick(float DeltaTime)
 {
 	APawn::Tick(DeltaTime);
 
-	for (auto Hitbox : HitBoxMap)
+	for (auto& Hitbox : HitBoxMap)
 	{
 		if (Hitbox.Value)
 		{
@@ -149,7 +149,7 @@ void AGolemBoss::LongAttack()
 	if (EnemyAnim)
 	{
 		CurState = EEnemyState::LongAttack;
-		MultiPlayMontage(this, FName("Throw"));
+		ServerPlayMontage(this, FName("Throw"));
 		
 	}
 	TargetPos = Target->GetActorLocation();
@@ -158,14 +158,11 @@ void AGolemBoss::LongAttack()
 void AGolemBoss::LaunchStone()
 {
 	FVector InitialPos = GetMesh()->GetSocketLocation(FName("LeftHand"));
-	if (Target == NULL) UE_LOG(LogTemp, Warning, TEXT("Dd"));
 	FVector EndPos = Target->GetActorLocation();
 	FVector DirectionVec = EndPos - InitialPos;
 	DirectionVec.Normalize();
 
-
-	AEnemyProjectile* Stone = GetWorld()->SpawnActor<AEnemyProjectile>(ProjectileClass, InitialPos, DirectionVec.Rotation());
-	Stone->FireInDirection(DirectionVec, InitialPos, EndPos);
+	ServerSpawnProjectile(ProjectileClass, InitialPos, EndPos, DirectionVec);
 }
 
 void AGolemBoss::SpawnBombs()
@@ -187,7 +184,7 @@ void AGolemBoss::SpawnBombs()
 
 		FHitResult HitResult;
 		FVector TraceStart = RandomPos;
-		FVector TraceEnd = RandomPos - FVector(0.f, 0.f, 100.f);
+		FVector TraceEnd = RandomPos - FVector(0.f, 0.f, 500.f);
 		FCollisionQueryParams TraceParams;
 		TraceParams.bTraceComplex = false;
 		TraceParams.bReturnPhysicalMaterial = false;
@@ -197,6 +194,7 @@ void AGolemBoss::SpawnBombs()
 			NewBomb->SetActorLocation(SpawnLocation);
 			NewBomb->ThisOwner = this;
 		}
+		
 		BombArray.Add(NewBomb);
 	}
 }
@@ -361,7 +359,7 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 				{
 					OtherActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GrabSocket"));
 					GrabbedCharacter->SetActorEnableCollision(false);
-					GrabbedTarget = GrabbedCharacter;
+					GrabbedTargets.Add(GrabbedCharacter);
 				}
 				return;
 			}
@@ -409,28 +407,51 @@ void AGolemBoss::DeleteHitBox(FName PartName)
 	HitBoxMap.Remove(PartName);
 }
 
+int AGolemBoss::CheckInRange()
+{
+	float Distance = FVector::Dist2D(Target->GetTargetLocation(), GetActorLocation());
+	for (int i = 0; i < NormalAttackRange.Num(); ++i)
+	{
+		if (NormalAttackRange[i] >= Distance) return i;
+	}
+	return 0;
+}
+
+int AGolemBoss::CheckPattern()
+{
+	float CurTime = GetWorld()->GetTimeSeconds();
+
+	for (auto& Pattern : PatternManageArray){
+		Pattern.CheckReady(CurTime);
+		if (Pattern.GetReady())
+		{
+			return Pattern.num;
+		}
+	}
+	return 0;
+}
+
 void AGolemBoss::Attack(int AttackPattern)
 {
+	//LongAttack();
 
 	switch (AttackPattern)
 	{
+
 	case 0:
-		if (Target != NULL)
-		{
-			ServerPlayMontage(this, FName("Attack"));
-			//EnemyAnim->PlayCombatMontage(TEXT("Attack"));
-		}
+		ServerPlayMontage(this, FName("Attack_Grab"));
+		
 		break;
 	case 1:
 		ServerPlayMontage(this, FName("Attack_Punch"));
 		break;
 
 	case 2:
-		ServerPlayMontage(this, FName("Attack_Grab"));
+		ServerPlayMontage(this, FName("Attack_Bind"));
 		break;
 
 	case 3:
-		ServerPlayMontage(this, FName("Attack_Bind"));
+		ServerPlayMontage(this, FName("Attack"));
 		break;
 	case 4:
 		ServerPlayMontage(this, FName("Block"));
@@ -441,6 +462,31 @@ void AGolemBoss::Attack(int AttackPattern)
 		WideAttack();
 		break;
 	}
+}
+
+void AGolemBoss::PatternAttack(int AttackPattern)
+{
+	
+	switch (AttackPattern)
+	{
+
+	case 0:
+		ServerPlayMontage(this, FName("Throw"));
+		break;
+	case 1:
+		ServerPlayMontage(this, FName("WideAttack"));
+		break;
+
+	case 2:
+		ServerPlayMontage(this, FName("ChargeAttack"));
+		break;
+
+	case 3:
+		ServerPlayMontage(this, FName("JumpAttack"));
+		break;
+	}
+
+	PatternManageArray[AttackPattern].UseSkill(GetWorld()->GetTimeSeconds());
 }
 
 void AGolemBoss::Earthquake()

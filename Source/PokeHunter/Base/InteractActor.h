@@ -40,4 +40,9 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
 
 	virtual void Interact_Implementation(AHunter* Hunter) override;
+
+	UFUNCTION(Server, Reliable)
+	void ServerInteract(AHunter* Hunter);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiInteract(AHunter* Hunter);
 };

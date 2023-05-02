@@ -47,11 +47,8 @@ void AItemDropActor::Tick(float DeltaTime)
 
 			}
 			//획득 처리 모션 추가 필요
-			if (HasAuthority())
-			{
-				ServerDestroy();
-				return;
-			}
+			ServerDestroy();
+			return;
 		}
 	}
 }
@@ -100,7 +97,7 @@ void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 	bInteracting = true;
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	TurningPointVec = Master->GetActorLocation() + FVector(0, 300, 200);
-	ServerInteract(Hunter);
+	SetActorTickEnabled(true);
 }
 
 void AItemDropActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -112,19 +109,6 @@ void AItemDropActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AItemDropActor, DropItemArray);
 	DOREPLIFETIME(AItemDropActor, StartPointVec);
 	DOREPLIFETIME(AItemDropActor, TurningPointVec);
-}
-
-void AItemDropActor::ServerInteract_Implementation(AHunter* Hunter)
-{
-	MultiInteract(Hunter);
-}
-
-void AItemDropActor::MultiInteract_Implementation(AHunter* Hunter)
-{
-	
-	SetActorTickEnabled(true);
-	
-	
 }
 
 void AItemDropActor::ServerDestroy_Implementation()

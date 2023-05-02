@@ -64,8 +64,6 @@ public:
 	void ServerDestroy();
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiDestroy();
-	UFUNCTION(Server, Reliable)
-	void ServerInteract(AHunter* Hunter);
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiInteract(AHunter* Hunter);
+
+	
 };

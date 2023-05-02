@@ -4,6 +4,7 @@
 #include "Partner.h"
 #include "PartnerController.h"
 #include "PartnerAnimInstance.h"
+#include "PartnerProjectile.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
@@ -80,6 +81,7 @@ void APartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	DOREPLIFETIME(APartner, HP);
 	DOREPLIFETIME(APartner, bOrdered);
 	DOREPLIFETIME(APartner, bUsingSkill);
+	DOREPLIFETIME(APartner, bPosing);
 }
 
 float APartner::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -368,3 +370,31 @@ void APartner::InteractEarthquake_Implementation()
 
 	LaunchCharacter(FVector(0, 0, 1000), false, false);
 }
+
+void APartner::InteractGrabAttack_Implementation()
+{
+	bNoCollision = true;
+	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
+}
+
+void APartner::InteractWideAttack_Implementation(float Damage)
+{
+	if (Damage <= 0.f)
+	{
+		return;
+	}
+
+	if (bInvincible) return;
+
+	LaunchCharacter(FVector(0, 0, 1000), false, false);
+	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
+	bNoCollision = true;
+	SetActorEnableCollision(false);
+}
+
+void APartner::ServerSpawnProjectile_Implementation(APartner* OwnerPartner, TSubclassOf<class APartnerProjectile> SpawnProjectileClass, FVector StartLoc, FVector EndLoc)
+{
+	APartnerProjectile* Projectile = GetWorld()->SpawnActor<APartnerProjectile>(SpawnProjectileClass, StartLoc, FRotator::ZeroRotator);
+	Projectile->MultiLaunchBullet(OwnerPartner, StartLoc, EndLoc);
+}
+

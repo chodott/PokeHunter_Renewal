@@ -67,8 +67,12 @@ AHunter::AHunter()
 	DestinationMesh->SetVisibility(false);
 
 	//Collision
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
-	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
+		GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
+	}
+	
 
 	//UI
 	static ConstructorHelpers::FClassFinder<UUserWidget>TempInvenClass(TEXT("/Game/UI/InvenStorage/WBP_InventoryList"));
@@ -342,7 +346,11 @@ void AHunter::ServerPlayMontage_Implementation(AHunter* Hunter ,FName Session)
 void AHunter::ServerZoom_Implementation(AHunter* Hunter, bool bZoom)
 {
 	MultiZoom(Hunter, bZoom);
-	if(bZoom) MultiPlayMontage(Hunter, FName("Zoom"));
+	if (bZoom)
+	{
+		MultiPlayMontage(Hunter, FName("Zoom"));
+		Hunter->bUpperOnly = true;
+	}
 }
 
 void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
@@ -712,7 +720,7 @@ void AHunter::EKeyDown()
 			ServerSprint(this, false);
 		}
 
-		InteractingActor->Interact_Implementation(this);
+		InteractingActor->ServerInteract(this);
 		return;
 	}
 }
@@ -825,7 +833,7 @@ void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AA
 {
 	if (InteractingActor == nullptr)
 	{
-		if (OtherActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
+		if (OtherActor->Implements<UInteractInterface>())
 		{
 			InteractingActor = Cast<AInteractActor>(OtherActor);
 		}
@@ -834,7 +842,7 @@ void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AA
 
 void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
+	if (OtherActor->Implements<UInteractInterface>())
 	{
 		if (InteractingActor == Cast<AInteractActor>(OtherActor))
 		{
@@ -995,14 +1003,25 @@ void AHunter::SetInstallMode()
 
 void AHunter::ServerSetPartnerPosition_Implementation(APartner* MyPartner, const FVector& LocVec)
 {
-	MyPartner->MultiSetPosition(LocVec);
+	MultiSetPartnerPosition(LocVec);
 }
+
+void AHunter::MultiSetPartnerPosition_Implementation(const FVector& LocVec)
+{
+	Partner->TargetPos = LocVec;
+	Partner->bOrdered = true;
+
+}
+
 
 void AHunter::ServerSpawnPartner_Implementation(AHunter* OwnerHunter, TSubclassOf<APartner> SpawnPartnerClass, const FVector& SpawnLoc)
 {
 	APartner* NewPartner = GetWorld()->SpawnActor<APartner>(SpawnPartnerClass, SpawnLoc, FRotator::ZeroRotator);
-	NewPartner->MultiSetHunter(OwnerHunter);
-	MultiSetPartner(NewPartner);
+	OwnerHunter->Partner = NewPartner;
+	NewPartner->Hunter = OwnerHunter;
+	NewPartner->CurState = EPartnerState::MoveTarget;
+	//NewPartner->MultiSetHunter(OwnerHunter);
+	//MultiSetPartner(NewPartner);
 
 }
 
@@ -1022,6 +1041,7 @@ void AHunter::ServerUsePotion_Implementation(AHunter* OwnerHunter, TSubclassOf<A
 void AHunter::MultiUsePotion_Implementation(APotion* Potion)
 {
 	CurItem = Potion;
+	bUpperOnly = true;
 	CurState = EPlayerState::Drink;
 }
 
@@ -1030,6 +1050,7 @@ void AHunter::ServerSpawnBullet_Implementation(AHunter* OwnerHunter, TSubclassOf
 	ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(SpawnItemClass, StartLoc, Rotation);
 	Bullet->MultiLaunchBullet(OwnerHunter, StartLoc, EndLoc);
 	MultiPlayMontage(OwnerHunter, FName("Shot"));
+	OwnerHunter->bUpperOnly = true;
 }
 
 void AHunter::ServerSpawnItem_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
@@ -1075,3 +1096,4 @@ void AHunter::ServerUsePartnerSpecialSkill_Implementation(APartner* MyPartner, E
 {
 	MyPartner->MultiUseSpecialSkill(SkillID);
 }
+

@@ -22,6 +22,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DropBomb();
 
+	virtual void FirstUse(const FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos);
 	virtual void InteractChargeAttack_Implementation();
 	
 public:

@@ -438,12 +438,11 @@ void AEnemy::LaunchToTarget()
 {
 	if (Target)
 	{
+		//개선 필요
 		FVector EndPos = Target->GetActorLocation();
 		FVector StartPos = GetActorLocation();
 		FVector LookVec = GetActorForwardVector();
 
-		
-	
 	}
 }
 void AEnemy::Block()
@@ -503,8 +502,10 @@ void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 		EnemyAnim->bPlaying = false;
 		if (CurState == EEnemyState::Hit) CurState = EEnemyState::Roar;
 		OnMontageEnd.Broadcast();
-		
+		CurState = EEnemyState::Chase;
 	}
+
+	
 }
 
 void AEnemy::InteractIce_Implementation()

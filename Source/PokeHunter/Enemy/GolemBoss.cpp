@@ -10,6 +10,7 @@
 #include "EnemyProjectile.h"
 #include "Kismet/GameplayStatics.h"
 
+
 AGolemBoss::AGolemBoss()
 {
 
@@ -88,13 +89,13 @@ void AGolemBoss::Tick(float DeltaTime)
 
 	for (auto Hitbox : HitBoxMap)
 	{
-		if (Hitbox.Value)
+		if (Hitbox.HitBoxComponent)
 		{
-			if (Hitbox.Value->CheckBurning(DeltaTime))
+			if (Hitbox.HitBoxComponent->CheckBurning(DeltaTime))
 			{
 				float DamageAmount = 1;
 				HP -= DamageAmount;
-				OnDamage.Broadcast(DamageAmount, Hitbox.Value->GetComponentLocation());
+				OnDamage.Broadcast(DamageAmount, Hitbox.HitBoxComponent->GetComponentLocation());
 			}
 		}
 	}
@@ -103,33 +104,31 @@ void AGolemBoss::Tick(float DeltaTime)
 void AGolemBoss::BeginPlay()
 {
 	Super::BeginPlay();
-
-	isDie = false;
 }
 
 void AGolemBoss::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	HitBoxMap.Add(FName("HeadSocket"), HeadHitBox);
-	HitBoxMafor (auto Hitbox : HitBoxMap)
-	{
-		Hitbox.Value->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
-		Hitbox.Value->BurningTime = BurningTime;
-	}p.Add(FName("Body"), BodyHitBox);
-	HitBoxMap.Add(FName("RightHand"), RightHandHitBox);
-	HitBoxMap.Add(FName("RightArm"), RightArmHitBox);
-	HitBoxMap.Add(FName("RightShoulder"), RightShoulderHitBox);
-	HitBoxMap.Add(FName("LeftHand"), LeftHandHitBox);
-	HitBoxMap.Add(FName("LeftArm"), LeftArmHitBox);
-	HitBoxMap.Add(FName("RightLeg"), RightLegHitBox);
-	HitBoxMap.Add(FName("LeftLeg"), LeftLegHitBox);
+	HitBoxMap.Reserve(9);
 
-	//for (auto& Hitbox : HitBoxMap)
-	//{
-	//	Hitbox.Value->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
-	//	// Hitbox.Value->BurningTime = BurningTime;
-	//}
+	HitBoxMap.Add(FHitBoxInfo(FName("HeadSocket"), HeadHitBox));
+	HitBoxMap.Add(FHitBoxInfo(FName("Body"), BodyHitBox));
+	HitBoxMap.Add(FHitBoxInfo(FName("RightHand"), RightHandHitBox));
+				  
+	HitBoxMap.Add(FHitBoxInfo(FName("RightArm"), RightArmHitBox));
+	HitBoxMap.Add(FHitBoxInfo(FName("RightShoulder"), RightShoulderHitBox));
+	HitBoxMap.Add(FHitBoxInfo(FName("LeftHand"), LeftHandHitBox));
+				  
+	HitBoxMap.Add(FHitBoxInfo(FName("LeftArm"), LeftArmHitBox));
+	HitBoxMap.Add(FHitBoxInfo(FName("RightLeg"), RightLegHitBox));
+	HitBoxMap.Add(FHitBoxInfo(FName("LeftLeg"), LeftLegHitBox));
+
+	for (auto& Hitbox : HitBoxMap)
+	{
+		Hitbox.HitBoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
+		// Hitbox.Value->BurningTime = BurningTime;
+	}
 }
 
 void AGolemBoss::Die()
@@ -144,8 +143,6 @@ void AGolemBoss::Die()
 		PrimitiveComponent->SetCollisionProfileName(FName("Destructible"));
 		PrimitiveComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
-
-	isDie = true;
 }
 
 void AGolemBoss::LongAttack()
@@ -256,17 +253,6 @@ void AGolemBoss::MultiApplyDamage_Implementation(AActor* OtherActor, float Damag
 	UGameplayStatics::ApplyPointDamage(OtherActor, DamageAmount, SweepResult.Normal, SweepResult, NULL, DamageCauser, UDamageType::StaticClass());
 
 }
-
-
-void AGolemBoss::OpenLevelHome()
-{
-	FString LevelName = GetWorld()->GetName();
-	if ("L_Field0" == LevelName && "MyHome" != LevelName) {
-		FString levelName = L"/Game/Map/Lobby/MyHome";
-		UGameplayStatics::OpenLevel(GetWorld(), *levelName);
-	}
-}
-
 
 float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -397,7 +383,8 @@ void AGolemBoss::DestroyPart_Implementation(FName PartName)
 
 void AGolemBoss::DeleteHitBox(FName PartName)
 {
-	HitBoxMap.Remove(PartName);
+	// Delete Hit Box를 제거함.
+	// HitBoxMap.Remove(PartName);
 }
 
 void AGolemBoss::Attack(int AttackPattern)

@@ -47,6 +47,11 @@ void UMainMenuWidget::NativeConstruct() {
 	WebBrowser->OnUrlChanged.Add(LoginDelegate);
 }
 
+void UMainMenuWidget::NativeDestruct()
+{
+	Super::NativeDestruct();
+}
+
 void UMainMenuWidget::HandleLoginUrlChange()
 {
 	FString BrowserUrl = WebBrowser->GetUrl();
@@ -99,15 +104,12 @@ void UMainMenuWidget::OnExchangeCodeForTokensResponseReceived(FHttpRequestPtr Re
 						FString RefreshToken = JsonObject->GetStringField("refresh_token");
 						ServerIntance->SetCognitoTokens(AccessToken, IdToken, RefreshToken);
 
-						/*
-						TSharedRef<IHttpRequest> GetPlayerDataRequest = gameinstance->HttpModule->CreateRequest();
-						GetPlayerDataRequest->OnProcessRequestComplete().BindUObject(this, &UMainMenuWidget::OnGetPlayerDataResponseReceived);
-						GetPlayerDataRequest->SetURL(ApiUrl + "/getplayerdata");
-						GetPlayerDataRequest->SetVerb("GET");
-						GetPlayerDataRequest->SetHeader("Content-Type", "application/json");
-						GetPlayerDataRequest->SetHeader("Authorization", AccessToken);
-						GetPlayerDataRequest->ProcessRequest();
-						*/
+						FString LevelName = GetWorld()->GetName();
+						if ("Title" == LevelName) {
+							FString levelName = L"/Game/Map/Lobby/MyHome";
+							UGameplayStatics::OpenLevel(GetWorld(), *levelName);
+						}
+						NativeDestruct();
 					}
 				}
 			}

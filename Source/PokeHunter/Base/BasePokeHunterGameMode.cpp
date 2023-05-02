@@ -4,7 +4,6 @@
 #include "PokeHunter/Base/BasePokeHunterGameMode.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "UObject/ConstructorHelpers.h"
-//#include "GameLiftTutorialHUD.h"
 #include "PokeHunterStateBase.h"
 #include "HunterState.h"
 #include "PokeHunter/MainMenu/TextReaderComponent.h"
@@ -27,6 +26,9 @@ ABasePokeHunterGameMode::ABasePokeHunterGameMode()
 
 	RemainingGameTime = 240;
 	GameSessionActivated = false;
+
+	WaitingForPlayersToJoin = false;
+	TimeSpentWaitingForPlayersToJoin = 0;
 }
 
 void ABasePokeHunterGameMode::BeginPlay() {
@@ -41,6 +43,45 @@ void ABasePokeHunterGameMode::BeginPlay() {
 			FStartGameSessionState* State = (FStartGameSessionState*)Params;
 
 			State->Status = Aws::GameLift::Server::ActivateGameSession().IsSuccess();
+
+			FString MatchmakerData = GameSessionObj.GetMatchmakerData();
+
+			TSharedPtr<FJsonObject> JsonObject;
+			TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(MatchmakerData);
+
+			if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
+				State->MatchmakingConfigurationArn = JsonObject->GetStringField("matchmakingConfigurationArn");
+
+				TArray<TSharedPtr<FJsonValue>> Teams = JsonObject->GetArrayField("teams");
+				for (TSharedPtr<FJsonValue> Team : Teams) {
+					TSharedPtr<FJsonObject> TeamObj = Team->AsObject();
+					FString TeamName = TeamObj->GetStringField("name");
+
+					TArray<TSharedPtr<FJsonValue>> Players = TeamObj->GetArrayField("players");
+
+					for (TSharedPtr<FJsonValue> Player : Players) {
+						TSharedPtr<FJsonObject> PlayerObj = Player->AsObject();
+						FString PlayerId = PlayerObj->GetStringField("playerId");
+
+						TSharedPtr<FJsonObject> Attributes = PlayerObj->GetObjectField("attributes");
+						TSharedPtr<FJsonObject> Skill = Attributes->GetObjectField("skill");
+						FString SkillValue = Skill->GetStringField("valueAttribute");
+						auto SkillAttributeValue = new Aws::GameLift::Server::Model::AttributeValue(FCString::Atod(*SkillValue));
+
+						Aws::GameLift::Server::Model::Player AwsPlayerObj;
+
+						AwsPlayerObj.SetPlayerId(TCHAR_TO_ANSI(*PlayerId));
+						AwsPlayerObj.SetTeam(TCHAR_TO_ANSI(*TeamName));
+						AwsPlayerObj.AddPlayerAttribute("skill", *SkillAttributeValue);
+
+						State->PlayerIdToPlayer.Add(PlayerId, AwsPlayerObj);
+
+						UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
+						UE_LOG(LogTemp, Warning, TEXT("[DUG - OnStartGameSession Add PlayerIdToPlayer] PlayerId : %s"), *PlayerId);
+						UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
+					}
+				}
+			}
 		};
 
 		auto OnUpdateGameSession = [](Aws::GameLift::Server::Model::UpdateGameSession UpdateGameSessionObj, void* Params)
@@ -50,7 +91,45 @@ void ABasePokeHunterGameMode::BeginPlay() {
 			auto Reason = UpdateGameSessionObj.GetUpdateReason();
 
 			if (Reason == Aws::GameLift::Server::Model::UpdateReason::MATCHMAKING_DATA_UPDATED) {
+				State->Reason = EUpdateReason::MATCHMAKING_DATA_UPDATED;
 
+				auto GameSessionObj = UpdateGameSessionObj.GetGameSession();
+				FString MatchmakerData = GameSessionObj.GetMatchmakerData();
+
+				TSharedPtr<FJsonObject> JsonObject;
+				TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(MatchmakerData);
+
+				if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
+					TArray<TSharedPtr<FJsonValue>> Teams = JsonObject->GetArrayField("teams");
+					for (TSharedPtr<FJsonValue> Team : Teams) {
+						TSharedPtr<FJsonObject> TeamObj = Team->AsObject();
+						FString TeamName = TeamObj->GetStringField("name");
+
+						TArray<TSharedPtr<FJsonValue>> Players = TeamObj->GetArrayField("players");
+
+						for (TSharedPtr<FJsonValue> Player : Players) {
+							TSharedPtr<FJsonObject> PlayerObj = Player->AsObject();
+							FString PlayerId = PlayerObj->GetStringField("playerId");
+
+							TSharedPtr<FJsonObject> Attributes = PlayerObj->GetObjectField("attributes");
+							TSharedPtr<FJsonObject> Skill = Attributes->GetObjectField("skill");
+							FString SkillValue = Skill->GetStringField("valueAttribute");
+							auto SkillAttributeValue = new Aws::GameLift::Server::Model::AttributeValue(FCString::Atod(*SkillValue));
+
+							Aws::GameLift::Server::Model::Player AwsPlayerObj;
+
+							AwsPlayerObj.SetPlayerId(TCHAR_TO_ANSI(*PlayerId));
+							AwsPlayerObj.SetTeam(TCHAR_TO_ANSI(*TeamName));
+							AwsPlayerObj.AddPlayerAttribute("skill", *SkillAttributeValue);
+
+							State->PlayerIdToPlayer.Add(PlayerId, AwsPlayerObj);
+
+							UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
+							UE_LOG(LogTemp, Warning, TEXT("[DUG - OnUpdateGameSession Add PlayerIdToPlayer] PlayerId : %s"), *PlayerId);
+							UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
+						}
+					}
+				}
 			}
 			else if (Reason == Aws::GameLift::Server::Model::UpdateReason::BACKFILL_CANCELLED) {
 				State->Reason = EUpdateReason::BACKFILL_CANCELLED;
@@ -71,7 +150,6 @@ void ABasePokeHunterGameMode::BeginPlay() {
 			if (GetTerminationTimeOutcome.IsSuccess()) {
 				State->TerminationTime = GetTerminationTimeOutcome.GetResult();
 			}
-
 			State->Status = true;
 		};
 
@@ -171,6 +249,11 @@ FString ABasePokeHunterGameMode::InitNewPlayer(APlayerController* NewPlayerContr
 						auto PlayerObj = UpdateGameSessionState.PlayerIdToPlayer.Find(PlayerId);
 						FString Team = PlayerObj->GetTeam();
 						PokeHunterPlayerState->Team = *Team;
+
+						UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
+						UE_LOG(LogTemp, Warning, TEXT("[DUG - UpdateGameSessionState GetTeam PlayerIdToPlayer] Team : %s"), *Team);
+						UE_LOG(LogTemp, Warning, TEXT("[DUG - UpdateGameSessionState GetTeam PlayerIdToPlayer] PlayerId : %s"), *PlayerId);
+						UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
 					}
 				}
 				else if (StartGameSessionState.PlayerIdToPlayer.Num() > 0) {
@@ -178,6 +261,11 @@ FString ABasePokeHunterGameMode::InitNewPlayer(APlayerController* NewPlayerContr
 						auto PlayerObj = StartGameSessionState.PlayerIdToPlayer.Find(PlayerId);
 						FString Team = PlayerObj->GetTeam();
 						PokeHunterPlayerState->Team = *Team;
+
+						UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
+						UE_LOG(LogTemp, Warning, TEXT("[DUG - StartGameSessionState GetTeam PlayerIdToPlayer] Team : %s"), *Team);
+						UE_LOG(LogTemp, Warning, TEXT("[DUG - UpdateGameSessionState GetTeam PlayerIdToPlayer] PlayerId : %s"), *PlayerId);
+						UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
 					}
 				}
 			}
@@ -236,13 +324,19 @@ void ABasePokeHunterGameMode::HandleGameSessionUpdate()
 			GameSessionActivated = true;
 			ExpectedPlayers = StartGameSessionState.PlayerIdToPlayer;
 			WaitingForPlayersToJoin = true;
+
+			int32 ticket_cnt = ExpectedPlayers.Num();
+			UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
+			UE_LOG(LogTemp, Warning, TEXT("[DUG - First GameSessionActivated] ExpectedPlayers cnt: %d"), ticket_cnt);
+			UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
+
 			// GetWorldTimerManager().SetTimer(PickAWinningTeamHandle, this, &AGameLiftTutorialGameMode::PickAWinningTeam, 1.0f, false, (float)RemainingGameTime);
 			// GetWorldTimerManager().SetTimer(SuspendBackfillHandle, this, &ABasePokeHunterGameMode::SuspendBackfill, 1.0f, false, (float)(RemainingGameTime - 60));
 			// GetWorldTimerManager().SetTimer(CountDownUntilGameOverHandle, this, &AGameLiftTutorialGameMode::CountDownUntilGameOver, 1.0f, true, 0.0f);
 		}
 	}
 	else if (WaitingForPlayersToJoin) {
-		if (TimeSpentWaitingForPlayersToJoin < 5) {		// 게임 시작 설정 5초
+		if (TimeSpentWaitingForPlayersToJoin < 10) {		// 게임 시작 설정 10초
 			auto GameSessionIdOutcome = Aws::GameLift::Server::GetGameSessionId();	// 현재 Game Session ID를 가져옴
 			if (GameSessionIdOutcome.IsSuccess()) {									// 가져오기 성공
 				FString GameSessionId = FString(GameSessionIdOutcome.GetResult());
@@ -257,7 +351,6 @@ void ABasePokeHunterGameMode::HandleGameSessionUpdate()
 					
 					Aws::GameLift::Server::Model::DescribePlayerSessionsResult;
 					
-					// int Count = DescribePlayerSessionsResult.GetPlayerSessionsCount();
 					int Count;
 					auto PlayerSessions = DescribePlayerSessionsResult.GetPlayerSessions(Count);
 					if (Count == 0) {
@@ -289,29 +382,49 @@ void ABasePokeHunterGameMode::HandleGameSessionUpdate()
 		LatestBackfillTicketId = "";
 		ExpectedPlayers = UpdateGameSessionState.PlayerIdToPlayer;
 
+		int32 ticket_cnt = ExpectedPlayers.Num();
+		UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
+		UE_LOG(LogTemp, Warning, TEXT("[DUG - 0] UpdateGameSessionState.PlayerIdToPlayer -->> ExpectedPlayers cnt: %d"), ticket_cnt);
+		UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
+
 		WaitingForPlayersToJoin = true;
 	}
 	else if (UpdateGameSessionState.Reason == EUpdateReason::BACKFILL_CANCELLED || UpdateGameSessionState.Reason == EUpdateReason::BACKFILL_COMPLETED 
 				|| UpdateGameSessionState.Reason == EUpdateReason::BACKFILL_FAILED || UpdateGameSessionState.Reason == EUpdateReason::BACKFILL_TIMED_OUT)
 	{
 		LatestBackfillTicketId = "";
+
+		int32 ticket_cnt = ExpectedPlayers.Num();
+		UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
+		UE_LOG(LogTemp, Warning, TEXT("[DUG - 0] ExpectedPlayers cnt: %d"), ticket_cnt);
 		
 		TMap<FString, Aws::GameLift::Server::Model::Player> ConnectedPlayers;
 		TArray<APlayerState*> PlayerStates = GetWorld()->GetGameState()->PlayerArray;
 
+		int32 playerStateCnt = PlayerStates.Num();
+		UE_LOG(LogTemp, Warning, TEXT("[DUG - 0] PlayerState(WorldPlayerArray) cnt: %d"), playerStateCnt);
+
 		for (APlayerState* PlayerState : PlayerStates) {
 			if (PlayerState != nullptr) {
 				AHunterState* PokeHunterPlayerState = Cast<AHunterState>(PlayerState);
+				UE_LOG(LogTemp, Warning, TEXT("[DUG - 1] MatchmakingPlayerId : %s"), *PokeHunterPlayerState->MatchmakingPlayerId);
+
 				if (PokeHunterPlayerState != nullptr) {
 					auto PlayerObj = ExpectedPlayers.Find(PokeHunterPlayerState->MatchmakingPlayerId);
+					UE_LOG(LogTemp, Warning, TEXT("[DUG - 2] [PlayerObj] MatchmakingPlayerId : %s"), *PokeHunterPlayerState->MatchmakingPlayerId);
 					if (PlayerObj != nullptr) {
+						UE_LOG(LogTemp, Warning, TEXT("[DUG - 3] [ConnectedPlayers] Add Actor"));
 						ConnectedPlayers.Add(PokeHunterPlayerState->MatchmakingPlayerId, *PlayerObj);
 					}
 				}
 			}
 		}
+		int32 connectedPlayer_cnt = ConnectedPlayers.Num();
+		UE_LOG(LogTemp, Warning, TEXT("[DUG - 4] ConnectedPlayers cnt: %d"), connectedPlayer_cnt);
+		UE_LOG(LogTemp, Warning, TEXT("========================================================================================"));
 
 		if (ConnectedPlayers.Num() == 0) {
+			UE_LOG(LogTemp, Warning, TEXT("[DUG - Ending] - Call EndGame() Function!"));
 			EndGame();
 		}
 		/*else if (ConnectedPlayers.Num() < 4) {

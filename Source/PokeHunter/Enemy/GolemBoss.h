@@ -7,6 +7,22 @@
 #include "PokeHunter/Base/HitBoxComponent.h"
 #include "GolemBoss.generated.h"
 
+USTRUCT(BlueprintType)
+struct FHitBoxInfo
+{
+	GENERATED_BODY();
+
+public:
+	FName HitBoxName;
+	class UHitBoxComponent* HitBoxComponent;
+
+	FHitBoxInfo() {};
+	FHitBoxInfo(FName in_name, class UHitBoxComponent* in_hitBox) {
+		HitBoxName = in_name;
+		HitBoxComponent = in_hitBox;
+	}
+};
+
 /**
  * 
  */
@@ -20,7 +36,9 @@ public:
 
 	//HitBox
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-	TMap<FName, class UHitBoxComponent*> HitBoxMap;
+		TArray<FHitBoxInfo> HitBoxMap;
+	// TMap<FName, class UHitBoxComponent*> HitBoxMap;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* HeadHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
@@ -114,9 +132,4 @@ public:
 
 	//Replication
 	void MultiApplyDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);
-
-	// Return Home
-	FTimerHandle ReHomeTimerHandle;
-	void OpenLevelHome();
-	// GetWorldTimerManager().SetTimer(TimerHandle, this, &AMyActor::MyFunction, 2.0f, false);
 };

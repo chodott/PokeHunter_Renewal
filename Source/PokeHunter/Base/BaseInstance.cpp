@@ -8,7 +8,7 @@
 
 UBaseInstance::UBaseInstance()
 {
-	UTextReaderComponent* TextReader = CreateDefaultSubobject<UTextReaderComponent>(TEXT("TextReaderComp"));
+	TextReader = CreateDefaultSubobject<UTextReaderComponent>(TEXT("TextReaderComp"));
 	ApiUrl = TextReader->ReadFile("Urls/ApiUrl.txt");
 	RegionCode = TextReader->ReadFile("Urls/RegionCode.txt");
 	HttpModule = &FHttpModule::Get();
@@ -19,8 +19,11 @@ void UBaseInstance::Init()
 	Super::Init();
 }
 
-bool UBaseInstance::ConnectToServer(FString server_addr)
+bool UBaseInstance::ConnectToServer()
 {
+	if (nullptr == TextReader) return false;
+	FString server_addr = TextReader->ReadFile("Urls/IOCPServerAddr.txt");
+
 	FIPv4Address::Parse(server_addr, ip);
 	addr->SetIp(ip.Value);
 	addr->SetPort(PORT_NUM);
@@ -218,12 +221,6 @@ bool UBaseInstance::LogoutGame()
 
 void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken)
 {
-	FString LevelName = GetWorld()->GetName();
-	if ("Title" == LevelName) {
-		FString levelName = L"/Game/Map/Lobby/MyHome";
-		UGameplayStatics::OpenLevel(GetWorld(), *levelName);
-	}
-
 	NewAccessToken.ReplaceInline(TEXT("\n"), TEXT(""));
 	AccessToken = NewAccessToken;
 
@@ -238,7 +235,7 @@ void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken,
 	UE_LOG(LogTemp, Warning, TEXT("refresh token: %s"), *RefreshToken);
 
 	// World Timer에 등록하기
-	GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UBaseInstance::RetrieveNewTokens, 1.0f, false, 3300.0f);
+	GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UBaseInstance::RetrieveNewTokens, 1.0f, false, 30.0f);
 }
 
 bool UBaseInstance::returnMyHome()
@@ -246,7 +243,7 @@ bool UBaseInstance::returnMyHome()
 	// GetWorld()->GetTimerManager().ClearTimer(RetrieveNewTokensHandle);
 	// GetWorld()->GetTimerManager().ClearTimer(GetResponseTimeHandle);
 
-	if (AccessToken.Len() > 0) {
+	/*if (AccessToken.Len() > 0) {
 		if (JoinTicketId.Len() > 0) {
 			TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
 			RequestObj->SetStringField("ticketId", JoinTicketId);
@@ -267,7 +264,7 @@ bool UBaseInstance::returnMyHome()
 
 		}
 		
-	}
+	}*/
 
 	return false;
 }

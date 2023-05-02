@@ -48,7 +48,10 @@ public:
 		FTimerHandle TH_Partyinfo;
 
 	UFUNCTION(BlueprintCallable, Category = "Party info")
-		bool SendClientState();
+		void TickRecvPartyState();
+
+	UFUNCTION(BlueprintCallable, Category = "Party info")
+		void SendClientState();
 
 	UFUNCTION(BlueprintCallable, Category = "Party info")
 		bool SendEnterParty();
@@ -66,7 +69,13 @@ public:
 		void LoadingScreenCall();
 
 	UPROPERTY()
+		bool WaitforOtherClient = true;
+	
+	UPROPERTY()
 		bool StartMath = false;
+
+	UPROPERTY()
+		FTimerHandle TH_WaitOtherClient;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
@@ -96,6 +105,12 @@ private:
 
 	UPROPERTY()
 		float AveragePlayerLatency;
+
+	UFUNCTION()
+		void SendReadyState();
+
+	UFUNCTION()
+		void EnterStageMap();
 
 	UFUNCTION()
 		void PollMatchmaking();

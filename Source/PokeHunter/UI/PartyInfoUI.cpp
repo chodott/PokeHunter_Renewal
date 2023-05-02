@@ -26,7 +26,7 @@ void UPartyInfoUI::NativeConstruct()
 	gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
 	SendEnterParty();
 	// TickSendPartyInfo();
-	GetWorld()->GetTimerManager().SetTimer(TH_Partyinfo, this, &UPartyInfoUI::TickSendPartyInfo, 0.1f, true, 0.f);
+	GetWorld()->GetTimerManager().SetTimer(TH_Partyinfo, this, &UPartyInfoUI::TickSendPartyInfo, 1.0f, true, 0.f);
 
 	// Join Blueprint UI widget 추가 필요
 	JoinButton = (UButton*)GetWidgetFromName(TEXT("BTN_READY"));
@@ -69,40 +69,10 @@ void UPartyInfoUI::NativeConstruct()
 void UPartyInfoUI::NativeDestruct()
 {
 	GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
+	GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
 	GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
 	GetWorld()->GetTimerManager().ClearTimer(SetAveragePlayerLatencyHandle);
 	Super::NativeDestruct();
-}
-
-bool UPartyInfoUI::SendClientState()	// Send this client State
-{
-	if (false == IsValid(gameinstance))																return false;
-	if (0 == gameinstance->PartyListMap.Num())														return false;
-	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState())	return false;
-	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;
-
-	bool retVal = false;
-	int32 bSize;
-
-	CS_PARTY_READY_PACK ready_pack;
-	ready_pack.size = sizeof(CS_PARTY_READY_PACK);
-	ready_pack.type = CS_PARTY_READY;
-	retVal = gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&ready_pack), ready_pack.size, bSize);
-	if (false == retVal) return false;
-
-	SC_PARTY_JOIN_RESULT_PACK result_pack;
-	retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&result_pack), sizeof(SC_PARTY_JOIN_RESULT_PACK), bSize);
-	if (false == retVal) return false;
-
-	if (-1 != result_pack._result) {
-		// UE_LOG(LogTemp, Warning, TEXT("Starttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"));
-	}
-	else {
-		// UE_LOG(LogTemp, Warning, TEXT("fail...................."));
-		return false;
-	}
-
-	return true;
 }
 
 bool UPartyInfoUI::SendEnterParty()
@@ -269,17 +239,84 @@ void UPartyInfoUI::SetAveragePlayerLatency() {
 
 void UPartyInfoUI::OnJoinButtonClicked()
 {
-	JoinButton->SetIsEnabled(false);
-
-	if (true == SendClientState()) {
-		UE_LOG(LogTemp, Warning, TEXT("[Success] OnJoinButtonClicked()"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("[Fail] OnJoinButtonClicked()"));
-		JoinButton->SetIsEnabled(true);
+	WaitforOtherClient = true;
+	UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
+	
+	if (ButtonTextBlock->GetText().ToString().Equals(FString("Wait"))) {
+		GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
+		ButtonTextBlock->SetText(FText::FromString("READY"));
+		// cancel match packet send and ...
 		return;
 	}
 
+	JoinButton->SetIsEnabled(false);
+	SendClientState();
+
+	if (false == WaitforOtherClient) {
+		GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
+		ButtonTextBlock->SetText(FText::FromString("Entering"));
+		JoinButton->SetIsEnabled(false);
+		EnterStageMap();
+		// BTN 비활성화->활성화 불필요.
+	}
+	else {
+		ButtonTextBlock->SetText(FText::FromString("Wait"));
+		JoinButton->SetIsEnabled(false);
+		// JoinButton->SetIsEnabled(true);
+		GetWorld()->GetTimerManager().SetTimer(TH_WaitOtherClient, this, &UPartyInfoUI::TickRecvPartyState, 1.0f, true, 0.f);
+	}
+}
+
+void UPartyInfoUI::TickRecvPartyState()
+{
+	SendClientState();
+
+	if (false == WaitforOtherClient) {
+		GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
+		UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
+		ButtonTextBlock->SetText(FText::FromString("Entering"));
+		JoinButton->SetIsEnabled(false);
+		// JoinButton->SetIsEnabled(true);
+		EnterStageMap();
+	}
+}
+
+void UPartyInfoUI::SendClientState()	// Send this client State
+{
+	if (false == IsValid(gameinstance))																return;
+	if (0 == gameinstance->PartyListMap.Num())														return;
+	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState())	return;
+	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return;
+
+	bool retVal = false;
+	int32 bSize;
+
+	CS_PARTY_READY_PACK ready_pack;
+	ready_pack.size = sizeof(CS_PARTY_READY_PACK);
+	ready_pack.type = CS_PARTY_READY;
+	retVal = gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&ready_pack), ready_pack.size, bSize);
+	if (false == retVal) return;
+
+	SC_PARTY_JOIN_RESULT_PACK result_pack;
+	retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&result_pack), sizeof(SC_PARTY_JOIN_RESULT_PACK), bSize);
+	if (false == retVal) return;
+
+	if (-1 != result_pack._result) {	// Enter Server
+		WaitforOtherClient = false;
+	}
+	else {								// Wait for other client
+		WaitforOtherClient = true;
+	}
+	return;
+}
+
+void UPartyInfoUI::SendReadyState()
+{
+
+}
+
+void UPartyInfoUI::EnterStageMap()
+{
 	FString AccessToken;
 	FString JoinTicketId;
 	UGameInstance* GameInstance = GetGameInstance();
@@ -298,6 +335,30 @@ void UPartyInfoUI::OnJoinButtonClicked()
 		}
 	}
 
+	if (AccessToken.Len() > 0 && false == StartMath) {
+		StartMath = true;
+
+		TSharedRef<FJsonObject> LatencyMapObj = MakeShareable(new FJsonObject);
+		LatencyMapObj->SetNumberField(PokeHunterGameInstance->RegionCode, AveragePlayerLatency);
+
+		TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
+		RequestObj->SetObjectField("latencyMap", LatencyMapObj);
+
+		FString RequestBody;
+		TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
+		if (FJsonSerializer::Serialize(RequestObj.ToSharedRef(), Writer)) {
+			TSharedRef<IHttpRequest> StartJoinRequest = gameinstance->HttpModule->CreateRequest();
+			StartJoinRequest->OnProcessRequestComplete().BindUObject(this, &UPartyInfoUI::OnStartMatchmakingResponseReceived);
+			StartJoinRequest->SetURL(PokeHunterGameInstance->ApiUrl + "/startmatchmaking");
+			StartJoinRequest->SetVerb("POST");
+			StartJoinRequest->SetHeader("Content-Type", "application/json");
+			StartJoinRequest->SetHeader("Authorization", AccessToken);
+			StartJoinRequest->SetContentAsString(RequestBody);
+			StartJoinRequest->ProcessRequest();
+		}
+	}
+
+	/*
 	if (SearchingForGame) {
 		GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
 		SearchingForGame = false;
@@ -365,27 +426,52 @@ void UPartyInfoUI::OnJoinButtonClicked()
 			JoinButton->SetIsEnabled(true);
 		}
 	}
+	*/
+}
+
+void UPartyInfoUI::OnStartMatchmakingResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+{
+	if (bWasSuccessful) {
+		TSharedPtr<FJsonObject> JsonObject;
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
+			if (JsonObject->HasField("ticketId")) {
+				FString MatchmakingTicketId = JsonObject->GetStringField("ticketId");
+
+				UGameInstance* GameInstance = GetGameInstance();
+				if (GameInstance != nullptr) {
+					UBaseInstance* GameLiftTutorialGameInstance = Cast<UBaseInstance>(GameInstance);
+					if (GameLiftTutorialGameInstance != nullptr) {
+						GameLiftTutorialGameInstance->JoinTicketId = MatchmakingTicketId;
+
+						GetWorld()->GetTimerManager().SetTimer(PollMatchmakingHandle, this, &UPartyInfoUI::PollMatchmaking, 2.5f, true);
+						SearchingForGame = true;
+
+						// UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
+						// ButtonTextBlock->SetText(FText::FromString("Cancel"));
+					}
+				}
+			}
+		}
+	}
+	// JoinButton->SetIsEnabled(true);
 }
 
 void UPartyInfoUI::PollMatchmaking()
 {
-	UE_LOG(LogTemp, Warning, TEXT("PollMatchmaking Function"));
-
 	FString AccessToken;
 	FString MatchmakingTicketId;
+
 	UGameInstance* GameInstance = GetGameInstance();
-	UBaseInstance* PokeHunterGameInstance = nullptr;
-
+	UBaseInstance* PokeHunterGameInstance = Cast<UBaseInstance>(GameInstance);
 	if (GameInstance != nullptr) {
-		PokeHunterGameInstance = Cast<UBaseInstance>(GameInstance);
 		if (PokeHunterGameInstance != nullptr) {
-
-			// AccessToken = PokeHunterGameInstance->AccessToken;
 			AccessToken = PokeHunterGameInstance->IdToken;
-
 			MatchmakingTicketId = PokeHunterGameInstance->JoinTicketId;
 		}
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("MatchmakingTicketId : %s"), *MatchmakingTicketId);
 
 	// if (nullptr != PokeHunterGameInstance && AccessToken.Len() > 0 && MatchmakingTicketId.Len() > 0 && SearchingForGame) {
 	if (AccessToken.Len() > 0 && MatchmakingTicketId.Len() > 0 && SearchingForGame) {
@@ -428,44 +514,8 @@ void UPartyInfoUI::OnGetPlayerDataResponseReceived(FHttpRequestPtr Request, FHtt
 	}
 }
 
-void UPartyInfoUI::OnStartMatchmakingResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
-{
-	if (bWasSuccessful) {
-		TSharedPtr<FJsonObject> JsonObject;
-		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
-		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
-			if (JsonObject->HasField("ticketId")) {
-				FString MatchmakingTicketId = JsonObject->GetStringField("ticketId");
-
-				UGameInstance* GameInstance = GetGameInstance();
-				if (GameInstance != nullptr) {
-					UBaseInstance* GameLiftTutorialGameInstance = Cast<UBaseInstance>(GameInstance);
-					if (GameLiftTutorialGameInstance != nullptr) {
-						GameLiftTutorialGameInstance->JoinTicketId = MatchmakingTicketId;
-
-						GetWorld()->GetTimerManager().SetTimer(PollMatchmakingHandle, this, &UPartyInfoUI::PollMatchmaking, 1.0f, true);
-						SearchingForGame = true;
-
-						UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
-						ButtonTextBlock->SetText(FText::FromString("Cancel"));
-					}
-				}
-			}
-		}
-	}
-	JoinButton->SetIsEnabled(true);
-}
-
 void UPartyInfoUI::OnStopMatchmakingResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
-	UGameInstance* GameInstance = GetGameInstance();
-	if (GameInstance != nullptr) {
-		UBaseInstance* PokeHunterGameInstance = Cast<UBaseInstance>(GameInstance);
-		if (PokeHunterGameInstance != nullptr) {
-			PokeHunterGameInstance->JoinTicketId = "";
-		}
-	}
-
 	UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
 	ButtonTextBlock->SetText(FText::FromString("Stop, READY"));
 	// ButtonTextBlock->SetText(FText::FromString("READY"));
@@ -491,12 +541,17 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 					if (GameInstance != nullptr) {
 						UBaseInstance* PokeHunterGameInstance = Cast<UBaseInstance>(GameInstance);
 						if (PokeHunterGameInstance != nullptr) {
-							PokeHunterGameInstance->JoinTicketId = "";
+							// PokeHunterGameInstance->JoinTicketId = "";
 						}
 
 						UE_LOG(LogTemp, Warning, TEXT("matchmaking event type: %s"), *TicketType);
 
 						if (TicketType.Equals("MatchmakingSucceeded")) {
+
+							GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
+							GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
+							GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
+							GetWorld()->GetTimerManager().ClearTimer(SetAveragePlayerLatencyHandle);
 
 							// Set Player input Mode;
 							FInputModeGameOnly gameModeOnly;
@@ -523,10 +578,8 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 							const FString& Options = "?PlayerSessionId=" + PlayerSessionId + "?PlayerId=" + PlayerId;
 							UE_LOG(LogTemp, Warning, TEXT("options: %s"), *Options);
 
-							// NativeDestruct();
-
-
 							//=====================================================================================================================
+							/*
 							UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 								TSubclassOf <UUserWidget> LoadingUIClass;
 							UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
@@ -540,7 +593,6 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 							LoadingUI = CreateWidget(GetWorld(), LoadingUIClass, TEXT("LogoutUI"));
 							LoadingUI->AddToViewport();
 
-
 							FTimerHandle DelayTimerHandle;
 							float DelayTime = 5.0f;
 
@@ -550,6 +602,7 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 								// 게임 엔진의 Tick 이벤트를 강제로 실행하여 Delay 타이머를 실행시킵니다.
 								GetWorld()->Tick(LEVELTICK_All, 0.0f);
 							}
+							*/
 							//=====================================================================================================================
 
 							UGameplayStatics::OpenLevel(GetWorld(), FName(gameinstance->GameLiftLevelName), false, Options);

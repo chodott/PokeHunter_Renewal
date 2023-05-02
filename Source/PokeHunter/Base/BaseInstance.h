@@ -37,6 +37,8 @@ enum class EPartnerType : uint8
 	GolemPartner	UMETA(DisplayName = "Golem")
 };
 
+class UTextReaderComponent;
+
 /**
  * 
  */
@@ -81,6 +83,10 @@ class POKEHUNTER_API UBaseInstance : public UGameInstance
 public:
 	UBaseInstance();
 
+	bool FirstEnterMyHome = true;
+
+	UTextReaderComponent* TextReader = nullptr;
+
 	virtual void Init() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -107,7 +113,7 @@ public:
 	int reval;
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
-		bool ConnectToServer(FString server_addr ="172.30.160.1"); // Default Addr = 172.30.160.1
+		bool ConnectToServer(); // Default Addr
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		bool SendAccessToken();
@@ -141,7 +147,7 @@ public:
 	TDoubleLinkedList<float> PlayerLatencies;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString GameLiftLevelName = "SurvivalArea";
+		FString GameLiftLevelName = "";
 
 	UFUNCTION()
 		void SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken);

@@ -53,7 +53,7 @@ struct FUpdateGameSessionState
 	}
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FProcessTerminateState
 {
 	GENERATED_BODY();
@@ -94,7 +94,7 @@ public:
 	UPROPERTY()
 		FTimerHandle EndGameHandle;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FTimerHandle HandleProcessTerminationHandle;
 
 	UPROPERTY()

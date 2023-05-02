@@ -438,10 +438,17 @@ void AEnemy::LaunchToTarget()
 {
 	if (Target)
 	{
-		//개선 필요
+		FVector Velocity = FVector::ZeroVector;
 		FVector EndPos = Target->GetActorLocation();
-		FVector StartPos = GetActorLocation();
+		FVector StartPos = GetActorLocation();	
 		FVector LookVec = GetActorForwardVector();
+
+		//개선 필요
+		bool bCantJump = UGameplayStatics::SuggestProjectileVelocity(this, Velocity,StartPos, EndPos,
+			3000.f, false, 200.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::OnlyTraceWhileAscending);
+		
+
+		LaunchCharacter(Velocity, true, true);
 
 	}
 }

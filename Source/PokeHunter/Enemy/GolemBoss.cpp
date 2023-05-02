@@ -87,7 +87,7 @@ void AGolemBoss::Tick(float DeltaTime)
 {
 	APawn::Tick(DeltaTime);
 
-	for (auto& Hitbox : HitBoxMap)
+	/*for (auto& Hitbox : HitBoxMap)
 	{
 		if (Hitbox.HitBoxComponent)
 		{
@@ -98,7 +98,7 @@ void AGolemBoss::Tick(float DeltaTime)
 				OnDamage.Broadcast(DamageAmount, Hitbox.HitBoxComponent->GetComponentLocation());
 			}
 		}
-	}
+	}*/
 }
 
 void AGolemBoss::BeginPlay()
@@ -364,30 +364,6 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 
 	}
 }
-
-//void AGolemBoss::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
-//{
-//	UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(HitComponent);
-//	if (HitBox)
-//	{
-//		if (bCanGrab)
-//		{
-//			FName PartName = HitBox->GetAttachSocketName();
-//			if (PartName == FName("LeftHand") || PartName == FName("RightHand"))
-//			{
-//				ACharacter* GrabbedCharacter = Cast<ACharacter>(OtherActor);
-//				if (GrabbedCharacter)
-//				{
-//					OtherActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GrabSocket"));
-//					GrabbedCharacter->SetActorEnableCollision(false);
-//					GrabbedTarget = GrabbedCharacter;
-//				}
-//				return;
-//			}
-//		}
-//
-//		ServerApplyDamage()
-//}
 
 void AGolemBoss::DestroyPart_Implementation(FName PartName)
 {

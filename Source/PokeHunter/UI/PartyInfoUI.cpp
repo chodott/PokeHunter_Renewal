@@ -574,7 +574,7 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 							FString PlayerSessionId = Player->GetObjectField("PlayerSessionId")->GetStringField("S");
 							FString PlayerId = Player->GetObjectField("PlayerId")->GetStringField("S");
 
-							gameinstance->GameLiftLevelName = IpAddress + ":" + Port;
+							gameinstance->GameLiftLevelName = IpAddress;
 							const FString& Options = "?PlayerSessionId=" + PlayerSessionId + "?PlayerId=" + PlayerId;
 							UE_LOG(LogTemp, Warning, TEXT("options: %s"), *Options);
 
@@ -605,7 +605,7 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 							*/
 							//=====================================================================================================================
 
-							UGameplayStatics::OpenLevel(GetWorld(), FName(gameinstance->GameLiftLevelName), false, Options);
+							UGameplayStatics::OpenLevel(GetWorld(), FName(gameinstance->GameLiftLevelName + ":" + Port), false, Options);
 						}
 						else {
 							// AWS GameLift Dedicated server 접속에 실패하였음.

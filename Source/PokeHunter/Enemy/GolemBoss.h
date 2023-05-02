@@ -58,7 +58,7 @@ public:
 		}
 	}
 
-	float UseSkill(float CurTime)
+	void UseSkill(float CurTime)
 	{
 		UsedTime = CurTime;
 		bReady = false;

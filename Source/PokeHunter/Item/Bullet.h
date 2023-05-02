@@ -41,6 +41,7 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiLaunchBullet(APawn* OwnerHunter, FVector InitialPos, FVector EndPos);
+	void MultiLaunchBullet_Implementation(APawn* OwnerHunter, FVector InitialPos, FVector EndPos);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnHitNotEnemy(const FVector& HitVec);

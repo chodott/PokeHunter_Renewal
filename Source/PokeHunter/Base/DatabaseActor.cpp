@@ -78,7 +78,11 @@ TSubclassOf<APartner> ADatabaseActor::FindPartner(EPartnerType input_type)
 {
 	if (PartnerDataObjectMap.IsEmpty())						return nullptr;
 	if (0 == PartnerDataObjectMap.Num())					return nullptr;
-	if (nullptr == PartnerDataObjectMap.Find(input_type))	return nullptr;
+
+	if (nullptr == PartnerDataObjectMap.Find(input_type)) {
+		input_type = EPartnerType::WolfPartner;
+		UE_LOG(LogTemp, Warning, TEXT("FindPartner() : input_type is nullptr"));
+	}
 
 	auto get_partner = *PartnerDataObjectMap.Find(input_type);
 

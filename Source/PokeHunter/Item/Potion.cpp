@@ -45,7 +45,7 @@ void APotion::MultiAttachPotion_Implementation(AHunter* ItemOwner)
 	AttachToComponent(ItemOwner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
 }
 
-void APotion::MultiLaunchBullet_Implementation(AHunter* OwnerHunter, FVector InitialPos, FVector EndPos)
+void APotion::MultiLaunchBullet_Implementation(APawn* OwnerHunter, FVector InitialPos, FVector EndPos)
 {
 	StaticMesh->SetSimulatePhysics(true);
 	StaticMesh->SetEnableGravity(true);

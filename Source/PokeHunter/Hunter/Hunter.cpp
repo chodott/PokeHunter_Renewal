@@ -166,22 +166,26 @@ void AHunter::BeginPlay()
 		DiveTimeline.SetTimelineLength(1.32f);
 	}
 
+	// Set Current player controller in gameinstance
+	gameinstance->cur_playerController = Cast<APlayerController>(GetController());
+
+	// Spawn my pet
 	FString LevelName = GetWorld()->GetName();
 	if (nullptr == gameinstance) return;
-	if ((gameinstance->GameLiftLevelName == LevelName)
-		&& (ESocketConnectionState::SCS_ConnectionError != gameinstance->gSocket->GetConnectionState())
-		&& (ESocketConnectionState::SCS_NotConnected != gameinstance->gSocket->GetConnectionState())) 
+	if (gameinstance->GameLiftLevelName.Contains(LevelName) || LevelName.Contains(gameinstance->GameLiftLevelName))
 	{
 		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
 		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
+		UE_LOG(LogTemp, Warning, TEXT("Success Pet information! LevelName: %s"), *gameinstance->GameLiftLevelName);
 
 		if (HasAuthority())
 		{
 			FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
 			ServerSpawnPartner(this, partnerClass, SpawnLocation);
 		}
+		else UE_LOG(LogTemp, Warning, TEXT("Fail HasAuthority()!"));
 	}
-	gameinstance->cur_playerController = Cast<APlayerController>(GetController());
+	else UE_LOG(LogTemp, Warning, TEXT("Fail to Spawn My Pet, SaveAddr: %s \ncurMapName : %s"), *gameinstance->GameLiftLevelName, *LevelName);
 }
 
 // Called every frame

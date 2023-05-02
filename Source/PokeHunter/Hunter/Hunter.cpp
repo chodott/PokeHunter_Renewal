@@ -67,8 +67,12 @@ AHunter::AHunter()
 	DestinationMesh->SetVisibility(false);
 
 	//Collision
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
-	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
+		GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
+	}
+	
 
 	//UI
 	static ConstructorHelpers::FClassFinder<UUserWidget>TempInvenClass(TEXT("/Game/UI/InvenStorage/WBP_InventoryList"));
@@ -333,6 +337,7 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AHunter, CurState);
 	DOREPLIFETIME(AHunter, Partner);
 	DOREPLIFETIME(AHunter, InteractingActor);
+	DOREPLIFETIME(AHunter, bUpperOnly);
 }
 
 void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
@@ -366,7 +371,11 @@ void AHunter::ServerPlayMontage_Implementation(AHunter* Hunter ,FName Session)
 void AHunter::ServerZoom_Implementation(AHunter* Hunter, bool bZoom)
 {
 	MultiZoom(Hunter, bZoom);
-	if(bZoom) MultiPlayMontage(Hunter, FName("Zoom"));
+	if (bZoom)
+	{
+		MultiPlayMontage(Hunter, FName("Zoom"));
+		Hunter->bUpperOnly = true;
+	}
 }
 
 void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
@@ -377,7 +386,7 @@ void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
 		{
 			CurState = EPlayerState::Zoom;
 			bUseControllerRotationYaw = true;
-			bUseControllerRotationPitch = true;
+			//bUseControllerRotationPitch = true;
 			GetCharacterMovement()->bOrientRotationToMovement = false;
 
 			GetCharacterMovement()->MaxWalkSpeed = 300.f;
@@ -553,22 +562,23 @@ void AHunter::LMBDown()
 			{
 				bool bIsBullet = ItemClass->IsChildOf(ABullet::StaticClass());
 				if (!bIsBullet) return;
-				//TSubclassOf<ABullet> BulletClass = ItemClass;
 				FVector StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle"));
 				FHitResult* HitResult = new FHitResult();
 				FVector EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
 
-				if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility))
+				FCollisionQueryParams BulletTraceParams(FName("Bullet"), true, this);
+
+				if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
 				{
 					//Debug LineTrace
-					/*DrawDebugLine(
+					DrawDebugLine(
 						GetWorld(),
 						StartTrace,
 						HitResult->Location,
 						FColor(255, 0, 0),
 						false, 3, 0,
 						12.333
-					);*/
+					);
 					EndTrace = HitResult->Location;
 				}
 				ServerSpawnBullet(this, ItemClass, StartTrace, EndTrace, GetControlRotation());
@@ -717,6 +727,7 @@ void AHunter::EKeyDown()
 		float sign = FMath::Sign(cross.Z);
 		if (Cast<AItemDropActor>(InteractingActor))
 		{
+			bUpperOnly = true;
 			if (sign <= 0)
 			{
 				ServerPlayMontage(this, FName("PickUp"));
@@ -725,7 +736,7 @@ void AHunter::EKeyDown()
 			{
 				ServerPlayMontage(this, FName("PickUp"));
 			}
-			bUpperOnly = true;
+			
 		}
 
 		else
@@ -734,7 +745,7 @@ void AHunter::EKeyDown()
 			ServerSprint(this, false);
 		}
 
-		InteractingActor->Interact_Implementation(this);
+		InteractingActor->ServerInteract(this);
 		return;
 	}
 }
@@ -840,7 +851,7 @@ void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AA
 {
 	if (InteractingActor == nullptr)
 	{
-		if (OtherActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
+		if (OtherActor->Implements<UInteractInterface>())
 		{
 			InteractingActor = Cast<AInteractActor>(OtherActor);
 		}
@@ -849,7 +860,7 @@ void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AA
 
 void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
+	if (OtherActor->Implements<UInteractInterface>())
 	{
 		if (InteractingActor == Cast<AInteractActor>(OtherActor))
 		{
@@ -1010,14 +1021,25 @@ void AHunter::SetInstallMode()
 
 void AHunter::ServerSetPartnerPosition_Implementation(APartner* MyPartner, const FVector& LocVec)
 {
-	MyPartner->MultiSetPosition(LocVec);
+	MultiSetPartnerPosition(LocVec);
 }
+
+void AHunter::MultiSetPartnerPosition_Implementation(const FVector& LocVec)
+{
+	Partner->TargetPos = LocVec;
+	Partner->bOrdered = true;
+
+}
+
 
 void AHunter::ServerSpawnPartner_Implementation(AHunter* OwnerHunter, TSubclassOf<APartner> SpawnPartnerClass, const FVector& SpawnLoc)
 {
 	APartner* NewPartner = GetWorld()->SpawnActor<APartner>(SpawnPartnerClass, SpawnLoc, FRotator::ZeroRotator);
-	NewPartner->MultiSetHunter(OwnerHunter);
-	MultiSetPartner(NewPartner);
+	OwnerHunter->Partner = NewPartner;
+	NewPartner->Hunter = OwnerHunter;
+	NewPartner->CurState = EPartnerState::MoveTarget;
+	//NewPartner->MultiSetHunter(OwnerHunter);
+	//MultiSetPartner(NewPartner);
 
 }
 
@@ -1037,6 +1059,7 @@ void AHunter::ServerUsePotion_Implementation(AHunter* OwnerHunter, TSubclassOf<A
 void AHunter::MultiUsePotion_Implementation(APotion* Potion)
 {
 	CurItem = Potion;
+	bUpperOnly = true;
 	CurState = EPlayerState::Drink;
 }
 
@@ -1045,6 +1068,7 @@ void AHunter::ServerSpawnBullet_Implementation(AHunter* OwnerHunter, TSubclassOf
 	ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(SpawnItemClass, StartLoc, Rotation);
 	Bullet->MultiLaunchBullet_Implementation(OwnerHunter, StartLoc, EndLoc);
 	MultiPlayMontage(OwnerHunter, FName("Shot"));
+	OwnerHunter->bUpperOnly = true;
 }
 
 void AHunter::ServerSpawnItem_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
@@ -1090,3 +1114,4 @@ void AHunter::ServerUsePartnerSpecialSkill_Implementation(APartner* MyPartner, E
 {
 	MyPartner->MultiUseSpecialSkill(SkillID);
 }
+

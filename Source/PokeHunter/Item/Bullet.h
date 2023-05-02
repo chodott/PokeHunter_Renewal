@@ -22,8 +22,10 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Battle")
 	float Damage{5.f};
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battle")
 	float TimeLimit{5.f};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battle")
+	bool bAttached{ false };
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -38,7 +40,7 @@ public:
 	virtual void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiLaunchBullet(AHunter* OwnerHunter, FVector InitialPos, FVector EndPos);
+	void MultiLaunchBullet(APawn* OwnerHunter, FVector InitialPos, FVector EndPos);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnHitNotEnemy(const FVector& HitVec);

@@ -123,9 +123,7 @@ void AWolfPartner::MakeIceShard()
 	FVector DirectionVec = EndPos - GetActorLocation();
 	DirectionVec.Normalize();
 
-
-	auto IceShard = GetWorld()->SpawnActor<APartnerProjectile>(IceShardClass, InitialPos, DirectionVec.Rotation());
-	IceShard->FireInDirection(DirectionVec, InitialPos, EndPos);
+	ServerSpawnProjectile(this, IceShardClass, InitialPos, EndPos);
 }
 
 void AWolfPartner::MakeStorm()

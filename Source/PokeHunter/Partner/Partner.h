@@ -70,6 +70,7 @@ public:
 	float HP{ 100.f };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
 	float HealPerSecondAmount{ 1.f };
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "AI")
 	bool bPosing;
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "AI")
 	bool bOrdered;
@@ -146,6 +147,8 @@ public:
 	//EnemyInterface
 	virtual void InteractAttack_Implementation(FVector HitDirection, float Damage);
 	virtual void InteractEarthquake_Implementation();
+	virtual void InteractGrabAttack_Implementation();
+	virtual void InteractWideAttack_Implementation(float Damage);
 
 	//ItemInteractInterface
 	virtual void InteractPotion_Implementation(float HealAmount);
@@ -169,6 +172,6 @@ public:
 	void MultiUseNormalSkill(ESkillID SkillID);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiUseSpecialSkill(ESkillID SkillID);
-
-
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnProjectile(APartner* OwnerPartner, TSubclassOf<class APartnerProjectile> SpawnProjectileClass, FVector StartLoc, FVector EndLoc);
 };

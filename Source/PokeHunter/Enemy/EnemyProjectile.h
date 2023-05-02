@@ -20,7 +20,7 @@ public:
 	class APawn* ThisOwner;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh")
-		class UStaticMeshComponent* StaticMesh;
+	class UStaticMeshComponent* StaticMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UProjectileMovementComponent* ProjectileMovement;
@@ -43,6 +43,13 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiApplyDamage(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass);
 
+	//Replicate
+	UFUNCTION(Server, Reliable)
+	void ServerDestroy();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiDestroy();
+
+	virtual void FirstUse(const FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos);
 	virtual void FireInDirection(FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos);
 	virtual void FireInDirection(FVector Direction);
 

@@ -59,5 +59,6 @@ void UBTTask_EnemyPlayMontage::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 	if (!bPlaying)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		Enemy->CurState = EEnemyState::Chase;
 	}
 }

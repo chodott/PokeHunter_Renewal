@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_EnemyAttack.generated.h"
+#include "BTTask_EnemySpecialAttack.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class POKEHUNTER_API UBTTask_EnemyAttack : public UBTTaskNode
+class POKEHUNTER_API UBTTask_EnemySpecialAttack : public UBTTaskNode
 {
 	GENERATED_BODY()
 	
 public:
-	UBTTask_EnemyAttack();
+	UBTTask_EnemySpecialAttack();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory);
 	void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 

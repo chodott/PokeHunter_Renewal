@@ -39,7 +39,7 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	EnemyAnim = Cast<UEnemyAnimInstance>(GetMesh()->GetAnimInstance());
-	EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
+	if(EnemyAnim) EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
 
 	BaseLocation = GetActorLocation();
 	ComeBackHome();

@@ -18,7 +18,7 @@ public:
 	ABullet();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
-		class UParticleSystem* ParticleSystem;
+	class UParticleSystem* ParticleSystem;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Battle")
 	float Damage{5.f};
@@ -40,8 +40,8 @@ public:
 	virtual void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiLaunchBullet(APawn* OwnerHunter, FVector InitialPos, FVector EndPos);
-	void MultiLaunchBullet_Implementation(APawn* OwnerHunter, FVector InitialPos, FVector EndPos);
+	void MultiLaunchBullet(APawn* BulletOwner, FVector InitialPos, FVector EndPos);
+	void MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector InitialPos, FVector EndPos);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnHitNotEnemy(const FVector& HitVec);

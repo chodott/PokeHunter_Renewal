@@ -5,6 +5,7 @@
 #include "PartnerProjectile.h"
 #include "PartnerAnimInstance.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "PokeHunter/Enemy/Enemy.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -18,6 +19,7 @@ AWolfPartner::AWolfPartner()
 	{
 		IceShardClass = TempIceShardClass.Class;
 	}
+
 
 	//스킬 범위 컴포넌트
 	StormCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("StormCollision"));

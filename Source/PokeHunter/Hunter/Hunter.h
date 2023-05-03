@@ -94,22 +94,13 @@ public:
 	class AItem* CurItem;
 
 	//UI
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
 	TSubclassOf <UUserWidget> MainUIClass;
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "UI")
 	class UUserWidget* MainUI;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-	TSubclassOf <UUserWidget> InventoryUIClass;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
-	class UUserWidget* InventoryUI;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf <UUserWidget> StorageUIClass;
 	class UUserWidget* StorageUI;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
-		TSubclassOf <UUserWidget> LogoutUIClass;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
-		class UUserWidget* LogoutUI;
 
 	//Partner
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner")

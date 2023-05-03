@@ -74,25 +74,6 @@ AHunter::AHunter()
 	}
 	
 
-	//UI
-	static ConstructorHelpers::FClassFinder<UUserWidget>TempInvenClass(TEXT("/Game/UI/InvenStorage/WBP_InventoryList"));
-	if (TempInvenClass.Succeeded())
-	{
-		InventoryUIClass = TempInvenClass.Class;
-	}
-	
-	static ConstructorHelpers::FClassFinder<UUserWidget>TempMainClass(TEXT("/Game/UI/WBP_MainUI"));
-	if (TempMainClass.Succeeded())
-	{
-		MainUIClass = TempMainClass.Class;
-	}
-
-	static ConstructorHelpers::FClassFinder<UUserWidget>TempLogoutClass(TEXT("/Game/UI/MainMenu/UI_LogoutMenu"));
-	if (TempLogoutClass.Succeeded())
-	{
-		LogoutUIClass = TempLogoutClass.Class;
-	}
-
 	// Particle System
 	Heal_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("HealParticle"));
 	Heal_Effect->SetupAttachment(GetRootComponent());
@@ -155,8 +136,6 @@ void AHunter::BeginPlay()
 	MainUI = CreateWidget(GetWorld(), MainUIClass, TEXT("MainUI"));
 	MainUI->AddToViewport();
 
-	LogoutUI = CreateWidget(GetWorld(), LogoutUIClass, TEXT("LogoutUI"));
-	// LogoutUI->AddToViewport();
 
 	//Timeline
 	DiveInterpCallback.BindUFunction(this, FName("DiveInterpReturn"));
@@ -166,26 +145,25 @@ void AHunter::BeginPlay()
 		DiveTimeline.SetTimelineLength(1.32f);
 	}
 
-	// Set Current player controller in gameinstance
-	gameinstance->cur_playerController = Cast<APlayerController>(GetController());
+	//FString LevelName = GetWorld()->GetName();
+	//if (nullptr == gameinstance) return;
+	//if ((gameinstance->GameLiftLevelName == LevelName)
+	//	&& (ESocketConnectionState::SCS_ConnectionError != gameinstance->gSocket->GetConnectionState())
+	//	&& (ESocketConnectionState::SCS_NotConnected != gameinstance->gSocket->GetConnectionState())) 
+	//{
+	//	
+	//}
+	//gameinstance->cur_playerController = Cast<APlayerController>(GetController());
 
-	// Spawn my pet
-	FString LevelName = GetWorld()->GetName();
-	if (nullptr == gameinstance) return;
-	if (FString("L_Field0") == LevelName)
-	{
-		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
-		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
-		UE_LOG(LogTemp, Warning, TEXT("Success Pet information! LevelName: %s"), *gameinstance->GameLiftLevelName);
+	ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
+	TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(EPartnerType::WolfPartner);
 
-		if (HasAuthority())
-		{
-			FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
-			ServerSpawnPartner(this, partnerClass, SpawnLocation);
-		}
-		else UE_LOG(LogTemp, Warning, TEXT("Fail HasAuthority()!"));
-	}
-	else UE_LOG(LogTemp, Warning, TEXT("Fail to Spawn My Pet, SaveAddr: %s \ncurMapName : %s"), *gameinstance->GameLiftLevelName, *LevelName);
+	//if (HasAuthority())
+	//{
+	//	FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
+	//	ServerSpawnPartner(this, partnerClass, SpawnLocation);
+	//}
+
 }
 
 // Called every frame

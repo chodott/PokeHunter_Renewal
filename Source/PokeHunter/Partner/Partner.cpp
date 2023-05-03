@@ -165,7 +165,7 @@ void APartner::SlashAttack()
 	{
 		FVector TargetLocation = Target->GetActorLocation();
 		FVector Offset = GetActorLocation() - TargetLocation;
-		FVector DirectionVec = Offset;
+		FVector DirectionVec = TargetLocation - GetActorLocation();
 		DirectionVec.Normalize();
 
 		float SafeDistance = GetCapsuleComponent()->GetScaledCapsuleRadius() + Target->GetCapsuleComponent()->GetScaledCapsuleRadius();
@@ -175,22 +175,35 @@ void APartner::SlashAttack()
 		FVector DesiredMovement = Offset + DirectionVec * SafeDistance;
 
 		FHitResult HitResult;
-		bool bHit = GetCapsuleComponent()->MoveComponent(DesiredMovement, GetActorRotation().Quaternion(), true, &HitResult);
+		FRotator NewRotation = DirectionVec.Rotation();
+		NewRotation.Pitch = 0;
+		bool bHit = GetCapsuleComponent()->MoveComponent(DesiredMovement, NewRotation, true, &HitResult);
 
 		if (bHit)
 		{
-			bHit = GetWorld()->LineTraceSingleByChannel(HitResult, EndLocation + FVector(0, 0, 100), EndLocation + FVector(0, 0, -100), ECollisionChannel::ECC_Pawn);
+			bHit = GetWorld()->LineTraceSingleByChannel(HitResult, EndLocation + FVector(0, 0, 100), EndLocation + FVector(0, 0, -1000), ECollisionChannel::ECC_Pawn);
 			FVector NewLocation = HitResult.Location + FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-			if (bHit) SetActorLocation(NewLocation);
-			else SetActorLocation(StartLocation);
-			//실패 구현 필요
+			if (bHit)
+			{
+				SetActorLocation(NewLocation);
+				ServerPlayMontage(FName("Attack"));
+
+				//ServerApplyDamage
+				ServerApplyDamage(Target, 30, GetController(), this);
+			}
+			else
+			{
+				SetActorLocation(StartLocation);
+			}
+				//실패 구현 필요
 		}
 
 		else
 		{
 			SetActorLocation(EndLocation);
+			ServerPlayMontage(FName("Attack"));
+
 		}
-		ServerPlayMontage(FName("Attack"));
 	}
 }
 
@@ -398,3 +411,13 @@ void APartner::ServerSpawnProjectile_Implementation(APartner* OwnerPartner, TSub
 	Projectile->MultiLaunchBullet(OwnerPartner, StartLoc, EndLoc);
 }
 
+void APartner::ServerApplyDamage_Implementation(AActor* DamagedActor, float DamageAmount, AController* EventInstigator, AActor* DamageCauser)
+{
+	MultiApplyDamage(DamagedActor, DamageAmount, EventInstigator, DamageCauser);
+}
+
+void APartner::MultiApplyDamage_Implementation(AActor* DamagedActor, float DamageAmount, AController* EventInstigator, AActor* DamageCauser)
+{
+	UGameplayStatics::ApplyDamage(Target, 30, GetController(), this, UDamageType::StaticClass());
+
+}

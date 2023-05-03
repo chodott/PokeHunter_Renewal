@@ -158,11 +158,11 @@ void AHunter::BeginPlay()
 	ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
 	TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(EPartnerType::WolfPartner);
 
-	//if (HasAuthority())
-	//{
-	//	FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
-	//	ServerSpawnPartner(this, partnerClass, SpawnLocation);
-	//}
+	if (HasAuthority())
+	{
+		FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
+		ServerSpawnPartner(this, partnerClass, SpawnLocation);
+	}
 
 }
 

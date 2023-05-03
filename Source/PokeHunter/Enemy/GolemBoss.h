@@ -78,7 +78,7 @@ public:
 
 	//HitBox
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-		TArray<FHitBoxInfo> HitBoxMap;
+		TArray<FHitBoxInfo> HitBoxArray;
 	// TMap<FName, class UHitBoxComponent*> HitBoxMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
@@ -153,10 +153,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	// void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep = true, const FHitResult& SweepResult = FHitResult(1.f));
 	UFUNCTION(BlueprintNativeEvent)
-	void DestroyPart(FName PartName);
-	void DeleteHitBox(FName PartName);
+	void DestroyPart(const FName& PartName);
+	void DeleteHitBox(const FName& PartName);
 	virtual void Die();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Life")

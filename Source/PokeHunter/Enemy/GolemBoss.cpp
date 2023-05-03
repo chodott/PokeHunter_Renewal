@@ -87,7 +87,7 @@ void AGolemBoss::Tick(float DeltaTime)
 {
 	APawn::Tick(DeltaTime);
 
-	/*for (auto& Hitbox : HitBoxMap)
+	for (auto& Hitbox : HitBoxArray)
 	{
 		if (Hitbox.HitBoxComponent)
 		{
@@ -98,7 +98,7 @@ void AGolemBoss::Tick(float DeltaTime)
 				OnDamage.Broadcast(DamageAmount, Hitbox.HitBoxComponent->GetComponentLocation());
 			}
 		}
-	}*/
+	}
 }
 
 void AGolemBoss::BeginPlay()
@@ -112,24 +112,24 @@ void AGolemBoss::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	HitBoxMap.Reserve(9);
+	HitBoxArray.Reserve(9);
 
-	HitBoxMap.Add(FHitBoxInfo(FName("HeadSocket"), HeadHitBox));
-	HitBoxMap.Add(FHitBoxInfo(FName("Body"), BodyHitBox));
-	HitBoxMap.Add(FHitBoxInfo(FName("RightHand"), RightHandHitBox));
-				  
-	HitBoxMap.Add(FHitBoxInfo(FName("RightArm"), RightArmHitBox));
-	HitBoxMap.Add(FHitBoxInfo(FName("RightShoulder"), RightShoulderHitBox));
-	HitBoxMap.Add(FHitBoxInfo(FName("LeftHand"), LeftHandHitBox));
-				  
-	HitBoxMap.Add(FHitBoxInfo(FName("LeftArm"), LeftArmHitBox));
-	HitBoxMap.Add(FHitBoxInfo(FName("RightLeg"), RightLegHitBox));
-	HitBoxMap.Add(FHitBoxInfo(FName("LeftLeg"), LeftLegHitBox));
+	HitBoxArray.Add(FHitBoxInfo(FName("HeadSocket"), HeadHitBox));
+	HitBoxArray.Add(FHitBoxInfo(FName("Body"), BodyHitBox));
+	HitBoxArray.Add(FHitBoxInfo(FName("RightHand"), RightHandHitBox));
+			
+	HitBoxArray.Add(FHitBoxInfo(FName("RightArm"), RightArmHitBox));
+	HitBoxArray.Add(FHitBoxInfo(FName("RightShoulder"), RightShoulderHitBox));
+	HitBoxArray.Add(FHitBoxInfo(FName("LeftHand"), LeftHandHitBox));
+				
+	HitBoxArray.Add(FHitBoxInfo(FName("LeftArm"), LeftArmHitBox));
+	HitBoxArray.Add(FHitBoxInfo(FName("RightLeg"), RightLegHitBox));
+	HitBoxArray.Add(FHitBoxInfo(FName("LeftLeg"), LeftLegHitBox));
 
-	for (auto& Hitbox : HitBoxMap)
+	for (auto& Hitbox : HitBoxArray)
 	{
 		Hitbox.HitBoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
-		// Hitbox.Value->BurningTime = BurningTime;
+		Hitbox.HitBoxComponent->BurningTime = BurningTime;
 	}
 }
 
@@ -368,15 +368,50 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	}
 }
 
-void AGolemBoss::DestroyPart_Implementation(FName PartName)
+//void AGolemBoss::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+//{
+//	UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(HitComponent);
+//	if (HitBox)
+//	{
+//		if (bCanGrab)
+//		{
+//			FName PartName = HitBox->GetAttachSocketName();
+//			if (PartName == FName("LeftHand") || PartName == FName("RightHand"))
+//			{
+//				ACharacter* GrabbedCharacter = Cast<ACharacter>(OtherActor);
+//				if (GrabbedCharacter)
+//				{
+//					OtherActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GrabSocket"));
+//					GrabbedCharacter->SetActorEnableCollision(false);
+//					GrabbedTarget = GrabbedCharacter;
+//				}
+//				return;
+//			}
+//		}
+//
+//		ServerApplyDamage()
+//}
+
+void AGolemBoss::DestroyPart_Implementation(const FName& PartName)
 {
 
 }
 
-void AGolemBoss::DeleteHitBox(FName PartName)
+void AGolemBoss::DeleteHitBox(const FName& PartName)
 {
 	// Delete Hit Box를 제거함.
-	// HitBoxMap.Remove(PartName);
+	//오류 계속 발생하면 제거 필요
+	int TargetIndex;
+	for (int i = 0; i < HitBoxArray.Num(); ++i)
+	{
+		if (HitBoxArray[i].HitBoxName == PartName)
+		{
+			TargetIndex = i;
+			break;
+		}
+	}
+	HitBoxArray.RemoveAt(TargetIndex);
+
 }
 
 int AGolemBoss::CheckInRange()

@@ -163,6 +163,11 @@ public:
 	void MultiStartPartnerInvincibility();
 
 	UFUNCTION(Server, Reliable)
+	void ServerApplyDamage(AActor* DamagedActor, float DamageAmount, AController* EventInstigator, AActor* DamageCauser);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiApplyDamage(AActor* DamagedActor, float DamageAmount, AController* EventInstigator, AActor* DamageCauser);
+
+	UFUNCTION(Server, Reliable)
 	void ServerSetPosition(const FVector& LocVec);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiSetPosition(const FVector& LocVec);

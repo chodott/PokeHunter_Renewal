@@ -31,7 +31,7 @@ void UEnemyAnimInstance::UpdateAnimationProperties()
 
 		//Target Loc
 		AActor* Target = Enemy->Target;
-		if (Enemy->CurState == EEnemyState::Die) bLookAt = false;
+		if (Enemy->bDied) bLookAt = false;
 		else
 		{
 			if (Target)

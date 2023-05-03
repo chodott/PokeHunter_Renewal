@@ -44,10 +44,10 @@ public:
 		float	UsedTime{};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-		int num;
+		int num{};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
-		bool	bReady;
+		bool	bReady{};
 
 	void CheckReady(float CurTime)
 	{

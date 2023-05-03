@@ -230,6 +230,11 @@ public:
 	void ServerSpawnItemBox(const FVector& SpawnLoc, TSubclassOf<AInteractActor> SpawnClass, const TArray<FName>&ItemID_Array);
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnProjectile(TSubclassOf<class AEnemyProjectile>SpawnClass, const FVector& SpawnLoc, const FVector& EndLoc, const FVector& DirectionVec);
+	UFUNCTION(Server, Reliable)
+	void ServerDestroy();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiDestroy();
+
 
 	//Animation Function
 	UFUNCTION()

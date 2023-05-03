@@ -502,6 +502,16 @@ void AEnemy::ServerSpawnProjectile_Implementation(TSubclassOf<class AEnemyProjec
 	Projectile->FirstUse(DirectionVec, SpawnLoc, EndLoc);
 }
 
+void AEnemy::ServerDestroy_Implementation()
+{
+	MultiDestroy();
+}
+
+void AEnemy::MultiDestroy_Implementation()
+{
+	Destroy();
+}
+
 void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (!bInterrupted)

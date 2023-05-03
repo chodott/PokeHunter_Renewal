@@ -11,7 +11,7 @@
 AItemDropActor::AItemDropActor()
 {
 	InteractionSphere->SetSphereRadius(80.f);
-	PrimaryActorTick.bCanEverTick = true;
+	//PrimaryActorTick.bCanEverTick = true;
 
 	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating Movement"));
 	AddOwnedComponent(RotatingMovement);

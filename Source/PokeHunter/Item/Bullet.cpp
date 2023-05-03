@@ -94,6 +94,8 @@ void ABullet::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
 
 void ABullet::MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector InitialPos, FVector EndPos)
 {
+	UE_LOG(LogTemp, Warning, TEXT("==============================================================================================="));
+	UE_LOG(LogTemp, Warning, TEXT("call MultiLaunchBullet_Implementation function"));
 	FVector Velocity = FVector::ZeroVector;
 	ThisOwner = BulletOwner;
 	bool bSuccess =
@@ -104,6 +106,15 @@ void ABullet::MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector Initi
 	//UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, Velocity, InitialPos, EndPos, GetWorld()->GetGravityZ(), 1.f);
 	ProjectileMovement->Velocity = Velocity;
 	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
+
+	UE_LOG(LogTemp, Warning, TEXT("Velocity.X : %.2f"), Velocity.X);
+	UE_LOG(LogTemp, Warning, TEXT("Velocity.Y : %.2f"), Velocity.Y);
+	UE_LOG(LogTemp, Warning, TEXT("Velocity.Z : %.2f"), Velocity.Z);
+
+	UE_LOG(LogTemp, Warning, TEXT("ProjectileMovement->Velocity.X : %.2f"), ProjectileMovement->Velocity.X);
+	UE_LOG(LogTemp, Warning, TEXT("ProjectileMovement->Velocity.Y : %.2f"), ProjectileMovement->Velocity.Y);
+	UE_LOG(LogTemp, Warning, TEXT("ProjectileMovement->Velocity.Z : %.2f"), ProjectileMovement->Velocity.Z);
+
 	SetLifeSpan(TimeLimit);
 
 	//��� ����� ��
@@ -115,6 +126,7 @@ void ABullet::MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector Initi
 	UGameplayStatics::PredictProjectilePath(this, predictParams, result);*/
 	ProjectileMovement->UpdateComponentVelocity();
 	StaticMesh->AddImpulse(Velocity, FName(""), true);
+	UE_LOG(LogTemp, Warning, TEXT("==============================================================================================="));
 }
 
 void ABullet::OnHitNotEnemy_Implementation(const FVector& HitVec)

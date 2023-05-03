@@ -196,7 +196,7 @@ public:
 	FGenericTeamId GetGenericTeamId()const override;
 
 	//Replicated
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 	UFUNCTION(Server, Reliable)
 	void ServerPlayMontage (AHunter* Hunter, FName Session);
 	UFUNCTION(NetMulticast, Reliable)

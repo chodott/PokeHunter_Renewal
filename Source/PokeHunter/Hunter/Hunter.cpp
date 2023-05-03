@@ -74,25 +74,6 @@ AHunter::AHunter()
 	}
 	
 
-	//UI
-	static ConstructorHelpers::FClassFinder<UUserWidget>TempInvenClass(TEXT("/Game/UI/InvenStorage/WBP_InventoryList"));
-	if (TempInvenClass.Succeeded())
-	{
-		InventoryUIClass = TempInvenClass.Class;
-	}
-	
-	static ConstructorHelpers::FClassFinder<UUserWidget>TempMainClass(TEXT("/Game/UI/WBP_MainUI"));
-	if (TempMainClass.Succeeded())
-	{
-		MainUIClass = TempMainClass.Class;
-	}
-
-	static ConstructorHelpers::FClassFinder<UUserWidget>TempLogoutClass(TEXT("/Game/UI/MainMenu/UI_LogoutMenu"));
-	if (TempLogoutClass.Succeeded())
-	{
-		LogoutUIClass = TempLogoutClass.Class;
-	}
-
 	// Particle System
 	Heal_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("HealParticle"));
 	Heal_Effect->SetupAttachment(GetRootComponent());
@@ -155,8 +136,6 @@ void AHunter::BeginPlay()
 	MainUI = CreateWidget(GetWorld(), MainUIClass, TEXT("MainUI"));
 	MainUI->AddToViewport();
 
-	LogoutUI = CreateWidget(GetWorld(), LogoutUIClass, TEXT("LogoutUI"));
-	// LogoutUI->AddToViewport();
 
 	//Timeline
 	DiveInterpCallback.BindUFunction(this, FName("DiveInterpReturn"));

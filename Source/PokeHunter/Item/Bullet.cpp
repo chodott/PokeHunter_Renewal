@@ -96,8 +96,11 @@ void ABullet::MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector Initi
 {
 	FVector Velocity = FVector::ZeroVector;
 	ThisOwner = BulletOwner;
+	bool bSuccess =
 	UGameplayStatics::SuggestProjectileVelocity(this, Velocity, InitialPos, EndPos,
 		ProjectileMovement->InitialSpeed, false, 0.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::DoNotTrace);
+
+	UE_LOG(LogTemp, Warning, TEXT("launch success:  %d"), bSuccess);
 	//UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, Velocity, InitialPos, EndPos, GetWorld()->GetGravityZ(), 1.f);
 	ProjectileMovement->Velocity = Velocity;
 	ProjectileMovement->SetVelocityInLocalSpace(Velocity);

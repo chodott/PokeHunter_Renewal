@@ -166,22 +166,25 @@ void AHunter::BeginPlay()
 		DiveTimeline.SetTimelineLength(1.32f);
 	}
 
-	FString LevelName = GetWorld()->GetName();
-	if (nullptr == gameinstance) return;
-	if ((gameinstance->GameLiftLevelName == LevelName)
-		&& (ESocketConnectionState::SCS_ConnectionError != gameinstance->gSocket->GetConnectionState())
-		&& (ESocketConnectionState::SCS_NotConnected != gameinstance->gSocket->GetConnectionState())) 
-	{
-		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
-		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
+	//FString LevelName = GetWorld()->GetName();
+	//if (nullptr == gameinstance) return;
+	//if ((gameinstance->GameLiftLevelName == LevelName)
+	//	&& (ESocketConnectionState::SCS_ConnectionError != gameinstance->gSocket->GetConnectionState())
+	//	&& (ESocketConnectionState::SCS_NotConnected != gameinstance->gSocket->GetConnectionState())) 
+	//{
+	//	
+	//}
+	//gameinstance->cur_playerController = Cast<APlayerController>(GetController());
 
-		if (HasAuthority())
-		{
-			FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
-			ServerSpawnPartner(this, partnerClass, SpawnLocation);
-		}
-	}
-	gameinstance->cur_playerController = Cast<APlayerController>(GetController());
+	ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
+	TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(EPartnerType::WolfPartner);
+
+	//if (HasAuthority())
+	//{
+	//	FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
+	//	ServerSpawnPartner(this, partnerClass, SpawnLocation);
+	//}
+
 }
 
 // Called every frame

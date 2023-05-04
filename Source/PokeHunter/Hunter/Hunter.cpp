@@ -382,6 +382,11 @@ void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
 	}
 }
 
+void AHunter::ServerInteractObject_Implementation(AInteractActor* TargetActor, AHunter* OwnerHunter)
+{
+	TargetActor->MultiInteract(OwnerHunter);
+}
+
 // Called to bind functionality to input
 void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -431,8 +436,9 @@ void AHunter::SpaceDown()
 		}
 
 		CurState = EPlayerState::Dive;
+		Crouch(true);
 		LastInput = GetCharacterMovement()->GetLastInputVector();
-
+		Crouch();
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		ServerPlayMontage(this, FName("Dive"));
 	
@@ -725,7 +731,7 @@ void AHunter::EKeyDown()
 			ServerSprint(this, false);
 		}
 
-		InteractingActor->ServerInteract(this);
+		ServerInteractObject(InteractingActor, this);
 		return;
 	}
 }
@@ -765,7 +771,6 @@ void AHunter::Use1Skill()
 		bUpperOnly = true;
 		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 0]);
-		//Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[0]);
 	}
 }
 
@@ -777,7 +782,6 @@ void AHunter::Use2Skill()
 		bUpperOnly = true;
 		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 1]);
-		//Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[1]);
 	}
 }
 
@@ -789,7 +793,6 @@ void AHunter::Use3Skill()
 		bUpperOnly = true;
 		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerSpecialSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 2]);
-		//Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[2]);
 	}
 }
 
@@ -801,7 +804,6 @@ void AHunter::Use4Skill()
 		bUpperOnly = true;
 		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerSpecialSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 3]);
-		//Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[3]);
 	}
 }
 
@@ -809,6 +811,7 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (CurState == EPlayerState::Dive) 
 	{
+		UnCrouch();
 		bInvincible = false;
 		CurState = EPlayerState::Idle;
 	}
@@ -1046,9 +1049,10 @@ void AHunter::MultiUsePotion_Implementation(APotion* Potion)
 void AHunter::ServerSpawnBullet_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
 {
 	ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(SpawnItemClass, StartLoc, Rotation);
-	Bullet->MultiLaunchBullet_Implementation(OwnerHunter, StartLoc, EndLoc);
-	MultiPlayMontage(OwnerHunter, FName("Shot"));
+	OwnerHunter->CurItem = Bullet;
 	OwnerHunter->bUpperOnly = true;
+	Bullet->MultiLaunchBullet(OwnerHunter, StartLoc, EndLoc);
+	MultiPlayMontage(OwnerHunter, FName("Shot"));
 }
 
 void AHunter::ServerSpawnItem_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
@@ -1095,3 +1099,7 @@ void AHunter::ServerUsePartnerSpecialSkill_Implementation(APartner* MyPartner, E
 	MyPartner->MultiUseSpecialSkill(SkillID);
 }
 
+void AHunter::ServerShotBullet_Implementation(ABullet* Bullet, AHunter* OwnerHunter, FVector InitialPos, FVector EndPos)
+{
+	Bullet->MultiLaunchBullet(OwnerHunter, InitialPos, EndPos);
+}

@@ -11,6 +11,7 @@ AEnemyBomb::AEnemyBomb()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 	ProjectileMovement->ProjectileGravityScale = 1.f;
+	ProjectileMovement->Deactivate();
 
 	float Roll = FMath::RandRange(0.0f, 360.0f);
 	float Pitch = FMath::RandRange(0.0f, 360.0f);
@@ -28,22 +29,25 @@ void AEnemyBomb::Tick(float DeltaTime)
 	{
 		UpSpeed += -9.8f * GravityValue;
 	}
-	AddActorWorldOffset(FVector(0, 0, DeltaTime * UpSpeed),true);
+	//AddActorWorldOffset(FVector(0, 0, DeltaTime * UpSpeed),true);
 }
 
 void AEnemyBomb::DropBomb()
 {
-	bActive = true;
-	ProjectileMovement->ProjectileGravityScale =1000.f;
-	StaticMesh->SetSimulatePhysics(true);
+	
 }
 
 void AEnemyBomb::FirstUse(const FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos)
 {
-
+	DirVec = DirectionVec;
 }
 
-void AEnemyBomb::InteractChargeAttack_Implementation()
+void AEnemyBomb::InteractChargeAttack_Implementation(float Distance)
 {
-	DropBomb();
+	bActive = true;
+	//ProjectileMovement->ProjectileGravityScale =1000.f;
+	ProjectileMovement->Velocity = DirVec * Distance;
+	ProjectileMovement->Activate();
+	StaticMesh->SetSimulatePhysics(true);
+
 }

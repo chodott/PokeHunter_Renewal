@@ -445,7 +445,7 @@ void AEnemy::LaunchToTarget()
 
 		//개선 필요
 		bool bCantJump = UGameplayStatics::SuggestProjectileVelocity(this, Velocity,StartPos, EndPos,
-			3000.f, false, 200.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::OnlyTraceWhileAscending);
+			3000.f, false, 0.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::OnlyTraceWhileAscending);
 		
 
 		LaunchCharacter(Velocity, true, true);

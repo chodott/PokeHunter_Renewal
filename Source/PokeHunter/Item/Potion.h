@@ -30,5 +30,5 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiAttachPotion(class AHunter* ItemOwner);
-	void MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector InitialPos, FVector EndPos);
+	virtual void MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector InitialPos, FVector EndPos) override;
 };

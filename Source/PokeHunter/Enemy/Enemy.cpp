@@ -66,30 +66,26 @@ void AEnemy::Tick(float DeltaTime)
 	//독 데미지 
 	if (bPoisoned)
 	{
-		float ElapsedTime = CurTime - StartPoisonedTime;
-		int CurSecond = FMath::FloorToInt(ElapsedTime);
-		float TimeLeft = PoisonedTime - ElapsedTime;
-		if (TimeLeft <= 0.0f)
+		int CurSecond = FMath::FloorToInt(PoisonLimitTime);
+		PoisonLimitTime -= DeltaTime;
+		if (CurSecond != FMath::FloorToInt(PoisonLimitTime))
 		{
-			bPoisoned = false;
-			CurSecond = 0;
-		}
-		else
-		{
-			if (CurSecond == PoisonSaveTime)
+			FDamageEvent PoisonedDamage;
+			float DamageAmount = 1.f;
+			UE_LOG(LogTemp, Warning, TEXT("PoisonedDamage"));
+			if (HasAuthority())
 			{
-				//
+				UGameplayStatics::ApplyDamage(this, DamageAmount, nullptr, nullptr, UDamageType::StaticClass());
 			}
+
 			else
 			{
-				PoisonSaveTime = CurSecond;
-				FDamageEvent PoisonDamage;
-				float DamageAmount = 1.f;
-				TakeDamage(DamageAmount, PoisonDamage, NULL, NULL);
-
-				//Damage UI Print Event
-				OnDamage.Broadcast(DamageAmount, GetActorLocation());
+				ServerApplyDamage(this, DamageAmount, nullptr, nullptr, UDamageType::StaticClass());
 			}
+		}
+		if (PoisonLimitTime <= 0.0f)
+		{
+			bPoisoned = false;
 		}
 	}
 
@@ -235,6 +231,8 @@ void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 	DOREPLIFETIME(AEnemy, bDied);
 	DOREPLIFETIME(AEnemy, bBurning);
 	DOREPLIFETIME(AEnemy, BurningLimitTime);
+	DOREPLIFETIME(AEnemy, bPoisoned);
+	DOREPLIFETIME(AEnemy, PoisonLimitTime);
 
 }
 
@@ -279,7 +277,7 @@ void AEnemy::StartBinding()
 void AEnemy::StartPoison()
 {
 	bPoisoned = true;
-	StartPoisonedTime = GetWorld()->TimeSeconds;
+	PoisonLimitTime = PoisonedTime;
 }
 
 void AEnemy::OnRep_Burning_Implementation()

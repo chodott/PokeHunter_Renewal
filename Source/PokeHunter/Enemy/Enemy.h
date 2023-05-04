@@ -115,12 +115,12 @@ public:
 	float GrogyDamage{};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bGrogy{ false };
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
 	bool bPoisoned{ false };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float PoisonedTime{};
-	float StartPoisonedTime;
-	int PoisonSaveTime{};
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
+	float PoisonLimitTime;
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Burning, BlueprintReadWrite)
 	bool bBurning{ false };

@@ -122,12 +122,12 @@ public:
 	float StartPoisonedTime;
 	int PoisonSaveTime{};
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Burning, BlueprintReadWrite)
 	bool bBurning{ false };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float BurningTime{};
-	float StartBurningTime;
-	int BurningSaveTime{};
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
+	float BurningLimitTime;
 
 
 	
@@ -172,11 +172,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartPoison();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void OnRep_Burning();
+
 	//Replication
 	UFUNCTION(Server, Reliable)
-	void ServerApplyDamage(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);
+	void ServerApplyPointDamage(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiApplyDamage(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);
+	void MultiApplyPointDamage(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);
+	UFUNCTION(Server, Reliable)
+	void ServerApplyDamage(AActor* OtherActor, float DamageAmount, AController* DamageInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageType);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiApplyDamage(AActor* OtherActor, float DamageAmount, AController* DamageInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageType);
+	UFUNCTION(Server, Reliable)
+	void ServerShowDamage(float DamageAmount, const FVector& ShowLoc);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiShowDamage(float DamageAmount, const FVector& ShowLoc);
 
 
 	void SetTarget(AActor* NewTarget) { Target = NewTarget; };

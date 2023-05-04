@@ -363,7 +363,7 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 
 		HitDirection = OtherActor->GetActorLocation() - OverlappedComp->GetComponentLocation();
 		HitDirection.Normalize();
-		ServerApplyDamage(OtherActor, OverlapHitBox->Damage, HitDirection, this,  SweepResult);
+		ServerApplyPointDamage(OtherActor, OverlapHitBox->Damage, HitDirection, this,  SweepResult);
 		
 
 	}

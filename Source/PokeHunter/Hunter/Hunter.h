@@ -66,8 +66,6 @@ public:
 	class UInventoryComponent* Inventory{};
 
 	//
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Partner")
-	class UStaticMeshComponent* DestinationMesh;
 
 	//HunterInfo
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")

@@ -101,6 +101,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf <UUserWidget> StorageUIClass;
 	class UUserWidget* StorageUI;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TSubclassOf <UUserWidget> PauseUIClass;
+	class UUserWidget* PauseUI;
 
 	//Partner
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner")

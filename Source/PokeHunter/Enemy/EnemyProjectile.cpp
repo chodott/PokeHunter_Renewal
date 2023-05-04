@@ -105,7 +105,7 @@ void AEnemyProjectile::FireInDirection(FVector Direction)
 
 }
 
-void AEnemyProjectile::InteractChargeAttack_Implementation()
+void AEnemyProjectile::InteractChargeAttack_Implementation(float Distance)
 {
 }
 

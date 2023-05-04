@@ -112,6 +112,38 @@ bool UBaseInstance::SendAccessToken()
 	return true;
 }
 
+bool UBaseInstance::LeaveParty()
+{
+	bool retVal = false;
+	int32 bSize;
+
+	CS_PARTY_LEAVE_PACK leave_pack;
+	leave_pack.size = sizeof(CS_PARTY_LEAVE_PACK);
+	leave_pack.type = CS_PARTY_LEAVE;
+	retVal = gSocket->Send(reinterpret_cast<const uint8*>(&leave_pack), leave_pack.size, bSize);
+
+	SC_PARTY_LEAVE_SUCCESS_PACK ok_pack;
+	ok_pack.size = sizeof(SC_PARTY_LEAVE_SUCCESS_PACK);
+	ok_pack.type = SC_PARTY_LEAVE_SUCCESS;
+
+	retVal = gSocket->Recv(reinterpret_cast<uint8*>(&ok_pack), sizeof(SC_PARTY_LEAVE_SUCCESS_PACK), bSize);
+	if (false == retVal) {
+		return false;
+	}
+
+	int32 leave_cnt = PlayerName.Find(FName(ok_pack._mem));
+
+	if (-1 != leave_cnt) {
+		PlayerName.RemoveAt(leave_cnt);
+		PlayerPetName.RemoveAt(leave_cnt);
+		PartyMemberState.RemoveAt(leave_cnt);
+	}
+	else {
+		return false;
+	}
+	return true;
+}
+
 // 클라이언트 종료시에 호출되는 함수
 void UBaseInstance::Shutdown()
 {
@@ -198,21 +230,37 @@ bool UBaseInstance::LogoutGame()
 		return false;
 	}
 
-	if ((NULL != gSocket) && (ESocketConnectionState::SCS_NotConnected != gSocket->GetConnectionState()) && (ESocketConnectionState::SCS_ConnectionError != gSocket->GetConnectionState()))
+	if ((ESocketConnectionState::SCS_NotConnected != gSocket->GetConnectionState()) && (ESocketConnectionState::SCS_ConnectionError != gSocket->GetConnectionState()))
 	{
+		bool retVal = true;
 		int32 bSize = 0;
 		CS_LOGOUT_PACK logout_pack;
 		logout_pack.size = sizeof(CS_LOGOUT_PACK);
 		logout_pack.type = CS_LOGOUT;
-		gSocket->Send(reinterpret_cast<const uint8*>(&logout_pack), logout_pack.size, bSize);
+		retVal = gSocket->Send(reinterpret_cast<const uint8*>(&logout_pack), logout_pack.size, bSize);
+		if (false == retVal) return false;
+
+		SC_LOGOUT_RESULT_PACK out_client;
+		retVal = gSocket->Recv(reinterpret_cast<uint8*>(&out_client), sizeof(SC_LOGOUT_RESULT_PACK), bSize);
+		if (false == retVal) return false;
+
+		TCHAR MBTWBuffer[128];
+		memset(MBTWBuffer, NULL, 128);
+		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)out_client._result, -1, MBTWBuffer, strlen(out_client._result));
+
+		uint8 partner_number = atoi(TCHAR_TO_ANSI(MBTWBuffer));
+		if (0 != partner_number) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
-	else {
+	else 
+	{
 		UE_LOG(LogTemp, Warning, TEXT("FSocket Error!"));
 		return false;
 	}
-
-
-	return true;
 }
 
 void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken)

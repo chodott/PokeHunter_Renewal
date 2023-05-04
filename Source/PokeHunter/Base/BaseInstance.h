@@ -9,7 +9,10 @@
 #include "Runtime/Sockets/Public/Sockets.h"
 #include "Runtime/Sockets/Public/SocketSubsystem.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
-#include "protocol.h"
+
+// #include "protocol.h"
+#include "../../../../PH-Server/IOCPServer/protocol.h"
+
 #include "Windows/WindowsPlatformMisc.h"
 #include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
 #include "PokeHunter/Item/ItemData.h"
@@ -119,6 +122,17 @@ public:
 		bool SendAccessToken();
 
 	virtual void Shutdown() override;
+
+	UFUNCTION(BlueprintCallable, Category = "LeaveParty")
+		bool LeaveParty();
+
+	// PartyInfoUI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
+		TArray<FName> PlayerName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
+		TArray<EPartnerType> PlayerPetName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
+		TArray<PLAYER_STATE> PartyMemberState;
 
 	UFUNCTION(BlueprintCallable, Category = "LogoutGame")
 		bool LogoutGame();

@@ -45,8 +45,6 @@ AHunter::AHunter()
 		DiveCurve = DIVE_CURVE.Object;
 	}
 
-
-
 	//Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
@@ -73,7 +71,6 @@ AHunter::AHunter()
 		GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
 	}
 	
-
 	// Particle System
 	Heal_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("HealParticle"));
 	Heal_Effect->SetupAttachment(GetRootComponent());
@@ -135,7 +132,7 @@ void AHunter::BeginPlay()
 	//UI
 	MainUI = CreateWidget(GetWorld(), MainUIClass, TEXT("MainUI"));
 	MainUI->AddToViewport();
-
+	PauseUI = CreateWidget(GetWorld(), PauseUIClass, TEXT("PauseUI"));
 
 	//Timeline
 	DiveInterpCallback.BindUFunction(this, FName("DiveInterpReturn"));
@@ -411,13 +408,16 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("RMB", IE_Released, this, &AHunter::RMBUp);
 	PlayerInputComponent->BindAction("I_Key", IE_Pressed, this, &AHunter::OpenInventory);
 	PlayerInputComponent->BindAction("E_Key", IE_Pressed, this, &AHunter::EKeyDown);
-	PlayerInputComponent->BindAction("Escape", IE_Pressed, this, &AHunter::ESCKeyDown);
 	PlayerInputComponent->BindAction("Ctrl", IE_Pressed, this, &AHunter::CtrlDown);
 	PlayerInputComponent->BindAction("Ctrl", IE_Released, this, &AHunter::CtrlUp);
 	PlayerInputComponent->BindAction("1_Key", IE_Pressed, this, &AHunter::Use1Skill);
 	PlayerInputComponent->BindAction("2_Key", IE_Pressed, this, &AHunter::Use2Skill);
 	PlayerInputComponent->BindAction("3_Key", IE_Pressed, this, &AHunter::Use3Skill);
 	PlayerInputComponent->BindAction("4_Key", IE_Pressed, this, &AHunter::Use4Skill);
+
+	// P_Key는 Debug Only
+	PlayerInputComponent->BindAction("P_Key", IE_Pressed, this, &AHunter::ESCKeyDown);
+	PlayerInputComponent->BindAction("Escape", IE_Pressed, this, &AHunter::ESCKeyDown);
 }
 
 void AHunter::SpaceDown()
@@ -738,7 +738,7 @@ void AHunter::EKeyDown()
 
 void AHunter::ESCKeyDown()
 {
-	
+	PauseUI->AddToViewport();
 }
 
 void AHunter::CtrlDown()

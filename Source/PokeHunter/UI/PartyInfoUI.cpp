@@ -149,6 +149,14 @@ void UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 		PartyMemberState.Add(PLAYER_STATE(info_pack._mem_state));
 	}
 
+	gameinstance->PlayerName.Empty();
+	gameinstance->PlayerPetName.Empty();
+	gameinstance->PartyMemberState.Empty();
+
+	gameinstance->PlayerName = PlayerName;
+	gameinstance->PlayerPetName = PlayerPetName;
+	gameinstance->PartyMemberState = PartyMemberState;
+
 	return;
 }
 
@@ -178,8 +186,6 @@ bool UPartyInfoUI::RecvClientJoin()	// [CheckPoint]-Blueprint에서 호출되는 곳이 
 
 bool UPartyInfoUI::LeaveParty()
 {
-	// GetWorld()->GetTimerManager().PauseTimer(TH_Partyinfo);
-
 	bool retVal = false;
 	int32 bSize;
 
@@ -194,7 +200,6 @@ bool UPartyInfoUI::LeaveParty()
 
 	retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&ok_pack), sizeof(SC_PARTY_LEAVE_SUCCESS_PACK), bSize);
 	if (false == retVal) {
-		// GetWorld()->GetTimerManager().UnPauseTimer(TH_Partyinfo);
 		return false;
 	}
 
@@ -204,11 +209,18 @@ bool UPartyInfoUI::LeaveParty()
 		PlayerName.RemoveAt(leave_cnt);
 		PlayerPetName.RemoveAt(leave_cnt);
 		PartyMemberState.RemoveAt(leave_cnt);
-		// GetWorld()->GetTimerManager().UnPauseTimer(TH_Partyinfo);
+
+		gameinstance->PlayerName.Empty();
+		gameinstance->PlayerPetName.Empty();
+		gameinstance->PartyMemberState.Empty();
+
+		gameinstance->PlayerName = PlayerName;
+		gameinstance->PlayerPetName = PlayerPetName;
+		gameinstance->PartyMemberState = PartyMemberState;
+
 		GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
 	}
 	else {
-		// GetWorld()->GetTimerManager().UnPauseTimer(TH_Partyinfo);
 		return false;
 	}
 

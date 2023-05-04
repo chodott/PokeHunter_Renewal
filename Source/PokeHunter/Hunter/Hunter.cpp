@@ -1051,9 +1051,10 @@ void AHunter::MultiUsePotion_Implementation(APotion* Potion)
 void AHunter::ServerSpawnBullet_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
 {
 	ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(SpawnItemClass, StartLoc, Rotation);
-	Bullet->MultiLaunchBullet_Implementation(OwnerHunter, StartLoc, EndLoc);
-	MultiPlayMontage(OwnerHunter, FName("Shot"));
+	OwnerHunter->CurItem = Bullet;
 	OwnerHunter->bUpperOnly = true;
+	Bullet->MultiLaunchBullet(OwnerHunter, StartLoc, EndLoc);
+	MultiPlayMontage(OwnerHunter, FName("Shot"));
 }
 
 void AHunter::ServerSpawnItem_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
@@ -1100,3 +1101,7 @@ void AHunter::ServerUsePartnerSpecialSkill_Implementation(APartner* MyPartner, E
 	MyPartner->MultiUseSpecialSkill(SkillID);
 }
 
+void AHunter::ServerShotBullet_Implementation(ABullet* Bullet, AHunter* OwnerHunter, FVector InitialPos, FVector EndPos)
+{
+	Bullet->MultiLaunchBullet(OwnerHunter, InitialPos, EndPos);
+}

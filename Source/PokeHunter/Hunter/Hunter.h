@@ -240,6 +240,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnBullet(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
 	UFUNCTION(Server, Reliable)
+	void ServerShotBullet(ABullet* Bullet, AHunter* OwnerHunter, FVector InitialPos, FVector EndPos);
+	UFUNCTION(Server, Reliable)
 	void	ServerUsePotion(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass);
 	UFUNCTION(NetMulticast, Reliable)
 	void	MultiUsePotion(APotion* Potion);

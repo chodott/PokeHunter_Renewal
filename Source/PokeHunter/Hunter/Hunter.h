@@ -243,6 +243,8 @@ public:
 	void	ServerUsePotion(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass);
 	UFUNCTION(NetMulticast, Reliable)
 	void	MultiUsePotion(APotion* Potion);
+	UFUNCTION(Server, Reliable)
+	void ServerInteractObject(AInteractActor* TargetActor, AHunter* OwnerHunter);
 
 	//Status
 	UFUNCTION(BlueprintCallable)

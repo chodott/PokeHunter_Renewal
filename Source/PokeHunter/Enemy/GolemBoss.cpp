@@ -304,6 +304,7 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		}
 
 		AItem* HitItem = Cast<AItem>(DamageCauser);
+		if (!HitItem) return 0;
 		if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
 		{
 			Hunter->SetPartnerTarget(this);
@@ -473,7 +474,8 @@ void AGolemBoss::Attack(int AttackPattern)
 
 void AGolemBoss::PatternAttack(int AttackPattern)
 {
-	ServerPlayMontage(this, FName("JumpAttack"));
+	ServerPlayMontage(this, FName("ChargeAttack"));
+
 	return; 
 	switch (AttackPattern)
 	{
@@ -486,7 +488,6 @@ void AGolemBoss::PatternAttack(int AttackPattern)
 		break;
 
 	case 2:
-		ServerPlayMontage(this, FName("ChargeAttack"));
 		break;
 
 	case 3:

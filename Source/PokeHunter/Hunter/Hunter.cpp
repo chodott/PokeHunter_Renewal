@@ -384,6 +384,11 @@ void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
 	}
 }
 
+void AHunter::ServerInteractObject_Implementation(AInteractActor* TargetActor, AHunter* OwnerHunter)
+{
+	TargetActor->MultiInteract(OwnerHunter);
+}
+
 // Called to bind functionality to input
 void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -433,8 +438,9 @@ void AHunter::SpaceDown()
 		}
 
 		CurState = EPlayerState::Dive;
+		Crouch(true);
 		LastInput = GetCharacterMovement()->GetLastInputVector();
-
+		Crouch();
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		ServerPlayMontage(this, FName("Dive"));
 	
@@ -727,7 +733,7 @@ void AHunter::EKeyDown()
 			ServerSprint(this, false);
 		}
 
-		InteractingActor->ServerInteract(this);
+		ServerInteractObject(InteractingActor, this);
 		return;
 	}
 }
@@ -767,7 +773,6 @@ void AHunter::Use1Skill()
 		bUpperOnly = true;
 		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 0]);
-		//Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[0]);
 	}
 }
 
@@ -779,7 +784,6 @@ void AHunter::Use2Skill()
 		bUpperOnly = true;
 		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 1]);
-		//Partner->UseNormalSkill(HunterInfo.PartnerSkillArray[1]);
 	}
 }
 
@@ -791,7 +795,6 @@ void AHunter::Use3Skill()
 		bUpperOnly = true;
 		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerSpecialSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 2]);
-		//Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[2]);
 	}
 }
 
@@ -803,7 +806,6 @@ void AHunter::Use4Skill()
 		bUpperOnly = true;
 		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerSpecialSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 3]);
-		//Partner->UseSpecialSkill(HunterInfo.PartnerSkillArray[3]);
 	}
 }
 
@@ -811,6 +813,7 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (CurState == EPlayerState::Dive) 
 	{
+		UnCrouch();
 		bInvincible = false;
 		CurState = EPlayerState::Idle;
 	}

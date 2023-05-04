@@ -23,9 +23,11 @@ public:
 	void DropBomb();
 
 	virtual void FirstUse(const FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos);
-	virtual void InteractChargeAttack_Implementation();
+	virtual void InteractChargeAttack_Implementation(float Distance);
 	
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FVector DirVec;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float UpSpeed{150.f};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)

@@ -56,6 +56,7 @@ public:
 	FVector CalculatePoint(float DeltaTime);
 
 	virtual void Interact_Implementation(AHunter* Hunter) override;
+	virtual void MultiInteract_Implementation(AHunter* Hunter);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
 

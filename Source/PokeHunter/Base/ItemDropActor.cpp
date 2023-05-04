@@ -11,8 +11,10 @@
 AItemDropActor::AItemDropActor()
 {
 	InteractionSphere->SetSphereRadius(80.f);
-	//PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;
 
+
+	//SetActorTickEnabled(false);
 	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating Movement"));
 	AddOwnedComponent(RotatingMovement);
 
@@ -30,9 +32,17 @@ void AItemDropActor::Tick(float DeltaTime)
 
 		if (RunningTime >= TotalTime)
 		{
+			if (DropItemArray.IsEmpty())
+			{
+				//임시 차단
+				ServerDestroy();
+				return;
+			}
+
 			DropCnt = FMath::RandRange(1, 5);
 			for (int i = 0; i < DropCnt; ++i)
 			{
+				if (DropItemArray.IsEmpty()) break;
 				int RandIndex = FMath::RandRange(0, DropItemArray.Num()-1);
 				DropItemArray[RandIndex].cnt += 1;
 			}
@@ -97,7 +107,16 @@ void AItemDropActor::Interact_Implementation(AHunter* Hunter)
 	bInteracting = true;
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	TurningPointVec = Master->GetActorLocation() + FVector(0, 300, 200);
+}
+
+void AItemDropActor::MultiInteract_Implementation(AHunter* Hunter)
+{
+	Master = Hunter;
+	StartPointVec = GetActorLocation();
+	bInteracting = true;
 	SetActorTickEnabled(true);
+	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	TurningPointVec = Master->GetActorLocation() + FVector(0, 300, 200);
 }
 
 void AItemDropActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

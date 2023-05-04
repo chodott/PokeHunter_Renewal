@@ -58,6 +58,7 @@ void AInteractActor::Interact_Implementation(AHunter* Hunter)
 
 void AInteractActor::ServerInteract_Implementation(AHunter* Hunter)
 {
+	SetActorTickEnabled(true);
 	MultiInteract(Hunter);
 }
 

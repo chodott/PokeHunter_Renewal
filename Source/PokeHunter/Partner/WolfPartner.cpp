@@ -99,6 +99,7 @@ void AWolfPartner::BeginPlay()
 
 void AWolfPartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AWolfPartner, bBreathe);
 	DOREPLIFETIME(AWolfPartner, BreatheLimitTime);
 	DOREPLIFETIME(AWolfPartner, bOnStorm);

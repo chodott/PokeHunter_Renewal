@@ -433,8 +433,7 @@ void AEnemy::Patrol()
 void AEnemy::JumpAttack()
 {
 	CurState = EEnemyState::JumpAttack;
-	ServerPlayMontage(this, FName("Attack_Jump"));
-
+	//ServerPlayMontage(this, FName("Attack_Jump"));
 }
 
 void AEnemy::ChargeAttack()
@@ -464,15 +463,20 @@ void AEnemy::LaunchToTarget()
 		FVector Velocity = FVector::ZeroVector;
 		FVector EndPos = Target->GetActorLocation();
 		FVector StartPos = GetActorLocation();
+		StartPos.Z = EndPos.Z;
 		FVector LookVec = GetActorForwardVector();
+		float Speed = 600.f;
 
-		//개선 필요
-		bool bCantJump = UGameplayStatics::SuggestProjectileVelocity(this, Velocity, StartPos, EndPos,
-			3000.f, false, 0.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::OnlyTraceWhileAscending);
+		bool JumpResult = false;
+		while (!JumpResult)
+		{
+			//개선 필요
+			JumpResult = UGameplayStatics::SuggestProjectileVelocity(this, Velocity, StartPos, EndPos,
+				Speed, true, 0.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::DoNotTrace);
+			Speed += 100.f;
 
-
+		}
 		LaunchCharacter(Velocity, true, true);
-
 	}
 }
 void AEnemy::Block()

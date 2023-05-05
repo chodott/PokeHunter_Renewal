@@ -643,6 +643,7 @@ void AHunter::LMBDown()
 				QuickSlotArray[CurQuickKey].ItemID = FName("None");
 				QuickSlotArray[CurQuickKey].cnt = 0;
 			}
+			UpdateQuickSlot();
 		}
 	}
 	
@@ -1098,4 +1099,8 @@ void AHunter::ServerUsePartnerSpecialSkill_Implementation(APartner* MyPartner, E
 void AHunter::ServerShotBullet_Implementation(ABullet* Bullet, AHunter* OwnerHunter, FVector InitialPos, FVector EndPos)
 {
 	Bullet->MultiLaunchBullet(OwnerHunter, InitialPos, EndPos);
+}
+
+void AHunter::UpdateQuickSlot_Implementation()
+{
 }

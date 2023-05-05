@@ -246,6 +246,10 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerInteractObject(AInteractActor* TargetActor, AHunter* OwnerHunter);
 
+	UFUNCTION(BlueprintNativeEvent)
+	void UpdateQuickSlot();
+
+
 	//Status
 	UFUNCTION(BlueprintCallable)
 	void SetHP(float HP) { HunterHP = HP; };

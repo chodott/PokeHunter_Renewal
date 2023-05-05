@@ -27,18 +27,22 @@ public:
 	class UStaticMeshComponent* BreathCollision;
 
 
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Skill")
+	float BreatheLimitTime{};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
-	float BreathStartTime{5.0f};
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
 	float BreathTime{ 5.0f };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	float BreathDamage{};
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Skill")
 	bool bBreathe{ false };
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
+	float StormTime{ 10.f };
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Skill")
+	float StormLimitTime{};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	float StormDamage{};
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Skill")
 	bool bOnStorm{ false };
 
 protected:
@@ -48,6 +52,8 @@ protected:
 	
 public:
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
+
 	void ApplyDamage();
 	virtual void UseSpecialSkill(ESkillID SkillID);
 	void LaunchIceShard();
@@ -55,6 +61,4 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void MakeIceShard();
 	void MakeStorm();
-	void IntoStorm(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	void OutStorm(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

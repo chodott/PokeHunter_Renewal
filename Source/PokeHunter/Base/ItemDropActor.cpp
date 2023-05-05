@@ -13,6 +13,9 @@ AItemDropActor::AItemDropActor()
 	InteractionSphere->SetSphereRadius(80.f);
 	PrimaryActorTick.bCanEverTick = true;
 
+	//Mesh
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	StaticMesh->SetupAttachment(GetRootComponent());
 
 	//SetActorTickEnabled(false);
 	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating Movement"));

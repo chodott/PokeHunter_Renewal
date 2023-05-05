@@ -2,7 +2,7 @@
 
 
 #include "BTTask_PartnerAttack.h"
-#include "Partner.h"
+#include "WolfPartner.h"
 #include "PartnerController.h"
 
 UBTTask_PartnerAttack::UBTTask_PartnerAttack()
@@ -13,13 +13,13 @@ UBTTask_PartnerAttack::UBTTask_PartnerAttack()
 EBTNodeResult::Type UBTTask_PartnerAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
-	APartner* Partner = Cast<APartner>(OwnerComp.GetAIOwner()->GetPawn());
-	if (Partner == NULL)return EBTNodeResult::Failed;
-	if (Partner->CurState != EPartnerState::Rushing) return EBTNodeResult::Failed;
-	Partner->Attack();
+	Wolf = Cast<AWolfPartner>(OwnerComp.GetAIOwner()->GetPawn());
+	if (Wolf == NULL)return EBTNodeResult::Failed;
+	if (Wolf->CurState != EPartnerState::MakingStorm) return EBTNodeResult::Failed;
+	Wolf->MakeStorm();
 	bPlaying = true;
 
-	Partner->OnMontageEnd.AddLambda([this]()->void
+	Wolf->OnMontageEnd.AddLambda([this]()->void
 		{
 			bPlaying = false;
 		});

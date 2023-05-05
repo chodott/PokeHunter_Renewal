@@ -16,6 +16,9 @@ class POKEHUNTER_API AItemDropActor : public AInteractActor
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh")
+	class UStaticMeshComponent* StaticMesh;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
 	class URotatingMovementComponent* RotatingMovement;
 

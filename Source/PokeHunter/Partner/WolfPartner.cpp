@@ -24,6 +24,7 @@ AWolfPartner::AWolfPartner()
 	//스킬 범위 컴포넌트
 	StormCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("StormCollision"));
 	StormCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	StormCollision->SetupAttachment(GetMesh());
 	BreathCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("BreathCollision"));
 	BreathCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BreathCollision->SetupAttachment(GetMesh(), FName("HeadSocket"));
@@ -39,32 +40,54 @@ void AWolfPartner::Tick(float DeltaTime)
 
 	if (bBreathe)
 	{
-		TArray<AActor*> OverlapActors;
-		BreathCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
-		for (auto Enemy : OverlapActors)
+		int CurSecond = FMath::FloorToInt(BreatheLimitTime);
+		BreatheLimitTime -= DeltaTime;
+		if (CurSecond != FMath::FloorToInt(BreatheLimitTime))
 		{
-			UGameplayStatics::ApplyDamage(Enemy, BreathDamage, GetController(), this, UDamageType::StaticClass());
+			UE_LOG(LogTemp, Warning, TEXT("Breathe is Running"));
+
+			TArray<AActor*> OverlapActors;
+			BreathCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
+			for (auto Enemy : OverlapActors)
+			{
+				ServerApplyDamage(Enemy, BreathDamage, GetController(), this);
+			}
 		}
 
-		float ElapsedTime = GetWorld()->TimeSeconds - BreathStartTime;
-		if (ElapsedTime > BreathTime)
+		if (BreatheLimitTime <= 0.0f)
 		{
 			bBreathe = false;
 			BreathCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			BreathCollision->SetVisibility(false);
 		}
-		
 	}
 
 	if (bOnStorm)
 	{
-		TArray<AActor*> OverlapActors;
-		BreathCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
-		for (auto Enemy : OverlapActors)
+		
+
+		int CurSecond = FMath::FloorToInt(StormLimitTime);
+		StormLimitTime -= DeltaTime;
+		if (CurSecond != FMath::FloorToInt(StormLimitTime))
 		{
-			UGameplayStatics::ApplyDamage(Enemy, StormDamage, GetController(), this, UDamageType::StaticClass());
+			UE_LOG(LogTemp, Warning, TEXT("Storm is Running"));
+
+			TArray<AActor*> OverlapActors;
+			StormCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
+			for (auto Enemy : OverlapActors)
+			{
+				ServerApplyDamage(Enemy, StormDamage, GetController(), this);
+			}
+		}
+
+		if (StormLimitTime <= 0.0f)
+		{
+			bOnStorm = false;
+			StormCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			StormCollision->SetVisibility(false);
 		}
 	}
+
 }
 
 void AWolfPartner::BeginPlay()
@@ -75,6 +98,14 @@ void AWolfPartner::BeginPlay()
 	//StormCollision->OnComponentEndOverlap.AddDynamic(this, &AWolfPartner::OutStorm);
 }
 
+
+void AWolfPartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(AWolfPartner, bBreathe);
+	DOREPLIFETIME(AWolfPartner, BreatheLimitTime);
+	DOREPLIFETIME(AWolfPartner, bOnStorm);
+	DOREPLIFETIME(AWolfPartner, StormLimitTime);
+}
 
 void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 {
@@ -111,11 +142,11 @@ void AWolfPartner::LaunchIceShard()
 
 void AWolfPartner::IceBreathe()
 {
-	BreathStartTime = GetWorld()->GetTimeSeconds();
+	BreatheLimitTime = BreathTime;
 	bBreathe = true;
 	BreathCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	BreathCollision->SetVisibility(true);
-	PartnerAnim->PlayCombatMontage(TEXT("Attack"));
+	ServerPlayMontage(FName("Breathe"));
 }
 
 void AWolfPartner::MakeIceShard()
@@ -130,16 +161,11 @@ void AWolfPartner::MakeIceShard()
 
 void AWolfPartner::MakeStorm()
 {
-	PartnerAnim->PlayCombatMontage(TEXT("Attack"));
+	ServerPlayMontage(FName("IceStorm"));
+	StormCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	StormCollision->SetVisibility(true);
+	StormLimitTime = StormTime;
+	bOnStorm = true;
 	//StormCollision.set
 }
 
-void AWolfPartner::IntoStorm(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	
-}
-
-void AWolfPartner::OutStorm(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-
-}

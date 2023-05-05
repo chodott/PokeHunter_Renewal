@@ -64,8 +64,6 @@ void AWolfPartner::Tick(float DeltaTime)
 
 	if (bOnStorm)
 	{
-		
-
 		int CurSecond = FMath::FloorToInt(StormLimitTime);
 		StormLimitTime -= DeltaTime;
 		if (CurSecond != FMath::FloorToInt(StormLimitTime))

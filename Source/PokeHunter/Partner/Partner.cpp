@@ -188,7 +188,6 @@ void APartner::SlashAttack()
 				SetActorLocation(NewLocation);
 				ServerPlayMontage(FName("SlashAttack"));
 
-				//ServerApplyDamage
 				ServerApplyDamage(Target, 30, GetController(), this);
 			}
 			else
@@ -418,6 +417,6 @@ void APartner::ServerApplyDamage_Implementation(AActor* DamagedActor, float Dama
 
 void APartner::MultiApplyDamage_Implementation(AActor* DamagedActor, float DamageAmount, AController* EventInstigator, AActor* DamageCauser)
 {
-	UGameplayStatics::ApplyDamage(Target, 30, GetController(), this, UDamageType::StaticClass());
+	UGameplayStatics::ApplyDamage(DamagedActor, DamageAmount, GetController(), DamageCauser, UDamageType::StaticClass());
 
 }

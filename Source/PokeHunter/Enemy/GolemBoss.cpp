@@ -258,7 +258,7 @@ void AGolemBoss::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
 	}
 }
 
-void AGolemBoss::MultiApplyDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult)
+void AGolemBoss::MultiApplyPointDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult)
 {
 	if (IEnemyInteractInterface* EnemyInteractInterface = Cast<IEnemyInteractInterface>(OtherActor))
 	{

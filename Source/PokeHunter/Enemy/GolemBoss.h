@@ -189,5 +189,5 @@ public:
 	virtual void InteractFire_Implementation(UPrimitiveComponent* HitComponent);
 
 	//Replication
-	void MultiApplyDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);
+	virtual void MultiApplyPointDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult) override;
 };

@@ -34,7 +34,7 @@ void AEnemyBomb::Tick(float DeltaTime)
 
 void AEnemyBomb::DropBomb()
 {
-	
+
 }
 
 void AEnemyBomb::FirstUse(const FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos)

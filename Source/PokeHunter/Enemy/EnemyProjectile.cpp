@@ -96,11 +96,11 @@ void AEnemyProjectile::FireInDirection(FVector DirectionVec, const FVector& Init
 
 void AEnemyProjectile::FireInDirection(FVector Direction)
 {
-	FVector Velocity = Direction * 5000.f;
-	ProjectileMovement->Velocity = Direction * 5000;
-	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
-	ProjectileMovement->UpdateComponentVelocity();
+	FVector Velocity = Direction * 3000.f;
+	//ProjectileMovement->Velocity = Direction * 2000;
+	//ProjectileMovement->UpdateComponentVelocity();
 	SetLifeSpan(TimeLimit);
+	StaticMesh->SetSimulatePhysics(true);
 	StaticMesh->AddImpulse(Velocity, FName(""), true);
 
 }

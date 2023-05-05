@@ -125,7 +125,7 @@ public:
 	//Bomb Attack
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	TArray<TSubclassOf<class AEnemyProjectile>> BombClassArray;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Battle")
 	TArray<class AEnemyProjectile*> BombArray;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float MaxBombRange{ 1000.f };
@@ -148,6 +148,8 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void PostInitializeComponents() override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
@@ -180,6 +182,9 @@ public:
 	void SpawnBombs();
 
 	UFUNCTION(BlueprintCallable)
+	void LaunchBombs();
+
+	UFUNCTION(BlueprintCallable)
 	void SpawnCupcake();
 
 	UFUNCTION(BlueprintCallable)
@@ -188,6 +193,10 @@ public:
 	//ItemInteractInterface
 	virtual void InteractFire_Implementation(UPrimitiveComponent* HitComponent);
 
+
 	//Replication
-	void MultiApplyDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);
+	void MultiApplyPointDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnBomb(class AGolemBoss* Golem, TSubclassOf<class AEnemyProjectile>SpawnClass, const FVector& SpawnLoc, const FRotator& Rotation);
 };

@@ -342,6 +342,7 @@ void UPartyInfoUI::TickRecvPartyState()
 		UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
 		ButtonTextBlock->SetText(FText::FromString("Entering"));
 		JoinButton->SetIsEnabled(false);
+		GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
 		GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
 		EnterStageMap();
 	}
@@ -501,10 +502,9 @@ void UPartyInfoUI::OnStartMatchmakingResponseReceived(FHttpRequestPtr Request, F
 
 				UGameInstance* GameInstance = GetGameInstance();
 				if (GameInstance != nullptr) {
-					UBaseInstance* GameLiftTutorialGameInstance = Cast<UBaseInstance>(GameInstance);
-					if (GameLiftTutorialGameInstance != nullptr) {
-						GameLiftTutorialGameInstance->JoinTicketId = MatchmakingTicketId;
-
+					UBaseInstance* baseinstance = Cast<UBaseInstance>(GameInstance);
+					if (baseinstance != nullptr) {
+						baseinstance->JoinTicketId = MatchmakingTicketId;
 						GetWorld()->GetTimerManager().SetTimer(PollMatchmakingHandle, this, &UPartyInfoUI::PollMatchmaking, 0.1f, true, 0.f);
 						SearchingForGame = true;
 					}
@@ -602,8 +602,6 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 						}
 
 						if (TicketType.Equals("MatchmakingSucceeded")) {
-							GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
-							GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
 							GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
 							GetWorld()->GetTimerManager().ClearTimer(SetAveragePlayerLatencyHandle);
 

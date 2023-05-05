@@ -27,6 +27,6 @@ void UBTTask_EnemyDie::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 	if (Enemy->GetActorScale().Length() < 0.2f)
 	{
 		Enemy->Die();
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		//FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

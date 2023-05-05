@@ -92,7 +92,7 @@ float APartner::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 	HP -= DamageAmount;
 	if (GetHP() <= 0)
 	{ //Á×¾úÀ» ¶§
-		//ServerPlayMontage(FName("Die"));
+		ServerPlayMontage(FName("Die"));
 		SetGenericTeamId(1);
 		AEnemy* DamageEnemy = Cast<AEnemy>(DamageCauser);
 		if(DamageEnemy) DamageEnemy->LeaveTarget(this);
@@ -107,7 +107,7 @@ float APartner::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 
 	else
 	{
-		//ServerPlayMontage( FName("NormalHit"));
+		ServerPlayMontage( FName("Hit"));
 	}
 
 
@@ -186,7 +186,7 @@ void APartner::SlashAttack()
 			if (bHit)
 			{
 				SetActorLocation(NewLocation);
-				ServerPlayMontage(FName("Attack"));
+				ServerPlayMontage(FName("SlashAttack"));
 
 				//ServerApplyDamage
 				ServerApplyDamage(Target, 30, GetController(), this);
@@ -201,7 +201,7 @@ void APartner::SlashAttack()
 		else
 		{
 			SetActorLocation(EndLocation);
-			ServerPlayMontage(FName("Attack"));
+			ServerPlayMontage(FName("SlashAttack"));
 
 		}
 	}

@@ -185,6 +185,12 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		{
 			Hunter->SetPartnerTarget(this);
 		}
+
+		if (Target == NULL)
+		{
+			Target = HitItem->ThisOwner;
+			CurState = EEnemyState::Hit;
+		}
 	}
 
 	if (HP <= 0)
@@ -202,11 +208,6 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		else
 		{
 			ServerPlayMontage(this, FName("Hit"));
-			if (Target == NULL)
-			{
-				Target = HitItem->ThisOwner;
-				CurState = EEnemyState::Hit;
-			}
 		}
 	}
 

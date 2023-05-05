@@ -23,8 +23,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	class USphereComponent* InteractionSphere;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh")
-	class UStaticMeshComponent* StaticMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	class AHunter* Master;

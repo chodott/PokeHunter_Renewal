@@ -402,7 +402,7 @@ void AGolemBoss::DeleteHitBox(const FName& PartName)
 {
 	// Delete Hit Box를 제거함.
 	//오류 계속 발생하면 제거 필요
-	int TargetIndex{};
+	int TargetIndex = -1;
 	for (int i = 0; i < HitBoxArray.Num(); ++i)
 	{
 		if (HitBoxArray[i].HitBoxName == PartName)
@@ -411,7 +411,9 @@ void AGolemBoss::DeleteHitBox(const FName& PartName)
 			break;
 		}
 	}
-	HitBoxArray.RemoveAt(TargetIndex);
+
+
+	if(TargetIndex >= 0) HitBoxArray.RemoveAt(TargetIndex);
 
 }
 

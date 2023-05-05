@@ -18,9 +18,14 @@ public:
 	// Sets default values for this actor's properties
 	ANpc();
 
+	//Mesh
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
+	class USkeletalMeshComponent* SkeletalMesh;
+
 	//충돌
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
 	class UBoxComponent* CollisionBox;
+
 
 	//카메라
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
@@ -45,6 +50,7 @@ public:
 
 public:
 	class AHunter* Master;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bActive;
 	FTimerHandle TimerHandle;
 };

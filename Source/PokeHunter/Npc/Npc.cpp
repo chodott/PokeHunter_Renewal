@@ -4,6 +4,7 @@
 #include "Npc.h"
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -16,13 +17,21 @@ ANpc::ANpc()
 	PrimaryActorTick.bCanEverTick = true;
 
 
+	//Skeletal Mesh
+	
+
+
+
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	CollisionBox->AddLocalOffset(FVector(0.f, 0.f, GetSimpleCollisionHalfHeight()),false);
 	CollisionBox->SetupAttachment(GetRootComponent());
 
+	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	SkeletalMesh->SetupAttachment(GetRootComponent());
+
 	//Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(StaticMesh);
+	CameraBoom->SetupAttachment(SkeletalMesh);
 	CameraBoom->TargetOffset = FVector(0, 0, 0.0f);
 	CameraBoom->TargetArmLength = 100.f;
 	CameraBoom->SetWorldRotation(FRotator(0, 180.0f, 0));

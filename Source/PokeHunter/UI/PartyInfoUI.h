@@ -107,9 +107,6 @@ private:
 		float AveragePlayerLatency;
 
 	UFUNCTION()
-		void SendReadyState();
-
-	UFUNCTION()
 		void EnterStageMap();
 
 	UFUNCTION()

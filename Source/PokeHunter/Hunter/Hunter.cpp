@@ -602,13 +602,11 @@ void AHunter::LMBDown()
 			{
 				bool bIsBullet = ItemClass->IsChildOf(ABullet::StaticClass());
 				if (!bIsBullet) return;
-				FVector StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle"));
-				FHitResult* HitResult = new FHitResult();
+				FVector StartTrace = FollowCamera->GetComponentLocation();
 				FVector EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
-
+				FHitResult* HitResult = new FHitResult();
 				FCollisionQueryParams BulletTraceParams(FName("Bullet"), true, this);
-
-				if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
+				if(GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
 				{
 					//Debug LineTrace
 					DrawDebugLine(
@@ -621,8 +619,13 @@ void AHunter::LMBDown()
 					);
 					EndTrace = HitResult->Location;
 				}
+				else
+				{
+					EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
+				}
+				StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle"));
+
 				ServerSpawnBullet(this, ItemClass, StartTrace, EndTrace, GetControlRotation());
-				
 			}
 			//NormalMode
 			else

@@ -22,6 +22,7 @@ APartner::APartner()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
+	baseinstace = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
 }
 
 // Called when the game starts or when spawned
@@ -90,6 +91,8 @@ float APartner::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 
 	if (bInvincible) return 0;
 	HP -= DamageAmount;
+	Hunter->ServerPetHP(baseinstace->MyName, HP);
+
 	if (GetHP() <= 0)
 	{ //Á×¾úÀ» ¶§
 		ServerPlayMontage(FName("Die"));

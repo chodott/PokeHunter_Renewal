@@ -128,9 +128,11 @@ public:
 
 	// PartyInfoUI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
-		TArray<FName> PlayerName;
+		FName MyName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
-		TArray<EPartnerType> PlayerPetName;
+		TArray<FName> PlayerName = {"Tester01", "Tester02", "Tester03", "Tester04"};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
+		TArray<EPartnerType> PlayerPetName = { EPartnerType::WolfPartner, EPartnerType::WolfPartner, EPartnerType::WolfPartner, EPartnerType::WolfPartner };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
 		TArray<PLAYER_STATE> PartyMemberState;
 

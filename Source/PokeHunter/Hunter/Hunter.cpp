@@ -28,6 +28,7 @@
 #include "PokeHunter/Base/InteractActor.h"
 #include "PokeHunter/Base/DatabaseActor.h"
 #include "PokeHunter/Base/ItemDropActor.h"
+#include <Blueprint/WidgetBlueprintLibrary.h>
 
 
 
@@ -128,7 +129,9 @@ void AHunter::BeginPlay()
 	//UI
 	MainUI = CreateWidget(GetWorld(), MainUIClass, TEXT("MainUI"));
 	MainUI->AddToViewport();
-	PauseUI = CreateWidget(GetWorld(), PauseUIClass, TEXT("PauseUI"));
+	// PauseUI = CreateWidget(GetWorld(), PauseUIClass, TEXT("PauseUI"));
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	PauseUI = CreateWidget<UUserWidget>(PlayerController, PauseUIClass, TEXT("PauseUI"));
 
 	//Timeline
 	DiveInterpCallback.BindUFunction(this, FName("DiveInterpReturn"));
@@ -150,6 +153,11 @@ void AHunter::BeginPlay()
 		{
 			FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
 			ServerSpawnPartner(this, partnerClass, SpawnLocation);
+		}
+
+		PartyMemberHP.Empty();
+		for (FName& newName : gameinstance->PlayerName) {
+			PartyMemberHP.Add(newName, 1.f);
 		}
 	}
 
@@ -265,6 +273,8 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 
 	if (bInvincible) return 0;
 	HunterHP -= DamageAmount;
+	ServerHunterHP(gameinstance->MyName, HunterHP);
+
 	if (GetHP() <= 0)
 	{ //죽었을 때
 		ServerPlayMontage(this, FName("Die"));
@@ -378,6 +388,32 @@ void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
 void AHunter::ServerInteractObject_Implementation(AInteractActor* TargetActor, AHunter* OwnerHunter)
 {
 	TargetActor->MultiInteract(OwnerHunter);
+}
+
+void AHunter::ServerHunterHP_Implementation(FName PlayerName, float NewHP)
+{
+	MultiHunterHP(PlayerName, NewHP);
+}
+
+void AHunter::MultiHunterHP_Implementation(FName PlayerName, float NewHP)
+{
+	float* HP = PartyMemberHP.Find(PlayerName);
+	if (HP) {
+		*HP = NewHP;
+	}
+}
+
+void AHunter::ServerPetHP_Implementation(FName PlayerName, float NewHP)
+{
+	MultiPetHP(PlayerName, NewHP);
+}
+
+void AHunter::MultiPetHP_Implementation(FName PlayerName, float NewHP)
+{
+	float* HP = PartyMemberPetHP.Find(PlayerName);
+	if (HP) {
+		*HP = NewHP;
+	}
 }
 
 // Called to bind functionality to input
@@ -734,7 +770,36 @@ void AHunter::EKeyDown()
 
 void AHunter::ESCKeyDown()
 {
-	PauseUI->AddToViewport();
+	if (PauseUI->IsInViewport()) {
+		PauseUI->RemoveFromViewport();
+	}
+	else {
+		PauseUI->AddToViewport();
+	}
+
+	return;
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+
+	TArray<UUserWidget*> Widgets;
+	UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), Widgets, UUserWidget::StaticClass(), false);
+
+	bool find_WBP_Pause = false;
+	for (UUserWidget* Widget : Widgets)
+	{
+		if ("WBP_Pause" == Widget->GetName()) {
+			find_WBP_Pause = true;
+		}
+	}
+
+	if (find_WBP_Pause) {
+		if (PauseUI->IsInViewport()) {
+			PauseUI->RemoveFromViewport();
+		}
+	}
+	else {
+		PauseUI->AddToViewport();
+	}
 }
 
 void AHunter::CtrlDown()

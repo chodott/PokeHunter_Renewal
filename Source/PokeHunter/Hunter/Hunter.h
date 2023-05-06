@@ -256,6 +256,20 @@ public:
 	float GetHP() { return HunterHP; };
 	UFUNCTION(BlueprintCallable)
 	void SetStamina(float Stamina) { HunterStamina = Stamina; };
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party member info")
+		TMap<FName, float> PartyMemberHP;		//  = { {FName("Tester01"), 0.f}, {FName("Tester02"), 80.f}, {FName("Tester03"), 20.f}, {FName("Tester04"), 60.f} };	// <OwnerName, pet HP>
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party member info")
+		TMap<FName, float> PartyMemberPetHP;	// = { {FName("Tester01"), 0.f}, {FName("Tester02"), 80.f}, {FName("Tester03"), 20.f}, {FName("Tester04"), 60.f} };	// <OwnerName, pet HP>
+
+	UFUNCTION(Server, Reliable, Category = "Party member info")
+		void ServerHunterHP(FName PlayerName, float HP);
+	UFUNCTION(NetMulticast, Reliable, Category = "Party member info")
+		void MultiHunterHP(FName PlayerName, float HP);
+	UFUNCTION(Server, Reliable, Category = "Party member info")
+		void ServerPetHP(FName PlayerName, float HP);
+	UFUNCTION(NetMulticast, Reliable, Category = "Party member info")
+		void MultiPetHP(FName PlayerName, float HP);
 
 
 	// Called to bind functionality to input

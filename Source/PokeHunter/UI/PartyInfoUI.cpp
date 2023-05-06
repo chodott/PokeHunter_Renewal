@@ -158,7 +158,13 @@ void UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 
 		// 오류/종료 범위가 큰 순서로 검사
 		if (false == retVal)									return;	// 소켓 통신의 실패
-		if (0 == strcmp(info_pack._mem, "theEnd"))				break;	// 파티멤버 수신 종료
+		if (0 == strcmp(info_pack._mem, "theEnd")) {
+			TCHAR MBTWBuffer[128];
+			memset(MBTWBuffer, NULL, 128);
+			MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._my_name, -1, MBTWBuffer, strlen(info_pack._my_name));
+			gameinstance->MyName = MBTWBuffer;
+			break;	// 파티멤버 수신 종료
+		}
 		if (i == 0 && (0 == strcmp(info_pack._mem, "Empty")))	break;	// 첫 번째 멤버부터 비어있음
 		if (i > 0 && (0 == strcmp(info_pack._mem, "Empty")))	break;	// 두 번째 멤버 이후 비어있음
 
@@ -505,7 +511,7 @@ void UPartyInfoUI::OnStartMatchmakingResponseReceived(FHttpRequestPtr Request, F
 					UBaseInstance* baseinstance = Cast<UBaseInstance>(GameInstance);
 					if (baseinstance != nullptr) {
 						baseinstance->JoinTicketId = MatchmakingTicketId;
-						GetWorld()->GetTimerManager().SetTimer(PollMatchmakingHandle, this, &UPartyInfoUI::PollMatchmaking, 0.1f, true, 0.f);
+						GetWorld()->GetTimerManager().SetTimer(PollMatchmakingHandle, this, &UPartyInfoUI::PollMatchmaking, 1.0f, true, 0.f);
 						SearchingForGame = true;
 					}
 				}

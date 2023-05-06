@@ -53,7 +53,7 @@ public:
 
 	FOnMontageEndDelegate OnMontageEnd;
 
-	
+	UBaseInstance* baseinstace;
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
 	FVector TargetPos;

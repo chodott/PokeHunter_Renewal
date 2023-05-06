@@ -209,13 +209,11 @@ bool UBaseInstance::LogoutGame()
 				StopMatchmakingRequest->ProcessRequest();
 			}
 			else {
-				UE_LOG(LogTemp, Warning, TEXT("stopmatchmaking Lambda Function Error!"));
-				return false;
+				UE_LOG(LogTemp, Warning, TEXT("stopmatchmaking Lambda Function Error! or JoinTicketId is Empty"));
 			}
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("JoinTicketId Error!"));
-			return false;
+			UE_LOG(LogTemp, Warning, TEXT("JoinTicketId is Emtpy!"));
 		}
 
 		TSharedRef<IHttpRequest> InvalidateTokensRequest = HttpModule->CreateRequest();
@@ -250,6 +248,12 @@ bool UBaseInstance::LogoutGame()
 
 		uint8 partner_number = atoi(TCHAR_TO_ANSI(MBTWBuffer));
 		if (0 != partner_number) {
+
+			gSocket->Close();
+			gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
+			addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+			ip = NULL;
+
 			return true;
 		}
 		else {

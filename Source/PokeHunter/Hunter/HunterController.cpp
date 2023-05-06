@@ -2,6 +2,11 @@
 
 #include "HunterController.h"
 
+void AHunterController::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
+
 void AHunterController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -9,10 +14,6 @@ void AHunterController::BeginPlay()
 
 	PlayerCameraManager->ViewPitchMax = 45.f;
 	PlayerCameraManager->ViewPitchMin = -30.f;
-	
+
 }
 
-void AHunterController::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-}

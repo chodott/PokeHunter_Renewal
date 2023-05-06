@@ -105,6 +105,11 @@ AHunter::AHunter()
 		HunterInfo.PartnerSkillArray.AddDefaulted();
 	}
 
+	for (int i = 0; i < 4; ++i)
+	{
+		SkillInfoArray.AddDefaulted();
+	}
+
 	TeamID = FGenericTeamId(0);
 
 	// Set Game instance
@@ -159,6 +164,16 @@ void AHunter::BeginPlay()
 		for (FName& newName : gameinstance->PlayerName) {
 			PartyMemberHP.Add(newName, 1.f);
 		}*/
+
+		for (int i = 0; i < 4; ++i)
+		{
+			ESkillID SkillID = HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i];
+			if (SkillID != ESkillID::None)
+			{
+				SkillInfoArray[i] = DatabaseActor->FindSkill(HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i]);
+			}
+		}
+
 	}
 
 	// Set player controller in baseintance
@@ -241,9 +256,9 @@ void AHunter::Tick(float DeltaTime)
 	}
 
 	//SkillReload
-	for (auto& SkillInfo : SkillInfoMap)
+	for (auto& SkillInfo : SkillInfoArray)
 	{
-		SkillInfo.Value.CheckTime(DeltaTime);
+		SkillInfo.CheckTime(DeltaTime);
 	}
 	UpdateSkillSlots();
 
@@ -587,13 +602,11 @@ void AHunter::LMBDown()
 			{
 				bool bIsBullet = ItemClass->IsChildOf(ABullet::StaticClass());
 				if (!bIsBullet) return;
-				FVector StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle"));
-				FHitResult* HitResult = new FHitResult();
+				FVector StartTrace = FollowCamera->GetComponentLocation();
 				FVector EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
-
+				FHitResult* HitResult = new FHitResult();
 				FCollisionQueryParams BulletTraceParams(FName("Bullet"), true, this);
-
-				if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
+				if(GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
 				{
 					//Debug LineTrace
 					DrawDebugLine(
@@ -606,8 +619,13 @@ void AHunter::LMBDown()
 					);
 					EndTrace = HitResult->Location;
 				}
+				else
+				{
+					EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
+				}
+				StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle"));
+
 				ServerSpawnBullet(this, ItemClass, StartTrace, EndTrace, GetControlRotation());
-				
 			}
 			//NormalMode
 			else
@@ -835,11 +853,12 @@ void AHunter::Use1Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill1"));
 	if (Partner)
 	{
-		bUpperOnly = true;
-		ESkillID CurSkillID = HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 0];
-		
-		ServerPlayMontage(this, FName("Order"));
-		ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 0]);
+		if (SkillInfoArray[0].CheckReady())
+		{
+			bUpperOnly = true;
+			ServerPlayMontage(this, FName("Order"));
+			ServerUsePartnerNormalSkill(Partner, SkillInfoArray[0].ID);
+		}
 	}
 }
 
@@ -848,9 +867,12 @@ void AHunter::Use2Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill2"));
 	if (Partner)
 	{
-		bUpperOnly = true;
-		ServerPlayMontage(this, FName("Order"));
-		ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 1]);
+		if (SkillInfoArray[1].CheckReady())
+		{
+			bUpperOnly = true;
+			ServerPlayMontage(this, FName("Order"));
+			ServerUsePartnerNormalSkill(Partner, SkillInfoArray[1].ID);
+		}
 	}
 }
 
@@ -859,9 +881,12 @@ void AHunter::Use3Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill3"));
 	if (Partner)
 	{
-		bUpperOnly = true;
-		ServerPlayMontage(this, FName("Order"));
-		ServerUsePartnerSpecialSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 2]);
+		if (SkillInfoArray[2].CheckReady())
+		{
+			bUpperOnly = true;
+			ServerPlayMontage(this, FName("Order"));
+			ServerUsePartnerSpecialSkill(Partner, SkillInfoArray[2].ID);
+		}
 	}
 }
 
@@ -870,9 +895,12 @@ void AHunter::Use4Skill()
 	UE_LOG(LogTemp, Warning, TEXT("Skill4"));
 	if (Partner)
 	{
-		bUpperOnly = true;
-		ServerPlayMontage(this, FName("Order"));
-		ServerUsePartnerSpecialSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 3]);
+		if (SkillInfoArray[3].CheckReady())
+		{
+			bUpperOnly = true;
+			ServerPlayMontage(this, FName("Order"));
+			ServerUsePartnerSpecialSkill(Partner, SkillInfoArray[3].ID);
+		}
 	}
 }
 
@@ -1038,8 +1066,38 @@ void AHunter::SetPartner(APartner* SelectedPartner)
 
 bool AHunter::SuccessUseSkill(ESkillID SkillID)
 {
-	SkillInfoMap.Find(SkillID)->UsedSkill();
+	for (auto& SkillInfo : SkillInfoArray)
+	{
+		if (SkillInfo.ID == SkillID)
+		{
+			SkillInfo.UsedSkill();
+			break;
+		}
+	}
 	return true;
+}
+
+bool AHunter::CheckUseSkill(ESkillID SkillID)
+{
+	for (auto& SkillInfo : SkillInfoArray)
+	{
+		if (SkillInfo.ID == SkillID)
+		{
+			bool bCanUse = SkillInfo.CheckReady();
+			if (bCanUse)
+			{
+				bUpperOnly = true;
+				ServerPlayMontage(this, FName("Order"));
+				ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 0]);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	return false;
 }
 
 void AHunter::UpdateSkillSlots_Implementation()

@@ -127,6 +127,9 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 
 	case ESkillID::IceStorm:
 		CurState = EPartnerState::MakingStorm;
+		bUsingSkill = true;
+		bOrdered = true;
+		bSuccess = true;
 		break;
 
 	case ESkillID::IceBreath:

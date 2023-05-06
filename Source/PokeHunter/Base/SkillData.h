@@ -71,6 +71,11 @@ public:
 		CurTime = 0.f;
 		bReady = false;
 	}
+
+	bool CheckReady()
+	{
+		return bReady;
+	}
 };
 
 

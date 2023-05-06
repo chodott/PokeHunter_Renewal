@@ -109,7 +109,7 @@ public:
 	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Partner")
 	class APartner* Partner{};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner")
-	TMap<ESkillID, FSkillInfo> SkillInfoMap;
+	TArray<FSkillInfo> SkillInfoArray;
 
 	//Delegate
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
@@ -322,7 +322,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetPartnerTarget(ACharacter* setTarget);
 	void SetPartner(class APartner* SelectedPartner);
-	bool SuccessUseSkill(ESkillID);
+	bool SuccessUseSkill(ESkillID SkillID);
+	bool CheckUseSkill(ESkillID SkillID);
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateSkillSlots();
 

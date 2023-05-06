@@ -39,8 +39,7 @@ constexpr char SC_PARTY_JOIN_SUCCESS	= 28;
 constexpr char SC_PARTY_LEAVE_FAIL		= 29;
 constexpr char SC_PARTY_LEAVE_SUCCESS	= 30;
 
-constexpr char SC_LOGOUT_FAIL			= 31;
-constexpr char SC_LOGOUT_SUCCESS		= 32;
+constexpr char SC_LOGOUT_RESULT			= 31;
 constexpr char SC_ITEM_INFO				= 33;
 
 constexpr char CS_TEST = 24;
@@ -163,6 +162,7 @@ struct SC_PARTY_INFO_PACK {		// 각 파티원의 세부 정보
 	char size;
 	char type;
 
+	char _my_name[CHAR_SIZE];
 	char _mem[CHAR_SIZE];
 	char _mem_pet[CHAR_SIZE];
 	char _mem_state;
@@ -196,14 +196,11 @@ struct SC_PARTY_LEAVE_SUCCESS_PACK {
 	char _mem_state;
 };
 
-struct SC_LOGOUT_FAIL_PACK {
+struct SC_LOGOUT_RESULT_PACK {
 	char size;
 	char type;
-};
 
-struct SC_LOGOUT_SUCCESS_PACK {
-	char size;
-	char type;
+	char _result[CHAR_SIZE];
 };
 
 struct SC_ITEM_INFO_PACK {

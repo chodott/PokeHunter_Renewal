@@ -885,7 +885,7 @@ void AHunter::Use3Skill()
 		{
 			bUpperOnly = true;
 			ServerPlayMontage(this, FName("Order"));
-			ServerUsePartnerNormalSkill(Partner, SkillInfoArray[2].ID);
+			ServerUsePartnerSpecialSkill(Partner, SkillInfoArray[2].ID);
 		}
 	}
 }
@@ -899,7 +899,7 @@ void AHunter::Use4Skill()
 		{
 			bUpperOnly = true;
 			ServerPlayMontage(this, FName("Order"));
-			ServerUsePartnerNormalSkill(Partner, SkillInfoArray[3].ID);
+			ServerUsePartnerSpecialSkill(Partner, SkillInfoArray[3].ID);
 		}
 	}
 }

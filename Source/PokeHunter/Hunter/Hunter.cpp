@@ -240,6 +240,13 @@ void AHunter::Tick(float DeltaTime)
 		}
 	}
 
+	//SkillReload
+	for (auto& SkillInfo : SkillInfoMap)
+	{
+		SkillInfo.Value.CheckTime(DeltaTime);
+	}
+	UpdateSkillSlots();
+
 	//bFalling
 	if (bNoCollision)
 	{
@@ -677,6 +684,7 @@ void AHunter::LMBDown()
 				QuickSlotArray[CurQuickKey].ItemID = FName("None");
 				QuickSlotArray[CurQuickKey].cnt = 0;
 			}
+			UpdateQuickSlot();
 		}
 	}
 	
@@ -828,6 +836,8 @@ void AHunter::Use1Skill()
 	if (Partner)
 	{
 		bUpperOnly = true;
+		ESkillID CurSkillID = HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 0];
+		
 		ServerPlayMontage(this, FName("Order"));
 		ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 0]);
 	}
@@ -960,9 +970,9 @@ void AHunter::InteractEarthquake_Implementation()
 	LaunchCharacter(FVector(0, 0, 1000), false, false);
 }
 
-void AHunter::InteractAttack_Implementation(FVector HitDirection, float Damage)
+void AHunter::InteractAttack_Implementation(FVector HitDirection, float DamageAmount)
 {
-	if (Damage <= 0.f || bDamaged)
+	if (DamageAmount <= 0.f || bDamaged)
 	{
 		return;
 	}
@@ -988,9 +998,9 @@ void AHunter::InteractGrabAttack_Implementation()
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 }
 
-void AHunter::InteractWideAttack_Implementation(float Damage)
+void AHunter::InteractWideAttack_Implementation(float DamageAmount)
 {
-	if (Damage <= 0.f || bDamaged)
+	if (DamageAmount <= 0.f || bDamaged)
 	{
 		return;
 	}
@@ -1024,6 +1034,16 @@ void AHunter::SetPartner(APartner* SelectedPartner)
 {
 	Partner = SelectedPartner;
 	//gameinstance->myPartner = EPartnerType::WolfPartner;
+}
+
+bool AHunter::SuccessUseSkill(ESkillID SkillID)
+{
+	SkillInfoMap.Find(SkillID)->UsedSkill();
+	return true;
+}
+
+void AHunter::UpdateSkillSlots_Implementation()
+{
 }
 
 void AHunter::ServerStartInvincibility_Implementation()
@@ -1161,4 +1181,8 @@ void AHunter::ServerUsePartnerSpecialSkill_Implementation(APartner* MyPartner, E
 void AHunter::ServerShotBullet_Implementation(ABullet* Bullet, AHunter* OwnerHunter, FVector InitialPos, FVector EndPos)
 {
 	Bullet->MultiLaunchBullet(OwnerHunter, InitialPos, EndPos);
+}
+
+void AHunter::UpdateQuickSlot_Implementation()
+{
 }

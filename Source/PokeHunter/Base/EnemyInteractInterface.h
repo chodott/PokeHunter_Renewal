@@ -25,11 +25,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void InteractEarthquake();
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
-	void InteractAttack(FVector HitDirection, float Damage);
+	void InteractAttack(FVector HitDirection, float DamageAmount);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void InteractGrabAttack();
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void InteractChargeAttack(float Distance);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
-	void InteractWideAttack(float Damage);
+	void InteractWideAttack(float DamageAmount);
 };

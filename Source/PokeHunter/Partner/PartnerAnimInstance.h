@@ -29,7 +29,18 @@ public:
 		float Direction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
-		class APartner* Partner;
+	class APartner* Partner;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
+	class APawn* Hunter;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
+	class APawn* Target;
+
+	FVector TargetLoc;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = Movement)
+	bool bLookAt;
 
 	bool bPlaying;
 

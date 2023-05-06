@@ -130,7 +130,6 @@ public:
 	float BurningLimitTime;
 
 
-	
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
 	bool bDied{ false };
 

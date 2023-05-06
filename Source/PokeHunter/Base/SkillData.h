@@ -42,10 +42,35 @@ public:
 	FName Type {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
+	float CoolTime{5.f};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	FText ToolTip {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	UTexture2D* Icon = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	float CurTime{ 0.f };
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	bool bReady{ true };
+
+	void CheckTime(float DeltaTime)
+	{
+		CurTime += DeltaTime;
+		if (CurTime >= CoolTime)
+		{
+			CurTime = CoolTime;
+			bReady = true;
+		}
+	}
+
+	void UsedSkill()
+	{
+		CurTime = 0.f;
+		bReady = false;
+	}
 };
 
 

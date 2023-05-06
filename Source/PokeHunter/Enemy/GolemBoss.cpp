@@ -3,6 +3,7 @@
 
 #include "GolemBoss.h"
 #include "Components/BoxComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "PokeHunter/Base/HitBoxComponent.h"
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Hunter/Hunter.h"
@@ -133,6 +134,12 @@ void AGolemBoss::PostInitializeComponents()
 	}
 }
 
+void AGolemBoss::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AGolemBoss, BombArray);
+}
+
 void AGolemBoss::Die()
 {
 	TArray<USceneComponent*> ChildComponents;
@@ -183,26 +190,36 @@ void AGolemBoss::SpawnBombs()
 		FVector RandomPos = ForwardVec.RotateAngleAxis(RandomAngle, UpVec) * RandomDistance + GetActorLocation();
 		
 		int RandClassNum = RandomStream.FRandRange(0, BombClassArray.Num());
-		AEnemyProjectile* NewBomb = GetWorld()->SpawnActor<AEnemyProjectile>(BombClassArray[RandClassNum], RandomPos, FRotator::ZeroRotator);
 
-		FHitResult HitResult;
-		FVector TraceStart = RandomPos;
-		FVector TraceEnd = RandomPos - FVector(0.f, 0.f, 500.f);
-		FCollisionQueryParams TraceParams;
-		TraceParams.bTraceComplex = false;
-		TraceParams.bReturnPhysicalMaterial = false;
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_WorldStatic, TraceParams))
-		{
-			FVector SpawnLocation = HitResult.ImpactPoint;
-			NewBomb->SetActorLocation(SpawnLocation);
-			NewBomb->ThisOwner = this;
-		}
-		
 		FVector DirectionVec = RandomPos - GetActorLocation();
 		DirectionVec.Normalize();
-		ServerSpawnProjectile(BombClassArray[RandClassNum], RandomPos, FVector(0,0,0), DirectionVec);
-		BombArray.Add(NewBomb);
+		ServerSpawnBomb(this, BombClassArray[RandClassNum], RandomPos, FRotator::ZeroRotator);
 	}
+
+}
+
+void AGolemBoss::LaunchBombs()
+{
+	int CloseStoneNum = 0;
+	int MinDistance = 99999;
+	FVector TargetLoc = Target->GetActorLocation();
+	FVector GolemLoc = GetActorLocation();
+	float GolemTargetDistance = FVector::Dist2D(TargetLoc, GolemLoc);
+	for (int i = 0; i < MaxBombCnt; ++i)
+	{
+		float BombGolemDistance = FVector::Dist2D(BombArray[i]->GetActorLocation(), GolemLoc);
+		FVector BombLoc = BombArray[i]->GetActorLocation();
+		FVector BombDirVec = BombLoc - GolemLoc;
+		BombDirVec.Z = 0;
+		BombDirVec.Normalize();
+		FVector PlaneGolemLoc = GolemLoc;
+		PlaneGolemLoc.Z = TargetLoc.Z;
+		FVector BombTargetPos = PlaneGolemLoc + GolemTargetDistance * BombDirVec;
+		FVector LaunchDirection = BombTargetPos - BombLoc;
+		LaunchDirection.Normalize();
+		BombArray[i]->FireInDirection(LaunchDirection);
+	}
+	BombArray.Reset();
 }
 
 void AGolemBoss::SpawnCupcake()
@@ -256,6 +273,12 @@ void AGolemBoss::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
 		HitBox->bBurning = true;
 		HitBox->StartBurningTime = GetWorld()->TimeSeconds;
 	}
+}
+
+void AGolemBoss::ServerSpawnBomb_Implementation(class AGolemBoss* Golem, TSubclassOf<class AEnemyProjectile>SpawnClass, const FVector& SpawnLoc, const FRotator& Rotation)
+{
+	AEnemyProjectile* SpawnBomb = GetWorld()->SpawnActor<AEnemyProjectile>(SpawnClass, SpawnLoc, Rotation);
+	Golem->BombArray.Add(SpawnBomb);
 }
 
 void AGolemBoss::MultiApplyPointDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult)
@@ -476,8 +499,8 @@ void AGolemBoss::Attack(int AttackPattern)
 
 void AGolemBoss::PatternAttack(int AttackPattern)
 {
-	ServerPlayMontage(this, FName("ChargeAttack"));
-
+	
+	ServerPlayMontage(this, FName("JumpAttack"));
 	return; 
 	switch (AttackPattern)
 	{
@@ -490,10 +513,11 @@ void AGolemBoss::PatternAttack(int AttackPattern)
 		break;
 
 	case 2:
+		ServerPlayMontage(this, FName("ChargeAttack"));
 		break;
 
 	case 3:
-		ServerPlayMontage(this, FName("JumpAttack"));
+		
 		break;
 	}
 

@@ -53,5 +53,5 @@ public:
 	virtual void FireInDirection(FVector DirectionVec, const FVector& InitialPos, const FVector& EndPos);
 	virtual void FireInDirection(FVector Direction);
 
-	virtual void InteractChargeAttack_Implementation(float Distance) override;
+	virtual void InteractChargeAttack_Implementation(float DamageAmount) override;
 };

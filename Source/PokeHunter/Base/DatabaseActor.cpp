@@ -60,7 +60,7 @@ UItemData* ADatabaseActor::FindItem(FName ItemID)
 
 FSkillInfo ADatabaseActor::FindSkill(ESkillID SkillID)
 {
-	for (auto Skill : SkillInfoArray)
+	for (auto& Skill : SkillInfoArray)
 	{
 		if (SkillID == Skill.ID)
 		{

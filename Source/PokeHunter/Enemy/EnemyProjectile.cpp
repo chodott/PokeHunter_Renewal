@@ -83,7 +83,7 @@ void AEnemyProjectile::FireInDirection(FVector DirectionVec, const FVector& Init
 	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
 	SetLifeSpan(TimeLimit);
 
-	//°æ·Î µð¹ö±× ¿ë
+	//ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 	/*FPredictProjectilePathParams predictParams(20.0f, InitialPos, Velocity, 15.0f);
 	predictParams.DrawDebugTime = 15.0f;
 	predictParams.DrawDebugType = EDrawDebugTrace::Type::ForDuration;
@@ -96,16 +96,16 @@ void AEnemyProjectile::FireInDirection(FVector DirectionVec, const FVector& Init
 
 void AEnemyProjectile::FireInDirection(FVector Direction)
 {
-	FVector Velocity = Direction * 5000.f;
-	ProjectileMovement->Velocity = Direction * 5000;
-	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
-	ProjectileMovement->UpdateComponentVelocity();
+	FVector Velocity = Direction * 3000.f;
+	//ProjectileMovement->Velocity = Direction * 2000;
+	//ProjectileMovement->UpdateComponentVelocity();
 	SetLifeSpan(TimeLimit);
+	StaticMesh->SetSimulatePhysics(true);
 	StaticMesh->AddImpulse(Velocity, FName(""), true);
 
 }
 
-void AEnemyProjectile::InteractChargeAttack_Implementation(float Distance)
+void AEnemyProjectile::InteractChargeAttack_Implementation(float DamageAmount)
 {
 }
 

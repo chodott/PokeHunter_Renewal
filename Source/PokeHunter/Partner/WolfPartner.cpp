@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "PokeHunter/Enemy/Enemy.h"
+#include "PokeHunter/Hunter/Hunter.h"
 #include "Kismet/GameplayStatics.h"
 
 AWolfPartner::AWolfPartner()
@@ -109,14 +110,19 @@ void AWolfPartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 {
 	if (bUsingSkill) return;
-	bOrdered = true;
-	bUsingSkill = true;
+	bool bSuccess = false;
 
 	switch (SkillID)
 	{
 	case ESkillID::IceShard:
-		TargetPos = Target->GetActorLocation();
-		CurState = EPartnerState::IceShard;
+		if (Target)
+		{
+			TargetPos = Target->GetActorLocation();
+			CurState = EPartnerState::IceShard;
+			bUsingSkill = true;
+			bOrdered = true;
+			bSuccess = true;
+		}
 		break;
 
 	case ESkillID::IceStorm:
@@ -124,10 +130,21 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 		break;
 
 	case ESkillID::IceBreath:
-		CurState = EPartnerState::IceBreath;
+		if (Target)
+		{
+			CurState = EPartnerState::IceBreath;
+			bUsingSkill = true;
+			bOrdered = true;
+			bSuccess = true;
+		}
 		break;
 	default:
 		break;
+	}
+
+	if (bSuccess)
+	{
+		Hunter->SuccessUseSkill(SkillID);
 	}
 }
 

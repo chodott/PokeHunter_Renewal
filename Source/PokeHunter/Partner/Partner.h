@@ -132,6 +132,8 @@ public:
 	UFUNCTION()
 	virtual void Attack();
 	virtual void SlashAttack();
+	UFUNCTION(BlueprintCallable)
+	virtual void SlashMove();
 	virtual void Howling();
 	virtual void StopSkill();
 	virtual void UseNormalSkill(ESkillID SkillID);

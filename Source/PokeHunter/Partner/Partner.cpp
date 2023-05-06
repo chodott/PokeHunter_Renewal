@@ -161,6 +161,12 @@ void APartner::Attack()
 
 void APartner::SlashAttack()
 {
+	ServerPlayMontage(FName("SlashAttack"));
+
+}
+
+void APartner::SlashMove()
+{
 	if (Target)
 	{
 		FVector TargetLocation = Target->GetActorLocation();
@@ -186,15 +192,13 @@ void APartner::SlashAttack()
 			if (bHit)
 			{
 				SetActorLocation(NewLocation);
-				ServerPlayMontage(FName("SlashAttack"));
-
 				ServerApplyDamage(Target, 30, GetController(), this);
 			}
 			else
 			{
 				SetActorLocation(StartLocation);
 			}
-				//실패 구현 필요
+			//실패 구현 필요
 		}
 
 		else
@@ -228,26 +232,38 @@ void APartner::UseNormalSkill(ESkillID SkillID)
 	if (bUsingSkill) return;
 	bOrdered = true;
 	bUsingSkill = true;
+	bool bSuccess = false;
 
 	switch (SkillID)
 	{
 	case ESkillID::Rush:
 
 		CurState = EPartnerState::Rushing;
-
+		bSuccess = true;
 		break;
 
 	case ESkillID::Howling:
 
 		CurState = EPartnerState::Howling;
-
+		bSuccess = true;
 		break;
 
 	case ESkillID:: Slash:
-		CurState = EPartnerState::SlashAttack;
+		if (Target)
+		{
+			CurState = EPartnerState::SlashAttack;
+			bUsingSkill = true;
+			bOrdered = true;
+			bSuccess = true;
+		}
 
 	default:
 		break;
+	}
+
+	if (bSuccess)
+	{
+		Hunter->SuccessUseSkill(SkillID);
 	}
 }
 
@@ -256,8 +272,7 @@ void APartner::UseSpecialSkill(ESkillID SkillID)
 	//스킬 사용중 접근 불가 추가 필요
 
 	if (bUsingSkill) return;
-	bOrdered = true;
-	bUsingSkill = true;
+	
 
 	switch (SkillID)
 	{
@@ -351,9 +366,9 @@ void APartner::ServerSetPosition_Implementation(const FVector& LocVec)
 	MultiSetPosition(LocVec);
 }
 
-void APartner::InteractAttack_Implementation(FVector HitDirection, float Damage)
+void APartner::InteractAttack_Implementation(FVector HitDirection, float DamageAmount)
 {
-	if (Damage <= 0.f)
+	if (DamageAmount <= 0.f)
 	{
 		return;
 	}
@@ -389,9 +404,9 @@ void APartner::InteractGrabAttack_Implementation()
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 }
 
-void APartner::InteractWideAttack_Implementation(float Damage)
+void APartner::InteractWideAttack_Implementation(float DamageAmount)
 {
-	if (Damage <= 0.f)
+	if (DamageAmount <= 0.f)
 	{
 		return;
 	}

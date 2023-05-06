@@ -105,6 +105,8 @@ public:
 	EPartnerType PartnerType {EPartnerType::WolfPartner};
 	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Partner")
 	class APartner* Partner{};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner")
+	TMap<ESkillID, FSkillInfo> SkillInfoMap;
 
 	//Delegate
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
@@ -303,6 +305,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetPartnerTarget(ACharacter* setTarget);
 	void SetPartner(class APartner* SelectedPartner);
+	bool SuccessUseSkill(ESkillID);
+	UFUNCTION(BlueprintNativeEvent)
+	void UpdateSkillSlots();
 
 	//Collision Function
 	UFUNCTION()

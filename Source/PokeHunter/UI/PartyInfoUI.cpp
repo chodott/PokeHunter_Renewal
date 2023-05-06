@@ -114,7 +114,7 @@ bool UPartyInfoUI::SendEnterParty()
 				TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
 				if (FJsonSerializer::Serialize(PartyNumberObj.ToSharedRef(), Writer)) {
 					TSharedRef<IHttpRequest> StartJoinRequest = gameinstance->HttpModule->CreateRequest();
-					StartJoinRequest->SetURL(PokeHunterGameInstance->ApiUrl + "/setpartynumber");
+					StartJoinRequest->SetURL(PokeHunterGameInstance->ApiUrl + "/setpartynumber");					// 2
 					StartJoinRequest->SetVerb("POST");
 					StartJoinRequest->SetHeader("Content-Type", "application/json");
 					StartJoinRequest->SetHeader("Authorization", AccessToken);
@@ -307,6 +307,7 @@ void UPartyInfoUI::SetAveragePlayerLatency() {
 			if (TotalPlayerLatency > 0) {
 				AveragePlayerLatency = TotalPlayerLatency / PokeHunterGameInstance->PlayerLatencies.Num();
 			}
+			UE_LOG(LogTemp, Warning, TEXT("TotalPlayerLatency: %f,\tAveragePlayerLatency : %f"), TotalPlayerLatency, AveragePlayerLatency);
 		}
 	}
 }
@@ -410,14 +411,14 @@ void UPartyInfoUI::EnterStageMap()
 		LatencyMapObj->SetNumberField(PokeHunterGameInstance->RegionCode, AveragePlayerLatency);
 
 		TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
-		RequestObj->SetObjectField("latencyMap", LatencyMapObj);
+		// RequestObj->SetObjectField("latencyMap", LatencyMapObj);
 
 		FString RequestBody;
 		TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
 		if (FJsonSerializer::Serialize(RequestObj.ToSharedRef(), Writer)) {
 			TSharedRef<IHttpRequest> StartJoinRequest = gameinstance->HttpModule->CreateRequest();
 			StartJoinRequest->OnProcessRequestComplete().BindUObject(this, &UPartyInfoUI::OnStartMatchmakingResponseReceived);
-			StartJoinRequest->SetURL(PokeHunterGameInstance->ApiUrl + "/startmatchmaking");
+			StartJoinRequest->SetURL(PokeHunterGameInstance->ApiUrl + "/startmatchmaking");										// 1
 			StartJoinRequest->SetVerb("POST");
 			StartJoinRequest->SetHeader("Content-Type", "application/json");
 			StartJoinRequest->SetHeader("Authorization", AccessToken);

@@ -155,10 +155,10 @@ void AHunter::BeginPlay()
 			ServerSpawnPartner(this, partnerClass, SpawnLocation);
 		}
 
-		PartyMemberHP.Empty();
+		/*PartyMemberHP.Empty();
 		for (FName& newName : gameinstance->PlayerName) {
 			PartyMemberHP.Add(newName, 1.f);
-		}
+		}*/
 	}
 
 	// Set player controller in baseintance

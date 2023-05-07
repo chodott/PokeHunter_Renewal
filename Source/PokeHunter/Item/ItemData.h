@@ -23,6 +23,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
 	TArray<FName> OfferingItemID;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+	TArray<int> OfferingItemCnt;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
 	UTexture2D* Icon = nullptr;

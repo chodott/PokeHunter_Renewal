@@ -18,6 +18,7 @@ class POKEHUNTER_API AWolfPartner : public APartner
 public:
 	AWolfPartner();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class APartnerProjectile> IceShardClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

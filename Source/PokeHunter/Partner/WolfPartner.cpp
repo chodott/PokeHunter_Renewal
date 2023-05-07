@@ -28,7 +28,7 @@ AWolfPartner::AWolfPartner()
 	StormCollision->SetupAttachment(GetMesh());
 	BreathCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("BreathCollision"));
 	BreathCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	BreathCollision->SetupAttachment(GetMesh(), FName("HeadSocket"));
+	BreathCollision->SetupAttachment(GetMesh(), FName("Head"));
 	BreathCollision->SetVisibility(false);
 
 }
@@ -60,6 +60,7 @@ void AWolfPartner::Tick(float DeltaTime)
 			bBreathe = false;
 			BreathCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			BreathCollision->SetVisibility(false);
+			PartnerAnim->StopAllMontages(0.2f);
 		}
 	}
 
@@ -153,10 +154,7 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 
 void AWolfPartner::LaunchIceShard()
 {
-	if (PartnerAnim)
-	{
-		PartnerAnim->PlayCombatMontage(TEXT("Attack"));
-	}
+	ServerPlayMontage(FName("IceShard"));
 }
 
 void AWolfPartner::IceBreathe()
@@ -173,9 +171,13 @@ void AWolfPartner::MakeIceShard()
 	FVector InitialPos = GetMesh()->GetSocketLocation(FName("Head")) + GetActorForwardVector() * 300.f;
 	FVector EndPos = Target->GetActorLocation();
 	FVector DirectionVec = EndPos - GetActorLocation();
+	
+	FQuat TargetRotation = FQuat::FindBetweenNormals(GetActorForwardVector(), DirectionVec);
+	FRotator Rotation = TargetRotation.Rotator();
+
 	DirectionVec.Normalize();
 
-	ServerSpawnProjectile(this, IceShardClass, InitialPos, EndPos);
+	ServerSpawnProjectile(this, IceShardClass, InitialPos, EndPos, Rotation);
 }
 
 void AWolfPartner::MakeStorm()

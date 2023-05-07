@@ -90,7 +90,7 @@ AHunter::AHunter()
 
 	//Inventory
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
-	Inventory->capacity = 21;
+	Inventory->capacity = 24;
 	Inventory->Hunter = this;
 
 	//Set Quickslot Default

@@ -262,7 +262,18 @@ void APartner::UseNormalSkill(ESkillID SkillID)
 	case ESkillID:: Slash:
 		if (Target)
 		{
+			TargetPos = Target->GetActorLocation();
 			CurState = EPartnerState::SlashAttack;
+			bUsingSkill = true;
+			bOrdered = true;
+			bSuccess = true;
+		}
+		break;
+	case ESkillID::IceShard:
+		if (Target)
+		{
+			TargetPos = Target->GetActorLocation();
+			CurState = EPartnerState::IceShard;
 			bUsingSkill = true;
 			bOrdered = true;
 			bSuccess = true;
@@ -430,9 +441,9 @@ void APartner::InteractWideAttack_Implementation(float DamageAmount)
 	SetActorEnableCollision(false);
 }
 
-void APartner::ServerSpawnProjectile_Implementation(APartner* OwnerPartner, TSubclassOf<class APartnerProjectile> SpawnProjectileClass, FVector StartLoc, FVector EndLoc)
+void APartner::ServerSpawnProjectile_Implementation(APartner* OwnerPartner, TSubclassOf<class APartnerProjectile> SpawnProjectileClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
 {
-	APartnerProjectile* Projectile = GetWorld()->SpawnActor<APartnerProjectile>(SpawnProjectileClass, StartLoc, FRotator::ZeroRotator);
+	APartnerProjectile* Projectile = GetWorld()->SpawnActor<APartnerProjectile>(SpawnProjectileClass, StartLoc, Rotation);
 	Projectile->MultiLaunchBullet(OwnerPartner, StartLoc, EndLoc);
 }
 

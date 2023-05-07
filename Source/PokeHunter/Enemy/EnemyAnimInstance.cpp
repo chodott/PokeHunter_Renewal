@@ -65,6 +65,14 @@ void UEnemyAnimInstance::StopCombatMontage(float BlendTime)
 bool UEnemyAnimInstance::PlayCombatMontage(FName Section, bool bInterrupt)
 {
 	//if (Section == FName("Die") || Section == FName("Hit"))
+
+	if (CurSection == FName("Die")) return false;
+	else if (CurSection == FName("Hit") && Section != FName("Die")) return false;
+	else if (CurSection == FName("LeftDestroy") || CurSection == FName("RightDestroy"))
+	{
+		if (Section != FName("LeftDestroy") && Section != FName("RightDestroy")) return false;
+	}
+
 	if(bInterrupt)
 	{
 		

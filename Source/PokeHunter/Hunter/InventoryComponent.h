@@ -41,7 +41,7 @@ public:
 	bool AddItemInfo(FName ItemID, int Cnt);
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex);
+	void ChangeSlot(AActor* Storage, FName TargetName, int TargetIndex, FName GoalName, int GoalIndex);
 	UFUNCTION(BlueprintCallable)
 	void SwapSlot(int TargetIndex, int GoalIndex);
 	UFUNCTION(BlueprintCallable)

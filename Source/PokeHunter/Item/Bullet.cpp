@@ -31,7 +31,6 @@ ABullet::ABullet()
 	{
 		StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
 	}
-	//StaticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnHit);
 
 	ItemType = EItemType::Bullet;
 
@@ -48,7 +47,7 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if(OtherComponent->IsA<UHitBoxComponent>())
 	UE_LOG(LogTemp, Warning, TEXT("HitBox Hit"), );
-	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, ThisOwner->GetController(), this, UDamageType::StaticClass());
 	if (OtherActor->Implements<UItemInteractInterface>())
 	{
 		//������ ȿ���� �޴� ���Ϳ� �浹

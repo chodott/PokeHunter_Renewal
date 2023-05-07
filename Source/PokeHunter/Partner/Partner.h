@@ -182,5 +182,5 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiUseSpecialSkill(ESkillID SkillID);
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnProjectile(APartner* OwnerPartner, TSubclassOf<class APartnerProjectile> SpawnProjectileClass, FVector StartLoc, FVector EndLoc);
+	void ServerSpawnProjectile(APartner* OwnerPartner, TSubclassOf<class APartnerProjectile> SpawnProjectileClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
 };

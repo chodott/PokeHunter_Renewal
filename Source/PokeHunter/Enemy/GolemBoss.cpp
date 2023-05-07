@@ -144,13 +144,23 @@ void AGolemBoss::Die()
 {
 	TArray<USceneComponent*> ChildComponents;
 	GetMesh()->GetChildrenComponents(true, ChildComponents);
+
 	for (auto Component : ChildComponents)
 	{
 		auto PrimitiveComponent = Cast<UPrimitiveComponent>(Component);
-		PrimitiveComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		PrimitiveComponent->SetSimulatePhysics(true);
-		PrimitiveComponent->SetCollisionProfileName(FName("Destructible"));
-		PrimitiveComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		if (PrimitiveComponent->IsA<UHitBoxComponent>())
+		{
+			PrimitiveComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+			PrimitiveComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+		else
+		{
+			PrimitiveComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+			PrimitiveComponent->SetSimulatePhysics(true);
+			PrimitiveComponent->SetCollisionProfileName(FName("Destructible"));
+			PrimitiveComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		}
+		
 	}
 }
 
@@ -472,11 +482,18 @@ void AGolemBoss::Attack(int AttackPattern)
 	{
 
 	case 0:
+		if (bLoseLeftHand && bLoseRightHand) return;
 		ServerPlayMontage(this, FName("Attack_Grab"));
 		
 		break;
 	case 1:
-		ServerPlayMontage(this, FName("Attack_Punch"));
+		//Attack Punch
+		if (bLoseLeftHand)
+		{
+			if (bLoseRightHand) ServerPlayMontage(this, FName("Attack_Bind"));
+			else ServerPlayMontage(this, FName("Attack"));
+		}
+		else ServerPlayMontage(this, FName("Attack_Punch"));
 		break;
 
 	case 2:
@@ -484,7 +501,12 @@ void AGolemBoss::Attack(int AttackPattern)
 		break;
 
 	case 3:
-		ServerPlayMontage(this, FName("Attack"));
+		if (bLoseRightHand)
+		{
+			if (bLoseLeftHand)  ServerPlayMontage(this, FName("Attack_Bind"));
+			else ServerPlayMontage(this, FName("Attack_Punch"));
+		}
+		else ServerPlayMontage(this, FName("Attack"));
 		break;
 	case 4:
 		ServerPlayMontage(this, FName("Block"));
@@ -504,7 +526,8 @@ void AGolemBoss::PatternAttack(int AttackPattern)
 	{
 
 	case 0:
-		ServerPlayMontage(this, FName("Throw"));
+		if (!bLoseLeftHand) ServerPlayMontage(this, FName("Throw"));
+		else ServerPlayMontage(this, FName("ChargeAttack"));
 		break;
 	case 1:
 		ServerPlayMontage(this, FName("WideAttack"));

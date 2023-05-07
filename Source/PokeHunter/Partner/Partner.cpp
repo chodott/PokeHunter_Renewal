@@ -83,20 +83,27 @@ void APartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	DOREPLIFETIME(APartner, bOrdered);
 	DOREPLIFETIME(APartner, bUsingSkill);
 	DOREPLIFETIME(APartner, bPosing);
+	DOREPLIFETIME(APartner, bDied);
 }
 
 float APartner::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
 	if (bInvincible) return 0;
+
+	//Bullet 그냥 리턴
+	ABullet* Bullet = Cast<ABullet>(DamageCauser);
+	if (Bullet) return 0.f;
+
 	HP -= DamageAmount;
 	Hunter->ServerPetHP(baseinstace->MyName, HP);
 
 	if (GetHP() <= 0)
 	{ //죽었을 때
 		ServerPlayMontage(FName("Die"));
+		bDied = true;
 		SetGenericTeamId(1);
+		HealPerSecondAmount = 0.f;
 		AEnemy* DamageEnemy = Cast<AEnemy>(DamageCauser);
 		if(DamageEnemy) DamageEnemy->LeaveTarget(this);
 		return 0;
@@ -105,6 +112,7 @@ float APartner::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{
 		FPointDamageEvent& PointDamageEvent = (FPointDamageEvent&)DamageEvent;
+		ServerPlayMontage(FName("Hit"));
 
 	}
 

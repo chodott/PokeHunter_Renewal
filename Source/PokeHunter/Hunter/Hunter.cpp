@@ -294,6 +294,11 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	if (bInvincible) return 0;
+
+	ABullet* Bullet = Cast<ABullet>(DamageCauser);
+	if (Bullet) return 0.f;
+
+
 	HunterHP -= DamageAmount;
 	ServerHunterHP(gameinstance->MyName, HunterHP);
 
@@ -301,6 +306,7 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	{ //죽었을 때
 		ServerPlayMontage(this, FName("Die"));
 		SetGenericTeamId(1);
+		HealPerSecondAmount = 0.f;
 		AEnemy* DamageEnemy = Cast<AEnemy>(DamageCauser);
 		if(DamageEnemy) DamageEnemy->LeaveTarget(this);
 		return 0; 
@@ -314,6 +320,7 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	else
 	{
 		ServerPlayMontage(this, FName("NormalHit"));
+		CurState = EPlayerState::Hit;
 	}
 	
 
@@ -602,7 +609,7 @@ void AHunter::LMBDown()
 			{
 				bool bIsBullet = ItemClass->IsChildOf(ABullet::StaticClass());
 				if (!bIsBullet) return;
-				FVector StartTrace = FollowCamera->GetComponentLocation();
+				FVector StartTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 200.f;
 				FVector EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
 				FHitResult* HitResult = new FHitResult();
 				FCollisionQueryParams BulletTraceParams(FName("Bullet"), true, this);
@@ -616,7 +623,7 @@ void AHunter::LMBDown()
 					//	FColor(255, 0, 0),
 					//	false, 3, 0,
 					//	12.333
-					// );
+					//);
 					EndTrace = HitResult->Location;
 				}
 				else
@@ -894,8 +901,10 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 		if (CurItem != NULL) CurItem->Destroy();
 		CurState = EPlayerState::Idle;
 	}
-
-	if (bUpperOnly) bUpperOnly = false;
+	if(!bInterrupted)
+	{
+		if (bUpperOnly) bUpperOnly = false;
+	}
 }
 
 void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -985,6 +994,7 @@ void AHunter::InteractAttack_Implementation(FVector HitDirection, float DamageAm
 	FRotator TargetRot = TargetVec.Rotation();
 	TargetRot.Pitch = 0;
 	SetActorRelativeRotation(TargetRot);
+	CurState = EPlayerState::Knockback;
 	LaunchCharacter(HitDirection * 1000.f,false,false);
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	bNoCollision = true;
@@ -1006,6 +1016,7 @@ void AHunter::InteractWideAttack_Implementation(float DamageAmount)
 
 	if (bInvincible) return;
 
+	CurState = EPlayerState::Knockback;
 	LaunchCharacter(FVector(0,0,1000), false, false);
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	bNoCollision = true;
@@ -1100,7 +1111,7 @@ void AHunter::SetInstallMode()
 	Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 500.0f;
 	if (CurState == EPlayerState::Zoom)
 	{
-		SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
+		//SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
 		HunterAnim->StopAllMontages(0.2f);
 	}
 	

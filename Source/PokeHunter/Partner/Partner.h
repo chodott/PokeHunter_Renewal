@@ -76,6 +76,8 @@ public:
 	bool bOrdered;
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "AI")
 	bool bUsingSkill;
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "AI");
+	bool bDied;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bGrabbed;
 

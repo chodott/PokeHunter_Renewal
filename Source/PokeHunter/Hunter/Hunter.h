@@ -28,7 +28,9 @@ enum class EPlayerState : uint8
 	Dive,
 	Zoom,
 	Install,
-	Drink
+	Drink,
+	Hit,
+	Knockback
 };
 
 USTRUCT(BlueprintType)

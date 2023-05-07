@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PokeHunter/Base/BaseInstance.h"
 #include "Npc.h"
 #include "NpcStorage.generated.h"
 
@@ -14,6 +15,8 @@ class POKEHUNTER_API ANpcStorage : public ANpc
 public:	
 	// Sets default values for this actor's properties
 	ANpcStorage();
+
+	UBaseInstance* gameinstance;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item")
 	class UInventoryComponent* Storage;
@@ -28,5 +31,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void Interact_Implementation(AHunter* Hunter) override;
 
+	bool GetNpcStorageInfo();
 };
 

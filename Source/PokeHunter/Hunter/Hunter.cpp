@@ -254,11 +254,11 @@ void AHunter::Tick(float DeltaTime)
 	}
 
 	//SkillReload
-	/*for (auto& SkillInfo : SkillInfoArray)
+	for (auto& SkillInfo : SkillInfoArray)
 	{
 		SkillInfo.CheckTime(DeltaTime);
 	}
-	UpdateSkillSlots();*/
+	UpdateSkillSlots();
 
 	//bFalling
 	if (bNoCollision)

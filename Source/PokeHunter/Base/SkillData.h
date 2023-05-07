@@ -14,16 +14,14 @@ UENUM(BlueprintType)
 enum class ESkillID : uint8
 {
 	None = 0,
-	Rush = 201,
-	Howling = 202,
-	Slash = 203,
-	IceShard = 211,
-	IceStorm = 212,
-	IceBreath = 213,
-	RockThrow = 221,
-	Meteor = 222
-
-	
+	달리기 = 201,
+	하울링 = 202,
+	관통공격 = 203,
+	얼음창 = 211,
+	냉기폭풍 = 212,
+	냉기숨결 = 213,
+	돌던지기 = 221,
+	메테오 = 222
 };
 
 USTRUCT(BlueprintType)

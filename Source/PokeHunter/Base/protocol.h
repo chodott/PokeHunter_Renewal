@@ -25,6 +25,7 @@ constexpr char CS_PARTY_LEAVE = 8;
 constexpr char CS_QUEST_INVENTORY = 9;
 constexpr char CS_SAVE_INVENTORY = 10;
 constexpr char CS_LOGOUT = 11;
+constexpr char CS_QUEST_STORAGE = 12;
 
 constexpr char SC_LOGIN_FAIL = 20;
 constexpr char SC_LOGIN_SUCCESS = 21;
@@ -126,6 +127,11 @@ struct CS_LOGOUT_PACK {
 	char type;
 
 	char name[CHAR_SIZE];
+};
+
+struct CS_QUEST_STORAGE_PACK {
+	char size;
+	char type;
 };
 
 struct SC_LOGIN_FAIL_PACK {

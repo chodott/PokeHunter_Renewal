@@ -18,7 +18,7 @@ ANpcStorage::ANpcStorage()
 
 	//인벤토리
 	Storage = CreateDefaultSubobject<UInventoryComponent>(TEXT("Storage"));
-	Storage->capacity = 30;
+	Storage->capacity = 28;
 
 	InteractionSphere->SetSphereRadius(100.f);
 }

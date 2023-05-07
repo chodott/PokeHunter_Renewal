@@ -116,15 +116,15 @@ void AEnemy::Tick(float DeltaTime)
 		}
 	}
 
-	if (bDied)
-	{
-		FVector CurScale = GetActorScale();
-		SetActorScale3D(CurScale - DeltaTime * FVector(1.f, 1.f, 1.f));
-		if (GetActorScale().Length() < 0.2f)
-		{
-			Die();
-		}
-	}
+	//if (bDied)
+	//{
+	//	FVector CurScale = GetActorScale();
+	//	SetActorScale3D(CurScale - DeltaTime * FVector(1.f, 1.f, 1.f));
+	//	if (GetActorScale().Length() < 0.2f)
+	//	{
+	//		Die();
+	//	}
+	//}
 }
 
 // Called to bind functionality to input

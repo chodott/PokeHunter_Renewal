@@ -327,11 +327,25 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 				{
 					ServerPlayMontage(this, FName("LeftDestroy"));
 					CurState = EEnemyState::LeftDestroy;
+					if (!BombArray.IsEmpty())
+					{
+						for (auto& Bomb : BombArray)
+						{
+							Bomb->StaticMesh->SetSimulatePhysics(true);
+						}
+					}
 				}
 				else if(StringPartName.Contains("Right"))
 				{
 					ServerPlayMontage(this, FName("RightDestroy"));
 					CurState = EEnemyState::RightDestroy;
+					if (!BombArray.IsEmpty())
+					{
+						for (auto& Bomb : BombArray)
+						{
+							Bomb->StaticMesh->SetSimulatePhysics(true);
+						}
+					}
 				}
 			}
 		}
@@ -358,6 +372,13 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		ServerPlayMontage(this, FName("Die"));
 		bDied = true;
 		SetActorTickEnabled(false);
+		if (!BombArray.IsEmpty())
+		{
+			for (auto& Bomb : BombArray)
+			{
+				Bomb->StaticMesh->SetSimulatePhysics(true);
+			}
+		}
 		//Die();
 	}
 

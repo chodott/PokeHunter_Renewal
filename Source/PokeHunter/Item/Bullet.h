@@ -53,5 +53,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiApplyDamage(AActor* DamagedActor, int DamageAmount, FVector Direction, const FHitResult& HitInfo, AController* EventInstigator, AActor* DamageCauser, TSubclassOf<UDamageType> DamageTypeClass);
 
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnEmitter(UParticleSystem* SpawnParticle, const FVector& SpawnLoc);
 	
 };

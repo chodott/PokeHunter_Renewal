@@ -45,6 +45,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Combat")
 	UAnimMontage* CombatMontage;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+	FName CurSection;
+
 public:
 	void StopCombatMontage(float BlendTime);
 	bool PlayCombatMontage(FName Section, bool interuupt = false);

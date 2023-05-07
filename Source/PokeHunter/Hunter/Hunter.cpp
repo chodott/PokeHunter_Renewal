@@ -90,7 +90,7 @@ AHunter::AHunter()
 
 	//Inventory
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
-	Inventory->capacity = 20;
+	Inventory->capacity = 21;
 	Inventory->Hunter = this;
 
 	//Set Quickslot Default
@@ -135,8 +135,6 @@ void AHunter::BeginPlay()
 	MainUI = CreateWidget(GetWorld(), MainUIClass, TEXT("MainUI"));
 	MainUI->AddToViewport();
 	// PauseUI = CreateWidget(GetWorld(), PauseUIClass, TEXT("PauseUI"));
-	PauseUI = CreateWidget(GetWorld(), MainUIClass, TEXT("PauseUI"));
-	PauseUI->AddToViewport();
 
 	//Timeline
 	DiveInterpCallback.BindUFunction(this, FName("DiveInterpReturn"));
@@ -788,15 +786,17 @@ void AHunter::EKeyDown()
 				ServerPlayMontage(this, FName("PickUp"));
 			}
 			
+			ServerInteractObject(InteractingActor, this);
+
 		}
 
 		else
 		{
 			//npc
+			InteractingActor->Interact_Implementation(this);
 			ServerSprint(this, false);
 		}
 
-		ServerInteractObject(InteractingActor, this);
 		return;
 	}
 }

@@ -43,7 +43,7 @@ void ABullet::BeginPlay()
 
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-
+	if (!OtherActor) return;
 	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if(OtherComponent->IsA<UHitBoxComponent>())
 	UE_LOG(LogTemp, Warning, TEXT("HitBox Hit"), );
@@ -55,7 +55,7 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 
 		if (ParticleSystem)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleSystem, StaticMesh->GetComponentLocation());
+			ServerSpawnEmitter(ParticleSystem, Hit.Location);
 		}
 	}
 	//������ ȿ���� ���� �ʴ� ���Ϳ� �浹
@@ -126,6 +126,11 @@ void ABullet::MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector Initi
 	ProjectileMovement->UpdateComponentVelocity();
 	StaticMesh->AddImpulse(Velocity, FName(""), true);
 	UE_LOG(LogTemp, Warning, TEXT("==============================================================================================="));
+}
+
+void ABullet::ServerSpawnEmitter_Implementation(UParticleSystem* SpawnParticle, const FVector& SpawnLoc)
+{
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SpawnParticle, SpawnLoc);
 }
 
 void ABullet::OnHitNotEnemy_Implementation(const FVector& HitVec)

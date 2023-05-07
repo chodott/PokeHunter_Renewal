@@ -95,7 +95,7 @@ bool UInventoryComponent::AddItemInfo(FName ItemID, int Cnt)
 }
 
 
-void UInventoryComponent::ChangeSlot(FName TargetName, int TargetIndex, FName GoalName, int GoalIndex)
+void UInventoryComponent::ChangeSlot(AActor* Storage, FName TargetName, int TargetIndex, FName GoalName, int GoalIndex)
 {
 	ANpcStorage* StorageNpc;
 	FItemCnter temp;
@@ -109,7 +109,7 @@ void UInventoryComponent::ChangeSlot(FName TargetName, int TargetIndex, FName Go
 		}
 		else 
 		{
-			StorageNpc = Cast<ANpcStorage>(Hunter->InteractingActor);
+			StorageNpc = Cast<ANpcStorage>(Storage);
 			if (StorageNpc)
 			{
 				InfoArray[TargetIndex] = StorageNpc->Storage->InfoArray[GoalIndex];
@@ -120,7 +120,7 @@ void UInventoryComponent::ChangeSlot(FName TargetName, int TargetIndex, FName Go
 
 	else if (TargetName == "Storage")
 	{
-		StorageNpc = Cast<ANpcStorage>(Hunter->InteractingActor);
+		StorageNpc = Cast<ANpcStorage>(Storage);
 
 		if (StorageNpc)
 		{

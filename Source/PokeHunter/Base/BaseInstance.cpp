@@ -269,18 +269,18 @@ bool UBaseInstance::LogoutGame()
 
 void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken)
 {
-	NewAccessToken.ReplaceInline(TEXT("\n"), TEXT(""));
+	// NewAccessToken.ReplaceInline(TEXT("\n"), TEXT(""));
 	AccessToken = NewAccessToken;
 
-	NewIdToken.ReplaceInline(TEXT("\n"), TEXT(""));
+	// NewIdToken.ReplaceInline(TEXT("\n"), TEXT(""));
 	IdToken = NewIdToken;
 	
-	NewRefreshToken.ReplaceInline(TEXT("\n"), TEXT(""));
+	// NewRefreshToken.ReplaceInline(TEXT("\n"), TEXT(""));
 	RefreshToken = NewRefreshToken;
 
-	UE_LOG(LogTemp, Warning, TEXT("[X]access token: %s"), *AccessToken);
-	UE_LOG(LogTemp, Warning, TEXT("[O]IdToken token: %s"), *IdToken);
-	UE_LOG(LogTemp, Warning, TEXT("refresh token: %s"), *RefreshToken);
+	UE_LOG(LogTemp, Warning, TEXT("[1]access token: %s\n\n"), *AccessToken);
+	UE_LOG(LogTemp, Warning, TEXT("[2]IdToken token: %s\n\n"), *IdToken);
+	UE_LOG(LogTemp, Warning, TEXT("[3]refresh token: %s\n\n"), *RefreshToken);
 
 	// World Timer에 등록하기
 	GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UBaseInstance::RetrieveNewTokens, 1.0f, false, 30.0f);
@@ -319,7 +319,7 @@ bool UBaseInstance::returnMyHome()
 
 void UBaseInstance::RetrieveNewTokens()
 {
-	if (IdToken.Len() > 0 && RefreshToken.Len() > 0) {
+	if (AccessToken.Len() > 0 && RefreshToken.Len() > 0) {
 		TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
 		RequestObj->SetStringField("refreshToken", RefreshToken);
 
@@ -332,7 +332,7 @@ void UBaseInstance::RetrieveNewTokens()
 			RetrieveNewTokensRequest->SetURL(ApiUrl + "/retrievenewtokens");
 			RetrieveNewTokensRequest->SetVerb("POST");
 			RetrieveNewTokensRequest->SetHeader("Content-Type", "application/json");
-			RetrieveNewTokensRequest->SetHeader("Authorization", IdToken);
+			RetrieveNewTokensRequest->SetHeader("Authorization", AccessToken);
 			RetrieveNewTokensRequest->SetContentAsString(RequestBody);
 			RetrieveNewTokensRequest->ProcessRequest();
 		}
@@ -348,7 +348,7 @@ void UBaseInstance::OnRetrieveNewTokensResponseReceived(FHttpRequestPtr Request,
 		TSharedPtr<FJsonObject> JsonObject;
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
-			if (JsonObject->HasField("access_token") && JsonObject->HasField("id_token") && JsonObject->HasField("refresh_token")) {
+			if (JsonObject->HasField("accessToken") && JsonObject->HasField("idToken")) {
 				SetCognitoTokens(JsonObject->GetStringField("accessToken"), JsonObject->GetStringField("idToken"), RefreshToken);
 			}
 		}

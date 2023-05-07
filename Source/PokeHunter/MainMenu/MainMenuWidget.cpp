@@ -58,6 +58,8 @@ void UMainMenuWidget::HandleLoginUrlChange()
 	FString Url;
 	FString QueryParameters;
 
+	// UE_LOG(LogTemp, Warning, TEXT("BrowserUrl: %s"), *BrowserUrl);
+
 	if (BrowserUrl.Split("?", &Url, &QueryParameters)) {
 		if (Url.Equals(CallbackUrl)) {
 			FString ParameterName;
@@ -65,13 +67,15 @@ void UMainMenuWidget::HandleLoginUrlChange()
 
 			if (QueryParameters.Split("=", &ParameterName, &ParameterValue)) {
 				if (ParameterName.Equals("code")) {
-					ParameterValue = ParameterValue.Replace(*FString("#"), *FString(""));
+					// ParameterValue = ParameterValue.Replace(*FString("#"), *FString(""));
 
 					TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
 					RequestObj->SetStringField(ParameterName, ParameterValue);
 
 					FString RequestBody;
 					TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
+
+					UE_LOG(LogTemp, Warning, TEXT("ParameterValue: %s"), *ParameterValue);
 
 					if (FJsonSerializer::Serialize(RequestObj.ToSharedRef(), Writer)) {
 						TSharedRef<IHttpRequest> ExchangeCodeForTokensRequest = gameinstance->HttpModule->CreateRequest();

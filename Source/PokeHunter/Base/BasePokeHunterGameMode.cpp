@@ -203,6 +203,56 @@ void ABasePokeHunterGameMode::BeginPlay() {
 	GetWorldTimerManager().SetTimer(HandleProcessTerminationHandle, this, &ABasePokeHunterGameMode::HandleProcessTermination, 1.0f, true, 5.0f);
 }
 
+void ABasePokeHunterGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) {
+	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+#if WITH_GAMELIFT
+	if (Options.Len() > 0) {
+		const FString& PlayerSessionId = UGameplayStatics::ParseOption(Options, "PlayerSessionId");
+		const FString& PlayerId = UGameplayStatics::ParseOption(Options, "PlayerId");
+
+		if (PlayerSessionId.Len() > 0 && PlayerId.Len() > 0) {
+			Aws::GameLift::Server::Model::DescribePlayerSessionsRequest DescribePlayerSessionsRequest;
+			DescribePlayerSessionsRequest.SetPlayerSessionId(TCHAR_TO_ANSI(*PlayerSessionId));
+
+			auto DescribePlayerSessionsOutcome = Aws::GameLift::Server::DescribePlayerSessions(DescribePlayerSessionsRequest);
+			if (DescribePlayerSessionsOutcome.IsSuccess()) {
+				auto DescribePlayerSessionsResult = DescribePlayerSessionsOutcome.GetResult();
+				int Count = 1;
+				auto PlayerSessions = DescribePlayerSessionsResult.GetPlayerSessions(Count);
+				if (PlayerSessions != nullptr) {
+					auto PlayerSession = PlayerSessions[0];
+					FString ExpectedPlayerId = PlayerSession.GetPlayerId();
+					auto PlayerStatus = PlayerSession.GetStatus();
+
+					if (ExpectedPlayerId.Equals(PlayerId) && PlayerStatus == Aws::GameLift::Server::Model::PlayerSessionStatus::RESERVED) {
+						auto AcceptPlayerSessionOutcome = Aws::GameLift::Server::AcceptPlayerSession(TCHAR_TO_ANSI(*PlayerSessionId));
+
+						if (!AcceptPlayerSessionOutcome.IsSuccess()) {
+							ErrorMessage = "Unauthorized";
+						}
+					}
+					else {
+						ErrorMessage = "Unauthorized";
+					}
+}
+				else {
+					ErrorMessage = "Unauthorized";
+				}
+			}
+			else {
+				ErrorMessage = "Unauthorized";
+			}
+		}
+		else {
+			ErrorMessage = "Unauthorized";
+		}
+	}
+	else {
+		ErrorMessage = "Unauthorized";
+	}
+#endif
+}
+
 void ABasePokeHunterGameMode::Logout(AController* Exiting) {
 #if WITH_GAMELIFT
 	if (LatestBackfillTicketId.Len() > 0) {

@@ -37,7 +37,7 @@ void UPartyInfoUI::NativeConstruct()
 	// TB_JoinEvent (TextBlock user Widget 추가 필요!)
 	JoinEventTextBlock = (UTextBlock*)GetWidgetFromName(TEXT("TB_JoinEvent"));
 
-	GetWorld()->GetTimerManager().SetTimer(SetAveragePlayerLatencyHandle, this, &UPartyInfoUI::SetAveragePlayerLatency, 1.0f, true, 1.0f);
+	// GetWorld()->GetTimerManager().SetTimer(SetAveragePlayerLatencyHandle, this, &UPartyInfoUI::SetAveragePlayerLatency, 1.0f, true, 1.0f);
 
 	FString AccessToken;
 	UGameInstance* GameInstance = GetGameInstance();
@@ -71,7 +71,7 @@ void UPartyInfoUI::NativeDestruct()
 	GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
 	GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
 	GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
-	GetWorld()->GetTimerManager().ClearTimer(SetAveragePlayerLatencyHandle);
+	// GetWorld()->GetTimerManager().ClearTimer(SetAveragePlayerLatencyHandle);
 	Super::NativeDestruct();
 }
 
@@ -178,9 +178,13 @@ void UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 		memset(MBTWBuffer, NULL, 128);
 		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._mem_pet, -1, MBTWBuffer, strlen(info_pack._mem_pet));
 
-		uint8 pet_number = atoi(TCHAR_TO_ANSI(MBTWBuffer));
-		PlayerPetName.Add(EPartnerType(pet_number));		// 작동이 안될 경우, TArray의 자료형을 변경
-		PartyMemberState.Add(PLAYER_STATE(info_pack._mem_state));
+		uint8 uintBuffer = atoi(TCHAR_TO_ANSI(MBTWBuffer));
+		PlayerPetName.Add(static_cast<EPartnerType>(uintBuffer));		// 작동이 안될 경우, TArray의 자료형을 변경
+
+		memset(MBTWBuffer, NULL, 128);
+		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._mem_state, -1, MBTWBuffer, strlen(info_pack._mem_state));
+		uintBuffer = atoi(TCHAR_TO_ANSI(MBTWBuffer));
+		PartyMemberState.Add(static_cast<PLAYER_STATE>(uintBuffer));
 	}
 
 	gameinstance->PlayerName.Empty();
@@ -412,10 +416,10 @@ void UPartyInfoUI::EnterStageMap()
 		StartMath = true;
 
 		TSharedRef<FJsonObject> LatencyMapObj = MakeShareable(new FJsonObject);
-		LatencyMapObj->SetNumberField(PokeHunterGameInstance->RegionCode, AveragePlayerLatency);
+		LatencyMapObj->SetNumberField(PokeHunterGameInstance->RegionCode, 60);
 
 		TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
-		// RequestObj->SetObjectField("latencyMap", LatencyMapObj);
+		RequestObj->SetObjectField("latencyMap", LatencyMapObj);
 
 		FString RequestBody;
 		TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
@@ -517,6 +521,8 @@ void UPartyInfoUI::OnStartMatchmakingResponseReceived(FHttpRequestPtr Request, F
 					if (baseinstance != nullptr) {
 						baseinstance->JoinTicketId = MatchmakingTicketId;
 						UE_LOG(LogTemp, Warning, TEXT("[AWS] Start PollMatch"));
+						UE_LOG(LogTemp, Warning, TEXT("[AWS] baseinstance->JoinTicketId: %s"), *(baseinstance->JoinTicketId));
+						UE_LOG(LogTemp, Warning, TEXT("[AWS] MatchmakingTicketId: %s"), *MatchmakingTicketId);
 						GetWorld()->GetTimerManager().SetTimer(PollMatchmakingHandle, this, &UPartyInfoUI::PollMatchmaking, 1.0f, true, 0.f);
 						SearchingForGame = true;
 					}
@@ -535,7 +541,7 @@ void UPartyInfoUI::PollMatchmaking()
 	UBaseInstance* PokeHunterGameInstance = Cast<UBaseInstance>(GameInstance);
 	if (GameInstance != nullptr) {
 		if (PokeHunterGameInstance != nullptr) {
-			AccessToken = PokeHunterGameInstance->IdToken;
+			AccessToken = PokeHunterGameInstance->AccessToken;
 			MatchmakingTicketId = PokeHunterGameInstance->JoinTicketId;
 		}
 	}
@@ -544,7 +550,7 @@ void UPartyInfoUI::PollMatchmaking()
 		TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
 		RequestObj->SetStringField("ticketId", MatchmakingTicketId);
 
-		UE_LOG(LogTemp, Warning, TEXT("[AWS] PollMatchmaking..."));
+		UE_LOG(LogTemp, Warning, TEXT("[AWS]\nAccessToken: %s\nMatchmakingTicketId: %s"), *AccessToken, *MatchmakingTicketId);
 
 		FString RequestBody;
 		TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
@@ -556,6 +562,7 @@ void UPartyInfoUI::PollMatchmaking()
 			PollMatchmakingRequest->SetHeader("Content-Type", "application/json");
 			PollMatchmakingRequest->SetHeader("Authorization", AccessToken);
 			PollMatchmakingRequest->SetContentAsString(RequestBody);
+			// UE_LOG(LogTemp, Warning, TEXT("[AWS] Poll RequestBody-%s"), *RequestBody);
 			PollMatchmakingRequest->ProcessRequest();
 		}
 	}
@@ -600,6 +607,9 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 {
 	if (bWasSuccessful && SearchingForGame) {
 		TSharedPtr<FJsonObject> JsonObject;
+
+		// UE_LOG(LogTemp, Warning, TEXT("ticket: %s"), *(Response->GetContentAsString()));
+
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
 			if (JsonObject->HasField("ticket")) {
@@ -618,7 +628,7 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 
 						if (TicketType.Equals("MatchmakingSucceeded")) {
 							GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
-							GetWorld()->GetTimerManager().ClearTimer(SetAveragePlayerLatencyHandle);
+							// GetWorld()->GetTimerManager().ClearTimer(SetAveragePlayerLatencyHandle);
 
 							// Set Player input Mode;
 							FInputModeGameOnly gameModeOnly;
@@ -639,8 +649,8 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 							FString PlayerId = Player->GetObjectField("PlayerId")->GetStringField("S");
 
 							gameinstance->GameLiftLevelName = IpAddress + ":" + Port;
-							const FString& Options = "?PlayerSessionId=" + PlayerSessionId + "?PlayerId=" + PlayerId;
-							UE_LOG(LogTemp, Warning, TEXT("options: %s"), *Options);
+							gameinstance->GameLiftLevelNameOptions = "?PlayerSessionId=" + PlayerSessionId + "?PlayerId=" + PlayerId;
+							// UE_LOG(LogTemp, Warning, TEXT("options: %s"), *Options);
 
 							//==========================================================================================================
 							/*

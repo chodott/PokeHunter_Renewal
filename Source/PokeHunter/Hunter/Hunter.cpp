@@ -256,11 +256,11 @@ void AHunter::Tick(float DeltaTime)
 	}
 
 	//SkillReload
-	for (auto& SkillInfo : SkillInfoArray)
+	/*for (auto& SkillInfo : SkillInfoArray)
 	{
 		SkillInfo.CheckTime(DeltaTime);
 	}
-	UpdateSkillSlots();
+	UpdateSkillSlots();*/
 
 	//bFalling
 	if (bNoCollision)
@@ -616,7 +616,7 @@ void AHunter::LMBDown()
 					//	FColor(255, 0, 0),
 					//	false, 3, 0,
 					//	12.333
-					);
+					// );
 					EndTrace = HitResult->Location;
 				}
 				else

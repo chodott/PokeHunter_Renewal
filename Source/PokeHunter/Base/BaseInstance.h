@@ -165,6 +165,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString GameLiftLevelName = "";
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString GameLiftLevelNameOptions = "";
+
 	UFUNCTION()
 		void SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken);
 

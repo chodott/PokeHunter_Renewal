@@ -135,8 +135,8 @@ void AHunter::BeginPlay()
 	MainUI = CreateWidget(GetWorld(), MainUIClass, TEXT("MainUI"));
 	MainUI->AddToViewport();
 	// PauseUI = CreateWidget(GetWorld(), PauseUIClass, TEXT("PauseUI"));
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-	PauseUI = CreateWidget<UUserWidget>(PlayerController, PauseUIClass, TEXT("PauseUI"));
+	PauseUI = CreateWidget(GetWorld(), MainUIClass, TEXT("PauseUI"));
+	PauseUI->AddToViewport();
 
 	//Timeline
 	DiveInterpCallback.BindUFunction(this, FName("DiveInterpReturn"));
@@ -796,36 +796,7 @@ void AHunter::EKeyDown()
 
 void AHunter::ESCKeyDown()
 {
-	if (PauseUI->IsInViewport()) {
-		PauseUI->RemoveFromViewport();
-	}
-	else {
-		PauseUI->AddToViewport();
-	}
 
-	return;
-
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-
-	TArray<UUserWidget*> Widgets;
-	UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), Widgets, UUserWidget::StaticClass(), false);
-
-	bool find_WBP_Pause = false;
-	for (UUserWidget* Widget : Widgets)
-	{
-		if ("WBP_Pause" == Widget->GetName()) {
-			find_WBP_Pause = true;
-		}
-	}
-
-	if (find_WBP_Pause) {
-		if (PauseUI->IsInViewport()) {
-			PauseUI->RemoveFromViewport();
-		}
-	}
-	else {
-		PauseUI->AddToViewport();
-	}
 }
 
 void AHunter::CtrlDown()

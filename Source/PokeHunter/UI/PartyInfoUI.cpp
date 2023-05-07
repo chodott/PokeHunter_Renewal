@@ -314,6 +314,10 @@ void UPartyInfoUI::SetAveragePlayerLatency() {
 
 void UPartyInfoUI::OnJoinButtonClicked()
 {
+	// ShowLoadingWidget();
+	// UGameplayStatics::OpenLevel(GetWorld(), FName("L_Field0"));
+	// return;
+
 	WaitforOtherClient = true;
 	UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
 	
@@ -418,7 +422,7 @@ void UPartyInfoUI::EnterStageMap()
 		if (FJsonSerializer::Serialize(RequestObj.ToSharedRef(), Writer)) {
 			TSharedRef<IHttpRequest> StartJoinRequest = gameinstance->HttpModule->CreateRequest();
 			StartJoinRequest->OnProcessRequestComplete().BindUObject(this, &UPartyInfoUI::OnStartMatchmakingResponseReceived);
-			StartJoinRequest->SetURL(PokeHunterGameInstance->ApiUrl + "/startmatchmaking");										// 1
+			StartJoinRequest->SetURL(PokeHunterGameInstance->ApiUrl + "/startmatchmaking");										
 			StartJoinRequest->SetVerb("POST");
 			StartJoinRequest->SetHeader("Content-Type", "application/json");
 			StartJoinRequest->SetHeader("Authorization", AccessToken);
@@ -512,6 +516,7 @@ void UPartyInfoUI::OnStartMatchmakingResponseReceived(FHttpRequestPtr Request, F
 					UBaseInstance* baseinstance = Cast<UBaseInstance>(GameInstance);
 					if (baseinstance != nullptr) {
 						baseinstance->JoinTicketId = MatchmakingTicketId;
+						UE_LOG(LogTemp, Warning, TEXT("[AWS] Start PollMatch"));
 						GetWorld()->GetTimerManager().SetTimer(PollMatchmakingHandle, this, &UPartyInfoUI::PollMatchmaking, 1.0f, true, 0.f);
 						SearchingForGame = true;
 					}
@@ -539,6 +544,8 @@ void UPartyInfoUI::PollMatchmaking()
 		TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
 		RequestObj->SetStringField("ticketId", MatchmakingTicketId);
 
+		UE_LOG(LogTemp, Warning, TEXT("[AWS] PollMatchmaking..."));
+
 		FString RequestBody;
 		TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
 		if (FJsonSerializer::Serialize(RequestObj.ToSharedRef(), Writer)) {
@@ -552,6 +559,7 @@ void UPartyInfoUI::PollMatchmaking()
 			PollMatchmakingRequest->ProcessRequest();
 		}
 	}
+	else UE_LOG(LogTemp, Warning, TEXT("[AWS] fail PollMatchmaking..."));
 }
 
 void UPartyInfoUI::OnGetPlayerDataResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
@@ -661,8 +669,10 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 							*/
 							//==========================================================================================================
 
+
 							UE_LOG(LogTemp, Warning, TEXT("[AWS] Server Addr : %s:%s"), *gameinstance->GameLiftLevelName, *Port);
-							UGameplayStatics::OpenLevel(GetWorld(), FName(gameinstance->GameLiftLevelName), false, Options);
+							ShowLoadingWidget();
+							// UGameplayStatics::OpenLevel(GetWorld(), FName(gameinstance->GameLiftLevelName), false, Options);
 						}
 						else {
 							// AWS GameLift Dedicated server 접속에 실패하였음.

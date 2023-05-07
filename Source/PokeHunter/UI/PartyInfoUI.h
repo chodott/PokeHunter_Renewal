@@ -93,6 +93,9 @@ public:
 	UFUNCTION()
 		void OnJoinButtonClicked();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Loading Widget")
+		void ShowLoadingWidget();
+
 	UPROPERTY()
 		FTimerHandle PollMatchmakingHandle;
 

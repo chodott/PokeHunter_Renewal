@@ -36,6 +36,9 @@ public:
 	UPROPERTY()
 		FString ApiUrl;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Loading Widget")
+		void ShowLoadingWidget();
+
 private:
 	UPROPERTY()
 		FString CallbackUrl;

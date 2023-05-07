@@ -104,6 +104,8 @@ void UMainMenuWidget::OnExchangeCodeForTokensResponseReceived(FHttpRequestPtr Re
 						FString RefreshToken = JsonObject->GetStringField("refresh_token");
 						ServerIntance->SetCognitoTokens(AccessToken, IdToken, RefreshToken);
 
+						ShowLoadingWidget();
+
 						FString LevelName = GetWorld()->GetName();
 						if ("Title" == LevelName) {
 							FString levelName = L"/Game/Map/Lobby/MyHome";

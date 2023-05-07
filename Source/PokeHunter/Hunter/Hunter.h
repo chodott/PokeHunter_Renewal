@@ -101,6 +101,7 @@ public:
 	class UUserWidget* StorageUI;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf <UUserWidget> PauseUIClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	class UUserWidget* PauseUI;
 
 	//Partner

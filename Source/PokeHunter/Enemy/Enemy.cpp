@@ -472,7 +472,7 @@ void AEnemy::LaunchToTarget()
 		{
 			//개선 필요
 			JumpResult = UGameplayStatics::SuggestProjectileVelocity(this, Velocity, StartPos, EndPos,
-				Speed, true, 0.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::DoNotTrace);
+				Speed, false, 0.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::DoNotTrace);
 			Speed += 100.f;
 
 		}

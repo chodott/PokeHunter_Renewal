@@ -608,14 +608,14 @@ void AHunter::LMBDown()
 				FCollisionQueryParams BulletTraceParams(FName("Bullet"), true, this);
 				if(GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
 				{
-					//Debug LineTrace
-					DrawDebugLine(
-						GetWorld(),
-						StartTrace,
-						HitResult->Location,
-						FColor(255, 0, 0),
-						false, 3, 0,
-						12.333
+					////Debug LineTrace
+					//DrawDebugLine(
+					//	GetWorld(),
+					//	StartTrace,
+					//	HitResult->Location,
+					//	FColor(255, 0, 0),
+					//	false, 3, 0,
+					//	12.333
 					);
 					EndTrace = HitResult->Location;
 				}

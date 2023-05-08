@@ -618,7 +618,7 @@ void AHunter::LMBDown()
 			{
 				bool bIsBullet = ItemClass->IsChildOf(ABullet::StaticClass());
 				if (!bIsBullet) return;
-				FVector StartTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 200.f;
+				FVector StartTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 150.f;
 				FVector EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
 				FHitResult* HitResult = new FHitResult();
 				FCollisionQueryParams BulletTraceParams(FName("Bullet"), true, this);

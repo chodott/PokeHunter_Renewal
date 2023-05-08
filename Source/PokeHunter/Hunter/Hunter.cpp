@@ -28,6 +28,7 @@
 #include "PokeHunter/Base/InteractActor.h"
 #include "PokeHunter/Base/DatabaseActor.h"
 #include "PokeHunter/Base/ItemDropActor.h"
+#include "PokeHunter/Enemy/EnemyProjectile.h"
 #include <Blueprint/WidgetBlueprintLibrary.h>
 
 
@@ -197,19 +198,24 @@ void AHunter::Tick(float DeltaTime)
 		float temp = FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, 0.f, DeltaTime, ArmSpeed);
 		CameraBoom->SetRelativeLocation(FVector(0.f, temp, 0.f));
 
-		if (HunterStamina < 100) HunterStamina += DeltaTime * 1;
-		else HunterStamina = 100;
+
 	}
 
 	//Stamina
-	if (GetCharacterMovement()->GetMaxSpeed() > 500.f)
+	if (GetVelocity().Length() > 600.f)
 	{
-		if (HunterStamina > 0) HunterStamina -= DeltaTime * 1;
+		if (HunterStamina > 0) HunterStamina -= DeltaTime * StaminaPerSecondAmount;
 		else
 		{
 			HunterStamina = 0;
 			GetCharacterMovement()->MaxWalkSpeed = 500.f;
 		}
+	}
+	else
+	{
+		HunterStamina += DeltaTime * StaminaPerSecondAmount;
+		if(HunterStamina >= 100) HunterStamina = 100;
+
 	}
 
 
@@ -313,7 +319,17 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{
 		FPointDamageEvent& PointDamageEvent = (FPointDamageEvent&)DamageEvent;
-	
+		AEnemyProjectile* EnemyBullet = Cast<AEnemyProjectile>(DamageCauser);
+		if (EnemyBullet)
+		{
+			FVector DirectionVec = EnemyBullet->GetActorLocation() - GetActorLocation();
+			DirectionVec.Normalize();
+			if (DirectionVec.Z <= 0.f)
+			{
+				DirectionVec.Z *= -1;
+			}
+			LaunchCharacter(DirectionVec * 1000.f, false, false);
+		}
 	}
 	else
 	{
@@ -321,9 +337,6 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		CurState = EPlayerState::Hit;
 	}
 	
-
-	if (bInvincible) return 0.0f;
-
 	
 	//HunterAnim->StopAllMontages(1.0f);
 	StartInvincibility();
@@ -488,16 +501,14 @@ void AHunter::SpaceDown()
 		FVector Speed = GetVelocity();
 		FVector XYspeed = FVector(Speed.X, Speed.Y, 0.f);
 		if (XYspeed.Size() <= 0.f) return;
-		else if (XYspeed.Size() <= 300.f) LastSpeed = 300.0f;
+		else if (XYspeed.Size() <= 500.f) LastSpeed = 500.0f;
 		else
 		{
 			LastSpeed = XYspeed.Size();
 		}
-
+		HunterStamina -= 15.f;
 		CurState = EPlayerState::Dive;
-		Crouch(true);
 		LastInput = GetCharacterMovement()->GetLastInputVector();
-		Crouch();
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		ServerPlayMontage(this, FName("Dive"));
 	
@@ -974,6 +985,8 @@ void AHunter::InteractEarthquake_Implementation()
 	if (GetCharacterMovement()->IsFalling()) return;
 
 	if (bInvincible) return;
+
+	HunterStamina -= 30.f;
 
 	LaunchCharacter(FVector(0, 0, 1000), false, false);
 }

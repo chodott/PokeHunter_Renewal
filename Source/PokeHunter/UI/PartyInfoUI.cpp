@@ -217,7 +217,6 @@ bool UPartyInfoUI::RecvClientJoin()	// [CheckPoint]-Blueprint에서 호출되는 곳이 
 	else				return false;
 
 	// Clinet에서 명령 실행 대기
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Recv] IOCP server...")));
 
 	return true;
 }

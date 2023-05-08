@@ -169,6 +169,10 @@ public:
 	float StartInvincibleTime;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float HealPerSecondAmount;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float StaminaPerSecondAmount;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float StaminaDecreaseAmount;
 	int SaveSecond;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bGrabbed;

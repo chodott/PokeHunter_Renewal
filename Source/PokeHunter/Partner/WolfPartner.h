@@ -27,6 +27,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* BreathCollision;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Particle")
+	class UParticleSystemComponent* IceBreathe_Effect = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Particle")
+	class UParticleSystemComponent* IceStorm_Effect = nullptr;
+
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Skill")
 	float BreatheLimitTime{};

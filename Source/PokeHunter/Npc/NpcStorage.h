@@ -30,7 +30,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void Interact_Implementation(AHunter* Hunter) override;
-
-	bool GetNpcStorageInfo();
+	
+	UFUNCTION(BlueprintCallable)
+		bool GetNpcStorageInfo();
 };
 

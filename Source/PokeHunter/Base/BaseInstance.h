@@ -10,7 +10,6 @@
 #include "Runtime/Sockets/Public/SocketSubsystem.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
 
-// #include "protocol.h"
 #include "protocol.h"
 
 #include "Windows/WindowsPlatformMisc.h"

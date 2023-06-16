@@ -30,8 +30,6 @@ void ANpcStorage::BeginPlay()
 {
 	Super::BeginPlay();
 	SetActorTickEnabled(0);
-
-
 }
 
 // Called every frame

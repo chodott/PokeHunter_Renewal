@@ -1,0 +1,12 @@
+.git
+.vs
+.vscode
+Content
+DerivedDataCache
+Intermediate
+Platforms
+Saved
+Script
+Plugins/GameLiftServerSDK/Intermediate
+Plugins/GameLiftServerSDK/Release-notes
+Plugins/GameLiftServerSDK/ThirdParty

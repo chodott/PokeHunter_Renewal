@@ -238,10 +238,8 @@ void APartner::StopSkill()
 
 void APartner::UseNormalSkill(ESkillID SkillID)
 {
-	//스킬 사용중 접근 불가 추가 필요
-
 	if (bUsingSkill) return;
-	bOrdered = true;
+
 	bUsingSkill = true;
 	bool bSuccess = false;
 
@@ -256,6 +254,7 @@ void APartner::UseNormalSkill(ESkillID SkillID)
 	case ESkillID::Howling:
 
 		CurState = EPartnerState::Howling;
+		bOrdered = true;
 		bSuccess = true;
 		break;
 
@@ -318,6 +317,11 @@ void APartner::UseSpecialSkill(ESkillID SkillID)
 void APartner::SetTarget(ACharacter* setTarget)
 {
 	Target = setTarget;
+}
+
+void APartner::CancelOrder()
+{
+	bOrdered = false;
 }
 
 void APartner::FollowHunter(AHunter* Master)

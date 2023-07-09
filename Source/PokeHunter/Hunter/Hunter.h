@@ -309,6 +309,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EKeyDown();
 	UFUNCTION(BlueprintCallable)
+	void RKeyDown();
+	UFUNCTION(BlueprintCallable)
 	void ESCKeyDown();
 	UFUNCTION(BlueprintCallable)
 	void CtrlDown();

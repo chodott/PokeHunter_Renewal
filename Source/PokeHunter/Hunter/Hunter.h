@@ -30,7 +30,8 @@ enum class EPlayerState : uint8
 	Install,
 	Drink,
 	Hit,
-	Knockback
+	Knockback,
+	Die
 };
 
 USTRUCT(BlueprintType)

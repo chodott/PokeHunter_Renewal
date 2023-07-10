@@ -480,6 +480,7 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("RMB", IE_Released, this, &AHunter::RMBUp);
 	PlayerInputComponent->BindAction("I_Key", IE_Pressed, this, &AHunter::OpenInventory);
 	PlayerInputComponent->BindAction("E_Key", IE_Pressed, this, &AHunter::EKeyDown);
+	PlayerInputComponent->BindAction("R_Key", IE_Pressed, this, &AHunter::RKeyDown);
 	PlayerInputComponent->BindAction("Ctrl", IE_Pressed, this, &AHunter::CtrlDown);
 	PlayerInputComponent->BindAction("Ctrl", IE_Released, this, &AHunter::CtrlUp);
 	PlayerInputComponent->BindAction("1_Key", IE_Pressed, this, &AHunter::Use1Skill);
@@ -809,6 +810,14 @@ void AHunter::EKeyDown()
 		}
 
 		return;
+	}
+}
+
+void AHunter::RKeyDown()
+{
+	if (Partner)
+	{
+		Partner->CancelOrder();
 	}
 }
 

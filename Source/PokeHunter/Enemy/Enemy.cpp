@@ -197,6 +197,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	{
 		//사망 애니메이션
 		CurState = EEnemyState::Die;
+		bDied = true;
 		ServerPlayMontage(this, FName("Die"));
 	}
 	else

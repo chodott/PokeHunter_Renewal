@@ -297,7 +297,7 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (bInvincible) return 0;
+	if (bInvincible || CurState == EPlayerState::Die) return 0;
 
 	ABullet* Bullet = Cast<ABullet>(DamageCauser);
 	if (Bullet) return 0.f;
@@ -311,6 +311,7 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		ServerPlayMontage(this, FName("Die"));
 		SetGenericTeamId(1);
 		HealPerSecondAmount = 0.f;
+		CurState = EPlayerState::Die;
 		AEnemy* DamageEnemy = Cast<AEnemy>(DamageCauser);
 		if(DamageEnemy) DamageEnemy->LeaveTarget(this);
 		return 0; 

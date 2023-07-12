@@ -4,6 +4,7 @@
 #include "BTDecorator_TargetInRange.h"
 #include "Enemy.h"
 #include "EnemyController.h"
+#include "components/CapsuleComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 bool UBTDecorator_TargetInRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
@@ -16,9 +17,12 @@ bool UBTDecorator_TargetInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 	if (Enemy->Target == NULL)
 	return false;
 	
+	ACharacter* CurTarget = Cast<ACharacter>(Enemy->Target);
 	float AttackRange = Enemy->AttackRange;
-
-	bResult = (Enemy->Target->GetDistanceTo(Enemy) <= AttackRange);
+	float Radius = Enemy->GetCapsuleComponent()->GetUnscaledCapsuleRadius();
+	float TargetRadius = CurTarget->GetCapsuleComponent()->GetUnscaledCapsuleRadius();
+	float Distance = CurTarget->GetDistanceTo(Enemy) - TargetRadius;
+	bResult = (Distance <= AttackRange);
 	if (bResult)
 	{
 		int PatternNum = Enemy->CheckInRange();

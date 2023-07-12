@@ -170,13 +170,13 @@ void AWolfPartner::MakeIceShard()
 {
 	FVector InitialPos = GetMesh()->GetSocketLocation(FName("Head")) + GetActorForwardVector() * 300.f;
 	FVector EndPos = Target->GetActorLocation();
-	FVector DirectionVec = EndPos - GetActorLocation();
+	FVector DirectionVec = EndPos - InitialPos;
+	FRotator Rotation = DirectionVec.Rotation();
+
 	
-	FQuat TargetRotation = FQuat::FindBetweenNormals(GetActorForwardVector(), DirectionVec);
-	FRotator Rotation = TargetRotation.Rotator();
-
-	DirectionVec.Normalize();
-
+	
+	//FQuat TargetRotation = FQuat::FindBetweenNormals(GetActorForwardVector(), DirectionVec);
+	//FRotator Rotation = TargetRotation.Rotator();
 	ServerSpawnProjectile(this, IceShardClass, InitialPos, EndPos, Rotation);
 }
 

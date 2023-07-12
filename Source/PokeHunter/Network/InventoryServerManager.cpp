@@ -6,10 +6,10 @@
 
 UInventoryServerManager::UInventoryServerManager()
 {
-	gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
+	// gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
 }
 
-bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer)
+bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer, UBaseInstance* gameinstance)
 {
 	if (nullptr == gameinstance->gSocket) return false;
 	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
@@ -42,7 +42,7 @@ bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer)
 	return true;
 }
 
-bool UInventoryServerManager::SaveInventoryDB()
+bool UInventoryServerManager::SaveInventoryDB(UBaseInstance* gameinstance)
 {
 	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
 	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return false;

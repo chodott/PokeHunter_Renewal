@@ -22,7 +22,7 @@ ANpcStorage::ANpcStorage()
 
 	InteractionSphere->SetSphereRadius(100.f);
 
-
+	// gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
 }
 
 // Called when the game starts or when spawned
@@ -45,7 +45,7 @@ void ANpcStorage::Interact_Implementation(AHunter* Hunter)
 	ANpc::Interact_Implementation(Hunter);
 }
 
-bool ANpcStorage::GetNpcStorageInfo()
+bool ANpcStorage::GetNpcStorageInfo(UBaseInstance* gameinstance)
 {
 	if (nullptr == gameinstance->gSocket)															return false;
 	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState())	return false;

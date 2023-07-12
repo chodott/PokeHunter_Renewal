@@ -3,7 +3,7 @@
 constexpr int MAX_USER = 100;
 constexpr int MAX_PARTY = 100;
 constexpr int BUF_SIZE = 128;
-constexpr int PORT_NUM = 9999;
+constexpr int PORT_NUM = 7777;
 
 constexpr short MAX_ITEM_CATEGORY = 4;
 constexpr short MAX_ITEM_COUNT = 9;
@@ -11,7 +11,6 @@ constexpr short MAX_ITEM_COUNT = 9;
 constexpr short CHAR_SIZE = 20;
 
 constexpr char CS_LOGIN = 0;
-constexpr char CS_MOVE = 1;
 
 constexpr char CS_PARTY_SEARCHING = 2;
 constexpr char CS_PARTY_INFO = 3;
@@ -27,10 +26,11 @@ constexpr char CS_SAVE_INVENTORY = 10;
 constexpr char CS_LOGOUT = 11;
 constexpr char CS_QUEST_STORAGE = 12;
 
+/////////////////////////////////////////////
+
 constexpr char SC_LOGIN_FAIL = 20;
 constexpr char SC_LOGIN_SUCCESS = 21;
 constexpr char SC_LOGIN_INFO = 22;
-
 constexpr char SC_PARTY_LIST_INFO = 23;
 constexpr char SC_PARTY_INFO = 24;
 constexpr char SC_PARTY_STAFF_READY = 25;
@@ -39,21 +39,11 @@ constexpr char SC_PARTY_JOIN_FAIL = 27;
 constexpr char SC_PARTY_JOIN_SUCCESS = 28;
 constexpr char SC_PARTY_LEAVE_FAIL = 29;
 constexpr char SC_PARTY_LEAVE_SUCCESS = 30;
-
 constexpr char SC_LOGOUT_RESULT = 31;
 constexpr char SC_ITEM_INFO = 33;
 
-constexpr char CS_TEST = 24;
-
 
 #pragma pack (push, 1)
-
-struct CS_TEST_PACK {
-	char size;
-	char type;
-
-	char BufferName[CHAR_SIZE];
-};
 
 struct CS_LOGIN_PACK {
 	char size;
@@ -76,15 +66,6 @@ struct CS_SAVE_INVENTORY_PACK {
 	char _cnt;
 };
 
-struct CS_MOVE_PACK {
-	char size;
-	char type;
-
-	short x;
-	short y;
-	short z;
-};
-
 struct CS_PARTY_SEARCHING_PACK {
 	char size;
 	char type;
@@ -94,7 +75,7 @@ struct CS_PARTY_INFO_PACK {
 	char size;
 	char type;
 
-	char party_num;			// client에서 선택한 파티번호(UI번호)
+	char party_num;
 };
 
 struct CS_PARTY_ENTER_PACK {
@@ -109,10 +90,12 @@ struct SC_PARTY_ENTER_OK_PACK {
 	char type;
 };
 
+///////// 제거 대상 ////////
 struct CS_PARTY_READY_PACK {
 	char size;
 	char type;
 };
+////////////////////////////
 
 struct CS_PARTY_LEAVE_PACK {
 	char size;
@@ -133,6 +116,8 @@ struct CS_QUEST_STORAGE_PACK {
 	char size;
 	char type;
 };
+
+/////////////////////////////////////////
 
 struct SC_LOGIN_FAIL_PACK {
 	char size;

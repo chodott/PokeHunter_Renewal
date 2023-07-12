@@ -16,7 +16,7 @@ public:
 	// Sets default values for this actor's properties
 	ANpcStorage();
 
-	UBaseInstance* gameinstance;
+	// UBaseInstance* gameinstance = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item")
 	class UInventoryComponent* Storage;
@@ -32,6 +32,6 @@ public:
 	virtual void Interact_Implementation(AHunter* Hunter) override;
 	
 	UFUNCTION(BlueprintCallable)
-		bool GetNpcStorageInfo();
+		bool GetNpcStorageInfo(UBaseInstance* gameinstance);
 };
 

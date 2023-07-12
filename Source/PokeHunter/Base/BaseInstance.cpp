@@ -28,7 +28,7 @@ bool UBaseInstance::ConnectToServer()
 	addr->SetIp(ip.Value);
 	addr->SetPort(PORT_NUM);
 
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Trying to connect.")));
+	GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Trying to connect. %s"), *server_addr));
 
 	if (true == gSocket->Connect(*addr)) {
 		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Success] connect to server")));
@@ -36,6 +36,12 @@ bool UBaseInstance::ConnectToServer()
 	}
 	else {
 		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Fail] connect to server")));
+
+		ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
+		ESocketErrors ErrorCode = SocketSubsystem->GetLastErrorCode();
+		FString ErroCodeAsString = FString(SocketSubsystem->GetSocketError(ErrorCode));
+		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("[Fail] connect to server\nRe: %s"), *ErroCodeAsString));
+
 		return false;
 	}
 }

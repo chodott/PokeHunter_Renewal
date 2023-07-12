@@ -22,12 +22,12 @@ class POKEHUNTER_API UInventoryServerManager : public UObject
 	GENERATED_BODY()
 public:
 	UInventoryServerManager();
-
-	UBaseInstance* gameinstance;
+	
+	// UBaseInstance* gameinstance = nullptr;
 	
 	UFUNCTION(BlueprintCallable, Category = "inventory")
-		bool GetInvenInfo(ACharacter* myPlayer);
+		bool GetInvenInfo(ACharacter* myPlayer, UBaseInstance* gameinstance);
 
 	UFUNCTION(BlueprintCallable, Category = "inventory")
-		bool SaveInventoryDB();
+		bool SaveInventoryDB(UBaseInstance* gameinstance);
 };

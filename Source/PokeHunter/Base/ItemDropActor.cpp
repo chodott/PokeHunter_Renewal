@@ -50,7 +50,7 @@ void AItemDropActor::Tick(float DeltaTime)
 				DropItemArray[RandIndex].cnt += 1;
 			}
 
-			for (int i = 0; i < DropItemArray.Num() - 1; ++i)
+			for (int i = 0; i < DropItemArray.Num(); ++i)
 			{
 				bool bAddSuccess = Master->Inventory->AddItemData(DropItemArray[i]);
 				if (!bAddSuccess)

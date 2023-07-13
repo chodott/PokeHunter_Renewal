@@ -109,6 +109,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		EPartnerType myPartner = EPartnerType::NonePartner;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int mySkin = 1;
+
 	FSocket* gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
 	TSharedRef<FInternetAddr>addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 	FIPv4Address ip{};
@@ -199,6 +202,24 @@ public:
 		TMap<FName, int> PartyListMap;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Party")
 		int PartnerNumber = -1;
+
+	// inGame start time
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Time")
+		double startTime = 0.0f;
+
+	// inGame end time
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Time")
+		double endTime = 0.0f;
+
+	UFUNCTION(BlueprintCallable, Category = "Time")
+		void setStartTimer();
+
+	// 게임 종료시 getElapseTime() 함수의 endTime 대입연산을 멈춤.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time")
+		bool endGame = false;
+
+	UFUNCTION(BlueprintCallable, Category = "Time")
+		double getElapseTime();
 };

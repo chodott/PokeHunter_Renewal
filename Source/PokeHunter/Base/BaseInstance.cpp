@@ -81,9 +81,6 @@ bool UBaseInstance::SendAccessToken()
 			UE_LOG(LogTemp, Warning, TEXT("Token Send Fail"));
 			int32 ErrorCode = GetLastError();
 		}
-		else {
-			UE_LOG(LogTemp, Warning, TEXT("Token Send Success"));
-		}
 	}
 
 	SC_LOGIN_SUCCESS_PACK ok_pack;
@@ -108,6 +105,8 @@ bool UBaseInstance::SendAccessToken()
 
 			if (partner_number <= (sizeof(EPartnerType) / sizeof(uint8))) {
 				myPartner = static_cast<EPartnerType>(partner_number);
+				mySkin = static_cast<int>(info_pack._player_skin - '0');
+
 				UE_LOG(LogTemp, Warning, TEXT("Success get player information!"));
 			}
 			else {
@@ -275,18 +274,13 @@ bool UBaseInstance::LogoutGame()
 
 void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken)
 {
-	// NewAccessToken.ReplaceInline(TEXT("\n"), TEXT(""));
 	AccessToken = NewAccessToken;
-
-	// NewIdToken.ReplaceInline(TEXT("\n"), TEXT(""));
 	IdToken = NewIdToken;
-	
-	// NewRefreshToken.ReplaceInline(TEXT("\n"), TEXT(""));
 	RefreshToken = NewRefreshToken;
 
-	UE_LOG(LogTemp, Warning, TEXT("[1]access token: %s\n\n"), *AccessToken);
+	/*UE_LOG(LogTemp, Warning, TEXT("[1]access token: %s\n\n"), *AccessToken);
 	UE_LOG(LogTemp, Warning, TEXT("[2]IdToken token: %s\n\n"), *IdToken);
-	UE_LOG(LogTemp, Warning, TEXT("[3]refresh token: %s\n\n"), *RefreshToken);
+	UE_LOG(LogTemp, Warning, TEXT("[3]refresh token: %s\n\n"), *RefreshToken);*/
 
 	// World Timer에 등록하기
 	GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UBaseInstance::RetrieveNewTokens, 1.0f, false, 30.0f);
@@ -374,7 +368,20 @@ void UBaseInstance::OnGetResponseTimeResponseReceived(FHttpRequestPtr Request, F
 	}
 
 	float ResponseTime = Request->GetElapsedTime() * 1000;
-	//UE_LOG(LogTemp, Warning, TEXT("response time in milliseconds: %s"), *FString::SanitizeFloat(ResponseTime));
 
 	PlayerLatencies.AddTail(ResponseTime);
+}
+
+void UBaseInstance::setStartTimer()
+{
+	startTime = FPlatformTime::Seconds();
+}
+
+double UBaseInstance::getElapseTime()
+{
+	if (endTime < 1.0f) {
+		endTime = FPlatformTime::Seconds();
+	}
+
+	return (endTime - startTime);
 }

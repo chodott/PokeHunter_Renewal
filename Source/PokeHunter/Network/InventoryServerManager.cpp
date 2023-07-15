@@ -21,10 +21,10 @@ bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer, UBaseInstance* 
 	quest_item.type = CS_QUEST_INVENTORY;
 	gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&quest_item), quest_item.size, bSize);
 
-	AHunter* hunter = Cast<AHunter>(myPlayer);
+	/*AHunter* hunter = Cast<AHunter>(myPlayer);
 	if (false == hunter->Inventory->InfoArray.IsEmpty()) {
 		hunter->Inventory->InfoArray.Empty();
-	}
+	}*/
 
 	SC_ITEM_INFO_PACK item_info{};
 	for (int i = 0; ; ++i) {
@@ -34,10 +34,8 @@ bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer, UBaseInstance* 
 		int msg_cnt = item_info._cnt;
 		if (msg_name == "theEnd") break;
 
-		// UE_LOG(LogTemp, Warning, TEXT("[Item name] : %s"), *msg_name.ToString());
-		// UE_LOG(LogTemp, Warning, TEXT("[Item cnt] : %d"), msg_cnt);
-
-		hunter->Inventory->InfoArray.Add(FItemCnter{ msg_name, msg_cnt });
+		// hunter->Inventory->InfoArray.Add(FItemCnter{ msg_name, msg_cnt });
+		gameinstance->InfoArray.Add(FItemCnter{ msg_name, msg_cnt });
 	}
 	return true;
 }

@@ -31,6 +31,7 @@ void UInventoryComponent::BeginPlay()
 	{
 		//아이템 struct
 		InfoArray.AddDefaulted();
+		FarmingArray.AddDefaulted();
 	}
 	
 }
@@ -51,6 +52,8 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 			{
 				//Add ItemCnt Update need
 				InfoArray[i].cnt += ItemCnt;
+				FarmingArray[i].cnt += ItemCnt;
+
 				return true;
 			}
 		}
@@ -61,6 +64,10 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 		//Find Object Need
 		InfoArray[NullNum].ItemID = ItemName;
 		InfoArray[NullNum].cnt += ItemCnt;
+
+		FarmingArray[NullNum].ItemID = ItemName;
+		FarmingArray[NullNum].cnt += ItemCnt;
+
 		return true;
 	}
 

@@ -188,6 +188,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battle")
 	float StartNoCollisionTime;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	float bTotalDamaged = 0.0f;
+
 protected:
 	// Sets default values for this character's properties
 	AHunter();

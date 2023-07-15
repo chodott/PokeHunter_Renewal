@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "PokeHunter/Hunter/Hunter.h"
+#include "PokeHunter/Hunter/HunterController.h"
 #include "HunterState.generated.h"
 
 /**
@@ -24,6 +26,13 @@ public:
 	UPROPERTY(Replicated)
 		FString Team;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+		float totalDamage = 0.0f;
+
+public:
 	//Replication
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
+
+	UFUNCTION(BlueprintCallable, Category = "Battle")
+		float getTotalDamage();
 };

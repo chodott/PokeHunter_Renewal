@@ -10,3 +10,9 @@ void AHunterState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 	DOREPLIFETIME(AHunterState, Team);
 }
+
+float AHunterState::getTotalDamage()
+{
+	AHunterController* hunterContoller = Cast<AHunterController>(GetOwner());
+	return Cast<AHunter>(hunterContoller->GetCharacter())->bTotalDamaged;
+}

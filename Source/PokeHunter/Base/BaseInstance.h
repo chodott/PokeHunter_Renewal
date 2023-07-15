@@ -173,9 +173,6 @@ public:
 	UFUNCTION()
 		void SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken);
 
-	UFUNCTION(BlueprintCallable, Category = "Home")
-		bool returnMyHome();
-
 	UPROPERTY()
 		FString JoinTicketId = "";
 
@@ -201,20 +198,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		TMap<FName, int> PartyListMap;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FItemCnter> InfoArray{};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FItemCnter> StorageInfoArray{};
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Party")
 		int PartnerNumber = -1;
 
-	// inGame start time
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Time")
-		double startTime = 0.0f;
-
 	// inGame end time
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Time")
 		double endTime = 0.0f;
-
-	UFUNCTION(BlueprintCallable, Category = "Time")
-		void setStartTimer();
 
 	// 게임 종료시 getElapseTime() 함수의 endTime 대입연산을 멈춤.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time")

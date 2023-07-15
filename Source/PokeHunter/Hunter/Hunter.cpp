@@ -177,6 +177,15 @@ void AHunter::BeginPlay()
 
 	// Set player controller in baseintance
 	gameinstance->cur_playerController = Cast<APlayerController>(GetController());
+
+
+	// Set item inventory
+	if (false == gameinstance->InfoArray.IsEmpty()) {
+		Inventory->InfoArray.Empty();
+		for (auto item : gameinstance->InfoArray) {
+			Inventory->InfoArray.Add(item);
+		}
+	}
 }
 
 // Called every frame

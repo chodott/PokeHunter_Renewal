@@ -16,8 +16,6 @@ public:
 	// Sets default values for this actor's properties
 	ANpcStorage();
 
-	// UBaseInstance* gameinstance = nullptr;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item")
 	class UInventoryComponent* Storage;
 

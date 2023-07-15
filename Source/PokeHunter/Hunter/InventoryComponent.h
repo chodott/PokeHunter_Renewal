@@ -21,6 +21,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FItemCnter> InfoArray;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FItemCnter> FarmingArray;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class AHunter* Hunter;
 

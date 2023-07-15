@@ -21,6 +21,7 @@ void UBaseInstance::Init()
 
 bool UBaseInstance::ConnectToServer()
 {
+	if (ESocketConnectionState::SCS_Connected == gSocket->GetConnectionState()) return true;
 	if (nullptr == TextReader) return false;
 	FString server_addr = TextReader->ReadFile("Urls/IOCPServerAddr.txt");
 
@@ -31,12 +32,9 @@ bool UBaseInstance::ConnectToServer()
 	GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Trying to connect. %s"), *server_addr));
 
 	if (true == gSocket->Connect(*addr)) {
-		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Success] connect to server")));
 		return true;
 	}
 	else {
-		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("[Fail] connect to server")));
-
 		ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
 		ESocketErrors ErrorCode = SocketSubsystem->GetLastErrorCode();
 		FString ErroCodeAsString = FString(SocketSubsystem->GetSocketError(ErrorCode));
@@ -286,37 +284,6 @@ void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken,
 	GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UBaseInstance::RetrieveNewTokens, 1.0f, false, 30.0f);
 }
 
-bool UBaseInstance::returnMyHome()
-{
-	// GetWorld()->GetTimerManager().ClearTimer(RetrieveNewTokensHandle);
-	// GetWorld()->GetTimerManager().ClearTimer(GetResponseTimeHandle);
-
-	/*if (AccessToken.Len() > 0) {
-		if (JoinTicketId.Len() > 0) {
-			TSharedPtr<FJsonObject> RequestObj = MakeShareable(new FJsonObject);
-			RequestObj->SetStringField("ticketId", JoinTicketId);
-
-			FString RequestBody;
-			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
-			if (FJsonSerializer::Serialize(RequestObj.ToSharedRef(), Writer)) {
-				TSharedRef<IHttpRequest> StopMatchmakingRequest = HttpModule->CreateRequest();
-				StopMatchmakingRequest->SetURL(ApiUrl + "/stopmatchmaking");
-				StopMatchmakingRequest->SetVerb("POST");
-				StopMatchmakingRequest->SetHeader("Content-Type", "application/json");
-				StopMatchmakingRequest->SetHeader("Authorization", AccessToken);
-				StopMatchmakingRequest->SetContentAsString(RequestBody);
-				StopMatchmakingRequest->ProcessRequest();
-
-				return true;
-			}
-
-		}
-		
-	}*/
-
-	return false;
-}
-
 void UBaseInstance::RetrieveNewTokens()
 {
 	if (AccessToken.Len() > 0 && RefreshToken.Len() > 0) {
@@ -372,16 +339,11 @@ void UBaseInstance::OnGetResponseTimeResponseReceived(FHttpRequestPtr Request, F
 	PlayerLatencies.AddTail(ResponseTime);
 }
 
-void UBaseInstance::setStartTimer()
-{
-	startTime = FPlatformTime::Seconds();
-}
-
 double UBaseInstance::getElapseTime()
 {
 	if (endTime < 1.0f) {
-		endTime = FPlatformTime::Seconds();
+		endTime = GetWorld()->GetTimeSeconds();
 	}
 
-	return (endTime - startTime);
+	return (endTime);
 }

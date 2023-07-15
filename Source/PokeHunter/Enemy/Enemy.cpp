@@ -152,6 +152,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	HP -= DamageAmount;
 	SavedDamage += DamageAmount;
+
 	if (GrogyDamage <= SavedDamage)
 	{
 		bGrogy = true;
@@ -162,6 +163,10 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	AItem* HitItem = Cast<AItem>(DamageCauser);
 	FVector HitLoc;
 
+	// Hunters TakeDamage Calc
+	if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner)) {
+		Hunter->bTotalDamaged = SavedDamage;
+	}
 
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{

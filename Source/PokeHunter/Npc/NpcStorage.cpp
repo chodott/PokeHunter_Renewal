@@ -21,8 +21,6 @@ ANpcStorage::ANpcStorage()
 	Storage->capacity = 28;
 
 	InteractionSphere->SetSphereRadius(100.f);
-
-	// gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
 }
 
 // Called when the game starts or when spawned
@@ -59,26 +57,29 @@ bool ANpcStorage::GetNpcStorageInfo(UBaseInstance* gameinstance)
 	retVal = gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&quest_item), quest_item.size, bSize);
 	if (false == retVal) return false;
 
-	TArray<FItemCnter> InfoArray;
 	if (false == Storage->InfoArray.IsEmpty()) {
 		Storage->InfoArray.Empty();
 	}
 
-	SC_ITEM_INFO_PACK item_info{};
-	for (int i = 0; ; ++i) {
-		memset(&item_info, 0, sizeof(SC_ITEM_INFO_PACK));
-		retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&item_info), sizeof(SC_ITEM_INFO_PACK), bSize);
-		if (false == retVal) return false;
+	if (true == gameinstance->StorageInfoArray.IsEmpty()) {
+		SC_ITEM_INFO_PACK item_info{};
+		for (int i = 0; ; ++i) {
+			memset(&item_info, 0, sizeof(SC_ITEM_INFO_PACK));
+			retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&item_info), sizeof(SC_ITEM_INFO_PACK), bSize);
+			if (false == retVal) return false;
 
-		FName msg_name = item_info._name;
-		int msg_cnt = item_info._cnt;
-		if (msg_name == "theEnd") break;
+			FName msg_name = item_info._name;
+			int msg_cnt = item_info._cnt;
+			if (msg_name == "theEnd") break;
 
-		FItemCnter itemBuffer;
-		itemBuffer.ItemID = msg_name;
-		itemBuffer.cnt = msg_cnt;
-		Storage->InfoArray.Add(itemBuffer);
+			FItemCnter itemBuffer;
+			itemBuffer.ItemID = msg_name;
+			itemBuffer.cnt = msg_cnt;
+			gameinstance->StorageInfoArray.Add(itemBuffer);
+		}
 	}
+
+	Storage->InfoArray = gameinstance->StorageInfoArray;
 
 	return true;
 }

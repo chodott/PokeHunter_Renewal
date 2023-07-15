@@ -21,6 +21,7 @@ public:
 	UPROPERTY(Replicated)
 		FString WinningTeam;
 
+public:
 	//Replication
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 };

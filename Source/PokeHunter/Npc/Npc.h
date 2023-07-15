@@ -37,6 +37,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<class UUserWidget> UIClass;
 
+	//Sound
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+	USoundBase* InteractSound;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+	USoundBase* EndSound;
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

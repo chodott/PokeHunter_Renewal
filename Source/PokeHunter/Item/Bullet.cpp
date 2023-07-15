@@ -2,6 +2,8 @@
 
 
 #include "Bullet.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/PrimitiveComponent.h"
@@ -12,6 +14,7 @@
 #include "PokeHunter/Partner/Partner.h"
 #include "PokeHunter/Enemy/Enemy.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 
 ABullet::ABullet()
 {
@@ -25,6 +28,9 @@ ABullet::ABullet()
 	ProjectileMovement->MaxSpeed = 3000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
+
+	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraSystem"));
+	NiagaraComponent->Deactivate();
 
 	
 	if (GetLocalRole() == ROLE_Authority)
@@ -43,6 +49,9 @@ void ABullet::BeginPlay()
 
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraComponent->GetAsset(), StaticMesh->GetComponentLocation(), GetActorRotation());
+
+	if(SoundEffect) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundEffect, StaticMesh->GetComponentLocation());
 	if (!OtherActor) return;
 	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	if(OtherComponent->IsA<UHitBoxComponent>())

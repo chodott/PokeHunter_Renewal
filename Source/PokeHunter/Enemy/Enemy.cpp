@@ -42,7 +42,7 @@ void AEnemy::BeginPlay()
 	if (EnemyAnim) EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
 
 	BaseLocation = GetActorLocation();
-	ComeBackHome();
+	//ComeBackHome();
 }
 
 // Called every frame
@@ -311,7 +311,6 @@ void AEnemy::SeeNewTarget(AActor* Actor)
 {
 	TargetArray.AddUnique(Actor);
 
-
 	if (Target == NULL)
 	{
 		SetTarget(Actor);
@@ -332,7 +331,7 @@ void AEnemy::ComeBackHome()
 {
 	Target = NULL;
 	TargetPos = BaseLocation;
-	CurState = EEnemyState::Patrol;
+	//CurState = EEnemyState::Patrol;
 }
 
 bool AEnemy::CheckInMoveRange()

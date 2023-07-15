@@ -16,12 +16,6 @@ ANpc::ANpc()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-
-	//Skeletal Mesh
-	
-
-
-
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	CollisionBox->AddLocalOffset(FVector(0.f, 0.f, GetSimpleCollisionHalfHeight()),false);
 	CollisionBox->SetupAttachment(GetRootComponent());
@@ -63,10 +57,12 @@ void ANpc::Interact_Implementation(AHunter* Hunter)
 		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(Hunter, 1.0f);
 		Master->StorageUI->RemoveFromParent();
 		Master->GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Opacity"), 1);
+		UGameplayStatics::PlaySound2D(GetWorld(), EndSound);
 	}
 	else
 	{
 		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(this, 1.0f);	
+		UGameplayStatics::PlaySound2D(GetWorld(), InteractSound);
 	}
 	Master->DisableInput(Cast<APlayerController>(Master->Controller));
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &ANpc::OpenUI, 1.0f, false, 1.0f);

@@ -19,6 +19,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
 	class UParticleSystem* ParticleSystem;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
+	class UNiagaraComponent* NiagaraComponent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+	class USoundBase* SoundEffect;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Battle")
 	float Damage{5.f};

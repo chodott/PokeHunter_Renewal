@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include "EnemyAnimInstance.h"
 #include "EnemyProjectile.h"
+#include "EnemyController.h"
 #include "Net/UnrealNetwork.h"
 #include "components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -147,27 +148,15 @@ FGenericTeamId AEnemy::GetGenericTeamId() const
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (HP <= 0) return 0;
+	if (HP <= 0 || CurState == EEnemyState::Die) return 0;
 
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	HP -= DamageAmount;
 	SavedDamage += DamageAmount;
 
-	if (GrogyDamage <= SavedDamage)
-	{
-		bGrogy = true;
-		CurState = EEnemyState::Grogy;
-		ServerPlayMontage(this, FName("Grogy"));
-	}
-	//Item Hit
+	//Item Hit && HitLocation
 	AItem* HitItem = Cast<AItem>(DamageCauser);
 	FVector HitLoc;
-
-	// Hunters TakeDamage Calc
-	if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner)) {
-		Hunter->bTotalDamaged = SavedDamage;
-	}
-
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{
 		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
@@ -183,9 +172,31 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		HitLoc = GetActorLocation();
 	}
 
+	//Change EnemyState
+	if (HP <= 0)
+	{
+		//사망 애니메이션
+		CurState = EEnemyState::Die;
+		bDied = true;
+		ServerPlayMontage(this, FName("Die"));
+		auto* EnemyController = Cast<AEnemyController>(GetController());
+		if (EnemyController) EnemyController->StopAI();
+	}
+
+	else if (GrogyDamage <= SavedDamage && CurState != EEnemyState::Grogy)
+	{
+		//그로기
+		bGrogy = true;
+		CurState = EEnemyState::Grogy;
+		ServerPlayMontage(this, FName("Grogy"));
+	}
+
+	else
+	{ 
 	//피격 애니메이션 처리
 	if (HitItem)
 	{
+		CurState = EEnemyState::Hit;
 		if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
 		{
 			Hunter->SetPartnerTarget(this);
@@ -194,19 +205,9 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		if (Target == NULL)
 		{
 			Target = HitItem->ThisOwner;
-			CurState = EEnemyState::Hit;
 		}
 	}
 
-	if (HP <= 0)
-	{
-		//사망 애니메이션
-		CurState = EEnemyState::Die;
-		bDied = true;
-		ServerPlayMontage(this, FName("Die"));
-	}
-	else
-	{
 		if (bGrogy)
 		{
 			//그로기 시 애니메이션 생략
@@ -319,8 +320,8 @@ void AEnemy::SeeNewTarget(AActor* Actor)
 	if (Target == NULL)
 	{
 		SetTarget(Actor);
-		CurState = EEnemyState::Chase;
-		EnemyAnim->StopCombatMontage(0.2f);
+		//CurState = EEnemyState::Chase;
+		//EnemyAnim->StopCombatMontage(0.2f);
 	}
 
 }
@@ -332,21 +333,29 @@ void AEnemy::HearSound(FVector SoundLoc, AActor* AgroActor)
 	bWaitingAgro = true;
 }
 
-void AEnemy::ComeBackHome()
+void AEnemy::ComeBackHome(float Distance)
 {
 	Target = NULL;
-	TargetPos = BaseLocation;
-	//CurState = EEnemyState::Patrol;
+	if (Distance <= 100.f)
+	{
+		CurState = EEnemyState::Patrol;
+	}
+	else
+	{
+		CurState = EEnemyState::Return;
+	}
 }
 
 bool AEnemy::CheckInMoveRange()
 {
+	if (CurState == EEnemyState::Die) return false;
+
 	float Distance = FVector::Dist2D(BaseLocation, GetActorLocation());
 	bool bResult = Distance <= MoveRange;
 	if (bResult) return true;
 	else
 	{
-		ComeBackHome();
+		ComeBackHome(Distance);
 		return false;
 	}
 }
@@ -549,9 +558,9 @@ void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	if (!bInterrupted)
 	{
 		EnemyAnim->bPlaying = false;
-		if (CurState == EEnemyState::Hit) CurState = EEnemyState::Roar;
 		OnMontageEnd.Broadcast();
-		CurState = EEnemyState::Chase;
+		//if (CurState == EEnemyState::Hit) CurState = EEnemyState::Roar;
+		//CurState = EEnemyState::Chase;
 	}
 
 

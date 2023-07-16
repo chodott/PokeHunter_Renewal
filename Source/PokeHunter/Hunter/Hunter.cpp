@@ -1239,7 +1239,6 @@ void AHunter::ServerSpawnItem_Implementation(AHunter* OwnerHunter, TSubclassOf<A
 
 void AHunter::ServerUsePartnerNormalSkill_Implementation(APartner* MyPartner,ESkillID SkillID)
 {
-
 	MyPartner->MultiUseNormalSkill(SkillID);
 }
 

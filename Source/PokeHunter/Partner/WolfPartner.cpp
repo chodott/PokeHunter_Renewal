@@ -136,6 +136,7 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 	case ESkillID::IceBreath:
 		if (Target)
 		{
+			TargetPos = Target->GetActorLocation();
 			CurState = EPartnerState::IceBreath;
 			bUsingSkill = true;
 			bOrdered = true;

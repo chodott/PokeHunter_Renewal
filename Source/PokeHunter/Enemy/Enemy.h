@@ -17,6 +17,7 @@ enum class EEnemyState : uint8
 {
 	Patrol UMETA(DisplayName = "Patrol"),
 	Chase UMETA(DisplayName = "Chase"),
+	Return UMETA(DisplayName = "Return"),
 	Hit UMETA(DisplayName = "Hit"),
 	Grogy UMETA(DisplayName = "Grogy"),
 	Die UMETA(DisplayName = "Die"),
@@ -193,7 +194,7 @@ public:
 	void SeeNewTarget(AActor* Actor);
 	void HearSound(FVector SoundLoc, AActor* AgroTarget);
 
-	void ComeBackHome();
+	void ComeBackHome(float Distance);
 	bool CheckInMoveRange();
 
 	UFUNCTION(BlueprintCallable)

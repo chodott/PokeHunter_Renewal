@@ -438,6 +438,13 @@ void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
 void AHunter::ServerInteractObject_Implementation(AInteractActor* TargetActor, AHunter* OwnerHunter)
 {
 	TargetActor->MultiInteract(OwnerHunter);
+	OwnerHunter->MultiInteractObject(OwnerHunter);
+}
+
+
+void AHunter::MultiInteractObject_Implementation(AHunter* OwnerHunter)
+{
+	bUpperOnly = true;
 }
 
 void AHunter::ServerHunterHP_Implementation(FName PlayerName, float NewHP)

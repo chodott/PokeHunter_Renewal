@@ -155,7 +155,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
 	FGenericTeamId TeamID;
 
-	//
+	//Battle
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float ReloadTime{};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
@@ -261,6 +261,8 @@ public:
 	void	MultiUsePotion(APotion* Potion);
 	UFUNCTION(Server, Reliable)
 	void ServerInteractObject(AInteractActor* TargetActor, AHunter* OwnerHunter);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiInteractObject(AHunter* OwnerHunter);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateQuickSlot();

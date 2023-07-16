@@ -36,8 +36,6 @@ void UInventoryComponent::BeginPlay()
 	
 }
 
-// AItemDropActor::Interact_Implementation(AHunter* Hunter) 함수에서 호출
-// bool UInventoryComponent::AddItemData(FName ItemName, int Cnt)
 bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 {
 	int NullNum = -1;
@@ -52,8 +50,13 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 			{
 				//Add ItemCnt Update need
 				InfoArray[i].cnt += ItemCnt;
+
+				if (FarmingArray[i].ItemID == FName("None")) {
+					FarmingArray[i].ItemID = InfoArray[i].ItemID;
+				}
 				FarmingArray[i].cnt += ItemCnt;
 
+				UE_LOG(LogTemp, Warning, TEXT("[Insert Info!] [FarmingArray[i] info]\nName: %s\nCnt: %d\n"), *FarmingArray[i].ItemID.ToString(), FarmingArray[i].cnt);
 				return true;
 			}
 		}
@@ -67,6 +70,9 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 
 		FarmingArray[NullNum].ItemID = ItemName;
 		FarmingArray[NullNum].cnt += ItemCnt;
+
+		UE_LOG(LogTemp, Warning, TEXT("[New Info!] FarmingArray[NullNum].ItemID: %s\n"), *FarmingArray[NullNum].ItemID.ToString());
+		UE_LOG(LogTemp, Warning, TEXT("[New Info!] FarmingArray[NullNum].cnt: %d\n"), FarmingArray[NullNum].cnt);
 
 		return true;
 	}
@@ -86,6 +92,7 @@ bool UInventoryComponent::AddItemInfo(FName ItemID, int Cnt)
 			if (InfoArray[i].ItemID == ItemID)
 			{
 				InfoArray[i].cnt += Cnt;
+				FarmingArray[i].cnt += Cnt;
 				return true;
 			}
 		}
@@ -95,6 +102,9 @@ bool UInventoryComponent::AddItemInfo(FName ItemID, int Cnt)
 	{
 		InfoArray[NullNum].ItemID = ItemID;
 		InfoArray[NullNum].cnt = Cnt;
+
+		FarmingArray[NullNum].ItemID = ItemID;
+		FarmingArray[NullNum].cnt = Cnt;
 		return true;
 	}
 

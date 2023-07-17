@@ -99,6 +99,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
 		FGenericTeamId TeamID;
 
+	//Effect
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effect")
+	class UNiagaraSystem* SlashHitEffect;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effect")
+	class UNiagaraSystem* SlashMoveEffect;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effect")
+	float MoveEffectOffsetX;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

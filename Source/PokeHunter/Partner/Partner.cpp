@@ -5,6 +5,7 @@
 #include "PartnerController.h"
 #include "PartnerAnimInstance.h"
 #include "PartnerProjectile.h"
+#include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
@@ -204,6 +205,12 @@ void APartner::SlashMove()
 			{
 				SetActorLocation(NewLocation);
 				ServerApplyDamage(Target, 30, GetController(), this);
+
+				//¿Ã∆Â∆Æ √‚∑¬
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SlashHitEffect, TargetLocation);
+				FVector MoveEffectSpawnLoc = StartLocation + DirectionVec * MoveEffectOffsetX;
+				MoveEffectSpawnLoc.Y += 50.f;
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SlashMoveEffect, MoveEffectSpawnLoc, DirectionVec.Rotation());
 			}
 			else
 			{

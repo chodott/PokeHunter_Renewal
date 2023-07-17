@@ -348,8 +348,6 @@ void AEnemy::ComeBackHome(float Distance)
 
 bool AEnemy::CheckInMoveRange()
 {
-	if (CurState == EEnemyState::Die) return false;
-
 	float Distance = FVector::Dist2D(BaseLocation, GetActorLocation());
 	bool bResult = Distance <= MoveRange;
 	if (bResult) return true;

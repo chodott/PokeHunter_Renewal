@@ -15,7 +15,7 @@ AItemDropActor::AItemDropActor()
 
 	//Mesh
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMesh->SetupAttachment(GetRootComponent());
+	SetRootComponent(StaticMesh);
 
 	//SetActorTickEnabled(false);
 	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating Movement"));

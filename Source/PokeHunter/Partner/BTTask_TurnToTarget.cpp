@@ -65,7 +65,7 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 
 
 	float BetweenAngle = FMath::Acos(FVector::DotProduct(LookVec, ForwardVec) / (LookVec.Size() * ForwardVec.Size())) * (180.0f / PI);
-	if (BetweenAngle < 5.f)
+	if (BetweenAngle < 10.f)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

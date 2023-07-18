@@ -301,8 +301,8 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	if (Bullet) return 0.f;
 
 
-	HunterHP -= DamageAmount;
-	ServerHunterHP(gameinstance->MyName, HunterHP);
+	HP -= DamageAmount;
+	ServerHunterHP(gameinstance->MyName, HP);
 
 	if (GetHP() <= 0)
 	{ //죽었을 때
@@ -354,7 +354,7 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 
-	DOREPLIFETIME(AHunter, HunterHP);
+	
 	DOREPLIFETIME(AHunter, HunterStamina);
 	DOREPLIFETIME(AHunter, CurState);
 	DOREPLIFETIME(AHunter, Partner);
@@ -443,9 +443,9 @@ void AHunter::ServerHunterHP_Implementation(FName PlayerName, float NewHP)
 
 void AHunter::MultiHunterHP_Implementation(FName PlayerName, float NewHP)
 {
-	float* HP = PartyMemberHP.Find(PlayerName);
-	if (HP) {
-		*HP = NewHP;
+	float* TempHP = PartyMemberHP.Find(PlayerName);
+	if (TempHP) {
+		*TempHP = NewHP;
 	}
 }
 
@@ -456,9 +456,9 @@ void AHunter::ServerPetHP_Implementation(FName PlayerName, float NewHP)
 
 void AHunter::MultiPetHP_Implementation(FName PlayerName, float NewHP)
 {
-	float* HP = PartyMemberPetHP.Find(PlayerName);
-	if (HP) {
-		*HP = NewHP;
+	float* TempHP = PartyMemberPetHP.Find(PlayerName);
+	if (TempHP) {
+		*TempHP = NewHP;
 	}
 }
 

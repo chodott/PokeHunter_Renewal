@@ -3,6 +3,7 @@
 
 #include "BTDecorator_InMoveRange.h"
 #include "BehaviorTree/BTDecorator.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Enemy.h"
 #include "EnemyController.h"
 
@@ -16,6 +17,7 @@ bool UBTDecorator_InMoveRange::CalculateRawConditionValue(UBehaviorTreeComponent
 	float Distance = FVector::Dist2D(Enemy->BaseLocation, Enemy->GetActorLocation());
 
 	bResult = (Distance <= Enemy->MoveRange);
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName("bInMoveRange"), bResult);
 
 	return bResult;
 }

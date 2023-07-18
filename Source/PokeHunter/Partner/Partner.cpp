@@ -80,7 +80,6 @@ void APartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	DOREPLIFETIME(APartner, CurState);
 	DOREPLIFETIME(APartner, Target);
 	DOREPLIFETIME(APartner, TargetPos);
-	DOREPLIFETIME(APartner, HP);
 	DOREPLIFETIME(APartner, bOrdered);
 	DOREPLIFETIME(APartner, bUsingSkill);
 	DOREPLIFETIME(APartner, bPosing);

@@ -503,9 +503,11 @@ void AGolemBoss::Attack(int AttackPattern)
 	{
 
 	case 0:
-		if (bLoseLeftHand && bLoseRightHand) return;
-		ServerPlayMontage(this, FName("Attack_Grab"));
-		
+		if (!bLoseLeftHand && !bLoseRightHand)
+		{
+			ServerPlayMontage(this, FName("Attack_Grab"));
+		}
+		else ServerPlayMontage(this, FName("Attack_Bind"));
 		break;
 	case 1:
 		//Attack Punch

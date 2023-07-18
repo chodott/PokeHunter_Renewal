@@ -10,6 +10,7 @@
 #include "PokeHunter/Base/ItemInteractInterface.h"
 #include "PokeHunter/Base/EnemyInteractInterface.h"
 #include "PokeHunter/Base/BaseInstance.h"
+#include "PokeHunter/Base/BaseCharacter.h"
 #include "Partner.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);
@@ -34,7 +35,7 @@ enum class EPartnerState : uint8
 };
 
 UCLASS()
-class POKEHUNTER_API APartner : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface 
+class POKEHUNTER_API APartner : public ABaseCharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface 
 {
 	GENERATED_BODY()
 
@@ -66,10 +67,6 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "AI")
 	EPartnerState CurState;
-	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Status")
-	float HP{ 100.f };
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
-	float HealPerSecondAmount{ 1.f };
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "AI")
 	bool bPosing;
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "AI")
@@ -80,20 +77,6 @@ public:
 	bool bDied;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bGrabbed;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
-	bool bInvincible{ false };
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
-	float InvincibleTime{ 1.f };
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
-	float StartInvincibleTime;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
-	bool bNoCollision;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
-	float NoCollisionTime{ 0.5f };
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battle")
-	float StartNoCollisionTime;
 
 	//TeamID
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")

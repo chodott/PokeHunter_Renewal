@@ -142,7 +142,7 @@ void AHunter::BeginPlay()
 	if (DiveCurve)
 	{
 		DiveTimeline.AddInterpFloat(DiveCurve, DiveInterpCallback);
-		DiveTimeline.SetTimelineLength(1.32f);
+		DiveTimeline.SetTimelineLength(0.66f);
 	}
 
 	FString LevelName = GetWorld()->GetName();
@@ -197,8 +197,6 @@ void AHunter::Tick(float DeltaTime)
 		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, 500.f, DeltaTime, ArmSpeed);
 		float temp = FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, 0.f, DeltaTime, ArmSpeed);
 		CameraBoom->SetRelativeLocation(FVector(0.f, temp, 0.f));
-
-
 	}
 
 	//Stamina
@@ -518,6 +516,7 @@ void AHunter::SpaceDown()
 		HunterStamina -= 15.f;
 		CurState = EPlayerState::Dive;
 		LastInput = GetCharacterMovement()->GetLastInputVector();
+		GetCharacterMovement()->Velocity = LastInput * GetCharacterMovement()->GetMaxSpeed();
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		ServerPlayMontage(this, FName("Dive"));
 	

@@ -10,14 +10,15 @@
 
 AItemDropActor::AItemDropActor()
 {
-	InteractionSphere->SetSphereRadius(80.f);
 	PrimaryActorTick.bCanEverTick = true;
 
 	//Mesh
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	SetRootComponent(StaticMesh);
 
-	//SetActorTickEnabled(false);
+	InteractionSphere->SetupAttachment(RootComponent);
+	InteractionSphere->SetSphereRadius(80.f);
+
 	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating Movement"));
 	AddOwnedComponent(RotatingMovement);
 

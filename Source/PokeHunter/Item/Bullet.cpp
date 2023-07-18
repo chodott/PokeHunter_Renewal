@@ -59,15 +59,8 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, ThisOwner->GetController(), this, UDamageType::StaticClass());
 	if (OtherActor->Implements<UItemInteractInterface>())
 	{
-		//������ ȿ���� �޴� ���Ϳ� �浹
 		ApplyAbillity(OtherActor, OtherComponent);
-
-		if (ParticleSystem)
-		{
-			ServerSpawnEmitter(ParticleSystem, Hit.Location);
-		}
 	}
-	//������ ȿ���� ���� �ʴ� ���Ϳ� �浹
 	else OnHitNotEnemy(Hit.Location);
 
 	if (!bAttached)
@@ -144,7 +137,7 @@ void ABullet::ServerSpawnEmitter_Implementation(UParticleSystem* SpawnParticle, 
 
 void ABullet::OnHitNotEnemy_Implementation(const FVector& HitVec)
 {
-	Destroy();
+	ServerDestroy();
 }
 
 

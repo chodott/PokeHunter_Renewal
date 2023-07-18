@@ -12,6 +12,9 @@ UBaseInstance::UBaseInstance()
 	ApiUrl = TextReader->ReadFile("Urls/ApiUrl.txt");
 	RegionCode = TextReader->ReadFile("Urls/RegionCode.txt");
 	HttpModule = &FHttpModule::Get();
+
+	InfoArray.Reserve(24);
+	StorageInfoArray.Reserve(24);
 }
 
 void UBaseInstance::Init()

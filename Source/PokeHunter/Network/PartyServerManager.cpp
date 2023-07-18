@@ -36,9 +36,6 @@ bool UPartyServerManager::GetPartyList()
         MultiByteToWideChar(CP_ACP, 0, (LPCSTR)party_list_pack._name, -1, MBTWBuffer, strlen(party_list_pack._name));
         msg_name = MBTWBuffer;
         int msg_cnt = party_list_pack._staff_count;
-
-        // UE_LOG(LogTemp, Warning, TEXT("[Party name] : %s"), *msg_name.ToString());
-		// UE_LOG(LogTemp, Warning, TEXT("[member cnt] : %d"), msg_cnt);
 		gameinstance->PartyListMap.Add(msg_name, msg_cnt);
 	}
 

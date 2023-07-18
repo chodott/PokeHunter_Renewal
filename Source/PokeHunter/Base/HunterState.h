@@ -29,6 +29,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 		float totalDamage = 0.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int HunterSkin = 1;
+
 public:
 	//Replication
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;

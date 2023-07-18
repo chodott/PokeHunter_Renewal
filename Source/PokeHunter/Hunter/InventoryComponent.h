@@ -22,13 +22,13 @@ public:
 	TArray<FItemCnter> InfoArray;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<FItemCnter> FarmingArray;
+	TArray<FItemCnter> FarmingArray;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class AHunter* Hunter;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	int capacity;
+	int capacity = 24;
 
 protected:
 	// Called when the game starts

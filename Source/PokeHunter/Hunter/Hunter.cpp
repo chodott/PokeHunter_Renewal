@@ -182,8 +182,13 @@ void AHunter::BeginPlay()
 	// Set item inventory
 	if (false == gameinstance->InfoArray.IsEmpty()) {
 		Inventory->InfoArray.Empty();
+		int cur = 0;
 		for (auto item : gameinstance->InfoArray) {
 			Inventory->InfoArray.Add(item);
+			++cur;
+		}
+		for (; cur < Inventory->capacity; ++cur) {
+			Inventory->InfoArray.Add(FItemCnter{});
 		}
 	}
 }

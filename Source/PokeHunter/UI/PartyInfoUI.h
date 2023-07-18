@@ -47,6 +47,8 @@ public:
 	UPROPERTY()
 		FTimerHandle TH_Partyinfo;
 
+	bool myReadyState = false;
+
 	UFUNCTION(BlueprintCallable, Category = "Party info")
 		void TickRecvPartyState();
 

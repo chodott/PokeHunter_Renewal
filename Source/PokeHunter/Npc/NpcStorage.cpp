@@ -63,7 +63,9 @@ bool ANpcStorage::GetNpcStorageInfo(UBaseInstance* gameinstance)
 
 	if (true == gameinstance->StorageInfoArray.IsEmpty()) {
 		SC_ITEM_INFO_PACK item_info{};
-		for (int i = 0; ; ++i) {
+		int curCap = 0;
+
+		for (int i = 0; ; ++i, ++curCap) {
 			memset(&item_info, 0, sizeof(SC_ITEM_INFO_PACK));
 			retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&item_info), sizeof(SC_ITEM_INFO_PACK), bSize);
 			if (false == retVal) return false;
@@ -75,6 +77,13 @@ bool ANpcStorage::GetNpcStorageInfo(UBaseInstance* gameinstance)
 			FItemCnter itemBuffer;
 			itemBuffer.ItemID = msg_name;
 			itemBuffer.cnt = msg_cnt;
+			gameinstance->StorageInfoArray.Add(itemBuffer);
+		}
+
+		for (; curCap < Storage->capacity; ++curCap) {
+			FItemCnter itemBuffer;
+			itemBuffer.ItemID = "None";
+			itemBuffer.cnt = 0;
 			gameinstance->StorageInfoArray.Add(itemBuffer);
 		}
 	}

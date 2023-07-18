@@ -25,7 +25,6 @@ void UPartyInfoUI::NativeConstruct()
 
 	gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
 	SendEnterParty();
-	// TickSendPartyInfo();
 	GetWorld()->GetTimerManager().SetTimer(TH_Partyinfo, this, &UPartyInfoUI::TickSendPartyInfo, 1.0f, true, 0.f);
 
 	// Join Blueprint UI widget 추가 필요
@@ -36,8 +35,6 @@ void UPartyInfoUI::NativeConstruct()
 
 	// TB_JoinEvent (TextBlock user Widget 추가 필요!)
 	JoinEventTextBlock = (UTextBlock*)GetWidgetFromName(TEXT("TB_JoinEvent"));
-
-	// GetWorld()->GetTimerManager().SetTimer(SetAveragePlayerLatencyHandle, this, &UPartyInfoUI::SetAveragePlayerLatency, 1.0f, true, 1.0f);
 
 	FString AccessToken;
 	UGameInstance* GameInstance = GetGameInstance();
@@ -124,7 +121,6 @@ bool UPartyInfoUI::SendEnterParty()
 			}
 		}
 	}
-
 	return true;
 }
 
@@ -181,10 +177,12 @@ void UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 		uint8 uintBuffer = atoi(TCHAR_TO_ANSI(MBTWBuffer));
 		PlayerPetName.Add(static_cast<EPartnerType>(uintBuffer));		// 작동이 안될 경우, TArray의 자료형을 변경
 
-		memset(MBTWBuffer, NULL, 128);
+		/*memset(MBTWBuffer, NULL, 128);
 		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._mem_state, -1, MBTWBuffer, strlen(info_pack._mem_state));
 		uintBuffer = atoi(TCHAR_TO_ANSI(MBTWBuffer));
-		PartyMemberState.Add(static_cast<PLAYER_STATE>(uintBuffer));
+		PartyMemberState.Add(static_cast<PLAYER_STATE>(info_pack._mem_state));*/
+
+		PartyMemberState.Add(PLAYER_STATE(info_pack._mem_state));
 	}
 
 	gameinstance->PlayerName.Empty();
@@ -206,18 +204,14 @@ bool UPartyInfoUI::RecvClientJoin()	// [CheckPoint]-Blueprint에서 호출되는 곳이 
 	if (-1 == SelctPartyNumber)		return false;
 	bool retVal = false;
 	int32 bSize{};
-
 	/*SC_PARTY_JOIN_SUCCESS_PACK start_party_pack;
 	retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&start_party_pack), sizeof(SC_PARTY_JOIN_SUCCESS_PACK), bSize);*/
-
 	if (true == retVal) {
 		// AWS 실행
 		return true;
 	}
 	else				return false;
-
 	// Clinet에서 명령 실행 대기
-
 	return true;
 }
 
@@ -317,35 +311,34 @@ void UPartyInfoUI::SetAveragePlayerLatency() {
 
 void UPartyInfoUI::OnJoinButtonClicked()
 {
-	// ShowLoadingWidget();
-	// UGameplayStatics::OpenLevel(GetWorld(), FName("L_Field0"));
-	// return;
-
+	GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
 	WaitforOtherClient = true;
 	UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
 	
+	/*
 	if (ButtonTextBlock->GetText().ToString().Equals(FString("Wait"))) {
 		GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
 		ButtonTextBlock->SetText(FText::FromString("READY"));
-		// cancel match packet send and ...
 		return;
 	}
-
-	JoinButton->SetIsEnabled(false);
 	SendClientState();
+	*/
 
-	if (false == WaitforOtherClient) {
+	ButtonTextBlock->SetText(FText::FromString("대기중"));
+	JoinButton->SetIsEnabled(false);
+	GetWorld()->GetTimerManager().SetTimer(TH_WaitOtherClient, this, &UPartyInfoUI::TickRecvPartyState, 1.0f, true, 0.f);
+
+	/*if (false == WaitforOtherClient) {
 		GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
 		ButtonTextBlock->SetText(FText::FromString("Entering"));
 		JoinButton->SetIsEnabled(false);
 		EnterStageMap();
-		// BTN 비활성화->활성화 불필요.
 	}
 	else {
 		ButtonTextBlock->SetText(FText::FromString("Wait"));
 		JoinButton->SetIsEnabled(false);
 		GetWorld()->GetTimerManager().SetTimer(TH_WaitOtherClient, this, &UPartyInfoUI::TickRecvPartyState, 1.0f, true, 0.f);
-	}
+	}*/
 }
 
 void UPartyInfoUI::TickRecvPartyState()
@@ -353,18 +346,16 @@ void UPartyInfoUI::TickRecvPartyState()
 	SendClientState();
 
 	if (false == WaitforOtherClient) {
-		UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
-		ButtonTextBlock->SetText(FText::FromString("Entering"));
-		JoinButton->SetIsEnabled(false);
-		GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
+		// GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
 		GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
+		UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
+		ButtonTextBlock->SetText(FText::FromString("입장중"));
 		EnterStageMap();
 	}
 }
 
 void UPartyInfoUI::SendClientState()	// Send this client State
 {
-	if (false == IsValid(gameinstance))																return;
 	if (0 == gameinstance->PartyListMap.Num())														return;
 	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState())	return;
 	if (ESocketConnectionState::SCS_ConnectionError == gameinstance->gSocket->GetConnectionState()) return;
@@ -375,6 +366,7 @@ void UPartyInfoUI::SendClientState()	// Send this client State
 	CS_PARTY_READY_PACK ready_pack;
 	ready_pack.size = sizeof(CS_PARTY_READY_PACK);
 	ready_pack.type = CS_PARTY_READY;
+
 	retVal = gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&ready_pack), ready_pack.size, bSize);
 	if (false == retVal) return;
 
@@ -382,7 +374,14 @@ void UPartyInfoUI::SendClientState()	// Send this client State
 	retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&result_pack), sizeof(SC_PARTY_JOIN_RESULT_PACK), bSize);
 	if (false == retVal) return;
 
-	if (-1 != result_pack._result) {	// Enter Server
+	if (false == PartyMemberState.IsEmpty()) {
+		PartyMemberState.Empty();
+	}
+	for (char c : result_pack.memberState) {
+		PartyMemberState.Add(PLAYER_STATE(c));
+	}
+
+	if (result_pack._result) {	// Enter Server
 		WaitforOtherClient = false;
 	}
 	else {								// Wait for other client

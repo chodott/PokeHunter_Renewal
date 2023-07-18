@@ -15,6 +15,9 @@ UInventoryComponent::UInventoryComponent()
 
 	bEditableWhenInherited = true;
 	// ...
+
+	InfoArray.Reserve(capacity);
+	FarmingArray.Reserve(capacity);
 }
 
 
@@ -55,8 +58,6 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 					FarmingArray[i].ItemID = InfoArray[i].ItemID;
 				}
 				FarmingArray[i].cnt += ItemCnt;
-
-				UE_LOG(LogTemp, Warning, TEXT("[Insert Info!] [FarmingArray[i] info]\nName: %s\nCnt: %d\n"), *FarmingArray[i].ItemID.ToString(), FarmingArray[i].cnt);
 				return true;
 			}
 		}
@@ -70,10 +71,6 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 
 		FarmingArray[NullNum].ItemID = ItemName;
 		FarmingArray[NullNum].cnt += ItemCnt;
-
-		UE_LOG(LogTemp, Warning, TEXT("[New Info!] FarmingArray[NullNum].ItemID: %s\n"), *FarmingArray[NullNum].ItemID.ToString());
-		UE_LOG(LogTemp, Warning, TEXT("[New Info!] FarmingArray[NullNum].cnt: %d\n"), FarmingArray[NullNum].cnt);
-
 		return true;
 	}
 
@@ -147,6 +144,9 @@ void UInventoryComponent::ChangeSlot(AActor* Storage, FName TargetName, int Targ
 			{
 				StorageNpc->Storage->InfoArray[TargetIndex] = InfoArray[GoalIndex];
 				InfoArray[GoalIndex] = temp;
+				UE_LOG(LogTemp, Warning, TEXT("\n\n[StorageNpc info]\nName: %s\nCnt: %d\n\n"), *temp.ItemID.ToString(), temp.cnt);
+				UE_LOG(LogTemp, Warning, TEXT("\n\n[InfoArray info]\nName: %s\nCnt: %d\n\n"), *InfoArray[GoalIndex].ItemID.ToString(), InfoArray[GoalIndex].cnt);
+				UE_LOG(LogTemp, Warning, TEXT("\n\n[Index]\nTargetIndex: %d\nGoalIndex: %d\n\n"), TargetIndex, GoalIndex);
 			}
 			else
 			{

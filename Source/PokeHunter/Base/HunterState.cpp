@@ -4,6 +4,14 @@
 #include "HunterState.h"
 #include "Net/UnrealNetwork.h"
 
+void AHunterState::InitPlayerData()
+{
+	totalDamage = 0.0f;
+	
+	auto instance = Cast<UBaseInstance>(GetGameInstance());
+	HunterSkin = instance->mySkin;
+}
+
 void AHunterState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

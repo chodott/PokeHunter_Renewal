@@ -32,7 +32,7 @@ bool UBaseInstance::ConnectToServer()
 	addr->SetIp(ip.Value);
 	addr->SetPort(PORT_NUM);
 
-	GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Trying to connect. %s"), *server_addr));
+	// GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Trying to connect. %s"), *server_addr));
 
 	if (true == gSocket->Connect(*addr)) {
 		return true;
@@ -107,8 +107,7 @@ bool UBaseInstance::SendAccessToken()
 			if (partner_number <= (sizeof(EPartnerType) / sizeof(uint8))) {
 				myPartner = static_cast<EPartnerType>(partner_number);
 				mySkin = static_cast<int>(info_pack._player_skin - '0');
-
-				UE_LOG(LogTemp, Warning, TEXT("Success get player information!"));
+				// UE_LOG(LogTemp, Warning, TEXT("Success get player information!"));
 			}
 			else {
 				UE_LOG(LogTemp, Warning, TEXT("Fail Get Partner number: %d"), partner_number);
@@ -215,11 +214,11 @@ bool UBaseInstance::LogoutGame()
 				StopMatchmakingRequest->ProcessRequest();
 			}
 			else {
-				UE_LOG(LogTemp, Warning, TEXT("stopmatchmaking Lambda Function Error! or JoinTicketId is Empty"));
+				// UE_LOG(LogTemp, Warning, TEXT("stopmatchmaking Lambda Function Error! or JoinTicketId is Empty"));
 			}
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("JoinTicketId is Emtpy!"));
+			// UE_LOG(LogTemp, Warning, TEXT("JoinTicketId is Emtpy!"));
 		}
 
 		TSharedRef<IHttpRequest> InvalidateTokensRequest = HttpModule->CreateRequest();
@@ -278,10 +277,6 @@ void UBaseInstance::SetCognitoTokens(FString NewAccessToken, FString NewIdToken,
 	AccessToken = NewAccessToken;
 	IdToken = NewIdToken;
 	RefreshToken = NewRefreshToken;
-
-	/*UE_LOG(LogTemp, Warning, TEXT("[1]access token: %s\n\n"), *AccessToken);
-	UE_LOG(LogTemp, Warning, TEXT("[2]IdToken token: %s\n\n"), *IdToken);
-	UE_LOG(LogTemp, Warning, TEXT("[3]refresh token: %s\n\n"), *RefreshToken);*/
 
 	// World Timer에 등록하기
 	GetWorld()->GetTimerManager().SetTimer(RetrieveNewTokensHandle, this, &UBaseInstance::RetrieveNewTokens, 1.0f, false, 30.0f);

@@ -253,6 +253,14 @@ void ABasePokeHunterGameMode::PreLogin(const FString& Options, const FString& Ad
 #endif
 }
 
+void ABasePokeHunterGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	auto playerState = Cast<AHunterState>(NewPlayer->PlayerState);
+	playerState->InitPlayerData();
+}
+
 void ABasePokeHunterGameMode::Logout(AController* Exiting) {
 #if WITH_GAMELIFT
 	if (LatestBackfillTicketId.Len() > 0) {

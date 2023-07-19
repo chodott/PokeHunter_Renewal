@@ -27,12 +27,14 @@ public:
 		FString Team;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
-		float totalDamage = 0.0f;
+		float totalDamage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int HunterSkin = 1;
+		int HunterSkin;
 
 public:
+	void InitPlayerData();
+
 	//Replication
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
 

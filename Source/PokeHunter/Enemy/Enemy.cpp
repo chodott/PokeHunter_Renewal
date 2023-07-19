@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Base/ItemDropActor.h"
+#include "PokeHunter/Base/BaseCharacter.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "PokeHunter/Partner/Partner.h"
 
@@ -197,14 +198,15 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	if (HitItem)
 	{
 		CurState = EEnemyState::Hit;
-		if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
+		AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner);
+		if (Hunter)
 		{
 			Hunter->SetPartnerTarget(this);
 		}
 
 		if (Target == NULL)
 		{
-			Target = HitItem->ThisOwner;
+			Target = Hunter;
 		}
 	}
 
@@ -313,13 +315,14 @@ void AEnemy::MultiShowDamage_Implementation(float DamageAmount, const FVector& S
 	OnDamage.Broadcast(DamageAmount, ShowLoc);
 }
 
-void AEnemy::SeeNewTarget(AActor* Actor)
+void AEnemy::SeeNewTarget(AActor* NewTarget)
 {
-	TargetArray.AddUnique(Actor);
+	ABaseCharacter* NewBaseCharacter = Cast<ABaseCharacter>(NewTarget);
+	TargetArray.AddUnique(NewBaseCharacter);
 
 	if (Target == NULL)
 	{
-		SetTarget(Actor);
+		SetTarget(NewBaseCharacter);
 		//CurState = EEnemyState::Chase;
 		//EnemyAnim->StopCombatMontage(0.2f);
 	}
@@ -328,9 +331,9 @@ void AEnemy::SeeNewTarget(AActor* Actor)
 
 void AEnemy::HearSound(FVector SoundLoc, AActor* AgroActor)
 {
-	TargetPos = SoundLoc;
-	AgroTarget = AgroActor;
-	bWaitingAgro = true;
+	//TargetPos = SoundLoc;
+	//AgroTarget = AgroActor;
+	//bWaitingAgro = true;
 }
 
 void AEnemy::ComeBackHome(float Distance)
@@ -348,8 +351,6 @@ void AEnemy::ComeBackHome(float Distance)
 
 bool AEnemy::CheckInMoveRange()
 {
-	if (CurState == EEnemyState::Die) return false;
-
 	float Distance = FVector::Dist2D(BaseLocation, GetActorLocation());
 	bool bResult = Distance <= MoveRange;
 	if (bResult) return true;
@@ -384,17 +385,20 @@ void AEnemy::ChangeTarget()
 	int ShortestDistance = 100000000;
 	for (int i = 0; i < TargetArray.Num(); ++i)
 	{
-		FVector DirectionVec = TargetArray[i]->GetActorLocation() - GetActorLocation();
-		DirectionVec.Z = 0;
-		float Distance = DirectionVec.Size();
-
-		if (Distance < ShortestDistance)
+		if (TargetArray[i]->HP > 0)
 		{
-			ShortestDistance = Distance;
-			NearestTargetNum = i;
+			FVector DirectionVec = TargetArray[i]->GetActorLocation() - GetActorLocation();
+			DirectionVec.Z = 0;
+			float Distance = DirectionVec.Size();
+
+			if (Distance < ShortestDistance)
+			{
+				ShortestDistance = Distance;
+				NearestTargetNum = i;
+			}
 		}
 	}
-	if (!TargetArray.IsEmpty()) Target = TargetArray[NearestTargetNum];
+	if (!TargetArray.IsEmpty()) Target = NULL;
 }
 
 int AEnemy::CheckInRange()
@@ -413,7 +417,6 @@ void AEnemy::Attack(int AttackPattern)
 	{
 		CurState = EEnemyState::NormalAttack;
 		ServerPlayMontage(this, FName("Attack"));
-		//EnemyAnim->PlayCombatMontage(TEXT("Attack"));
 	}
 }
 
@@ -559,8 +562,9 @@ void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	{
 		EnemyAnim->bPlaying = false;
 		OnMontageEnd.Broadcast();
+		CurState = EEnemyState::Chase;
 		//if (CurState == EEnemyState::Hit) CurState = EEnemyState::Roar;
-		//CurState = EEnemyState::Chase;
+
 	}
 
 

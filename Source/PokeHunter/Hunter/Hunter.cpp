@@ -142,7 +142,7 @@ void AHunter::BeginPlay()
 	if (DiveCurve)
 	{
 		DiveTimeline.AddInterpFloat(DiveCurve, DiveInterpCallback);
-		DiveTimeline.SetTimelineLength(1.32f);
+		DiveTimeline.SetTimelineLength(0.66f);
 	}
 
 	FString LevelName = GetWorld()->GetName();
@@ -211,8 +211,6 @@ void AHunter::Tick(float DeltaTime)
 		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, 500.f, DeltaTime, ArmSpeed);
 		float temp = FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, 0.f, DeltaTime, ArmSpeed);
 		CameraBoom->SetRelativeLocation(FVector(0.f, temp, 0.f));
-
-
 	}
 
 	//Stamina
@@ -317,8 +315,8 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	if (Bullet) return 0.f;
 
 
-	HunterHP -= DamageAmount;
-	ServerHunterHP(gameinstance->MyName, HunterHP);
+	HP -= DamageAmount;
+	ServerHunterHP(gameinstance->MyName, HP);
 
 	if (GetHP() <= 0)
 	{ //죽었을 때
@@ -370,7 +368,7 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 
-	DOREPLIFETIME(AHunter, HunterHP);
+	
 	DOREPLIFETIME(AHunter, HunterStamina);
 	DOREPLIFETIME(AHunter, CurState);
 	DOREPLIFETIME(AHunter, Partner);
@@ -459,9 +457,9 @@ void AHunter::ServerHunterHP_Implementation(FName PlayerName, float NewHP)
 
 void AHunter::MultiHunterHP_Implementation(FName PlayerName, float NewHP)
 {
-	float* HP = PartyMemberHP.Find(PlayerName);
-	if (HP) {
-		*HP = NewHP;
+	float* TempHP = PartyMemberHP.Find(PlayerName);
+	if (TempHP) {
+		*TempHP = NewHP;
 	}
 }
 
@@ -472,9 +470,9 @@ void AHunter::ServerPetHP_Implementation(FName PlayerName, float NewHP)
 
 void AHunter::MultiPetHP_Implementation(FName PlayerName, float NewHP)
 {
-	float* HP = PartyMemberPetHP.Find(PlayerName);
-	if (HP) {
-		*HP = NewHP;
+	float* TempHP = PartyMemberPetHP.Find(PlayerName);
+	if (TempHP) {
+		*TempHP = NewHP;
 	}
 }
 
@@ -532,6 +530,7 @@ void AHunter::SpaceDown()
 		HunterStamina -= 15.f;
 		CurState = EPlayerState::Dive;
 		LastInput = GetCharacterMovement()->GetLastInputVector();
+		GetCharacterMovement()->Velocity = LastInput * GetCharacterMovement()->GetMaxSpeed();
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		ServerPlayMontage(this, FName("Dive"));
 	

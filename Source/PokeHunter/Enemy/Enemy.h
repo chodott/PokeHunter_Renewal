@@ -49,7 +49,7 @@ public:
 	float HP{ 30 };
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
-		class AActor* Target;
+		class ABaseCharacter* Target;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		class AActor* AgroTarget;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -62,7 +62,7 @@ public:
 		TArray<FName> DropItemID_Array;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		TArray<AActor*> TargetArray;
+		TArray<class ABaseCharacter*> TargetArray;
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
 		FVector TargetPos;
@@ -190,8 +190,8 @@ public:
 	void MultiShowDamage(float DamageAmount, const FVector& ShowLoc);
 
 
-	void SetTarget(AActor* NewTarget) { Target = NewTarget; };
-	void SeeNewTarget(AActor* Actor);
+	void SetTarget(AActor* NewTarget) { Target = Cast<class ABaseCharacter>(NewTarget); };
+	void SeeNewTarget(AActor* NewTarget);
 	void HearSound(FVector SoundLoc, AActor* AgroTarget);
 
 	void ComeBackHome(float Distance);

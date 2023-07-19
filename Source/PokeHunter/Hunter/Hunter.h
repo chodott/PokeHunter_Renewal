@@ -12,6 +12,7 @@
 #include "PokeHunter/Base/ItemInteractInterface.h"
 #include "PokeHunter/Base/EnemyInteractInterface.h"
 #include "PokeHunter/Base/BaseInstance.h"
+#include "PokeHunter/Base/BaseCharacter.h"
 #include "Hunter.generated.h"
 
 //Dynamic 
@@ -53,7 +54,7 @@ public:
 };
 
 UCLASS()
-class POKEHUNTER_API AHunter : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface
+class POKEHUNTER_API AHunter : public ABaseCharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface
 {
 	GENERATED_BODY()
 
@@ -73,9 +74,6 @@ public:
 	//HunterInfo
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
 	FHunterInfo HunterInfo;
-
-	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Status")
-	float HunterHP{ 100 };
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Status")
 	float HunterStamina{ 100 };
@@ -162,14 +160,8 @@ public:
 	float StartShotTime;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bCanShot;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
-	bool bInvincible{ false};
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
-	float InvincibleTime{ 1.f };
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
-	float StartInvincibleTime;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
-	float HealPerSecondAmount;
+	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float StaminaPerSecondAmount;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
@@ -178,15 +170,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bGrabbed;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
-	bool bDamaged;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bBound;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
-	bool bNoCollision;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
-	float NoCollisionTime{ 0.5f };
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battle")
-	float StartNoCollisionTime;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	float bTotalDamaged = 0.0f;
@@ -270,9 +254,9 @@ public:
 
 	//Status
 	UFUNCTION(BlueprintCallable)
-	void SetHP(float HP) { HunterHP = HP; };
+	void SetHP(float setHP) { HP = setHP; };
 	UFUNCTION(BlueprintCallable)
-	float GetHP() { return HunterHP; };
+	float GetHP() { return HP; };
 	UFUNCTION(BlueprintCallable)
 	void SetStamina(float Stamina) { HunterStamina = Stamina; };
 	
@@ -282,13 +266,13 @@ public:
 		TMap<FName, float> PartyMemberPetHP;	// = { {FName("Tester01"), 0.f}, {FName("Tester02"), 80.f}, {FName("Tester03"), 20.f}, {FName("Tester04"), 60.f} };	// <OwnerName, pet HP>
 
 	UFUNCTION(Server, Reliable, Category = "Party member info")
-		void ServerHunterHP(FName PlayerName, float HP);
+		void ServerHunterHP(FName PlayerName, float NewHP);
 	UFUNCTION(NetMulticast, Reliable, Category = "Party member info")
-		void MultiHunterHP(FName PlayerName, float HP);
+		void MultiHunterHP(FName PlayerName, float NewHP);
 	UFUNCTION(Server, Reliable, Category = "Party member info")
-		void ServerPetHP(FName PlayerName, float HP);
+		void ServerPetHP(FName PlayerName, float NewHP);
 	UFUNCTION(NetMulticast, Reliable, Category = "Party member info")
-		void MultiPetHP(FName PlayerName, float HP);
+		void MultiPetHP(FName PlayerName, float NewHP);
 
 
 	// Called to bind functionality to input

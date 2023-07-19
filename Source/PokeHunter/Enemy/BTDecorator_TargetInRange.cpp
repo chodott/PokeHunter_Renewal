@@ -6,6 +6,8 @@
 #include "EnemyController.h"
 #include "components/CapsuleComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "PokeHunter/Base/BaseCharacter.h"
+
 
 bool UBTDecorator_TargetInRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
@@ -13,11 +15,13 @@ bool UBTDecorator_TargetInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 
 	AEnemy* Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	if (Enemy == NULL) return false;
+	ABaseCharacter* CurTarget = Cast<ABaseCharacter>(Enemy->Target);
+	if (CurTarget == NULL) return false;
 
-	if (Enemy->Target == NULL)
-	return false;
-	
-	ACharacter* CurTarget = Cast<ACharacter>(Enemy->Target);
+	if (CurTarget->HP <= 0)
+	{
+		Enemy->ChangeTarget();
+	}
 	float AttackRange = Enemy->AttackRange;
 	float Radius = Enemy->GetCapsuleComponent()->GetUnscaledCapsuleRadius();
 	float TargetRadius = CurTarget->GetCapsuleComponent()->GetUnscaledCapsuleRadius();

@@ -4,11 +4,11 @@
 #include <Net/UnrealNetwork.h>
 #include <PokeHunter/Base/BaseInstance.h>
 
-AHunterController::AHunterController()
-{
-	SetReplicates(true);
-	bAlwaysRelevant = true;
-}
+//AHunterController::AHunterController()
+//{
+//	SetReplicates(true);
+//	bAlwaysRelevant = true;
+//}
 
 void AHunterController::PostInitializeComponents()
 {
@@ -23,7 +23,9 @@ void AHunterController::BeginPlay()
 	PlayerCameraManager->ViewPitchMax = 45.f;
 	PlayerCameraManager->ViewPitchMin = -30.f;
 
-	baseinstance = Cast<UBaseInstance>(GetGameInstance());
+	
+
+	// baseinstance = Cast<UBaseInstance>(GetGameInstance());
 }
 
 //bool AHunterController::Server_SendMaterialInfo_Validate(int32 SelectedMaterialIndex)

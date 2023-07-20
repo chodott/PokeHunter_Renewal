@@ -15,13 +15,13 @@ class POKEHUNTER_API AHunterController : public APlayerController
 	GENERATED_BODY()
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "HunterSkin")
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "HunterSkin")
 		int32 SelectedMaterialIndex;
 
-	UBaseInstance* baseinstance;
+	UBaseInstance* baseinstance;*/
 
 public:
-	AHunterController();
+	// AHunterController();
 
 	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;

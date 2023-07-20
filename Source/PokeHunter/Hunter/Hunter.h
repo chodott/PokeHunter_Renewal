@@ -175,12 +175,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	float bTotalDamaged = 0.0f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "HunterSkin")
-		UMaterialInterface* OriginalMaterial;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MaterialInstance, Category = "HunterSkin")
-		UMaterialInstanceDynamic* MaterialInstance;
-
 protected:
 	// Sets default values for this character's properties
 	AHunter();

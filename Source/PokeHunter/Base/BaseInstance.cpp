@@ -20,7 +20,7 @@ UBaseInstance::UBaseInstance()
 void UBaseInstance::Init()
 {
 	Super::Init();
-	ConnectToServer();
+	// ConnectToServer();
 }
 
 bool UBaseInstance::ConnectToServer()

@@ -178,8 +178,6 @@ void AHunter::BeginPlay()
 			Inventory->InfoArray.Add(FItemCnter{});
 		}
 	}
-
-	ApplyMaterialToCharacter();
 }
 
 // Called every frame
@@ -363,9 +361,6 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AHunter, Partner);
 	DOREPLIFETIME(AHunter, InteractingActor);
 	DOREPLIFETIME(AHunter, bUpperOnly);
-
-	DOREPLIFETIME_CONDITION(AHunter, OriginalMaterial, COND_InitialOnly);
-	DOREPLIFETIME_CONDITION(AHunter, MaterialInstance, COND_OwnerOnly);
 }
 
 void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)

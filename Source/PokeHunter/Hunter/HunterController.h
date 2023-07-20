@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "..\PokeHunter.h"
+#include "PokeHunter/PokeHunter.h"
 #include "GameFramework/PlayerController.h"
 #include "HunterController.generated.h"
 
@@ -14,7 +14,24 @@ class POKEHUNTER_API AHunterController : public APlayerController
 {
 	GENERATED_BODY()
 	
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "HunterSkin")
+		int32 SelectedMaterialIndex;
+
+	UBaseInstance* baseinstance;
+
 public:
+	AHunterController();
+
 	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
+
+	//Replicated
+	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
+	//void SelectMaterial(int32 SelectedMaterialIndex);
+
+	//// UFUNCTION(Server, Reliable, WithValidation)
+	//UFUNCTION(Server, WithValidation)
+	//	void Server_SendMaterialInfo(int32 SelectedMaterialIndex);
 };

@@ -8,8 +8,13 @@ void AHunterState::InitPlayerData()
 {
 	totalDamage = 0.0f;
 	
-	auto instance = Cast<UBaseInstance>(GetGameInstance());
+	/*auto instance = Cast<UBaseInstance>(GetGameInstance());
+
+	instance->SendAccessToken();
+
 	HunterSkin = instance->mySkin;
+
+	UE_LOG(LogTemp, Warning, TEXT("[HunterSkin] : %d\n[instance->mySkin] : %d"), HunterSkin, instance->mySkin);*/
 }
 
 void AHunterState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -20,6 +20,7 @@ UBaseInstance::UBaseInstance()
 void UBaseInstance::Init()
 {
 	Super::Init();
+	ConnectToServer();
 }
 
 bool UBaseInstance::ConnectToServer()
@@ -107,7 +108,8 @@ bool UBaseInstance::SendAccessToken()
 			if (partner_number <= (sizeof(EPartnerType) / sizeof(uint8))) {
 				myPartner = static_cast<EPartnerType>(partner_number);
 				mySkin = static_cast<int>(info_pack._player_skin - '0');
-				// UE_LOG(LogTemp, Warning, TEXT("Success get player information!"));
+
+				UE_LOG(LogTemp, Warning, TEXT("[Skin] %d"), mySkin);
 			}
 			else {
 				UE_LOG(LogTemp, Warning, TEXT("Fail Get Partner number: %d"), partner_number);

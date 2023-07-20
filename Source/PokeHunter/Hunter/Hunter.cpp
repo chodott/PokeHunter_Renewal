@@ -145,39 +145,26 @@ void AHunter::BeginPlay()
 		DiveTimeline.SetTimelineLength(0.66f);
 	}
 
-	FString LevelName = GetWorld()->GetName();
-	FString StageName = "L_Field0";
-	if (nullptr == gameinstance) return;
-	if (StageName == LevelName) 
+	ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
+	TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
+
+	if (HasAuthority())
 	{
-		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
-		TSubclassOf<APartner> partnerClass = DatabaseActor->FindPartner(gameinstance->myPartner);
+		FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
+		ServerSpawnPartner(this, partnerClass, SpawnLocation);
+	}
 
-		if (HasAuthority())
+	for (int i = 0; i < 4; ++i)
+	{
+		ESkillID SkillID = HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i];
+		if (SkillID != ESkillID::None)
 		{
-			FVector SpawnLocation = GetActorLocation() + FVector(0, 200, 0);
-			ServerSpawnPartner(this, partnerClass, SpawnLocation);
+			SkillInfoArray[i] = DatabaseActor->FindSkill(HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i]);
 		}
-
-		/*PartyMemberHP.Empty();
-		for (FName& newName : gameinstance->PlayerName) {
-			PartyMemberHP.Add(newName, 1.f);
-		}*/
-
-		for (int i = 0; i < 4; ++i)
-		{
-			ESkillID SkillID = HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i];
-			if (SkillID != ESkillID::None)
-			{
-				SkillInfoArray[i] = DatabaseActor->FindSkill(HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i]);
-			}
-		}
-
 	}
 
 	// Set player controller in baseintance
 	gameinstance->cur_playerController = Cast<APlayerController>(GetController());
-
 
 	// Set item inventory
 	if (false == gameinstance->InfoArray.IsEmpty()) {
@@ -191,6 +178,8 @@ void AHunter::BeginPlay()
 			Inventory->InfoArray.Add(FItemCnter{});
 		}
 	}
+
+	ApplyMaterialToCharacter();
 }
 
 // Called every frame
@@ -374,6 +363,9 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AHunter, Partner);
 	DOREPLIFETIME(AHunter, InteractingActor);
 	DOREPLIFETIME(AHunter, bUpperOnly);
+
+	DOREPLIFETIME_CONDITION(AHunter, OriginalMaterial, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(AHunter, MaterialInstance, COND_OwnerOnly);
 }
 
 void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
@@ -1064,6 +1056,14 @@ void AHunter::InteractWideAttack_Implementation(float DamageAmount)
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	bNoCollision = true;
 	SetActorEnableCollision(false);
+}
+
+void AHunter::ApplyMaterialToCharacter()
+{
+	UBaseInstance* baseinstance = Cast<UBaseInstance>(GetGameInstance());
+	if (baseinstance) {
+		baseinstance->mySkin;
+	}
 }
 
 void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)

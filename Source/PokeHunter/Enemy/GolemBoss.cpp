@@ -473,10 +473,13 @@ void AGolemBoss::DeleteHitBox(const FName& PartName)
 
 int AGolemBoss::CheckInRange()
 {
-	float Distance = FVector::Dist2D(Target->GetTargetLocation(), GetActorLocation());
-	for (int i = 0; i < NormalAttackRange.Num(); ++i)
+	if (Target)
 	{
-		if (NormalAttackRange[i] >= Distance) return i;
+		float Distance = FVector::Dist2D(Target->GetTargetLocation(), GetActorLocation());
+		for (int i = 0; i < NormalAttackRange.Num(); ++i)
+		{
+			if (NormalAttackRange[i] >= Distance) return i;
+		}
 	}
 	return 0;
 }

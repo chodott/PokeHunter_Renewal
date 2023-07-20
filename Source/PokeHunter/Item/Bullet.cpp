@@ -77,7 +77,7 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	if (!OtherActor || OtherActor == ThisOwner) return;
 	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	
-	const FHitResult HitInfo = FHitResult(OtherActor, OtherComponent, GetActorLocation(), FVector(0,0,0));
+	const FHitResult HitInfo = FHitResult(OtherActor, OtherComponent, StaticMesh->GetComponentLocation(), FVector(0, 0, 0));
 	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), HitInfo, ThisOwner->GetController(), this, UDamageType::StaticClass());
 	if (OtherActor->Implements<UItemInteractInterface>())
 	{

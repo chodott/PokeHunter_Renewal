@@ -35,7 +35,8 @@ ABullet::ABullet()
 	
 	if (GetLocalRole() == ROLE_Authority)
 	{
-		StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
+		//StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
+		StaticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnOverlapBegin);
 	}
 
 	ItemType = EItemType::Bullet;
@@ -67,6 +68,28 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 	{
 		ServerDestroy();
 	}
+}
+
+void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraComponent->GetAsset(), StaticMesh->GetComponentLocation(), GetActorRotation());
+	if (SoundEffect) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundEffect, StaticMesh->GetComponentLocation());
+	if (!OtherActor || OtherActor == ThisOwner) return;
+	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+	
+	const FHitResult HitInfo = FHitResult(OtherActor, OtherComponent, GetActorLocation(), FVector(0,0,0));
+	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), HitInfo, ThisOwner->GetController(), this, UDamageType::StaticClass());
+	if (OtherActor->Implements<UItemInteractInterface>())
+	{
+		ApplyAbillity(OtherActor, OtherComponent);
+	}
+	else OnHitNotEnemy(HitInfo.Location);
+
+	if (!bAttached)
+	{
+		ServerDestroy();
+	}
+
 }
 
 

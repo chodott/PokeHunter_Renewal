@@ -63,9 +63,15 @@ public:
 
 	void ApplyDamage();
 	virtual void UseSpecialSkill(ESkillID SkillID);
+	virtual void CancelOrder();
 	void LaunchIceShard();
+	UFUNCTION(BlueprintCallable)
+	void ActivateBreathe();
 	void IceBreathe();
+	void ResetBreathe();
 	UFUNCTION(BlueprintCallable)
 	void MakeIceShard();
+	UFUNCTION(BlueprintCallable)
+	void ActivateStorm();
 	void MakeStorm();
 };

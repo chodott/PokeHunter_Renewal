@@ -45,8 +45,6 @@ void AWolfPartner::Tick(float DeltaTime)
 		BreatheLimitTime -= DeltaTime;
 		if (CurSecond != FMath::FloorToInt(BreatheLimitTime))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Breathe is Running"));
-
 			TArray<AActor*> OverlapActors;
 			BreathCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
 			for (auto Enemy : OverlapActors)
@@ -141,6 +139,7 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 			bUsingSkill = true;
 			bOrdered = true;
 			bSuccess = true;
+			
 		}
 		break;
 	default:
@@ -153,6 +152,12 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 	}
 }
 
+void AWolfPartner::CancelOrder()
+{
+	Super::CancelOrder();
+	ResetBreathe();
+}
+
 void AWolfPartner::LaunchIceShard()
 {
 	ServerPlayMontage(FName("IceShard"));
@@ -160,11 +165,21 @@ void AWolfPartner::LaunchIceShard()
 
 void AWolfPartner::IceBreathe()
 {
+	ServerPlayMontage(FName("Breathe"));
+	
+}
+
+void AWolfPartner::ResetBreathe()
+{
+	BreatheLimitTime = 0.0f;
+}
+
+void AWolfPartner::ActivateBreathe()
+{
 	BreatheLimitTime = BreathTime;
 	bBreathe = true;
 	BreathCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	BreathCollision->SetVisibility(true);
-	ServerPlayMontage(FName("Breathe"));
 }
 
 void AWolfPartner::MakeIceShard()
@@ -184,10 +199,13 @@ void AWolfPartner::MakeIceShard()
 void AWolfPartner::MakeStorm()
 {
 	ServerPlayMontage(FName("IceStorm"));
+}
+
+void AWolfPartner::ActivateStorm()
+{
 	StormCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	StormCollision->SetVisibility(true);
 	StormLimitTime = StormTime;
 	bOnStorm = true;
-	//StormCollision.set
 }
 

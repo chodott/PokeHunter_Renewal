@@ -327,6 +327,8 @@ void APartner::SetTarget(ACharacter* setTarget)
 void APartner::CancelOrder()
 {
 	bOrdered = false;
+	PartnerAnim->StopAllMontages(0.5f);
+	StopSkill();
 }
 
 void APartner::FollowHunter(AHunter* Master)

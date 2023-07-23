@@ -131,8 +131,8 @@ public:
 	virtual void StopSkill();
 	virtual void UseNormalSkill(ESkillID SkillID);
 	virtual void UseSpecialSkill(ESkillID SkillID);
+	virtual void CancelOrder();
 	void SetTarget(ACharacter* setTarget);
-	void CancelOrder();
 	void FollowHunter(class AHunter* Hunter);
 
 	//AnimationFunction

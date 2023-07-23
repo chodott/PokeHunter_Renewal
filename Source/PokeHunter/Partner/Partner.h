@@ -9,6 +9,7 @@
 #include "PokeHunter/Base/SkillData.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
 #include "PokeHunter/Base/EnemyInteractInterface.h"
+#include "PokeHunter/Base/PartnerSkillInterface.h"
 #include "PokeHunter/Base/BaseInstance.h"
 #include "PokeHunter/Base/BaseCharacter.h"
 #include "Partner.generated.h"
@@ -35,7 +36,7 @@ enum class EPartnerState : uint8
 };
 
 UCLASS()
-class POKEHUNTER_API APartner : public ABaseCharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface 
+class POKEHUNTER_API APartner : public ABaseCharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface , public IPartnerSkillInterface
 {
 	GENERATED_BODY()
 

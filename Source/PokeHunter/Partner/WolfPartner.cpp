@@ -57,6 +57,10 @@ void AWolfPartner::Tick(float DeltaTime)
 			for (auto Enemy : OverlapActors)
 			{
 				ServerApplyDamage(Enemy, BreathDamage, GetController(), this);
+				if (Enemy->Implements<UItemInteractInterface>())
+				{
+					Execute_InteractIceSkill(Enemy);
+				}
 			}
 		}
 
@@ -75,13 +79,14 @@ void AWolfPartner::Tick(float DeltaTime)
 		StormLimitTime -= DeltaTime;
 		if (CurSecond != FMath::FloorToInt(StormLimitTime))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Storm is Running"));
+			
 
 			TArray<AActor*> OverlapActors;
 			StormCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
 			for (auto Enemy : OverlapActors)
 			{
 				ServerApplyDamage(Enemy, StormDamage, GetController(), this);
+				Execute_InteractIceSkill(Enemy);
 			}
 		}
 
@@ -203,8 +208,6 @@ void AWolfPartner::MakeIceShard()
 	FVector DirectionVec = EndPos - InitialPos;
 	FRotator Rotation = DirectionVec.Rotation();
 
-	
-	
 	//FQuat TargetRotation = FQuat::FindBetweenNormals(GetActorForwardVector(), DirectionVec);
 	//FRotator Rotation = TargetRotation.Rotator();
 	ServerSpawnProjectile(this, IceShardClass, InitialPos, EndPos, Rotation);

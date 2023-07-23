@@ -17,10 +17,8 @@ class POKEHUNTER_API ABullet : public AItem
 public:
 	ABullet();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
-	class UParticleSystem* ParticleSystem;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
-	class UNiagaraComponent* NiagaraComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	class UNiagaraSystem* HitEffect;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
 	class USoundBase* SoundEffect;
 

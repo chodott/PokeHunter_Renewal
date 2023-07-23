@@ -9,6 +9,7 @@
 #include "PokeHunter/Enemy/Enemy.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
 
 AWolfPartner::AWolfPartner()
 {
@@ -25,12 +26,18 @@ AWolfPartner::AWolfPartner()
 	//스킬 범위 컴포넌트
 	StormCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("StormCollision"));
 	StormCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	StormCollision->SetupAttachment(GetMesh());
+	StormCollision->SetupAttachment(GetRootComponent());
+
 	BreathCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("BreathCollision"));
 	BreathCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BreathCollision->SetupAttachment(GetMesh(), FName("Head"));
 	BreathCollision->SetVisibility(false);
 
+	IceBreatheEffect = CreateDefaultSubobject<UNiagaraComponent>(FName("BreathEffect"));
+	IceBreatheEffect->SetupAttachment(GetMesh(), FName("Head"));
+
+	IceStormEffect = CreateDefaultSubobject<UNiagaraComponent>(FName("StormEffect"));
+	IceStormEffect->SetupAttachment(GetRootComponent());
 }
 
 
@@ -94,6 +101,12 @@ void AWolfPartner::BeginPlay()
 
 	//StormCollision->OnComponentBeginOverlap.AddDynamic(this, &AWolfPartner::IntoStorm);
 	//StormCollision->OnComponentEndOverlap.AddDynamic(this, &AWolfPartner::OutStorm);
+
+	IceBreatheEffect->SetFloatParameter(FName("SkillDuration"), BreathTime);
+	IceBreatheEffect->SetVectorParameter(FName("BreathSize"), BreathCollision->GetComponentScale());
+	IceStormEffect->SetFloatParameter(FName("SkillDuration"), StormTime);
+	IceStormEffect->SetFloatParameter(FName("RadiusScale"), StormSize);
+	
 }
 
 
@@ -172,6 +185,7 @@ void AWolfPartner::IceBreathe()
 void AWolfPartner::ResetBreathe()
 {
 	BreatheLimitTime = 0.0f;
+	IceBreatheEffect->Deactivate();
 }
 
 void AWolfPartner::ActivateBreathe()
@@ -179,7 +193,7 @@ void AWolfPartner::ActivateBreathe()
 	BreatheLimitTime = BreathTime;
 	bBreathe = true;
 	BreathCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	BreathCollision->SetVisibility(true);
+	IceBreatheEffect->Activate(true);
 }
 
 void AWolfPartner::MakeIceShard()
@@ -204,8 +218,8 @@ void AWolfPartner::MakeStorm()
 void AWolfPartner::ActivateStorm()
 {
 	StormCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	StormCollision->SetVisibility(true);
 	StormLimitTime = StormTime;
 	bOnStorm = true;
+	IceStormEffect->Activate(true);
 }
 

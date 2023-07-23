@@ -27,11 +27,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* BreathCollision;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Particle")
-	class UParticleSystemComponent* IceBreathe_Effect = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Particle")
+	class UNiagaraComponent* IceBreatheEffect = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Particle")
-	class UParticleSystemComponent* IceStorm_Effect = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Particle")
+	class UNiagaraComponent* IceStormEffect = nullptr;
 
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Skill")
@@ -49,6 +49,8 @@ public:
 	float StormLimitTime{};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	float StormDamage{};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
+	float StormSize{4.f};
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Skill")
 	bool bOnStorm{ false };
 

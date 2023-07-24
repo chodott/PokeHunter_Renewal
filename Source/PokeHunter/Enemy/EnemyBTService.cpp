@@ -19,4 +19,6 @@ void UEnemyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 	OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName("Binding"), Enemy->bBinding);
 	OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName("Died"), Enemy->bDied);
 	OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName("bInMoveRange"), Enemy->CheckInMoveRange());
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName("bFrozen"), Enemy->bFrozen);
+	OwnerComp.GetBlackboardComponent()->SetValueAsFloat(FName("FrozenTime"), Enemy->FrozenTime);
 }

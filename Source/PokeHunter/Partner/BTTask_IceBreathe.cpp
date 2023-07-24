@@ -2,6 +2,7 @@
 
 
 #include "BTTask_IceBreathe.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "WolfPartner.h"
 #include "PartnerController.h"
 
@@ -30,9 +31,26 @@ EBTNodeResult::Type UBTTask_IceBreathe::ExecuteTask(UBehaviorTreeComponent& Owne
 
 void UBTTask_IceBreathe::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+
+	APawn* Pawn = Cast<APawn>(OwnerComp.GetAIOwner()->GetPawn());
+	if (Pawn == nullptr) FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+	APartner* Partner = Cast<APartner>(Pawn);
+	FVector TargetPos = Partner->Target->GetActorLocation();
+	FVector LookVec = TargetPos - Pawn->GetActorLocation();
+
+	
+
+	LookVec.Z = 0.f;
+	FVector ForwardVec = Pawn->GetActorForwardVector();
+
+	LookVec.Normalize();
+	FRotator Rot = FRotationMatrix::MakeFromX(LookVec).Rotator();
+
+	Pawn->SetActorRotation(FMath::RInterpTo(Pawn->GetActorRotation(), Rot, GetWorld()->GetDeltaSeconds(), 8.f));
+
+
 	if (!bPlaying)
 	{
-		APartner* Partner = Cast<APartner>(OwnerComp.GetAIOwner()->GetPawn());
 		Partner->StopSkill();
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

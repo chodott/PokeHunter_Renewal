@@ -44,6 +44,8 @@ void AEnemy::BeginPlay()
 	if (EnemyAnim) EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
 
 	BaseLocation = GetActorLocation();
+
+	BaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	//ComeBackHome();
 }
 
@@ -118,15 +120,28 @@ void AEnemy::Tick(float DeltaTime)
 		}
 	}
 
-	//if (bDied)
-	//{
-	//	FVector CurScale = GetActorScale();
-	//	SetActorScale3D(CurScale - DeltaTime * FVector(1.f, 1.f, 1.f));
-	//	if (GetActorScale().Length() < 0.2f)
-	//	{
-	//		Die();
-	//	}
-	//}
+	//µÐÈ­
+	if (bSlow)
+	{
+		int CurSecond = FMath::FloorToInt(SlowLimitTime);
+		SlowLimitTime -= DeltaTime;
+		if (SlowLimitTime <= 0.0f)
+		{
+			bSlow = false;
+			GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		}
+	}
+
+	//ºù°á
+	if (bFrozen)
+	{
+		int CurSecond = FMath::FloorToInt(FrozenLimitTime);
+		FrozenLimitTime -= DeltaTime;
+		if (FrozenLimitTime <= 0.0f)
+		{
+			bFrozen = false;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -163,10 +178,6 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
 		HitLoc = PointDamageEvent.HitInfo.Location;
 		FVector DirectionVec = -1.f * PointDamageEvent.HitInfo.ImpactNormal;
-		//DirectionVec.Z = 0.f;
-		//DirectionVec.Normalize();
-		//GetCharacterMovement()->Launch(DirectionVec * 1000.f);
-		//LaunchCharacter(DirectionVec * 1000000.f, true,true);
 	}
 	else
 	{
@@ -243,7 +254,10 @@ void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 	DOREPLIFETIME(AEnemy, BurningLimitTime);
 	DOREPLIFETIME(AEnemy, bPoisoned);
 	DOREPLIFETIME(AEnemy, PoisonLimitTime);
-
+	DOREPLIFETIME(AEnemy, bSlow);
+	DOREPLIFETIME(AEnemy, SlowLimitTime);
+	DOREPLIFETIME(AEnemy, bFrozen);
+	DOREPLIFETIME(AEnemy, FrozenLimitTime);
 }
 
 void AEnemy::ServerPlayMontage_Implementation(AEnemy* Enemy, FName Section)
@@ -572,11 +586,19 @@ void AEnemy::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 
 void AEnemy::InteractIce_Implementation()
 {
+	if (bSlow) return;
 	GetCharacterMovement()->MaxWalkSpeed /= 2;
+	bSlow = true;
+	SlowLimitTime = SlowTime;
 }
 
 void AEnemy::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
 {
+	if (bSlow)
+	{
+		return;
+	}
+
 	bBurning = true;
 	BurningLimitTime = BurningTime;
 }
@@ -604,4 +626,14 @@ void AEnemy::InteractAttack_Implementation(FVector HitDirection, float Damage)
 
 void AEnemy::InteractGrabAttack_Implementation()
 {
+}
+
+void AEnemy::InteractIceSkill_Implementation()
+{
+	if (bFrozen) return;
+	else if (bSlow)
+	{
+		bFrozen = true;
+		FrozenLimitTime = FrozenTime;
+	}
 }

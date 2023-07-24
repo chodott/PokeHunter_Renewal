@@ -9,6 +9,7 @@
 #include "PokeHunter/Enemy/Enemy.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
 
 AWolfPartner::AWolfPartner()
 {
@@ -25,12 +26,18 @@ AWolfPartner::AWolfPartner()
 	//스킬 범위 컴포넌트
 	StormCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("StormCollision"));
 	StormCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	StormCollision->SetupAttachment(GetMesh());
+	StormCollision->SetupAttachment(GetRootComponent());
+
 	BreathCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("BreathCollision"));
 	BreathCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BreathCollision->SetupAttachment(GetMesh(), FName("Head"));
 	BreathCollision->SetVisibility(false);
 
+	IceBreatheEffect = CreateDefaultSubobject<UNiagaraComponent>(FName("BreathEffect"));
+	IceBreatheEffect->SetupAttachment(GetMesh(), FName("Head"));
+
+	IceStormEffect = CreateDefaultSubobject<UNiagaraComponent>(FName("StormEffect"));
+	IceStormEffect->SetupAttachment(GetRootComponent());
 }
 
 
@@ -45,13 +52,15 @@ void AWolfPartner::Tick(float DeltaTime)
 		BreatheLimitTime -= DeltaTime;
 		if (CurSecond != FMath::FloorToInt(BreatheLimitTime))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Breathe is Running"));
-
 			TArray<AActor*> OverlapActors;
 			BreathCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
 			for (auto Enemy : OverlapActors)
 			{
 				ServerApplyDamage(Enemy, BreathDamage, GetController(), this);
+				if (Enemy->Implements<UItemInteractInterface>())
+				{
+					Execute_InteractIceSkill(Enemy);
+				}
 			}
 		}
 
@@ -70,13 +79,14 @@ void AWolfPartner::Tick(float DeltaTime)
 		StormLimitTime -= DeltaTime;
 		if (CurSecond != FMath::FloorToInt(StormLimitTime))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Storm is Running"));
+			
 
 			TArray<AActor*> OverlapActors;
 			StormCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
 			for (auto Enemy : OverlapActors)
 			{
 				ServerApplyDamage(Enemy, StormDamage, GetController(), this);
+				Execute_InteractIceSkill(Enemy);
 			}
 		}
 
@@ -96,6 +106,12 @@ void AWolfPartner::BeginPlay()
 
 	//StormCollision->OnComponentBeginOverlap.AddDynamic(this, &AWolfPartner::IntoStorm);
 	//StormCollision->OnComponentEndOverlap.AddDynamic(this, &AWolfPartner::OutStorm);
+
+	IceBreatheEffect->SetFloatParameter(FName("SkillDuration"), BreathTime);
+	IceBreatheEffect->SetVectorParameter(FName("BreathSize"), BreathCollision->GetComponentScale());
+	IceStormEffect->SetFloatParameter(FName("SkillDuration"), StormTime);
+	IceStormEffect->SetFloatParameter(FName("RadiusScale"), StormSize);
+	
 }
 
 
@@ -141,6 +157,7 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 			bUsingSkill = true;
 			bOrdered = true;
 			bSuccess = true;
+			
 		}
 		break;
 	default:
@@ -153,6 +170,12 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 	}
 }
 
+void AWolfPartner::CancelOrder()
+{
+	Super::CancelOrder();
+	ResetBreathe();
+}
+
 void AWolfPartner::LaunchIceShard()
 {
 	ServerPlayMontage(FName("IceShard"));
@@ -160,11 +183,22 @@ void AWolfPartner::LaunchIceShard()
 
 void AWolfPartner::IceBreathe()
 {
+	ServerPlayMontage(FName("Breathe"));
+	
+}
+
+void AWolfPartner::ResetBreathe()
+{
+	BreatheLimitTime = 0.0f;
+	IceBreatheEffect->Deactivate();
+}
+
+void AWolfPartner::ActivateBreathe()
+{
 	BreatheLimitTime = BreathTime;
 	bBreathe = true;
 	BreathCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	BreathCollision->SetVisibility(true);
-	ServerPlayMontage(FName("Breathe"));
+	IceBreatheEffect->Activate(true);
 }
 
 void AWolfPartner::MakeIceShard()
@@ -174,8 +208,6 @@ void AWolfPartner::MakeIceShard()
 	FVector DirectionVec = EndPos - InitialPos;
 	FRotator Rotation = DirectionVec.Rotation();
 
-	
-	
 	//FQuat TargetRotation = FQuat::FindBetweenNormals(GetActorForwardVector(), DirectionVec);
 	//FRotator Rotation = TargetRotation.Rotator();
 	ServerSpawnProjectile(this, IceShardClass, InitialPos, EndPos, Rotation);
@@ -184,10 +216,13 @@ void AWolfPartner::MakeIceShard()
 void AWolfPartner::MakeStorm()
 {
 	ServerPlayMontage(FName("IceStorm"));
+}
+
+void AWolfPartner::ActivateStorm()
+{
 	StormCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	StormCollision->SetVisibility(true);
 	StormLimitTime = StormTime;
 	bOnStorm = true;
-	//StormCollision.set
+	IceStormEffect->Activate(true);
 }
 

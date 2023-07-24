@@ -409,7 +409,7 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 				{
 					OtherActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GrabSocket"));
 					GrabbedCharacter->SetActorEnableCollision(false);
-					GrabbedTargets.Add(GrabbedCharacter);
+					GrabbedTargets.AddUnique(GrabbedCharacter);
 				}
 				return;
 			}

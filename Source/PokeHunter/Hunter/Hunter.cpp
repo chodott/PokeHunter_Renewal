@@ -239,14 +239,14 @@ void AHunter::Tick(float DeltaTime)
 		if (HunterStamina > 0) HunterStamina -= DeltaTime * StaminaPerSecondAmount;
 		else
 		{
-			HunterStamina = 0;
+			SetStamina(0);
 			GetCharacterMovement()->MaxWalkSpeed = 500.f;
 		}
 	}
 	else
 	{
-		HunterStamina += DeltaTime * StaminaPerSecondAmount;
-		if(HunterStamina >= 100) HunterStamina = 100;
+		SetStamina(HunterStamina + DeltaTime * StaminaPerSecondAmount);
+		if(HunterStamina >= 100) SetStamina(100);
 
 	}
 
@@ -549,7 +549,7 @@ void AHunter::SpaceDown()
 		{
 			LastSpeed = XYspeed.Size();
 		}
-		HunterStamina -= 15.f;
+		SetStamina(HunterStamina - 15.f);
 		CurState = EPlayerState::Dive;
 		LastInput = GetCharacterMovement()->GetLastInputVector();
 		GetCharacterMovement()->Velocity = LastInput * GetCharacterMovement()->GetMaxSpeed();
@@ -665,18 +665,18 @@ void AHunter::LMBDown()
 				FVector StartTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 150.f;
 				FVector EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
 				FHitResult* HitResult = new FHitResult();
-				FCollisionQueryParams BulletTraceParams(FName("Bullet"), true, this);
+				FCollisionQueryParams BulletTraceParams(FName("Visibility"), true, this);
 				if(GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
 				{
-					////Debug LineTrace
-					//DrawDebugLine(
-					//	GetWorld(),
-					//	StartTrace,
-					//	HitResult->Location,
-					//	FColor(255, 0, 0),
-					//	false, 3, 0,
-					//	12.333
-					//);
+					//Debug LineTrace
+					/*DrawDebugLine(
+						GetWorld(),
+						StartTrace,
+						HitResult->Location,
+						FColor(255, 0, 0),
+						false, 3, 0,
+						12.333
+					);*/
 					EndTrace = HitResult->Location;
 				}
 				else
@@ -1038,7 +1038,7 @@ void AHunter::InteractEarthquake_Implementation()
 
 	if (bInvincible) return;
 
-	HunterStamina -= 30.f;
+	SetStamina(HunterStamina - 30.f);
 
 	LaunchCharacter(FVector(0, 0, 1000), false, false);
 }

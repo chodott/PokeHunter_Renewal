@@ -104,8 +104,8 @@ float APartner::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 		bDied = true;
 		SetGenericTeamId(1);
 		HealPerSecondAmount = 0.f;
-		AEnemy* DamageEnemy = Cast<AEnemy>(DamageCauser);
-		if(DamageEnemy) DamageEnemy->LeaveTarget(this);
+		//AEnemy* DamageEnemy = Cast<AEnemy>(DamageCauser);
+		//if(DamageEnemy) DamageEnemy->LeaveTarget(this);
 		return 0;
 	}
 	//입력 제한 필요
@@ -113,7 +113,6 @@ float APartner::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 	{
 		FPointDamageEvent& PointDamageEvent = (FPointDamageEvent&)DamageEvent;
 		ServerPlayMontage(FName("Hit"));
-
 	}
 
 	else
@@ -328,6 +327,8 @@ void APartner::SetTarget(ACharacter* setTarget)
 void APartner::CancelOrder()
 {
 	bOrdered = false;
+	PartnerAnim->StopAllMontages(0.5f);
+	StopSkill();
 }
 
 void APartner::FollowHunter(AHunter* Master)

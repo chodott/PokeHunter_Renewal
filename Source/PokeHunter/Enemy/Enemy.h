@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GenericTeamAgentInterface.h"
+#include "PokeHunter/Base/PartnerSkillInterface.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
 #include "PokeHunter/Base/EnemyInteractInterface.h"
 #include "Enemy.generated.h"
@@ -37,7 +38,7 @@ enum class EEnemyState : uint8
 
 
 UCLASS()
-class POKEHUNTER_API AEnemy : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface
+class POKEHUNTER_API AEnemy : public ACharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface, public IPartnerSkillInterface
 {
 	GENERATED_BODY()
 
@@ -46,7 +47,7 @@ public:
 	AEnemy();
 
 	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite)
-	float HP{ 30 };
+		float HP{ 30 };
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
 		class ABaseCharacter* Target;
@@ -76,7 +77,7 @@ public:
 	};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf <class AEnemyProjectile> ProjectileClass;
+		TSubclassOf <class AEnemyProjectile> ProjectileClass;
 
 	FOnMontageEndDelegate OnMontageEnd;
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable)
@@ -84,51 +85,67 @@ public:
 
 	//TeamID
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
-	FGenericTeamId TeamID;
+		FGenericTeamId TeamID;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FVector BaseLocation;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float MoveRange;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float AttackDamage = 10.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float AttackRange = 200.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float EarthquakeRange = 1000.f;
+	float BaseWalkSpeed {};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float ReflectDamgeAmount{ 0.f};
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bReflecting{ false };
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float StartBindingTime;
+		FVector BaseLocation;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float BindingTime;
+		float MoveRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float AttackDamage = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float AttackRange = 200.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float EarthquakeRange = 1000.f;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bBinding{ false };
+		float ReflectDamgeAmount{ 0.f };
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		bool bReflecting{ false };
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		float StartBindingTime;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		float BindingTime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		bool bBinding{ false };
 
 	//상태 이상
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float SavedDamage{0};
+		float SavedDamage{ 0 };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float GrogyDamage{};
+		float GrogyDamage{};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bGrogy{ false };
+		bool bGrogy{ false };
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
-	bool bPoisoned{ false };
+		bool bPoisoned{ false };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float PoisonedTime{};
+		float PoisonedTime{};
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
-	float PoisonLimitTime;
+		float PoisonLimitTime;
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Burning, BlueprintReadWrite)
-	bool bBurning{ false };
+		bool bBurning{ false };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float BurningTime{};
+		float BurningTime{};
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
-	float BurningLimitTime;
+		float BurningLimitTime;
+
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite);
+	bool bFrozen{false};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float FrozenTime{};
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
+	float FrozenLimitTime{};
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
+	bool bSlow{false};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float SlowTime{};
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
+	float SlowLimitTime{};
 
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
@@ -260,6 +277,9 @@ public:
 	virtual void InteractEarthquake_Implementation();
 	virtual void InteractAttack_Implementation(FVector HitDirection, float Damage);
 	virtual void InteractGrabAttack_Implementation();
+
+	//PartnerSkillInterface
+	virtual void InteractIceSkill_Implementation();
 
 
 };

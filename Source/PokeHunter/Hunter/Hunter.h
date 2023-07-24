@@ -228,6 +228,8 @@ public:
 	void ServerUsePartnerNormalSkill(APartner* MyPartner, ESkillID SkillID);
 	UFUNCTION(Server, Reliable)
 	void ServerUsePartnerSpecialSkill(APartner* MyPartner, ESkillID SkillID);
+	UFUNCTION(Server, Reliable)
+	void ServerCancelOrder(APartner* MyPartner);
 
 	//Use Item RPC
 	UFUNCTION(Server, Reliable)
@@ -255,7 +257,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetHP() { return HP; };
 	UFUNCTION(BlueprintCallable)
-	void SetStamina(float Stamina) { HunterStamina = Stamina; };
+	void SetStamina(float Stamina);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party member info")
 		TMap<FName, float> PartyMemberHP;		//  = { {FName("Tester01"), 0.f}, {FName("Tester02"), 80.f}, {FName("Tester03"), 20.f}, {FName("Tester04"), 60.f} };	// <OwnerName, pet HP>

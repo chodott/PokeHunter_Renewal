@@ -468,3 +468,8 @@ void APartner::MultiApplyDamage_Implementation(AActor* DamagedActor, float Damag
 	UGameplayStatics::ApplyDamage(DamagedActor, DamageAmount, GetController(), DamageCauser, UDamageType::StaticClass());
 
 }
+
+void APartner::MultiCancelOrder_Implementation()
+{
+	CancelOrder();
+}

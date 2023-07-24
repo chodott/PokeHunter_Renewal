@@ -824,7 +824,7 @@ void AHunter::RKeyDown()
 {
 	if (Partner)
 	{
-		Partner->CancelOrder();
+		ServerCancelOrder(Partner);
 	}
 }
 
@@ -1159,7 +1159,6 @@ void AHunter::MultiSetPartnerPosition_Implementation(const FVector& LocVec)
 {
 	Partner->TargetPos = LocVec;
 	Partner->bOrdered = true;
-
 }
 
 
@@ -1197,6 +1196,7 @@ void AHunter::MultiUsePotion_Implementation(APotion* Potion)
 void AHunter::ServerSpawnBullet_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
 {
 	ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(SpawnItemClass, StartLoc, Rotation);
+	Bullet->StaticMesh->SetCollisionProfileName(FName("Bullet"), true);
 	OwnerHunter->CurItem = Bullet;
 	OwnerHunter->bUpperOnly = true;
 	Bullet->MultiLaunchBullet(OwnerHunter, StartLoc, EndLoc);
@@ -1253,4 +1253,17 @@ void AHunter::ServerShotBullet_Implementation(ABullet* Bullet, AHunter* OwnerHun
 
 void AHunter::UpdateQuickSlot_Implementation()
 {
+}
+
+void AHunter::ServerCancelOrder_Implementation(APartner* MyPartner)
+{
+	MyPartner->MultiCancelOrder();
+}
+
+void AHunter::SetStamina(float setStamina)
+{
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		HunterStamina = setStamina;
+	}
 }

@@ -175,6 +175,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	float bTotalDamaged = 0.0f;
 
+	UPROPERTY(Replicated)
+		int32 MaterialIndex;
+
 protected:
 	// Sets default values for this character's properties
 	AHunter();
@@ -351,8 +354,11 @@ public:
 	virtual void InteractAttack_Implementation(FVector HitDirection, float Damage);
 	virtual void InteractGrabAttack_Implementation();
 	virtual void InteractWideAttack_Implementation(float Damage);
-	
-	void ApplyMaterialToCharacter();
+
+	//Hunter New Material
+	void SetNewMaterialIndex(int32 NewMaterialIndex);
+	UFUNCTION(Server, Reliable, Category = "Material")
+		void ServerChangeMaterialIndex(int32 NewMaterialIndex);
 
 public:	// Particle System
 	UPROPERTY(EditDefaultsOnly, Category = "Particle")

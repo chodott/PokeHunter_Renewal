@@ -29,9 +29,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 		float totalDamage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int HunterSkin;
-
 public:
 	void InitPlayerData();
 

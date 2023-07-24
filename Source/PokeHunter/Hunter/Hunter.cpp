@@ -30,6 +30,7 @@
 #include "PokeHunter/Base/ItemDropActor.h"
 #include "PokeHunter/Enemy/EnemyProjectile.h"
 #include <Blueprint/WidgetBlueprintLibrary.h>
+#include "HunterController.h"
 
 
 
@@ -115,6 +116,8 @@ AHunter::AHunter()
 
 	// Set Game instance
 	gameinstance = Cast<UBaseInstance>(UGameplayStatics::GetGameInstance((GetWorld())));
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -177,6 +180,36 @@ void AHunter::BeginPlay()
 		for (; cur < Inventory->capacity; ++cur) {
 			Inventory->InfoArray.Add(FItemCnter{});
 		}
+	}
+
+	//Set Hunter Material
+	/*FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(this, true);
+	if (CurrentLevelName == "MyHome") {
+		FStringAssetReference MaterialPath;
+		switch (gameinstance->mySkin)
+		{
+		case 1:
+			MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+			break;
+		case 2:
+			MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter02");
+			break;
+		default:
+			MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+			break;
+		}
+
+		UMaterialInterface* Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
+		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
+
+		GetMesh()->SetMaterial(0, DynamicMaterial);
+	}*/
+
+	MaterialIndex = gameinstance->mySkin;
+
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerChangeMaterialIndex(MaterialIndex);
 	}
 }
 
@@ -361,6 +394,8 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AHunter, Partner);
 	DOREPLIFETIME(AHunter, InteractingActor);
 	DOREPLIFETIME(AHunter, bUpperOnly);
+
+	DOREPLIFETIME(AHunter, MaterialIndex);
 }
 
 void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
@@ -1053,14 +1088,6 @@ void AHunter::InteractWideAttack_Implementation(float DamageAmount)
 	SetActorEnableCollision(false);
 }
 
-void AHunter::ApplyMaterialToCharacter()
-{
-	UBaseInstance* baseinstance = Cast<UBaseInstance>(GetGameInstance());
-	if (baseinstance) {
-		baseinstance->mySkin;
-	}
-}
-
 void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)
 {
 	for (int i = 0; i < 4; ++i)
@@ -1262,4 +1289,51 @@ void AHunter::ServerShotBullet_Implementation(ABullet* Bullet, AHunter* OwnerHun
 
 void AHunter::UpdateQuickSlot_Implementation()
 {
+}
+
+void AHunter::SetNewMaterialIndex(int32 NewMaterialIndex)
+{
+	UE_LOG(LogTemp, Warning, TEXT("[DBG] AHunter::SetNewMaterialIndex() -> NewMaterialIndex: %d"), NewMaterialIndex);
+
+	MaterialIndex = NewMaterialIndex;
+	// FStringAssetReference MaterialPath{};
+	FSoftObjectPath MaterialPath{};
+	switch (MaterialIndex)
+	{
+	case 1:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		break;
+	case 2:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter02");
+		break;
+	default:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		break;
+	}
+	UMaterialInterface* Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
+	GetMesh()->SetMaterial(0, DynamicMaterial);
+}
+
+void AHunter::ServerChangeMaterialIndex_Implementation(int32 NewMaterialIndex)
+{
+	UE_LOG(LogTemp, Warning, TEXT("[DBG] AHunter::ServerChangeMaterialIndex_Implementation() -> NewMaterialIndex: %d"), NewMaterialIndex);
+	// SetNewMaterialIndex(NewMaterialIndex);
+
+	FSoftObjectPath MaterialPath{};
+	switch (NewMaterialIndex)
+	{
+	case 1:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		break;
+	case 2:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter02");
+		break;
+	default:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		break;
+	}
+	UMaterialInterface* Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
+	GetMesh()->SetMaterial(0, DynamicMaterial);
 }

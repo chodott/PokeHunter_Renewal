@@ -251,6 +251,8 @@ void ABasePokeHunterGameMode::PreLogin(const FString& Options, const FString& Ad
 		ErrorMessage = "Unauthorized";
 	}
 #endif
+	UBaseInstance* gameinstance = Cast<UBaseInstance>(GetGameInstance());
+	UE_LOG(LogTemp, Warning, TEXT("[DBG] - ABasePokeHunterGameMode::PreLogin() -> gameinstance->mySkin : %d"), gameinstance->mySkin);
 }
 
 void ABasePokeHunterGameMode::PostLogin(APlayerController* NewPlayer)
@@ -259,6 +261,9 @@ void ABasePokeHunterGameMode::PostLogin(APlayerController* NewPlayer)
 
 	auto playerState = Cast<AHunterState>(NewPlayer->PlayerState);
 	playerState->InitPlayerData();
+
+	UBaseInstance* gameinstance = Cast<UBaseInstance>(NewPlayer->GetGameInstance());
+	UE_LOG(LogTemp, Warning, TEXT("[DBG] - ABasePokeHunterGameMode::PostLogin() -> gameinstance->mySkin : %d"), gameinstance->mySkin);
 }
 
 void ABasePokeHunterGameMode::Logout(AController* Exiting) {
@@ -330,6 +335,10 @@ FString ABasePokeHunterGameMode::InitNewPlayer(APlayerController* NewPlayerContr
 		}
 	}
 #endif
+
+	UBaseInstance* gameinstance = Cast<UBaseInstance>(NewPlayerController->GetGameInstance());
+	UE_LOG(LogTemp, Warning, TEXT("[DBG] - ABasePokeHunterGameMode::PostLogin() -> gameinstance->mySkin : %d"), gameinstance->mySkin);
+
 	return InitializedString;
 }
 
@@ -555,4 +564,26 @@ bool ABasePokeHunterGameMode::StopBackfillRequest(FString GameSessionArn, FStrin
 	return StopMatchBackfillOutcome.IsSuccess();
 #endif
 	return false;
+}
+
+APawn* ABasePokeHunterGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
+{
+	APawn* pawn = Super::SpawnDefaultPawnFor_Implementation(NewPlayer, StartSpot);
+
+	ACharacter* NewCharacter = Cast<ACharacter>(pawn);
+	if (NewCharacter) {
+		AHunterController* hunterController = Cast<AHunterController>(NewPlayer);
+		if (hunterController) {
+			UE_LOG(LogTemp, Warning, TEXT("[DBG] ABasePokeHunterGameMode::SpawnDefaultPawnFor_Implementation()"));
+			hunterController->SetCharacterMaterialFromGameInstance(pawn);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("[DBG] ABasePokeHunterGameMode::SpawnDefaultPawnFor_Implementation() -> hunterController is nullptr"));
+		}
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("[DBG] ABasePokeHunterGameMode::SpawnDefaultPawnFor_Implementation() -> NewCharacter is nullptr"));
+	}
+
+	return pawn;
 }

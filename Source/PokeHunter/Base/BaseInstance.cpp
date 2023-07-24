@@ -5,6 +5,7 @@
 #include "JsonUtilities.h"
 #include "Kismet/GameplayStatics.h"
 #include "PokeHunter/MainMenu/TextReaderComponent.h"
+#include <Net/UnrealNetwork.h>
 
 UBaseInstance::UBaseInstance()
 {
@@ -337,6 +338,14 @@ void UBaseInstance::OnGetResponseTimeResponseReceived(FHttpRequestPtr Request, F
 	float ResponseTime = Request->GetElapsedTime() * 1000;
 
 	PlayerLatencies.AddTail(ResponseTime);
+}
+
+void UBaseInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// RepNotify 설정
+	DOREPLIFETIME(UBaseInstance, mySkin);
 }
 
 double UBaseInstance::getElapseTime()

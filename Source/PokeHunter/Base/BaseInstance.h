@@ -109,9 +109,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		EPartnerType myPartner = EPartnerType::NonePartner;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int mySkin = 1;
-
 	FSocket* gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
 	TSharedRef<FInternetAddr>addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 	FIPv4Address ip{};
@@ -205,6 +202,13 @@ public:
 		TArray<FItemCnter> StorageInfoArray{};
 
 public:
+	//Replicated
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
+	// Hunter Material Number
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Material")
+		int32 mySkin = 1;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Party")
 		int PartnerNumber = -1;
 

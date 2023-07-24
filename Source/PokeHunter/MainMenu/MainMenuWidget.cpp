@@ -26,7 +26,7 @@ UMainMenuWidget::UMainMenuWidget(const FObjectInitializer& ObjectInitializer) : 
 
 void UMainMenuWidget::NativeConstruct() {
 	Super::NativeConstruct();
-	bIsFocusable = true;
+	SetIsFocusable(true);
 
 	WebBrowser = (UWebBrowser*)GetWidgetFromName(TEXT("WebBrowser_Login"));
 
@@ -107,6 +107,13 @@ void UMainMenuWidget::OnExchangeCodeForTokensResponseReceived(FHttpRequestPtr Re
 						FString IdToken = JsonObject->GetStringField("id_token");
 						FString RefreshToken = JsonObject->GetStringField("refresh_token");
 						ServerIntance->SetCognitoTokens(AccessToken, IdToken, RefreshToken);
+
+						bool connect = ServerIntance->ConnectToServer();
+						bool token = ServerIntance->SendAccessToken();
+
+						if (connect && token) {
+							UE_LOG(LogTemp, Warning, TEXT("[Title] connect and token is TRUE!"));
+						}
 
 						ShowLoadingWidget();
 

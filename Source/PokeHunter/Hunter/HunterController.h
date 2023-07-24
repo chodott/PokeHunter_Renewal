@@ -15,23 +15,17 @@ class POKEHUNTER_API AHunterController : public APlayerController
 	GENERATED_BODY()
 	
 protected:
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "HunterSkin")
-		int32 SelectedMaterialIndex;
-
-	UBaseInstance* baseinstance;*/
 
 public:
-	// AHunterController();
-
 	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 
-	//Replicated
-	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+	UFUNCTION()
+		void SetCharacterMaterialFromGameInstance(APawn* ClientPawn);
 
-	//void SelectMaterial(int32 SelectedMaterialIndex);
-
-	//// UFUNCTION(Server, Reliable, WithValidation)
-	//UFUNCTION(Server, WithValidation)
-	//	void Server_SendMaterialInfo(int32 SelectedMaterialIndex);
+	// 서버에 캐릭터의 머티리얼 정보를 전송하는 함수
+	UFUNCTION(Server, Reliable)
+		void Server_SetCharacterMaterialInfo(APawn* ClientPawn, int32 NewMaterialInfo);
+	UFUNCTION(Server, Reliable)
+		void ClientConnectToServer(int32 NewMaterialInfo);
 };

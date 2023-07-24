@@ -69,7 +69,7 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 
 void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, StaticMesh->GetComponentLocation(), GetActorRotation());
+	ServerSpawnEffect();
 	if (SoundEffect) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundEffect, StaticMesh->GetComponentLocation());
 	if (!OtherActor || OtherActor == ThisOwner) return;
 	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
@@ -171,4 +171,9 @@ void ABullet::MultiApplyDamage_Implementation(AActor* DamagedActor, int DamageAm
 	FPointDamageEvent DamageEvent(DamageAmount, HitInfo, HitInfo.Normal, UDamageType::StaticClass());
 	//DamagedActor->TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	UGameplayStatics::ApplyPointDamage(DamagedActor, DamageAmount, Direction, HitInfo, EventInstigator, DamageCauser, DamageTypeClass);
+}
+
+void ABullet::ServerSpawnEffect_Implementation()
+{
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, StaticMesh->GetComponentLocation(), GetActorRotation());
 }

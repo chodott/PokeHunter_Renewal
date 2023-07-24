@@ -173,6 +173,9 @@ public:
 	void MultiUseNormalSkill(ESkillID SkillID);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiUseSpecialSkill(ESkillID SkillID);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCancelOrder();
+
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnProjectile(APartner* OwnerPartner, TSubclassOf<class APartnerProjectile> SpawnProjectileClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
 };

@@ -165,7 +165,11 @@ FGenericTeamId AEnemy::GetGenericTeamId() const
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (HP <= 0 || CurState == EEnemyState::Die) return 0;
-
+	if (bWeaken)
+	{
+		DamageAmount *= 2;
+		bWeaken = false;
+	}
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	HP -= DamageAmount;
 	SavedDamage += DamageAmount;
@@ -258,6 +262,7 @@ void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 	DOREPLIFETIME(AEnemy, SlowLimitTime);
 	DOREPLIFETIME(AEnemy, bFrozen);
 	DOREPLIFETIME(AEnemy, FrozenLimitTime);
+	DOREPLIFETIME(AEnemy, bWeaken);
 }
 
 void AEnemy::ServerPlayMontage_Implementation(AEnemy* Enemy, FName Section)
@@ -635,5 +640,12 @@ void AEnemy::InteractIceSkill_Implementation()
 	{
 		bFrozen = true;
 		FrozenLimitTime = FrozenTime;
+	}
+
+	else if (bBurning)
+	{
+		bWeaken = true;
+		bBurning = false;
+		BurningLimitTime = 0.f;
 	}
 }

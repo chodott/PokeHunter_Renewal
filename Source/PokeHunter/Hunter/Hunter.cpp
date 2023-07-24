@@ -211,6 +211,13 @@ void AHunter::BeginPlay()
 	{
 		ServerChangeMaterialIndex(MaterialIndex);
 	}
+	if (!HasAuthority())
+	{
+		ServerChangeMaterialIndex(MaterialIndex);
+	}
+	else {
+		ServerChangeMaterialIndex(MaterialIndex);
+	}
 }
 
 // Called every frame
@@ -396,6 +403,7 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AHunter, bUpperOnly);
 
 	DOREPLIFETIME(AHunter, MaterialIndex);
+	DOREPLIFETIME(AHunter, Material);
 }
 
 void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
@@ -1296,7 +1304,6 @@ void AHunter::SetNewMaterialIndex(int32 NewMaterialIndex)
 	UE_LOG(LogTemp, Warning, TEXT("[DBG] AHunter::SetNewMaterialIndex() -> NewMaterialIndex: %d"), NewMaterialIndex);
 
 	MaterialIndex = NewMaterialIndex;
-	// FStringAssetReference MaterialPath{};
 	FSoftObjectPath MaterialPath{};
 	switch (MaterialIndex)
 	{
@@ -1310,16 +1317,32 @@ void AHunter::SetNewMaterialIndex(int32 NewMaterialIndex)
 		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
 		break;
 	}
-	UMaterialInterface* Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
-	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
-	GetMesh()->SetMaterial(0, DynamicMaterial);
+	Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
+	GetMesh()->SetMaterial(0, Material);
+}
+
+void AHunter::OnRep_Material()
+{
+	FSoftObjectPath MaterialPath{};
+	switch (MaterialIndex)
+	{
+	case 1:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		break;
+	case 2:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter02");
+		break;
+	default:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		break;
+	}
+	Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
+	GetMesh()->SetMaterial(0, Material);
 }
 
 void AHunter::ServerChangeMaterialIndex_Implementation(int32 NewMaterialIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[DBG] AHunter::ServerChangeMaterialIndex_Implementation() -> NewMaterialIndex: %d"), NewMaterialIndex);
-	// SetNewMaterialIndex(NewMaterialIndex);
-
 	FSoftObjectPath MaterialPath{};
 	switch (NewMaterialIndex)
 	{
@@ -1333,7 +1356,6 @@ void AHunter::ServerChangeMaterialIndex_Implementation(int32 NewMaterialIndex)
 		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
 		break;
 	}
-	UMaterialInterface* Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
-	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
-	GetMesh()->SetMaterial(0, DynamicMaterial);
+	Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
+	GetMesh()->SetMaterial(0, Material);
 }

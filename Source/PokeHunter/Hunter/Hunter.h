@@ -175,9 +175,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	float bTotalDamaged = 0.0f;
 
-	UPROPERTY(Replicated)
-		int32 MaterialIndex;
-
 protected:
 	// Sets default values for this character's properties
 	AHunter();
@@ -359,6 +356,16 @@ public:
 	void SetNewMaterialIndex(int32 NewMaterialIndex);
 	UFUNCTION(Server, Reliable, Category = "Material")
 		void ServerChangeMaterialIndex(int32 NewMaterialIndex);
+
+protected:
+	UPROPERTY(Replicated)
+		int32 MaterialIndex;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Material)
+		UMaterialInterface* Material;
+
+	UFUNCTION()
+		void OnRep_Material();
 
 public:	// Particle System
 	UPROPERTY(EditDefaultsOnly, Category = "Particle")

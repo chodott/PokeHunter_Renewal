@@ -147,6 +147,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
 	float SlowLimitTime{};
 
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite);
+	bool bWeaken{ false };
+
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
 	bool bDied{ false };

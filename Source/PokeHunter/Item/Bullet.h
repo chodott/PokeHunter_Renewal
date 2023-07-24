@@ -59,5 +59,8 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnEmitter(UParticleSystem* SpawnParticle, const FVector& SpawnLoc);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnEffect();
 	
 };

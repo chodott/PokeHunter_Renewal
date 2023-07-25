@@ -138,6 +138,7 @@ void AGolemBoss::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AGolemBoss, BombArray);
+
 }
 
 void AGolemBoss::Die()

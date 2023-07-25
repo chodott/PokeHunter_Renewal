@@ -203,6 +203,11 @@ public:
 	void MultiSprint(AHunter* Hunter, bool bSprinting);
 
 	UFUNCTION(Server, Reliable)
+	void ServerRoll(AHunter* Hunter, const FVector& LastInputVec);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiRoll(AHunter* Hunter, const FVector& LastInputVec);
+
+	UFUNCTION(Server, Reliable)
 	void ServerZoom(AHunter* Hunter, bool bZoom);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiZoom(AHunter* Hunter, bool bZoom);

@@ -62,5 +62,7 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnEffect();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSpawnEffect();
 	
 };

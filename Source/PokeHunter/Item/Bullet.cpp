@@ -150,6 +150,8 @@ void ABullet::MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector Initi
 	UE_LOG(LogTemp, Warning, TEXT("==============================================================================================="));
 }
 
+
+
 void ABullet::ServerSpawnEmitter_Implementation(UParticleSystem* SpawnParticle, const FVector& SpawnLoc)
 {
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SpawnParticle, SpawnLoc);
@@ -174,6 +176,11 @@ void ABullet::MultiApplyDamage_Implementation(AActor* DamagedActor, int DamageAm
 }
 
 void ABullet::ServerSpawnEffect_Implementation()
+{
+	MultiSpawnEffect();
+}
+
+void ABullet::MultiSpawnEffect_Implementation()
 {
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, StaticMesh->GetComponentLocation(), GetActorRotation());
 }

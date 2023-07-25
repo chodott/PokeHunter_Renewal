@@ -202,6 +202,8 @@ void AHunter::Tick(float DeltaTime)
 	//Stamina
 	if (GetVelocity().Length() > 600.f)
 	{
+		if (CurState == EPlayerState::Dive) return;
+
 		if (HunterStamina > 0) HunterStamina -= DeltaTime * StaminaPerSecondAmount;
 		else
 		{
@@ -366,11 +368,11 @@ void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
 {
 	if (bSprinting && Hunter->CurState == EPlayerState::Idle)
 	{
-		Hunter->GetCharacterMovement()->MaxWalkSpeed = 700.f;
+		Hunter->GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 	}
 	else if (!bSprinting)
 	{
-		Hunter->GetCharacterMovement()->MaxWalkSpeed = 500.f;
+		Hunter->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	}
 }
 
@@ -595,13 +597,15 @@ void AHunter::LookUp(float NewAxisValue)
 void AHunter::LShiftDown()
 {
 	if (bBound) return;
-	ServerSprint(this, true);
+	bShiftDown = true;
+	ServerSprint(this, bShiftDown);
 }
 
 void AHunter::LShiftUp()
 {
-	if(CurState != EPlayerState::Zoom)
-	ServerSprint(this, false);
+	if (CurState == EPlayerState::Zoom) return;
+	bShiftDown = false;
+	ServerSprint(this, bShiftDown);
 }
 
 void AHunter::LMBDown()
@@ -927,7 +931,8 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 		UnCrouch();
 		bInvincible = false;
 		CurState = EPlayerState::Idle;
-		GetCharacterMovement()->MaxWalkSpeed = 500.f;
+		if(bShiftDown) GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+		else GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	}
 	else if (CurState == EPlayerState::Install)
 	{
@@ -1149,7 +1154,7 @@ void AHunter::SetInstallMode()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = 500.0f;
+	Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = WalkSpeed;
 	if (CurState == EPlayerState::Zoom)
 	{
 		//SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));

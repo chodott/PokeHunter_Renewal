@@ -80,6 +80,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
 	float DiveSpeed{ 1000.f };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
+	float SprintSpeed{ 700.f };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
+	float WalkSpeed{ 500.f };
 	
 	//
 	UPROPERTY(VisibleAnywhere, Replicated,  BlueprintReadOnly, Category = "Interaction")
@@ -157,6 +161,8 @@ public:
 	FGenericTeamId TeamID;
 
 	//Battle
+	bool bShiftDown{ false };
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float ReloadTime{};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")

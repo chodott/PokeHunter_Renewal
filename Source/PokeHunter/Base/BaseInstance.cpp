@@ -14,14 +14,23 @@ UBaseInstance::UBaseInstance()
 	RegionCode = TextReader->ReadFile("Urls/RegionCode.txt");
 	HttpModule = &FHttpModule::Get();
 
+	mySkin = 1;
+	PartnerNumber = -1;
+	myPartner = EPartnerType::NonePartner;
 	InfoArray.Reserve(24);
 	StorageInfoArray.Reserve(24);
+
+	gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
+	addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+
+	PlayerPetName = { EPartnerType::WolfPartner, EPartnerType::WolfPartner, EPartnerType::WolfPartner, EPartnerType::WolfPartner };
+
+	endGame = false;
 }
 
 void UBaseInstance::Init()
 {
 	Super::Init();
-	// ConnectToServer();
 }
 
 bool UBaseInstance::ConnectToServer()
@@ -262,6 +271,9 @@ bool UBaseInstance::LogoutGame()
 			addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 			ip = NULL;
 
+			// Reset Game instance data
+			resetGameInstance();
+
 			return true;
 		}
 		else {
@@ -355,4 +367,46 @@ double UBaseInstance::getElapseTime()
 	}
 
 	return (endTime);
+}
+
+void UBaseInstance::resetGameInstance()
+{
+	if (false == Player_Name.IsEmpty()) Player_Name.Empty();
+	if (false == Player_Skin.IsEmpty()) Player_Skin.Empty();
+	if (false == Pet_Number.IsEmpty()) Pet_Number.Empty();
+	if (false == Quick_Item.IsEmpty()) Quick_Item.Empty();
+	if (false == Quick_Skill.IsEmpty()) Quick_Skill.Empty();
+
+	myPartner = EPartnerType::NonePartner;
+
+	gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
+	addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+	ip = NULL;
+
+	AccessToken = NULL;
+	IdToken = NULL;
+	RefreshToken = NULL;
+
+	RetrieveNewTokensHandle.Invalidate();
+	GetResponseTimeHandle.Invalidate();
+	PartyInfoHandle.Invalidate();
+
+	if (false == PlayerLatencies.IsEmpty()) PlayerLatencies.Empty();
+	if (false == GameLiftLevelName.IsEmpty()) GameLiftLevelName.Empty();
+	if (false == GameLiftLevelNameOptions.IsEmpty()) GameLiftLevelNameOptions.Empty();
+	if (false == JoinTicketId.IsEmpty()) JoinTicketId.Empty();
+
+	cur_playerController = nullptr;
+
+	if (false == PartyListMap.IsEmpty()) PartyListMap.Empty();
+	if (false == InfoArray.IsEmpty()) InfoArray.Empty();
+	if (false == StorageInfoArray.IsEmpty()) StorageInfoArray.Empty();
+
+	InfoArray.Reserve(24);
+	StorageInfoArray.Reserve(24);
+
+	mySkin = 1;
+	PartnerNumber = -1;
+	endTime = 0.0f;
+	endGame = false;
 }

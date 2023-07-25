@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -27,13 +27,13 @@ void UPartyInfoUI::NativeConstruct()
 	SendEnterParty();
 	GetWorld()->GetTimerManager().SetTimer(TH_Partyinfo, this, &UPartyInfoUI::TickSendPartyInfo, 1.0f, true, 0.f);
 
-	// Join Blueprint UI widget Ãß°¡ ÇÊ¿ä
+	// Join Blueprint UI widget ì¶”ê°€ í•„ìš”
 	JoinButton = (UButton*)GetWidgetFromName(TEXT("BTN_READY"));
 	FScriptDelegate JoinDelegate{};
 	JoinDelegate.BindUFunction(this, "OnJoinButtonClicked");
 	JoinButton->OnClicked.Add(JoinDelegate);
 
-	// TB_JoinEvent (TextBlock user Widget Ãß°¡ ÇÊ¿ä!)
+	// TB_JoinEvent (TextBlock user Widget ì¶”ê°€ í•„ìš”!)
 	JoinEventTextBlock = (UTextBlock*)GetWidgetFromName(TEXT("TB_JoinEvent"));
 
 	FString AccessToken;
@@ -44,12 +44,12 @@ void UPartyInfoUI::NativeConstruct()
 		if (PokeHunterGameInstance != nullptr) {
 			AccessToken = PokeHunterGameInstance->AccessToken;
 
-			// Id AccessÀÌ ¾Æ´Ñ Access TokenÀÌ »ç¿ëµÈ´Ù.
+			// Id Accessì´ ì•„ë‹Œ Access Tokenì´ ì‚¬ìš©ëœë‹¤.
 			// AccessToken = PokeHunterGameInstance->IdToken;
 		}
 	}
 
-	// AccessToken ÀÌ À¯È¿ÇÑ °æ¿ì
+	// AccessToken ì´ ìœ íš¨í•œ ê²½ìš°
 	if (AccessToken.Len() > 0 && nullptr != PokeHunterGameInstance) {
 		TSharedRef<IHttpRequest> GetPlayerDataRequest = gameinstance->HttpModule->CreateRequest();
 		GetPlayerDataRequest->OnProcessRequestComplete().BindUObject(this, &UPartyInfoUI::OnGetPlayerDataResponseReceived);
@@ -132,7 +132,7 @@ void UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 	if (0 == gameinstance->PartyListMap.Num())														return;
 	if (-1 == SelctPartyNumber)																		return;
 
-	// »õ·Î¿î ÆÄÆ¼ Á¤º¸¸¦ À§ÇØ¼­ ±âÁ¸ÀÇ Á¤º¸¸¦ ÀüºÎ Áö¿î´Ù.
+	// ìƒˆë¡œìš´ íŒŒí‹° ì •ë³´ë¥¼ ìœ„í•´ì„œ ê¸°ì¡´ì˜ ì •ë³´ë¥¼ ì „ë¶€ ì§€ìš´ë‹¤.
 	if(false == PlayerName.IsEmpty())		PlayerName.Empty();
 	if(false == PlayerPetName.IsEmpty())	PlayerPetName.Empty();
 	if(false == PartyMemberState.IsEmpty())	PartyMemberState.Empty();
@@ -148,34 +148,34 @@ void UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 	if (false == retVal) return;
 
 	SC_PARTY_INFO_PACK info_pack;
-	for (int i = 0; i < 4; ++i) {	// ÃÖ´ë ÇÃ·¹ÀÌ¾î ¼ö ¸¸Å­¸¸ ¹İº¹ÇÑ´Ù.
+	for (int i = 0; i < 4; ++i) {	// ìµœëŒ€ í”Œë ˆì´ì–´ ìˆ˜ ë§Œí¼ë§Œ ë°˜ë³µí•œë‹¤.
 		memset(&info_pack, 0, sizeof(SC_PARTY_INFO_PACK));
 		retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&info_pack), sizeof(SC_PARTY_INFO_PACK), bSize);
 
-		// ¿À·ù/Á¾·á ¹üÀ§°¡ Å« ¼ø¼­·Î °Ë»ç
-		if (false == retVal)									return;	// ¼ÒÄÏ Åë½ÅÀÇ ½ÇÆĞ
+		// ì˜¤ë¥˜/ì¢…ë£Œ ë²”ìœ„ê°€ í° ìˆœì„œë¡œ ê²€ì‚¬
+		if (false == retVal)									return;	// ì†Œì¼“ í†µì‹ ì˜ ì‹¤íŒ¨
 		if (0 == strcmp(info_pack._mem, "theEnd")) {
 			TCHAR MBTWBuffer[128];
 			memset(MBTWBuffer, NULL, 128);
 			MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._my_name, -1, MBTWBuffer, strlen(info_pack._my_name));
 			gameinstance->MyName = MBTWBuffer;
-			break;	// ÆÄÆ¼¸â¹ö ¼ö½Å Á¾·á
+			break;	// íŒŒí‹°ë©¤ë²„ ìˆ˜ì‹  ì¢…ë£Œ
 		}
-		if (i == 0 && (0 == strcmp(info_pack._mem, "Empty")))	break;	// Ã¹ ¹øÂ° ¸â¹öºÎÅÍ ºñ¾îÀÖÀ½
-		if (i > 0 && (0 == strcmp(info_pack._mem, "Empty")))	break;	// µÎ ¹øÂ° ¸â¹ö ÀÌÈÄ ºñ¾îÀÖÀ½
+		if (i == 0 && (0 == strcmp(info_pack._mem, "Empty")))	break;	// ì²« ë²ˆì§¸ ë©¤ë²„ë¶€í„° ë¹„ì–´ìˆìŒ
+		if (i > 0 && (0 == strcmp(info_pack._mem, "Empty")))	break;	// ë‘ ë²ˆì§¸ ë©¤ë²„ ì´í›„ ë¹„ì–´ìˆìŒ
 
 		TCHAR MBTWBuffer[128];
 		memset(MBTWBuffer, NULL, 128);
 		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._mem, -1, MBTWBuffer, strlen(info_pack._mem));
 		
-		// ±âÁ¸ ÆÄÆ¼ ¸â¹öÀÇ ÁØºñ»óÅÂ Ç¥½Ã¿ë
+		// ê¸°ì¡´ íŒŒí‹° ë©¤ë²„ì˜ ì¤€ë¹„ìƒíƒœ í‘œì‹œìš©
 		PlayerName.Add(FName(MBTWBuffer));
 
 		memset(MBTWBuffer, NULL, 128);
 		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._mem_pet, -1, MBTWBuffer, strlen(info_pack._mem_pet));
 
 		uint8 uintBuffer = atoi(TCHAR_TO_ANSI(MBTWBuffer));
-		PlayerPetName.Add(static_cast<EPartnerType>(uintBuffer));		// ÀÛµ¿ÀÌ ¾ÈµÉ °æ¿ì, TArrayÀÇ ÀÚ·áÇüÀ» º¯°æ
+		PlayerPetName.Add(static_cast<EPartnerType>(uintBuffer));		// ì‘ë™ì´ ì•ˆë  ê²½ìš°, TArrayì˜ ìë£Œí˜•ì„ ë³€ê²½
 
 		/*memset(MBTWBuffer, NULL, 128);
 		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._mem_state, -1, MBTWBuffer, strlen(info_pack._mem_state));
@@ -196,7 +196,7 @@ void UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 	return;
 }
 
-bool UPartyInfoUI::RecvClientJoin()	// [CheckPoint]-Blueprint¿¡¼­ È£ÃâµÇ´Â °÷ÀÌ ÀÖ³ª? -> ¾øÀ¸¸é Á¦°Å
+bool UPartyInfoUI::RecvClientJoin()	// [CheckPoint]-Blueprintì—ì„œ í˜¸ì¶œë˜ëŠ” ê³³ì´ ìˆë‚˜? -> ì—†ìœ¼ë©´ ì œê±°
 {
 	if (nullptr == gameinstance)	return false;
 	if (ESocketConnectionState::SCS_NotConnected == gameinstance->gSocket->GetConnectionState()) return false;
@@ -207,11 +207,11 @@ bool UPartyInfoUI::RecvClientJoin()	// [CheckPoint]-Blueprint¿¡¼­ È£ÃâµÇ´Â °÷ÀÌ 
 	/*SC_PARTY_JOIN_SUCCESS_PACK start_party_pack;
 	retVal = gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&start_party_pack), sizeof(SC_PARTY_JOIN_SUCCESS_PACK), bSize);*/
 	if (true == retVal) {
-		// AWS ½ÇÇà
+		// AWS ì‹¤í–‰
 		return true;
 	}
 	else				return false;
-	// Clinet¿¡¼­ ¸í·É ½ÇÇà ´ë±â
+	// Clinetì—ì„œ ëª…ë ¹ ì‹¤í–‰ ëŒ€ê¸°
 	return true;
 }
 
@@ -324,7 +324,8 @@ void UPartyInfoUI::OnJoinButtonClicked()
 	SendClientState();
 	*/
 
-	ButtonTextBlock->SetText(FText::FromString("´ë±âÁß"));
+	FString korean = TEXT("ëŒ€ê¸°ì¤‘");
+	ButtonTextBlock->SetText(FText::FromString(korean));
 	JoinButton->SetIsEnabled(false);
 	GetWorld()->GetTimerManager().SetTimer(TH_WaitOtherClient, this, &UPartyInfoUI::TickRecvPartyState, 1.0f, true, 0.f);
 
@@ -349,7 +350,8 @@ void UPartyInfoUI::TickRecvPartyState()
 		// GetWorld()->GetTimerManager().ClearTimer(TH_Partyinfo);
 		GetWorld()->GetTimerManager().ClearTimer(TH_WaitOtherClient);
 		UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
-		ButtonTextBlock->SetText(FText::FromString("ÀÔÀåÁß"));
+		FString korean = TEXT("ì…ì¥ì¤‘");
+		ButtonTextBlock->SetText(FText::FromString(korean));
 		EnterStageMap();
 	}
 }
@@ -400,9 +402,9 @@ void UPartyInfoUI::EnterStageMap()
 	if (GameInstance != nullptr) {
 		PokeHunterGameInstance = Cast<UBaseInstance>(GameInstance);
 		if (PokeHunterGameInstance != nullptr) {
-			// AWS Lambda StartMatchmaking Function Å×½ºÆ® °á°ú Id TokenÀÌ ¾Æ´Ñ Access TokenÀÌ ¸Â´Ù.
-			// ->> ±×·¯³ª StartMatchmaking Function ¾È¿¡¼­ GetPlayerData FunctionÀ» ½ÇÇàÇÒ ¶§, Id TokenÀÌ ¾Æ´Ñ Access TokenÀ» »ç¿ëÇÏ¹Ç·Î
-			// ->> API Gateway¿¡¼­ Startmachmaking APIÀÇ POST ºÎºĞ¿¡¼­ Authorization ÀÎÁõÀ» Á¦°ÅÇÔ
+			// AWS Lambda StartMatchmaking Function í…ŒìŠ¤íŠ¸ ê²°ê³¼ Id Tokenì´ ì•„ë‹Œ Access Tokenì´ ë§ë‹¤.
+			// ->> ê·¸ëŸ¬ë‚˜ StartMatchmaking Function ì•ˆì—ì„œ GetPlayerData Functionì„ ì‹¤í–‰í•  ë•Œ, Id Tokenì´ ì•„ë‹Œ Access Tokenì„ ì‚¬ìš©í•˜ë¯€ë¡œ
+			// ->> API Gatewayì—ì„œ Startmachmaking APIì˜ POST ë¶€ë¶„ì—ì„œ Authorization ì¸ì¦ì„ ì œê±°í•¨
 
 			AccessToken = PokeHunterGameInstance->AccessToken;
 			// AccessToken = PokeHunterGameInstance->IdToken;
@@ -470,7 +472,7 @@ void UPartyInfoUI::EnterStageMap()
 		}
 	}
 	else {
-		// Player Latency¸¦ ¿¬»êÇÏ´Â ºÎºĞÀÌÁö¸¸ ÇÊ¿ä¾øÀ½?
+		// Player Latencyë¥¼ ì—°ì‚°í•˜ëŠ” ë¶€ë¶„ì´ì§€ë§Œ í•„ìš”ì—†ìŒ?
 
 		if (AccessToken.Len() > 0 && false == StartMath) {
 			StartMath = true;
@@ -574,7 +576,7 @@ void UPartyInfoUI::OnGetPlayerDataResponseReceived(FHttpRequestPtr Request, FHtt
 		if (FJsonSerializer::Deserialize(Reader, JsonObject)) {
 			if (JsonObject->HasField("playerData")) {
 
-				// UMG¿¡ Ç¥½ÃµÉ µ¥ÀÌÅÍµéÀ» ¼³Á¤ÇÏÁö¸¸ ÇÊ¿ä¾øÀ¸¹Ç·Î Á¦°Å.
+				// UMGì— í‘œì‹œë  ë°ì´í„°ë“¤ì„ ì„¤ì •í•˜ì§€ë§Œ í•„ìš”ì—†ìœ¼ë¯€ë¡œ ì œê±°.
 				// TSharedPtr<FJsonObject> PlayerData = JsonObject->GetObjectField("playerData");
 				// WebBrowser->SetVisibility(ESlateVisibility::Hidden);
 
@@ -633,7 +635,7 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 							PokeHunterGameInstance->cur_playerController->bShowMouseCursor = false;
 							PokeHunterGameInstance->cur_playerController->SetInputMode(gameModeOnly);
 
-							// MatchmakingSucceeded ÀÏ °æ¿ì¿¡¸¸ ½ÇÇà
+							// MatchmakingSucceeded ì¼ ê²½ìš°ì—ë§Œ ì‹¤í–‰
 							GetWorld()->GetTimerManager().ClearTimer(PollMatchmakingHandle);
 							SearchingForGame = false;
 
@@ -671,7 +673,7 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 							GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, this, &UPartyInfoUI::LoadingScreenCall, DelayTime, false);
 							while (GetWorld()->GetTimerManager().IsTimerActive(DelayTimerHandle) && !GetWorld()->IsPendingKill())
 							{
-								// °ÔÀÓ ¿£ÁøÀÇ Tick ÀÌº¥Æ®¸¦ °­Á¦·Î ½ÇÇàÇÏ¿© Delay Å¸ÀÌ¸Ó¸¦ ½ÇÇà½ÃÅµ´Ï´Ù.
+								// ê²Œì„ ì—”ì§„ì˜ Tick ì´ë²¤íŠ¸ë¥¼ ê°•ì œë¡œ ì‹¤í–‰í•˜ì—¬ Delay íƒ€ì´ë¨¸ë¥¼ ì‹¤í–‰ì‹œí‚µë‹ˆë‹¤.
 								GetWorld()->Tick(LEVELTICK_All, 0.0f);
 							}
 							*/
@@ -683,7 +685,7 @@ void UPartyInfoUI::OnPollMatchmakingResponseReceived(FHttpRequestPtr Request, FH
 							// UGameplayStatics::OpenLevel(GetWorld(), FName(gameinstance->GameLiftLevelName), false, Options);
 						}
 						else {
-							// AWS GameLift Dedicated server Á¢¼Ó¿¡ ½ÇÆĞÇÏ¿´À½.
+							// AWS GameLift Dedicated server ì ‘ì†ì— ì‹¤íŒ¨í•˜ì˜€ìŒ.
 							// UTextBlock* ButtonTextBlock = (UTextBlock*)JoinButton->GetChildAt(0);
 							// ButtonTextBlock->SetText(FText::FromString("FreREADY"));
 							// JoinEventTextBlock->SetText(FText::FromString(TicketType + ". Please try again"));

@@ -83,106 +83,113 @@ class POKEHUNTER_API UBaseInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
-	UBaseInstance();
+	// Title UI
+	UTextReaderComponent* TextReader;
 
-	bool FirstEnterMyHome = true;
-
-	UTextReaderComponent* TextReader = nullptr;
-
-	virtual void Init() override;
-
+	// Hunter information
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString Player_Name;
-
+		FString Player_Name{};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString Player_Skin;
-
+		FString Player_Skin{};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString Pet_Number;
-
+		FString Pet_Number{};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString Quick_Item;
-
+		FString Quick_Item{};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString Quick_Skill;
-
+		FString Quick_Skill{};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		EPartnerType myPartner = EPartnerType::NonePartner;
+		EPartnerType myPartner{};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FItemCnter> InfoArray{};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FItemCnter> StorageInfoArray{};
+	APlayerController* cur_playerController{};
 
+	// Replicated
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Rep")
+		int32 mySkin{};
+
+	// Network Socket
 	FSocket* gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
-	TSharedRef<FInternetAddr>addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+	TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 	FIPv4Address ip{};
-	int reval;
+
+	// PartyInfoUI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
+		FName MyName{};
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Party info")
+		int PartnerNumber{};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
+		TArray<FName> PlayerName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
+		TArray<EPartnerType> PlayerPetName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
+		TArray<PLAYER_STATE> PartyMemberState;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Party info")
+		TMap<FName, int> PartyListMap;
+
+	// AWS Access information
+	UPROPERTY(BlueprintReadOnly, Category = "AWS info")
+		FString AccessToken;
+	UPROPERTY(BlueprintReadOnly, Category = "AWS info")
+		FString IdToken;
+	UPROPERTY(BlueprintReadOnly, Category = "AWS info")
+		FString RefreshToken;
+	UPROPERTY(BlueprintReadOnly, Category = "AWS info")
+		FTimerHandle RetrieveNewTokensHandle;
+	UPROPERTY(BlueprintReadOnly, Category = "AWS info")
+		FTimerHandle GetResponseTimeHandle;
+	UPROPERTY(BlueprintReadOnly, Category = "AWS info")
+		FTimerHandle PartyInfoHandle;
+	TDoubleLinkedList<float> PlayerLatencies;
+	UPROPERTY(BlueprintReadOnly, Category = "AWS info")
+		FString JoinTicketId = "";
+	FHttpModule* HttpModule;
+	UPROPERTY(BlueprintReadOnly, Category = "AWS info")
+		FString ApiUrl;
+	UPROPERTY(BlueprintReadOnly, Category = "AWS info")
+		FString RegionCode;
+
+	// AWS Dedicated Server Level Name
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Server Level Option")
+		FString GameLiftLevelName = "";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Server Level Option")
+		FString GameLiftLevelNameOptions = "";
+
+	// inGame end time
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Exit Level")
+		double endTime{};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Exit Level")
+		bool endGame{};
+
+public:
+	// 
+	virtual void Init() override;
+	UBaseInstance();
+	UFUNCTION(BlueprintCallable, Category = "Reset Data")
+		void resetGameInstance();
+	virtual void Shutdown() override;
+
+	//Replicated
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
-		bool ConnectToServer(); // Default Addr
+		bool ConnectToServer();
 
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 		bool SendAccessToken();
 
-	virtual void Shutdown() override;
+	UFUNCTION()
+		void SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken);
+
+	UFUNCTION(BlueprintCallable, Category = "Exit Level")
+		double getElapseTime();
 
 	UFUNCTION(BlueprintCallable, Category = "LeaveParty")
 		bool LeaveParty();
 
-	// PartyInfoUI
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
-		FName MyName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
-		TArray<FName> PlayerName = {"Tester01", "Tester02", "Tester03", "Tester04"};
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
-		TArray<EPartnerType> PlayerPetName = { EPartnerType::WolfPartner, EPartnerType::WolfPartner, EPartnerType::WolfPartner, EPartnerType::WolfPartner };
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
-		TArray<PLAYER_STATE> PartyMemberState;
-
 	UFUNCTION(BlueprintCallable, Category = "LogoutGame")
 		bool LogoutGame();
-
-	UPROPERTY()
-		FString AccessToken;
-
-	UPROPERTY()
-		FString IdToken;
-
-	UPROPERTY()
-		FString RefreshToken;
-
-	UPROPERTY()
-		FTimerHandle RetrieveNewTokensHandle;
-
-	UPROPERTY()
-		FTimerHandle GetResponseTimeHandle;
-
-	UPROPERTY()
-		FTimerHandle PartyInfoHandle;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<FItemCnter> InstanceInfoArray;
-
-	TDoubleLinkedList<float> PlayerLatencies;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString GameLiftLevelName = "";
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString GameLiftLevelNameOptions = "";
-
-	UFUNCTION()
-		void SetCognitoTokens(FString NewAccessToken, FString NewIdToken, FString NewRefreshToken);
-
-	UPROPERTY()
-		FString JoinTicketId = "";
-
-	FHttpModule* HttpModule;
-
-
-	UPROPERTY()
-		FString ApiUrl;
-
-	UPROPERTY()
-		FString RegionCode;
-
-	APlayerController* cur_playerController;
 
 private:
 	UFUNCTION()
@@ -191,35 +198,4 @@ private:
 	void OnRetrieveNewTokensResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	void OnGetResponseTimeResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		TMap<FName, int> PartyListMap;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<FItemCnter> InfoArray{};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<FItemCnter> StorageInfoArray{};
-
-public:
-	//Replicated
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
-
-	// Hunter Material Number
-	UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Material")
-		int32 mySkin = 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Party")
-		int PartnerNumber = -1;
-
-	// inGame end time
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Time")
-		double endTime = 0.0f;
-
-	// 게임 종료시 getElapseTime() 함수의 endTime 대입연산을 멈춤.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time")
-		bool endGame = false;
-
-	UFUNCTION(BlueprintCallable, Category = "Time")
-		double getElapseTime();
 };

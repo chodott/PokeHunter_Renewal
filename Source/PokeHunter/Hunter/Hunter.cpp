@@ -182,42 +182,8 @@ void AHunter::BeginPlay()
 		}
 	}
 
-	//Set Hunter Material
-	/*FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(this, true);
-	if (CurrentLevelName == "MyHome") {
-		FStringAssetReference MaterialPath;
-		switch (gameinstance->mySkin)
-		{
-		case 1:
-			MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
-			break;
-		case 2:
-			MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter02");
-			break;
-		default:
-			MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
-			break;
-		}
-
-		UMaterialInterface* Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
-		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
-
-		GetMesh()->SetMaterial(0, DynamicMaterial);
-	}*/
-
 	MaterialIndex = gameinstance->mySkin;
-
-	if (GetLocalRole() == ROLE_AutonomousProxy)
-	{
-		ServerChangeMaterialIndex(MaterialIndex);
-	}
-	if (!HasAuthority())
-	{
-		ServerChangeMaterialIndex(MaterialIndex);
-	}
-	else {
-		ServerChangeMaterialIndex(MaterialIndex);
-	}
+	ServerChangeMaterialIndex(MaterialIndex);
 }
 
 // Called every frame
@@ -1310,26 +1276,6 @@ void AHunter::SetStamina(float setStamina)
 	{
 		HunterStamina = setStamina;
 	}
-void AHunter::SetNewMaterialIndex(int32 NewMaterialIndex)
-{
-	UE_LOG(LogTemp, Warning, TEXT("[DBG] AHunter::SetNewMaterialIndex() -> NewMaterialIndex: %d"), NewMaterialIndex);
-
-	MaterialIndex = NewMaterialIndex;
-	FSoftObjectPath MaterialPath{};
-	switch (MaterialIndex)
-	{
-	case 1:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
-		break;
-	case 2:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter02");
-		break;
-	default:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
-		break;
-	}
-	Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
-	GetMesh()->SetMaterial(0, Material);
 }
 
 void AHunter::OnRep_Material()
@@ -1353,7 +1299,27 @@ void AHunter::OnRep_Material()
 
 void AHunter::ServerChangeMaterialIndex_Implementation(int32 NewMaterialIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[DBG] AHunter::ServerChangeMaterialIndex_Implementation() -> NewMaterialIndex: %d"), NewMaterialIndex);
+	FSoftObjectPath MaterialPath{};
+	switch (NewMaterialIndex)
+	{
+	case 1:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		break;
+	case 2:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter02");
+		break;
+	default:
+		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		break;
+	}
+	Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
+	GetMesh()->SetMaterial(0, Material);
+
+	MulticastChangeMaterialIndex(NewMaterialIndex);
+}
+
+void AHunter::MulticastChangeMaterialIndex_Implementation(int32 NewMaterialIndex)
+{
 	FSoftObjectPath MaterialPath{};
 	switch (NewMaterialIndex)
 	{

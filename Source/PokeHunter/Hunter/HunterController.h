@@ -19,13 +19,4 @@ protected:
 public:
 	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
-
-	UFUNCTION()
-		void SetCharacterMaterialFromGameInstance(APawn* ClientPawn);
-
-	// 서버에 캐릭터의 머티리얼 정보를 전송하는 함수
-	UFUNCTION(Server, Reliable)
-		void Server_SetCharacterMaterialInfo(APawn* ClientPawn, int32 NewMaterialInfo);
-	UFUNCTION(Server, Reliable)
-		void ClientConnectToServer(int32 NewMaterialInfo);
 };

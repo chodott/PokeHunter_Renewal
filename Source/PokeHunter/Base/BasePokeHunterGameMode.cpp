@@ -575,7 +575,7 @@ APawn* ABasePokeHunterGameMode::SpawnDefaultPawnFor_Implementation(AController* 
 		AHunterController* hunterController = Cast<AHunterController>(NewPlayer);
 		if (hunterController) {
 			UE_LOG(LogTemp, Warning, TEXT("[DBG] ABasePokeHunterGameMode::SpawnDefaultPawnFor_Implementation()"));
-			hunterController->SetCharacterMaterialFromGameInstance(pawn);
+			// hunterController->SetCharacterMaterialFromGameInstance(pawn);
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("[DBG] ABasePokeHunterGameMode::SpawnDefaultPawnFor_Implementation() -> hunterController is nullptr"));

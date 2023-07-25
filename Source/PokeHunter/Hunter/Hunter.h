@@ -355,9 +355,10 @@ public:
 	virtual void InteractWideAttack_Implementation(float Damage);
 
 	//Hunter New Material
-	void SetNewMaterialIndex(int32 NewMaterialIndex);
 	UFUNCTION(Server, Reliable, Category = "Material")
 		void ServerChangeMaterialIndex(int32 NewMaterialIndex);
+	UFUNCTION(NetMulticast, Reliable, Category = "Material")
+		void MulticastChangeMaterialIndex(int32 NewMaterialIndex);
 
 protected:
 	UPROPERTY(Replicated)

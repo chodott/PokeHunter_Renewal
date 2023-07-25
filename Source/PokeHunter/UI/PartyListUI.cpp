@@ -43,21 +43,9 @@ bool UPartyListUI::GetPartyList()
 		Count_PartyList.Add(info.Value);
 	}
 
-	/*if (PartyServerManager->GetPartyList()) {
-		if (false == Name_PartyList.IsEmpty())	Name_PartyList.Empty();
-		if (false == Count_PartyList.IsEmpty()) Count_PartyList.Empty();
-
-		for (const auto& info : gameinstance->PartyListMap) {
-			Name_PartyList.Add(info.Key);
-		}
-
-		for (const auto& info : gameinstance->PartyListMap) {
-			Count_PartyList.Add(info.Value);
-		}
+	for (int32 info : gameinstance->inStageParty) {
+		inStage_PartyList.Add(info);
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Fail PartyServerManager->GetPartyList()..."));
-	}*/
 
 	return true;
 }

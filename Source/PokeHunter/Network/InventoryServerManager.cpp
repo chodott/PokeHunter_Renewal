@@ -21,22 +21,18 @@ bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer, UBaseInstance* 
 	quest_item.type = CS_QUEST_INVENTORY;
 	gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&quest_item), quest_item.size, bSize);
 
-	/*AHunter* hunter = Cast<AHunter>(myPlayer);
-	if (false == hunter->Inventory->InfoArray.IsEmpty()) {
-		hunter->Inventory->InfoArray.Empty();
-	}*/
-
 	SC_ITEM_INFO_PACK item_info{};
-	for (int i = 0; ; ++i) {
+	int index = 0;
+	for ( ; ; ++index) {
 		memset(&item_info, 0, sizeof(SC_ITEM_INFO_PACK));
 		gameinstance->gSocket->Recv(reinterpret_cast<uint8*>(&item_info), sizeof(SC_ITEM_INFO_PACK), bSize);
 		FName msg_name = item_info._name;
 		int msg_cnt = item_info._cnt;
 		if (msg_name == "theEnd") break;
 
-		// hunter->Inventory->InfoArray.Add(FItemCnter{ msg_name, msg_cnt });
 		gameinstance->InfoArray.Add(FItemCnter{ msg_name, msg_cnt });
 	}
+
 	return true;
 }
 

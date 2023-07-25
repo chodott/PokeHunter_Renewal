@@ -17,6 +17,7 @@ UBaseInstance::UBaseInstance()
 	mySkin = 1;
 	PartnerNumber = -1;
 	myPartner = EPartnerType::NonePartner;
+	
 	InfoArray.Reserve(24);
 	StorageInfoArray.Reserve(24);
 
@@ -35,15 +36,13 @@ void UBaseInstance::Init()
 
 bool UBaseInstance::ConnectToServer()
 {
-	if (ESocketConnectionState::SCS_Connected == gSocket->GetConnectionState()) return true;
+	if (ESocketConnectionState::SCS_Connected == gSocket->GetConnectionState()) return false;	// 다시 연결할 필요 없으므로 false
 	if (nullptr == TextReader) return false;
 	FString server_addr = TextReader->ReadFile("Urls/IOCPServerAddr.txt");
 
 	FIPv4Address::Parse(server_addr, ip);
 	addr->SetIp(ip.Value);
 	addr->SetPort(PORT_NUM);
-
-	// GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Trying to connect. %s"), *server_addr));
 
 	if (true == gSocket->Connect(*addr)) {
 		return true;
@@ -399,6 +398,7 @@ void UBaseInstance::resetGameInstance()
 	cur_playerController = nullptr;
 
 	if (false == PartyListMap.IsEmpty()) PartyListMap.Empty();
+	if (false == inStageParty.IsEmpty()) inStageParty.Empty();
 	if (false == InfoArray.IsEmpty()) InfoArray.Empty();
 	if (false == StorageInfoArray.IsEmpty()) StorageInfoArray.Empty();
 

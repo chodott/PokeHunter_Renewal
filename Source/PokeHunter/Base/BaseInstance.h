@@ -127,6 +127,8 @@ public:
 		TArray<PLAYER_STATE> PartyMemberState;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Party info")
 		TMap<FName, int> PartyListMap;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Party info")
+		TArray<int32> inStageParty;
 
 	// AWS Access information
 	UPROPERTY(BlueprintReadOnly, Category = "AWS info")

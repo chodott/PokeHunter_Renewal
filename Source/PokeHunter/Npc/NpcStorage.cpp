@@ -74,17 +74,11 @@ bool ANpcStorage::GetNpcStorageInfo(UBaseInstance* gameinstance)
 			int msg_cnt = item_info._cnt;
 			if (msg_name == "theEnd") break;
 
-			FItemCnter itemBuffer;
-			itemBuffer.ItemID = msg_name;
-			itemBuffer.cnt = msg_cnt;
-			gameinstance->StorageInfoArray.Add(itemBuffer);
+			gameinstance->StorageInfoArray.Add(FItemCnter{ msg_name, msg_cnt });
 		}
 
 		for (; curCap < Storage->capacity; ++curCap) {
-			FItemCnter itemBuffer;
-			itemBuffer.ItemID = "None";
-			itemBuffer.cnt = 0;
-			gameinstance->StorageInfoArray.Add(itemBuffer);
+			gameinstance->StorageInfoArray.Add(FItemCnter{ "None", 0 });
 		}
 	}
 

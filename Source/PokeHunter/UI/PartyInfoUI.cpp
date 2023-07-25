@@ -175,12 +175,7 @@ void UPartyInfoUI::TickSendPartyInfo()	// Request Client -> Server
 		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._mem_pet, -1, MBTWBuffer, strlen(info_pack._mem_pet));
 
 		uint8 uintBuffer = atoi(TCHAR_TO_ANSI(MBTWBuffer));
-		PlayerPetName.Add(static_cast<EPartnerType>(uintBuffer));		// 작동이 안될 경우, TArray의 자료형을 변경
-
-		/*memset(MBTWBuffer, NULL, 128);
-		MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._mem_state, -1, MBTWBuffer, strlen(info_pack._mem_state));
-		uintBuffer = atoi(TCHAR_TO_ANSI(MBTWBuffer));
-		PartyMemberState.Add(static_cast<PLAYER_STATE>(info_pack._mem_state));*/
+		PlayerPetName.Add(static_cast<EPartnerType>(uintBuffer));
 
 		PartyMemberState.Add(PLAYER_STATE(info_pack._mem_state));
 	}

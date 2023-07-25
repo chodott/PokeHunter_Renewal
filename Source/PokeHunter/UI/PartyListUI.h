@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
 		TArray<int32> Count_PartyList;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party info")
+		TArray<int32> inStage_PartyList;
+
 	UFUNCTION(BlueprintCallable, Category = "Party")
 		bool GetPartyList();
 };

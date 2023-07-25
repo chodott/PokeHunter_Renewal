@@ -21,6 +21,7 @@ bool UPartyServerManager::GetPartyList()
 	gameinstance->gSocket->Send(reinterpret_cast<const uint8*>(&searching_pack), searching_pack.size, bSize);
 
 	gameinstance->PartyListMap.Reset();
+	gameinstance->inStageParty.Reset();
 
 	SC_PARTIES_INFO_PACK party_list_pack;
 	bool retVal;
@@ -36,6 +37,15 @@ bool UPartyServerManager::GetPartyList()
         MultiByteToWideChar(CP_ACP, 0, (LPCSTR)party_list_pack._name, -1, MBTWBuffer, strlen(party_list_pack._name));
         msg_name = MBTWBuffer;
         int msg_cnt = party_list_pack._staff_count;
+
+		// UE_LOG(LogTemp, Warning, TEXT("(int)party_list_pack.Inaccessible : %d"), (int)party_list_pack.Inaccessible);
+
+		if ((int32)1 == (int32)party_list_pack.Inaccessible) {
+			gameinstance->inStageParty.Add(1);
+			UE_LOG(LogTemp, Warning, TEXT("Add (int)party_list_pack.Inaccessible : %d"), (int32)party_list_pack.Inaccessible);
+		}
+		else gameinstance->inStageParty.Add(0);
+
 		gameinstance->PartyListMap.Add(msg_name, msg_cnt);
 	}
 

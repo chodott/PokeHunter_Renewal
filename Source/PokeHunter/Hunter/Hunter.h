@@ -77,6 +77,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Status")
 	float HunterStamina{ 100 };
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
+	float DiveSpeed{ 1000.f };
 	
 	//
 	UPROPERTY(VisibleAnywhere, Replicated,  BlueprintReadOnly, Category = "Interaction")

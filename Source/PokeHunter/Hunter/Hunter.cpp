@@ -513,6 +513,7 @@ void AHunter::SpaceDown()
 		{
 			LastSpeed = XYspeed.Size();
 		}
+		LastInput = GetCharacterMovement()->GetLastInputVector();
 		ServerRoll(this, LastInput);
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		ServerPlayMontage(this, FName("Dive"));
@@ -531,7 +532,8 @@ void AHunter::MultiRoll_Implementation(AHunter* Hunter, const FVector& LastInput
 {
 	Hunter->SetStamina(Hunter->HunterStamina - 15.f);
 	Hunter->CurState = EPlayerState::Dive;
-	Hunter->GetCharacterMovement()->Velocity = LastInputVec * 1200.f;
+	Hunter->GetCharacterMovement()->Velocity = LastInputVec * DiveSpeed;
+	Hunter->GetCharacterMovement()->MaxWalkSpeed = DiveSpeed;
 }
 
 void AHunter::MoveForward(float Val)
@@ -925,6 +927,7 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 		UnCrouch();
 		bInvincible = false;
 		CurState = EPlayerState::Idle;
+		GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	}
 	else if (CurState == EPlayerState::Install)
 	{

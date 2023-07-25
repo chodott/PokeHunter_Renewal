@@ -25,6 +25,7 @@ ABullet::ABullet()
 	//Movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->InitialSpeed = 1000.f;
+
 	ProjectileMovement->MaxSpeed = 3000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
@@ -43,6 +44,19 @@ ABullet::ABullet()
 void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
+
+	bool bResult = FMath::RandBool();
+	if (!bResult) Pitch = -1;
+	bResult = FMath::RandBool();
+	if (!bResult) Roll = -1;
+}
+
+void ABullet::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	FVector RotVec = FVector(Roll * RotateSpeed, Pitch * RotateSpeed, 0.f);
+	StaticMesh->AddLocalRotation(RotVec.Rotation(), false);
 }
 
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)

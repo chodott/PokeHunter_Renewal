@@ -29,11 +29,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bAttached{ false };
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int Pitch{ 1 };
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int Roll{ 1 };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float RotateSpeed{ 1000 };
+
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UProjectileMovementComponent* ProjectileMovement;
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 	//void OnHit(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
@@ -62,5 +71,7 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnEffect();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSpawnEffect();
 	
 };

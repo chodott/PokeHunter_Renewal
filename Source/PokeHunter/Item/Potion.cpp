@@ -50,6 +50,7 @@ void APotion::MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector Initi
 	StaticMesh->SetSimulatePhysics(true);
 	StaticMesh->SetEnableGravity(true);
 	StaticMesh->SetCollisionProfileName(FName("Bullet"));
+	StaticMesh->SetWorldScale3D(FVector(2.f, 2.f, 2.f));
 	ProjectileMovement->ProjectileGravityScale = 1.f;
 	ProjectileMovement->Activate();
 	ABullet::MultiLaunchBullet_Implementation(BulletOwner, InitialPos, EndPos);

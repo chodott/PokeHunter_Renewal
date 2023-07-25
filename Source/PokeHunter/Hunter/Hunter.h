@@ -77,6 +77,13 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Status")
 	float HunterStamina{ 100 };
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
+	float DiveSpeed{ 1000.f };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
+	float SprintSpeed{ 700.f };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
+	float WalkSpeed{ 500.f };
 	
 	//
 	UPROPERTY(VisibleAnywhere, Replicated,  BlueprintReadOnly, Category = "Interaction")
@@ -154,6 +161,8 @@ public:
 	FGenericTeamId TeamID;
 
 	//Battle
+	bool bShiftDown{ false };
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float ReloadTime{};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
@@ -204,6 +213,11 @@ public:
 	void ServerSprint(AHunter* Hunter, bool bSprinting);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiSprint(AHunter* Hunter, bool bSprinting);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRoll(AHunter* Hunter, const FVector& LastInputVec);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiRoll(AHunter* Hunter, const FVector& LastInputVec);
 
 	UFUNCTION(Server, Reliable)
 	void ServerZoom(AHunter* Hunter, bool bZoom);

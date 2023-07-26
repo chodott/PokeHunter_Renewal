@@ -176,6 +176,20 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 	//Item Hit && HitLocation
 	AItem* HitItem = Cast<AItem>(DamageCauser);
+
+	if (nullptr != HitItem) {
+		AHunter* hunterDamageStack = Cast<AHunter>(HitItem->ThisOwner);
+		if (hunterDamageStack) {
+			hunterDamageStack->bTotalDamaged += DamageAmount;
+		}
+	}
+	else {
+		APartner* HitPartner = Cast<APartner>(DamageCauser);
+		if (nullptr != HitPartner) {
+			HitPartner->Hunter->bPartnerTotalDamaged += DamageAmount;
+		}
+	}
+	
 	FVector HitLoc;
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{

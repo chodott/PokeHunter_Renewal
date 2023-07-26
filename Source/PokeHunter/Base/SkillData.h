@@ -14,14 +14,22 @@ UENUM(BlueprintType)
 enum class ESkillID : uint8
 {
 	None = 0,
-	Rush = 201,
+	/*Rush = 201,
 	Howling = 202,
 	Slash = 203,
 	IceShard = 211,
 	IceStorm = 212,
 	IceBreath = 213,
 	RockThrow = 221,
-	Meteor = 222
+	Meteor = 222*/
+	Rush = 1,
+	Howling = 2,
+	Slash = 3,
+	IceShard = 4,
+	IceStorm = 5,
+	IceBreath = 6,
+	RockThrow = 7,
+	Meteor = 8
 };
 
 USTRUCT(BlueprintType)

@@ -184,6 +184,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	float bTotalDamaged = 0.0f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+	float bPartnerTotalDamaged = 0.0f;
+
 protected:
 	// Sets default values for this character's properties
 	AHunter();

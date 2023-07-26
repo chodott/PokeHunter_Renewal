@@ -26,6 +26,11 @@ UBaseInstance::UBaseInstance()
 
 	PlayerPetName = { EPartnerType::WolfPartner, EPartnerType::WolfPartner, EPartnerType::WolfPartner, EPartnerType::WolfPartner };
 
+	for (int i = 0; i < 4; ++i)
+	{
+		PartnerSkillArray.AddDefaulted();
+	}
+
 	endGame = false;
 }
 
@@ -117,11 +122,12 @@ bool UBaseInstance::SendAccessToken()
 			if (partner_number <= (sizeof(EPartnerType) / sizeof(uint8))) {
 				myPartner = static_cast<EPartnerType>(partner_number);
 				mySkin = static_cast<int>(info_pack._player_skin - '0');
-
-				UE_LOG(LogTemp, Warning, TEXT("[Skin] %d"), mySkin);
 			}
-			else {
-				UE_LOG(LogTemp, Warning, TEXT("Fail Get Partner number: %d"), partner_number);
+
+			memset(MBTWBuffer, NULL, 128);
+			MultiByteToWideChar(CP_ACP, 0, (LPCSTR)info_pack._q_skill, -1, MBTWBuffer, strlen(info_pack._q_skill));
+			for (int i = 0; i < 4; ++i) {
+				PartnerSkillArray[i] = (ESkillID)((uint8)(MBTWBuffer[i] - '0'));
 			}
 		}
 	}
@@ -401,6 +407,7 @@ void UBaseInstance::resetGameInstance()
 	if (false == inStageParty.IsEmpty()) inStageParty.Empty();
 	if (false == InfoArray.IsEmpty()) InfoArray.Empty();
 	if (false == StorageInfoArray.IsEmpty()) StorageInfoArray.Empty();
+	if (false == PartnerSkillArray.IsEmpty()) PartnerSkillArray.Empty();
 
 	InfoArray.Reserve(24);
 	StorageInfoArray.Reserve(24);

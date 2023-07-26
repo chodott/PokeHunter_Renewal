@@ -11,6 +11,19 @@
 /**
  * 
  */
+
+USTRUCT(BlueprintType)
+struct FU_DamageInfo {
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 hunterAmount {};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 petAmount {};
+};
+
 UCLASS()
 class POKEHUNTER_API AHunterState : public APlayerState
 {
@@ -36,5 +49,5 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
 
 	UFUNCTION(BlueprintCallable, Category = "Battle")
-		float getTotalDamage();
+		FU_DamageInfo getTotalDamage();
 };

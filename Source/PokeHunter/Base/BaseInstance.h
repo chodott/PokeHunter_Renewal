@@ -15,6 +15,7 @@
 #include "Windows/WindowsPlatformMisc.h"
 #include "Runtime/Core/Public/Windows/HideWindowsPlatformTypes.h"
 #include "PokeHunter/Item/ItemData.h"
+#include "PokeHunter/Base/SkillData.h"
 
 #include "GameFramework/Controller.h"
 
@@ -157,6 +158,10 @@ public:
 		FString GameLiftLevelName = "";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Server Level Option")
 		FString GameLiftLevelNameOptions = "";
+
+	// Pet info
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner")
+		TArray<ESkillID> PartnerSkillArray;
 
 	// inGame end time
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Exit Level")

@@ -17,7 +17,7 @@ UInventoryComponent::UInventoryComponent()
 	// ...
 
 	InfoArray.Reserve(capacity);
-	FarmingArray.Reserve(capacity);
+	// FarmingArray.Reserve(capacity);
 }
 
 
@@ -36,7 +36,7 @@ void UInventoryComponent::BeginPlay()
 		InfoArray.AddDefaulted();
 		FarmingArray.AddDefaulted();
 	}
-	
+
 }
 
 bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
@@ -44,9 +44,13 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 	int NullNum = -1;
 	FName ItemName = ItemCnter.ItemID;
 	int ItemCnt = ItemCnter.cnt;
+
 	for (int i = 0; i < capacity; ++i)
 	{
-		if (NullNum == -1 && InfoArray[i].ItemID == FName("None")) NullNum = i;
+		if (NullNum == -1 && InfoArray[i].ItemID == FName("None")) 
+		{
+			NullNum = i;
+		}
 		else if (InfoArray[i].ItemID != FName("None"))
 		{
 			if (InfoArray[i].ItemID == ItemName) 
@@ -54,10 +58,24 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 				//Add ItemCnt Update need
 				InfoArray[i].cnt += ItemCnt;
 
-				if (FarmingArray[i].ItemID == FName("None")) {
+				/*if (FarmingArray[i].ItemID == FName("None")) {
 					FarmingArray[i].ItemID = InfoArray[i].ItemID;
 				}
-				FarmingArray[i].cnt += ItemCnt;
+				FarmingArray[i].cnt += ItemCnt;*/
+
+				for (auto& item : FarmingArray) {
+					if (item.ItemID == ItemName) {
+						item.cnt += ItemCnt;
+						return true;
+					}
+				}
+				for (auto& item : FarmingArray) {
+					if (item.ItemID == FName("None")) {
+						item = ItemCnter;
+						return true;
+					}
+				}
+
 				return true;
 			}
 		}
@@ -69,8 +87,19 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 		InfoArray[NullNum].ItemID = ItemName;
 		InfoArray[NullNum].cnt += ItemCnt;
 
-		FarmingArray[NullNum].ItemID = ItemName;
-		FarmingArray[NullNum].cnt += ItemCnt;
+		for (auto& item : FarmingArray) {
+			if (item.ItemID == ItemName) {
+				item.cnt += ItemCnt;
+				return true;
+			}
+		}
+		for (auto& item : FarmingArray) {
+			if (item.ItemID == FName("None")) {
+				item = ItemCnter;
+				return true;
+			}
+		}
+
 		return true;
 	}
 
@@ -89,7 +118,7 @@ bool UInventoryComponent::AddItemInfo(FName ItemID, int Cnt)
 			if (InfoArray[i].ItemID == ItemID)
 			{
 				InfoArray[i].cnt += Cnt;
-				FarmingArray[i].cnt += Cnt;
+				// FarmingArray[i].cnt += Cnt;
 				return true;
 			}
 		}
@@ -100,8 +129,8 @@ bool UInventoryComponent::AddItemInfo(FName ItemID, int Cnt)
 		InfoArray[NullNum].ItemID = ItemID;
 		InfoArray[NullNum].cnt = Cnt;
 
-		FarmingArray[NullNum].ItemID = ItemID;
-		FarmingArray[NullNum].cnt = Cnt;
+		// FarmingArray[NullNum].ItemID = ItemID;
+		// FarmingArray[NullNum].cnt = Cnt;
 		return true;
 	}
 

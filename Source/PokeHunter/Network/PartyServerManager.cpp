@@ -42,7 +42,6 @@ bool UPartyServerManager::GetPartyList()
 
 		if ((int32)1 == (int32)party_list_pack.Inaccessible) {
 			gameinstance->inStageParty.Add(1);
-			UE_LOG(LogTemp, Warning, TEXT("Add (int)party_list_pack.Inaccessible : %d"), (int32)party_list_pack.Inaccessible);
 		}
 		else gameinstance->inStageParty.Add(0);
 

@@ -157,6 +157,12 @@ void AHunter::BeginPlay()
 		ServerSpawnPartner(this, partnerClass, SpawnLocation);
 	}
 
+	for (int i = 0; i < 4; ++i) {
+		// partner wolf -> static_cast<int>(PartnerType) * 4 ==> 4
+		// HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = ESkillID::Slash;
+		HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = gameinstance->PartnerSkillArray[i];
+	}
+
 	for (int i = 0; i < 4; ++i)
 	{
 		ESkillID SkillID = HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i];
@@ -1084,6 +1090,8 @@ void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)
 	for (int i = 0; i < 4; ++i)
 	{
 		HunterInfo.PartnerSkillArray[4 * SkillListNum + i] = SkillArray[i];
+		// HunterInfo.PartnerSkillArray[4 * SkillListNum + i] = ESkillID::Slash;
+		gameinstance->PartnerSkillArray[i] = SkillArray[i];
 	}
 }
 

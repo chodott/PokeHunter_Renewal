@@ -33,6 +33,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Particle")
 	class UNiagaraComponent* IceStormEffect = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Particle")
+	class UNiagaraSystem* IceHornEffect = nullptr;
+
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Skill")
 	float BreatheLimitTime{};

@@ -362,6 +362,7 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AHunter, Partner);
 	DOREPLIFETIME(AHunter, InteractingActor);
 	DOREPLIFETIME(AHunter, bUpperOnly);
+	DOREPLIFETIME(AHunter, bShiftDown);
 }
 
 void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
@@ -507,14 +508,7 @@ void AHunter::SpaceDown()
 
 	if(CurState == EPlayerState::Idle)
 	{
-		FVector Speed = GetVelocity();
-		FVector XYspeed = FVector(Speed.X, Speed.Y, 0.f);
-		if (XYspeed.Size() <= 0.f) return;
-		else if (XYspeed.Size() <= 500.f) LastSpeed = 500.0f;
-		else
-		{
-			LastSpeed = XYspeed.Size();
-		}
+
 		LastInput = GetCharacterMovement()->GetLastInputVector();
 		ServerRoll(this, LastInput);
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
@@ -931,8 +925,8 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 		UnCrouch();
 		bInvincible = false;
 		CurState = EPlayerState::Idle;
-		if(bShiftDown) GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-		else GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	/*	if(bShiftDown) GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+		else */GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	}
 	else if (CurState == EPlayerState::Install)
 	{

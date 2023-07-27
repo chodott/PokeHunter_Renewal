@@ -42,6 +42,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 		float totalDamage;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+		FU_DamageInfo damageInfo {
+		0, 0
+	};
+
 public:
 	void InitPlayerData();
 

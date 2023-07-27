@@ -13,6 +13,7 @@
 #include "PokeHunter/Base/BaseCharacter.h"
 #include "PokeHunter/Hunter/Hunter.h"
 #include "PokeHunter/Partner/Partner.h"
+#include <PokeHunter/Base/HunterState.h>
 
 // Sets default values
 AEnemy::AEnemy()
@@ -180,13 +181,19 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	if (nullptr != HitItem) {
 		AHunter* hunterDamageStack = Cast<AHunter>(HitItem->ThisOwner);
 		if (hunterDamageStack) {
-			hunterDamageStack->bTotalDamaged += DamageAmount;
+			AHunterState* playerState = Cast<AHunterState>(GetPlayerState());
+			if (playerState) {
+				playerState->damageInfo.hunterAmount += DamageAmount;
+			}
 		}
 	}
 	else {
 		APartner* HitPartner = Cast<APartner>(DamageCauser);
 		if (nullptr != HitPartner) {
-			HitPartner->Hunter->bPartnerTotalDamaged += DamageAmount;
+			AHunterState* playerState = Cast<AHunterState>(GetPlayerState());
+			if (playerState) {
+				playerState->damageInfo.petAmount += DamageAmount;
+			}
 		}
 	}
 	

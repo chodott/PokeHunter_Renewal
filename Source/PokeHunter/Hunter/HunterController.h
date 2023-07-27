@@ -17,6 +17,9 @@ class POKEHUNTER_API AHunterController : public APlayerController
 protected:
 
 public:
+	FName MyName;
+
+public:
 	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 };

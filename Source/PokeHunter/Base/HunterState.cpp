@@ -18,10 +18,5 @@ void AHunterState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 FU_DamageInfo AHunterState::getTotalDamage()
 {
-	AHunterController* hunterContoller = Cast<AHunterController>(GetOwner());
-
-	int32 hunterDamage = Cast<AHunter>(hunterContoller->GetCharacter())->bTotalDamaged;
-	int32 partnerDamage = Cast<AHunter>(hunterContoller->GetCharacter())->bPartnerTotalDamaged;
-
-	return FU_DamageInfo{ hunterDamage, partnerDamage };
+	return damageInfo;
 }

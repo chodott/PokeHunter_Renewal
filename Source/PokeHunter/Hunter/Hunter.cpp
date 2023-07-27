@@ -190,6 +190,8 @@ void AHunter::BeginPlay()
 
 	MaterialIndex = gameinstance->mySkin;
 	ServerChangeMaterialIndex(MaterialIndex);
+
+	HunterName = gameinstance->MyName;
 }
 
 // Called every frame
@@ -378,6 +380,7 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 
 	DOREPLIFETIME(AHunter, MaterialIndex);
 	DOREPLIFETIME(AHunter, Material);
+	DOREPLIFETIME(AHunter, DamageList);
 }
 
 void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
@@ -1360,4 +1363,15 @@ void AHunter::MulticastChangeMaterialIndex_Implementation(int32 NewMaterialIndex
 	}
 	Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
 	GetMesh()->SetMaterial(0, Material);
+}
+
+void AHunter::ServerGetALLDamage_Implementation(AHunter* hunter, int amountDamage)
+{
+	hunter->MulticastGetALLDamage(hunter->HunterName, amountDamage);
+}
+
+void AHunter::MulticastGetALLDamage_Implementation(FName name, int amountDamage)
+{
+	// DamageList.Add( name, amountDamage );
+	// if(DamageList.Find())
 }

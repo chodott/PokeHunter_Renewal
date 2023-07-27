@@ -49,8 +49,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner Skill")
 	TArray<ESkillID> PartnerSkillArray;
+};
 
-	
+USTRUCT(BlueprintType)
+struct FPartyInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "partyMemberInfo")
+		FName hunterName;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "partyMemberInfo")
+		int32 hunterDamage;
 };
 
 UCLASS()
@@ -376,6 +386,15 @@ public:
 		void ServerChangeMaterialIndex(int32 NewMaterialIndex);
 	UFUNCTION(NetMulticast, Reliable, Category = "Material")
 		void MulticastChangeMaterialIndex(int32 NewMaterialIndex);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ResultUIDamage")
+		FName HunterName;
+	UFUNCTION(Server, Reliable, Category = "ResultUIDamage")
+		void ServerGetALLDamage(AHunter* hunter, int amountDamage);
+	UFUNCTION(NetMulticast, Reliable, Category = "ResultUIDamage")
+		void MulticastGetALLDamage(FName name, int amountDamage);
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "ResultUIDamage")
+		TArray<FPartyInfo> DamageList;
 
 protected:
 	UPROPERTY(Replicated)

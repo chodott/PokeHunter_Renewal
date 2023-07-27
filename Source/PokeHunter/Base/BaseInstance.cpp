@@ -129,6 +129,8 @@ bool UBaseInstance::SendAccessToken()
 			for (int i = 0; i < 4; ++i) {
 				PartnerSkillArray[i] = (ESkillID)((uint8)(MBTWBuffer[i] - '0'));
 			}
+
+
 		}
 	}
 	return true;

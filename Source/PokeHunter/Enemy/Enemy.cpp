@@ -181,10 +181,11 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	if (nullptr != HitItem) {
 		AHunter* hunterDamageStack = Cast<AHunter>(HitItem->ThisOwner);
 		if (hunterDamageStack) {
-			AHunterState* playerState = Cast<AHunterState>(GetPlayerState());
+			AHunterState* playerState = Cast<AHunterState>(hunterDamageStack->GetPlayerState());
 			if (playerState) {
 				playerState->damageInfo.hunterAmount += DamageAmount;
 			}
+			// hunterDamageStack->ServerGetALLDamage(hunterDamageStack, DamageAmount);
 		}
 	}
 	else {

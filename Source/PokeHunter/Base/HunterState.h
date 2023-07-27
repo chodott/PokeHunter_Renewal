@@ -24,6 +24,18 @@ public:
 		int32 petAmount {};
 };
 
+USTRUCT(BlueprintType)
+struct FU_HPInfo {
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 hunterHP {};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 petHP {};
+};
+
 UCLASS()
 class POKEHUNTER_API AHunterState : public APlayerState
 {
@@ -44,6 +56,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 		FU_DamageInfo damageInfo {
+		0, 0
+	};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
+		FU_HPInfo hpInfo {
 		0, 0
 	};
 

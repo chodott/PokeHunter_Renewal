@@ -1365,6 +1365,10 @@ void AHunter::ServerGetALLDamage_Implementation(AHunter* hunter, int amountDamag
 
 void AHunter::MulticastGetALLDamage_Implementation(FName name, int amountDamage)
 {
-	// DamageList.Add( name, amountDamage );
-	// if(DamageList.Find())
+	for (FPartyInfo& info : DamageList) {
+		if (name == info.hunterName) {
+			info.hunterDamage += amountDamage;
+			break;
+		}
+	}
 }

@@ -284,7 +284,7 @@ public:
 
 	//Status
 	UFUNCTION(BlueprintCallable)
-	void SetHP(float setHP) { HP = setHP; };
+	void SetHP(float setHP) { HP = setHP; }
 	UFUNCTION(BlueprintCallable)
 	float GetHP() { return HP; };
 	UFUNCTION(BlueprintCallable)

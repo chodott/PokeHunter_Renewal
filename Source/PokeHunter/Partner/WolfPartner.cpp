@@ -8,6 +8,7 @@
 #include "Components/CapsuleComponent.h"
 #include "PokeHunter/Enemy/Enemy.h"
 #include "PokeHunter/Hunter/Hunter.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
 
@@ -207,6 +208,8 @@ void AWolfPartner::MakeIceShard()
 	FVector EndPos = Target->GetActorLocation();
 	FVector DirectionVec = EndPos - InitialPos;
 	FRotator Rotation = DirectionVec.Rotation();
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), IceHornEffect, InitialPos);
 
 	//FQuat TargetRotation = FQuat::FindBetweenNormals(GetActorForwardVector(), DirectionVec);
 	//FRotator Rotation = TargetRotation.Rotator();

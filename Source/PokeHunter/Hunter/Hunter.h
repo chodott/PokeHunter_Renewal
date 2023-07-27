@@ -171,6 +171,7 @@ public:
 	FGenericTeamId TeamID;
 
 	//Battle
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite)
 	bool bShiftDown{ false };
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")

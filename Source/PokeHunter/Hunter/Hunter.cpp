@@ -656,7 +656,7 @@ void AHunter::LMBDown()
 				{
 					EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
 				}
-				StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle"));
+				StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle")) + GetActorForwardVector() * 100.f;
 
 				ServerSpawnBullet(this, ItemClass, StartTrace, EndTrace, GetControlRotation());
 			}

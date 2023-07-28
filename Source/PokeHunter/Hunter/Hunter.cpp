@@ -370,10 +370,13 @@ void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
 	if (bSprinting && Hunter->CurState == EPlayerState::Idle)
 	{
 		Hunter->GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+		Hunter->bShiftDown = bSprinting;
 	}
 	else if (!bSprinting)
 	{
 		Hunter->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		Hunter->bShiftDown = !bSprinting;
+
 	}
 }
 
@@ -591,15 +594,15 @@ void AHunter::LookUp(float NewAxisValue)
 void AHunter::LShiftDown()
 {
 	if (bBound) return;
-	bShiftDown = true;
-	ServerSprint(this, bShiftDown);
+	//bShiftDown = true;
+	ServerSprint(this, true);
 }
 
 void AHunter::LShiftUp()
 {
 	if (CurState == EPlayerState::Zoom) return;
-	bShiftDown = false;
-	ServerSprint(this, bShiftDown);
+	//bShiftDown = false;
+	ServerSprint(this, false);
 }
 
 void AHunter::LMBDown()
@@ -925,8 +928,8 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 		UnCrouch();
 		bInvincible = false;
 		CurState = EPlayerState::Idle;
-	/*	if(bShiftDown) GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-		else */GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		if(bShiftDown) GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+		else GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	}
 	else if (CurState == EPlayerState::Install)
 	{

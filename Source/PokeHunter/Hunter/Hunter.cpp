@@ -1359,13 +1359,13 @@ void AHunter::OnRep_Material()
 	switch (MaterialIndex)
 	{
 	case 1:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
 		break;
 	case 2:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter02");
+		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter2");
 		break;
 	default:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
 		break;
 	}
 	Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
@@ -1378,13 +1378,13 @@ void AHunter::ServerChangeMaterialIndex_Implementation(int32 NewMaterialIndex)
 	switch (NewMaterialIndex)
 	{
 	case 1:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
 		break;
 	case 2:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter02");
+		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter2");
 		break;
 	default:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
 		break;
 	}
 	Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
@@ -1399,13 +1399,13 @@ void AHunter::MulticastChangeMaterialIndex_Implementation(int32 NewMaterialIndex
 	switch (NewMaterialIndex)
 	{
 	case 1:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
 		break;
 	case 2:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter02");
+		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter2");
 		break;
 	default:
-		MaterialPath = TEXT("/Game/Hunter/Asset/Hunter/M_Hunter");
+		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
 		break;
 	}
 	Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());

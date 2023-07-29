@@ -8,6 +8,7 @@
 #include "InventoryComponent.h"
 #include "HunterAnimInstance.h"
 #include "Net/UnrealNetwork.h"
+#include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
@@ -949,15 +950,20 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	}
 	else if (CurState == EPlayerState::Drink)
 	{
-		CurItem->UseItem(this);
-		Heal_Effect->Activate();
-		if (CurItem != NULL) CurItem->Destroy();
+		
 		CurState = EPlayerState::Idle;
 	}
 	if(!bInterrupted)
 	{
 		if (bUpperOnly) bUpperOnly = false;
 	}
+}
+
+void AHunter::DrinkPotion()
+{
+	ServerSpawnEffect(HealEffect);
+	CurItem->UseItem(this);
+	if (CurItem != NULL) CurItem->Destroy();
 }
 
 void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -1043,6 +1049,7 @@ void AHunter::InteractAttack_Implementation(FVector HitDirection, float DamageAm
 	if (bInvincible) return;
 
 	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
+	if (HitDirection.Z <= 0.3f) HitDirection.Z = 0.35f;
 
 	//bDamaged = true;
 	FVector TargetVec = FVector(HitDirection.X * -1, HitDirection.Y * -1, 0);
@@ -1050,6 +1057,7 @@ void AHunter::InteractAttack_Implementation(FVector HitDirection, float DamageAm
 	TargetRot.Pitch = 0;
 	SetActorRelativeRotation(TargetRot);
 	CurState = EPlayerState::Knockback;
+	UE_LOG(LogTemp, Warning, TEXT("%F,,,"), HitDirection.Z);
 	LaunchCharacter(HitDirection * 1000.f,false,false);
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	bNoCollision = true;
@@ -1293,3 +1301,16 @@ void AHunter::SetStamina(float setStamina)
 		HunterStamina = setStamina;
 	}
 }
+
+void AHunter::ServerSpawnEffect_Implementation(class UNiagaraSystem* Niagara)
+{
+	MultiSpawnEffect(Niagara);
+}
+
+
+void AHunter::MultiSpawnEffect_Implementation(class UNiagaraSystem* Niagara)
+{
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HealEffect, GetActorLocation());
+
+}
+

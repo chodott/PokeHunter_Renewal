@@ -288,6 +288,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable, Category = "Party member info")
 		void MultiPetHP(FName PlayerName, float NewHP);
 
+	UFUNCTION(Server, Reliable)
+	void ServerSetMaxSpeed(AHunter* OwnerHunter, float NewSpeed);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSetMaxSpeed(AHunter* OwnerHunter, float NewSpeed);
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

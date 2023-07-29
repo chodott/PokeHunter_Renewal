@@ -367,15 +367,15 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 
 void AHunter::MultiSprint_Implementation(AHunter* Hunter, bool bSprinting)
 {
+	Hunter->bShiftDown = false;
 	if (bSprinting && Hunter->CurState == EPlayerState::Idle)
 	{
 		Hunter->GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 		Hunter->bShiftDown = bSprinting;
 	}
-	else if (!bSprinting)
+	else if (!bSprinting && Hunter->CurState == EPlayerState::Idle)
 	{
 		Hunter->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-		Hunter->bShiftDown = !bSprinting;
 
 	}
 }
@@ -466,6 +466,16 @@ void AHunter::MultiPetHP_Implementation(FName PlayerName, float NewHP)
 	if (TempHP) {
 		*TempHP = NewHP;
 	}
+}
+
+void AHunter::ServerSetMaxSpeed_Implementation(AHunter* OwnerHunter, float NewSpeed)
+{
+	MultiSetMaxSpeed(OwnerHunter, NewSpeed);
+}
+
+void AHunter::MultiSetMaxSpeed_Implementation(AHunter* OwnerHunter, float NewSpeed)
+{
+	OwnerHunter->GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 }
 
 // Called to bind functionality to input
@@ -928,8 +938,10 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 		UnCrouch();
 		bInvincible = false;
 		CurState = EPlayerState::Idle;
-		if(bShiftDown) GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-		else GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		//set rpc movement speed
+		if (bShiftDown) ServerSetMaxSpeed(this, SprintSpeed);
+		else ServerSetMaxSpeed(this, WalkSpeed);
+
 	}
 	else if (CurState == EPlayerState::Install)
 	{

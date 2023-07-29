@@ -40,6 +40,11 @@ void AEnemyProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bool bResult = FMath::RandBool();
+	if (!bResult) Pitch = -1;
+	bResult = FMath::RandBool();
+	if (!bResult) Roll = -1;
+
 }
 
 // Called every frame
@@ -47,12 +52,14 @@ void AEnemyProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FVector RotVec = FVector(Roll * RotateSpeed, Pitch * RotateSpeed, 0.f);
+	StaticMesh->AddLocalRotation(RotVec.Rotation(), false);
 }
 
 void AEnemyProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	//if(OtherActor->CanBeDamaged())
-	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, ThisOwner, UDamageType::StaticClass());
+	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 
 	ServerDestroy();
 }
@@ -102,7 +109,7 @@ void AEnemyProjectile::FireInDirection(FVector Direction)
 	SetLifeSpan(TimeLimit);
 	StaticMesh->SetSimulatePhysics(true);
 	StaticMesh->AddImpulse(Velocity, FName(""), true);
-
+	SetActorTickEnabled(true);
 }
 
 void AEnemyProjectile::InteractChargeAttack_Implementation(float DamageAmount)

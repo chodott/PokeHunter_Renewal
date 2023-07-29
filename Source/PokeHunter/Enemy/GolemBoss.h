@@ -103,9 +103,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
 	TArray<class ACharacter*> GrabbedTargets;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "HitBox")
 	bool bLoseLeftHand{ false };
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "HitBox")
 	bool bLoseRightHand{ false };
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
 	bool bCanGrab;

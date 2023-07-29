@@ -178,4 +178,9 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnProjectile(APartner* OwnerPartner, TSubclassOf<class APartnerProjectile> SpawnProjectileClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnEffect(class UNiagaraSystem* Niagara, const FVector& SpawnLoc);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSpawnEffect(class UNiagaraSystem* Niagara, const FVector& SpawnLoc);
+
 };

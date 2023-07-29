@@ -57,7 +57,7 @@ void AWolfPartner::Tick(float DeltaTime)
 			for (auto Enemy : OverlapActors)
 			{
 				ServerApplyDamage(Enemy, BreathDamage, GetController(), this);
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), IceHitEffect, Enemy->GetActorLocation());
+				ServerSpawnEffect(IceHitEffect, Enemy->GetActorLocation());
 				if (Enemy->Implements<UItemInteractInterface>())
 				{
 					Execute_InteractIceSkill(Enemy);
@@ -87,7 +87,7 @@ void AWolfPartner::Tick(float DeltaTime)
 			for (auto Enemy : OverlapActors)
 			{
 				ServerApplyDamage(Enemy, StormDamage, GetController(), this);
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), IceHitEffect, Enemy->GetActorLocation());
+				ServerSpawnEffect(IceHitEffect, Enemy->GetActorLocation());
 				if (Enemy->Implements<UItemInteractInterface>())
 				{
 					Execute_InteractIceSkill(Enemy);
@@ -177,7 +177,6 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 			bUsingSkill = true;
 			bOrdered = true;
 			bSuccess = true;
-			
 		}
 		break;
 	default:

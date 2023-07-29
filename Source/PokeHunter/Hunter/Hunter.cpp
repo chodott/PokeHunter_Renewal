@@ -361,6 +361,7 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 				DirectionVec.Z *= -1;
 			}
 			LaunchCharacter(DirectionVec * 1000.f, false, false);
+			ServerPlayMontage(this, FName("NormalHit"));
 		}
 	}
 	else
@@ -1105,6 +1106,8 @@ void AHunter::InteractGrabAttack_Implementation()
 {
 	bNoCollision = true;
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
+	FRotator TargetRot = FVector::ZeroVector.Rotation();
+	SetActorRelativeRotation(TargetRot);
 }
 
 void AHunter::InteractWideAttack_Implementation(float DamageAmount)

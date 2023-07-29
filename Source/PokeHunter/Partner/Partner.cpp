@@ -473,3 +473,13 @@ void APartner::MultiCancelOrder_Implementation()
 {
 	CancelOrder();
 }
+
+void APartner::ServerSpawnEffect_Implementation(class UNiagaraSystem* Niagara, const FVector& SpawnLoc)
+{
+	MultiSpawnEffect(Niagara, SpawnLoc);
+}
+
+void APartner::MultiSpawnEffect_Implementation(class UNiagaraSystem* Niagara, const FVector& SpawnLoc)
+{
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Niagara, SpawnLoc);
+}

@@ -30,6 +30,13 @@ public:
 
 	float TimeLimit{ 5.f };
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int Pitch{ 1 };
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int Roll{ 1 };
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		float RotateSpeed{ 500 };
+
 public:
 	virtual void BeginPlay() override;
 

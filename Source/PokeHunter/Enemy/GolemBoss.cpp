@@ -524,7 +524,7 @@ void AGolemBoss::Attack(int AttackPattern)
 		break;
 
 	case 2:
-		ServerPlayMontage(this, FName("Attack_Bind"));
+		ServerPlayMontage(this, FName("Attack"));
 		break;
 
 	case 3:

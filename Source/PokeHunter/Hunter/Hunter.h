@@ -192,6 +192,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bBound;
 
+	//Effect
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effect")
+	class UNiagaraSystem* HealEffect;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	float bTotalDamaged = 0.0f;
 
@@ -277,10 +280,16 @@ public:
 	void ServerInteractObject(AInteractActor* TargetActor, AHunter* OwnerHunter);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiInteractObject(AHunter* OwnerHunter);
+	UFUNCTION(NetMulticast, Reliable)
+	void ServerSpawnEffect(class UNiagaraSystem* Niagara);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSpawnEffect(class UNiagaraSystem* Niagara);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateQuickSlot();
 
+	UFUNCTION(BlueprintCallable)
+	void DrinkPotion();
 
 	//Status
 	UFUNCTION(BlueprintCallable)
@@ -304,6 +313,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable, Category = "Party member info")
 		void MultiPetHP(FName PlayerName, float NewHP);
 
+	UFUNCTION(Server, Reliable)
+	void ServerSetMaxSpeed(AHunter* OwnerHunter, float NewSpeed);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSetMaxSpeed(AHunter* OwnerHunter, float NewSpeed);
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

@@ -49,25 +49,28 @@ void AWolfPartner::Tick(float DeltaTime)
 
 	if (bBreathe)
 	{
-		int CurSecond = FMath::FloorToInt(BreatheLimitTime);
-		BreatheLimitTime -= DeltaTime;
-		if (CurSecond != FMath::FloorToInt(BreatheLimitTime))
+		BreatheRuntime += DeltaTime;
+		if (BreatheRuntime >= BreatheDamagePeriod)
 		{
 			TArray<AActor*> OverlapActors;
 			BreathCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
 			for (auto Enemy : OverlapActors)
 			{
 				ServerApplyDamage(Enemy, BreathDamage, GetController(), this);
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), IceHitEffect, Enemy->GetActorLocation());
 				if (Enemy->Implements<UItemInteractInterface>())
 				{
 					Execute_InteractIceSkill(Enemy);
 				}
 			}
+			BreatheRuntime = 0.f;
+			BreatheDamageCnt++;
 		}
 
-		if (BreatheLimitTime <= 0.0f)
+		if (BreatheDamageCnt >= BreathTime/BreatheDamagePeriod)
 		{
 			bBreathe = false;
+			BreatheDamageCnt = 0;
 			BreathCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			BreathCollision->SetVisibility(false);
 			PartnerAnim->StopAllMontages(0.2f);
@@ -76,26 +79,31 @@ void AWolfPartner::Tick(float DeltaTime)
 
 	if (bOnStorm)
 	{
-		int CurSecond = FMath::FloorToInt(StormLimitTime);
-		StormLimitTime -= DeltaTime;
-		if (CurSecond != FMath::FloorToInt(StormLimitTime))
+		StormRuntime += DeltaTime;
+		if (StormRuntime >= StormDamagePeriod)
 		{
-			
-
 			TArray<AActor*> OverlapActors;
 			StormCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
 			for (auto Enemy : OverlapActors)
 			{
 				ServerApplyDamage(Enemy, StormDamage, GetController(), this);
-				Execute_InteractIceSkill(Enemy);
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), IceHitEffect, Enemy->GetActorLocation());
+				if (Enemy->Implements<UItemInteractInterface>())
+				{
+					Execute_InteractIceSkill(Enemy);
+				}
 			}
+			StormRuntime = 0.f;
+			StormDamageCnt++;
 		}
 
-		if (StormLimitTime <= 0.0f)
+		if (StormDamageCnt >= StormTime / StormDamagePeriod)
 		{
-			bOnStorm = false;
+			bOnStorm= false;
+			StormDamageCnt = 0;
 			StormCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			StormCollision->SetVisibility(false);
+			PartnerAnim->StopAllMontages(0.2f);
 		}
 	}
 
@@ -120,9 +128,9 @@ void AWolfPartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AWolfPartner, bBreathe);
-	DOREPLIFETIME(AWolfPartner, BreatheLimitTime);
+	//DOREPLIFETIME(AWolfPartner, BreatheLimitTime);
 	DOREPLIFETIME(AWolfPartner, bOnStorm);
-	DOREPLIFETIME(AWolfPartner, StormLimitTime);
+	//DOREPLIFETIME(AWolfPartner, StormLimitTime);
 }
 
 void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
@@ -201,13 +209,12 @@ void AWolfPartner::IceBreathe()
 
 void AWolfPartner::ResetBreathe()
 {
-	BreatheLimitTime = 0.0f;
+	//¼öÁ¤ÇÊ
 	IceBreatheEffect->Deactivate();
 }
 
 void AWolfPartner::ActivateBreathe()
 {
-	BreatheLimitTime = BreathTime;
 	bBreathe = true;
 	BreathCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	IceBreatheEffect->Activate(true);
@@ -235,7 +242,6 @@ void AWolfPartner::MakeStorm()
 void AWolfPartner::ActivateStorm()
 {
 	StormCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	StormLimitTime = StormTime;
 	bOnStorm = true;
 	IceStormEffect->Activate(true);
 }

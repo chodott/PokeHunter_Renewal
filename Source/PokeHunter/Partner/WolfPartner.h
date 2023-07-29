@@ -36,9 +36,16 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Particle")
 	class UNiagaraSystem* IceHornEffect = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effect")
+	class UNiagaraSystem* IceHitEffect;
 
-	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Skill")
-	float BreatheLimitTime{};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	float BreatheRuntime{};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
+	float BreatheDamagePeriod{ 0.5f };
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	float BreatheDamageCnt;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	float BreathTime{ 5.0f };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
@@ -48,8 +55,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	float StormTime{ 10.f };
-	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Skill")
-	float StormLimitTime{};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	float StormRuntime{};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
+	float StormDamagePeriod{ 0.5f };
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	float StormDamageCnt;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	float StormDamage{};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")

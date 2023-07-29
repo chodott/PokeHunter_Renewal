@@ -216,19 +216,23 @@ void AGolemBoss::LaunchBombs()
 	FVector TargetLoc = Target->GetActorLocation();
 	FVector GolemLoc = GetActorLocation();
 	float GolemTargetDistance = FVector::Dist2D(TargetLoc, GolemLoc);
-	for (int i = 0; i < MaxBombCnt; ++i)
+	int BombLength = BombArray.Num();
+	for (int i = 0; i < BombLength; ++i)
 	{
-		float BombGolemDistance = FVector::Dist2D(BombArray[i]->GetActorLocation(), GolemLoc);
-		FVector BombLoc = BombArray[i]->GetActorLocation();
-		FVector BombDirVec = BombLoc - GolemLoc;
-		BombDirVec.Z = 0;
-		BombDirVec.Normalize();
-		FVector PlaneGolemLoc = GolemLoc;
-		PlaneGolemLoc.Z = TargetLoc.Z;
-		FVector BombTargetPos = PlaneGolemLoc + GolemTargetDistance * BombDirVec;
-		FVector LaunchDirection = BombTargetPos - BombLoc;
-		LaunchDirection.Normalize();
-		BombArray[i]->FireInDirection(LaunchDirection);
+		if (BombArray[i])
+		{
+			float BombGolemDistance = FVector::Dist2D(BombArray[i]->GetActorLocation(), GolemLoc);
+			FVector BombLoc = BombArray[i]->GetActorLocation();
+			FVector BombDirVec = BombLoc - GolemLoc;
+			BombDirVec.Z = 0;
+			BombDirVec.Normalize();
+			FVector PlaneGolemLoc = GolemLoc;
+			PlaneGolemLoc.Z = TargetLoc.Z;
+			FVector BombTargetPos = PlaneGolemLoc + GolemTargetDistance * BombDirVec;
+			FVector LaunchDirection = BombTargetPos - BombLoc;
+			LaunchDirection.Normalize();
+			BombArray[i]->FireInDirection(LaunchDirection);
+		}
 	}
 	BombArray.Reset();
 }
@@ -489,14 +493,17 @@ int AGolemBoss::CheckPattern()
 {
 	float CurTime = GetWorld()->GetTimeSeconds();
 
-	for (auto& Pattern : PatternManageArray){
-		Pattern.CheckReady(CurTime);
-		if (Pattern.GetReady())
-		{
-			return Pattern.num;
-		}
-	}
-	return 0;
+	//for (auto& Pattern : PatternManageArray){
+	//	Pattern.CheckReady(CurTime);
+	//	if (Pattern.GetReady())
+	//	{
+	//		return Pattern.num;
+	//	}
+	//}
+	int PatternNum = FMath::RandRange(0, 3);
+
+
+	return PatternNum;
 }
 
 void AGolemBoss::Attack(int AttackPattern)
@@ -505,7 +512,6 @@ void AGolemBoss::Attack(int AttackPattern)
 
 	switch (AttackPattern)
 	{
-
 	case 0:
 		if (!bLoseLeftHand && !bLoseRightHand)
 		{
@@ -555,6 +561,8 @@ void AGolemBoss::PatternAttack(int AttackPattern)
 	case 0:
 		if (!bLoseLeftHand) ServerPlayMontage(this, FName("Throw"));
 		else ServerPlayMontage(this, FName("ChargeAttack"));
+
+		ServerPlayMontage(this, FName("ChargeAttack"));
 		break;
 	case 1:
 		ServerPlayMontage(this, FName("WideAttack"));

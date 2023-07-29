@@ -343,7 +343,7 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 				else if(StringPartName.Contains("Right"))
 				{
 					ServerPlayMontage(this, FName("RightDestroy"));
-					CurState = EEnemyState::RightDestroy;
+					CurState = EEnemyState::LeftDestroy;
 					if (!BombArray.IsEmpty())
 					{
 						for (auto& Bomb : BombArray)

@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-#include "PokeHunter/Hunter/Hunter.h"
-#include "PokeHunter/Hunter/HunterController.h"
+//#include "PokeHunter/Hunter/Hunter.h"
+//#include "PokeHunter/Hunter/HunterController.h"
 #include "HunterState.generated.h"
 
 /**
@@ -29,11 +29,11 @@ struct FU_HPInfo {
 	GENERATED_USTRUCT_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 hunterHP {};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
+		float hunterHP {};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 petHP {};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
+		float petHP {};
 };
 
 UCLASS()
@@ -50,6 +50,9 @@ public:
 
 	UPROPERTY(Replicated)
 		FString Team;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hunter info")
+		FName MyName {};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 		float totalDamage;
@@ -71,5 +74,13 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
 
 	UFUNCTION(BlueprintCallable, Category = "Battle")
-		FU_DamageInfo getTotalDamage();
+		FU_DamageInfo getTotalDamage()	{ return damageInfo; }
+	UFUNCTION(BlueprintCallable, Category = "Battle")
+		FU_HPInfo getHPInfo()			{ return hpInfo; }
+
+	UFUNCTION(BlueprintCallable, Category = "Battle")
+		void setHPInfoHunter(float newHP) { hpInfo.hunterHP = newHP; }
+	UFUNCTION(BlueprintCallable, Category = "Battle")
+		void setHPInfoPet(float newHP) { hpInfo.petHP = newHP; }
+
 };

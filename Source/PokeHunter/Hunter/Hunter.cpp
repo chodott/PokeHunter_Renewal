@@ -31,6 +31,7 @@
 #include "PokeHunter/Enemy/EnemyProjectile.h"
 #include <Blueprint/WidgetBlueprintLibrary.h>
 #include "HunterController.h"
+#include "PokeHunter/Base/HunterState.h"
 
 
 
@@ -192,6 +193,11 @@ void AHunter::BeginPlay()
 	ServerChangeMaterialIndex(MaterialIndex);
 
 	HunterName = gameinstance->MyName;
+	AHunterState* hunterState = Cast<AHunterState>(GetPlayerState());
+	if (hunterState) {
+		hunterState->MyName = HunterName;
+		hunterState->hpInfo.hunterHP = HP;
+	}
 }
 
 // Called every frame
@@ -292,6 +298,16 @@ void AHunter::Tick(float DeltaTime)
 			SetActorEnableCollision(true);
 		}
 	}
+
+	if (false == Inventory->InfoArray.IsEmpty()) {
+		gameinstance->InfoArray = Inventory->InfoArray;
+	}
+
+	/*AHunterState* hunterState = Cast<AHunterState>(GetPlayerState());
+	if (hunterState) {
+		hunterState->hpInfo.hunterHP = HP;
+	}*/
+	// ServerHunterHP(gameinstance->MyName, HP);
 }
 
 void AHunter::PostInitializeComponents()
@@ -317,9 +333,8 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	ABullet* Bullet = Cast<ABullet>(DamageCauser);
 	if (Bullet) return 0.f;
 
-
 	HP -= DamageAmount;
-	ServerHunterHP(gameinstance->MyName, HP);
+	// ServerHunterHP(gameinstance->MyName, HP);
 
 	if (GetHP() <= 0)
 	{ //죽었을 때
@@ -465,9 +480,14 @@ void AHunter::ServerHunterHP_Implementation(FName PlayerName, float NewHP)
 void AHunter::MultiHunterHP_Implementation(FName PlayerName, float NewHP)
 {
 	float* TempHP = PartyMemberHP.Find(PlayerName);
-	if (TempHP) {
+	if (nullptr != TempHP) {
 		*TempHP = NewHP;
 	}
+	else {
+		PartyMemberHP.Add(PlayerName, NewHP);
+	}
+	TArray<FU_HPInfo> arr;
+	
 }
 
 void AHunter::ServerPetHP_Implementation(FName PlayerName, float NewHP)
@@ -889,7 +909,7 @@ void AHunter::Use1Skill()
 		{
 			bUpperOnly = true;
 			ServerPlayMontage(this, FName("Order"));
-			ServerUsePartnerNormalSkill(Partner, SkillInfoArray[0].ID);
+			ServerUsePartnerSpecialSkill(Partner, SkillInfoArray[0].ID);
 		}
 	}
 }
@@ -903,7 +923,7 @@ void AHunter::Use2Skill()
 		{
 			bUpperOnly = true;
 			ServerPlayMontage(this, FName("Order"));
-			ServerUsePartnerNormalSkill(Partner, SkillInfoArray[1].ID);
+			ServerUsePartnerSpecialSkill(Partner, SkillInfoArray[1].ID);
 		}
 	}
 }
@@ -943,8 +963,8 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 		UnCrouch();
 		bInvincible = false;
 		CurState = EPlayerState::Idle;
-	/*	if(bShiftDown) GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-		else */GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		if(bShiftDown) GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+		else GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	}
 	else if (CurState == EPlayerState::Install)
 	{

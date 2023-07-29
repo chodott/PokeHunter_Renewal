@@ -33,6 +33,7 @@ bool UInventoryServerManager::GetInvenInfo(ACharacter* myPlayer, UBaseInstance* 
 		gameinstance->InfoArray.Add(FItemCnter{ msg_name, msg_cnt });
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("gameinstance->InfoArray.Num() : %d"), gameinstance->InfoArray.Num());
 	return true;
 }
 

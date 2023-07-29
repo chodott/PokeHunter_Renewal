@@ -198,6 +198,11 @@ struct SC_LOGOUT_RESULT_PACK {
 	char _result[CHAR_SIZE];
 };
 
+struct CS_LOGOUT_RESULT_PACK {
+	char size;
+	char type;
+};
+
 struct SC_ITEM_INFO_PACK {
 	char size;
 	char type;

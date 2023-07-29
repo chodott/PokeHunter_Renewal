@@ -565,25 +565,3 @@ bool ABasePokeHunterGameMode::StopBackfillRequest(FString GameSessionArn, FStrin
 #endif
 	return false;
 }
-
-APawn* ABasePokeHunterGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
-{
-	APawn* pawn = Super::SpawnDefaultPawnFor_Implementation(NewPlayer, StartSpot);
-
-	ACharacter* NewCharacter = Cast<ACharacter>(pawn);
-	if (NewCharacter) {
-		AHunterController* hunterController = Cast<AHunterController>(NewPlayer);
-		if (hunterController) {
-			UE_LOG(LogTemp, Warning, TEXT("[DBG] ABasePokeHunterGameMode::SpawnDefaultPawnFor_Implementation()"));
-			// hunterController->SetCharacterMaterialFromGameInstance(pawn);
-		}
-		else {
-			UE_LOG(LogTemp, Warning, TEXT("[DBG] ABasePokeHunterGameMode::SpawnDefaultPawnFor_Implementation() -> hunterController is nullptr"));
-		}
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("[DBG] ABasePokeHunterGameMode::SpawnDefaultPawnFor_Implementation() -> NewCharacter is nullptr"));
-	}
-
-	return pawn;
-}

@@ -15,8 +15,3 @@ void AHunterState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 	DOREPLIFETIME(AHunterState, Team);
 }
-
-FU_DamageInfo AHunterState::getTotalDamage()
-{
-	return damageInfo;
-}

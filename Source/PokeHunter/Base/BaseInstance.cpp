@@ -202,10 +202,22 @@ void UBaseInstance::Shutdown()
 	if ((NULL != gSocket) && (ESocketConnectionState::SCS_NotConnected != gSocket->GetConnectionState()) && (ESocketConnectionState::SCS_ConnectionError != gSocket->GetConnectionState()))
 	{
 		int32 bSize = 0;
+		CS_SAVE_INVENTORY_PACK item_pack;
+		item_pack.size = sizeof(CS_SAVE_INVENTORY_PACK);
+		item_pack.type = CS_SAVE_INVENTORY;
+		for (FItemCnter& it : InfoArray) {
+			if (FName("None") != it.ItemID) {
+				ZeroMemory(item_pack._name, sizeof(item_pack._name));
+				strcpy(item_pack._name, TCHAR_TO_ANSI(*it.ItemID.ToString()));
+				item_pack._cnt = it.cnt;
+				gSocket->Send(reinterpret_cast<const uint8*>(&item_pack), item_pack.size, bSize);
+			}
+		}
+
 		CS_LOGOUT_PACK logout_pack;
 		logout_pack.size = sizeof(CS_LOGOUT_PACK);
 		logout_pack.type = CS_LOGOUT;
-		gSocket->Send(reinterpret_cast<const uint8*>(&logout_pack), logout_pack.size, bSize);
+		bool retVal = gSocket->Send(reinterpret_cast<const uint8*>(&logout_pack), logout_pack.size, bSize);
 	}
 
 	Super::Shutdown();
@@ -254,14 +266,31 @@ bool UBaseInstance::LogoutGame()
 
 	if ((ESocketConnectionState::SCS_NotConnected != gSocket->GetConnectionState()) && (ESocketConnectionState::SCS_ConnectionError != gSocket->GetConnectionState()))
 	{
-		bool retVal = true;
 		int32 bSize = 0;
+		bool retVal = true;
+		CS_SAVE_INVENTORY_PACK item_pack;
+		item_pack.size = sizeof(CS_SAVE_INVENTORY_PACK);
+		item_pack.type = CS_SAVE_INVENTORY;
+		for (FItemCnter& it : InfoArray) {
+			if (FName("None") != it.ItemID) {
+				ZeroMemory(item_pack._name, sizeof(item_pack._name));
+				strcpy(item_pack._name, TCHAR_TO_ANSI(*it.ItemID.ToString()));
+				item_pack._cnt = it.cnt;
+				retVal = gSocket->Send(reinterpret_cast<const uint8*>(&item_pack), item_pack.size, bSize);
+				if (false == retVal) return false;
+			}
+		}
+		strcpy(item_pack._name, "theEnd");
+		retVal = gSocket->Send(reinterpret_cast<const uint8*>(&item_pack), item_pack.size, bSize);
+		if (false == retVal) return false;
+
 		CS_LOGOUT_PACK logout_pack;
 		logout_pack.size = sizeof(CS_LOGOUT_PACK);
 		logout_pack.type = CS_LOGOUT;
 		retVal = gSocket->Send(reinterpret_cast<const uint8*>(&logout_pack), logout_pack.size, bSize);
 		if (false == retVal) return false;
 
+		bSize = 0;
 		SC_LOGOUT_RESULT_PACK out_client;
 		retVal = gSocket->Recv(reinterpret_cast<uint8*>(&out_client), sizeof(SC_LOGOUT_RESULT_PACK), bSize);
 		if (false == retVal) return false;
@@ -272,7 +301,6 @@ bool UBaseInstance::LogoutGame()
 
 		uint8 partner_number = atoi(TCHAR_TO_ANSI(MBTWBuffer));
 		if (0 != partner_number) {
-
 			gSocket->Close();
 			gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
 			addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
@@ -386,17 +414,13 @@ void UBaseInstance::resetGameInstance()
 
 	myPartner = EPartnerType::NonePartner;
 
-	gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
-	addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-	ip = NULL;
-
 	AccessToken = NULL;
 	IdToken = NULL;
 	RefreshToken = NULL;
 
-	RetrieveNewTokensHandle.Invalidate();
+	/*RetrieveNewTokensHandle.Invalidate();
 	GetResponseTimeHandle.Invalidate();
-	PartyInfoHandle.Invalidate();
+	PartyInfoHandle.Invalidate();*/
 
 	if (false == PlayerLatencies.IsEmpty()) PlayerLatencies.Empty();
 	if (false == GameLiftLevelName.IsEmpty()) GameLiftLevelName.Empty();
@@ -410,6 +434,10 @@ void UBaseInstance::resetGameInstance()
 	if (false == InfoArray.IsEmpty()) InfoArray.Empty();
 	if (false == StorageInfoArray.IsEmpty()) StorageInfoArray.Empty();
 	if (false == PartnerSkillArray.IsEmpty()) PartnerSkillArray.Empty();
+	for (int i = 0; i < 4; ++i)
+	{
+		PartnerSkillArray.AddDefaulted();
+	}
 
 	InfoArray.Reserve(24);
 	StorageInfoArray.Reserve(24);
@@ -418,4 +446,11 @@ void UBaseInstance::resetGameInstance()
 	PartnerNumber = -1;
 	endTime = 0.0f;
 	endGame = false;
+
+	myPartner = EPartnerType::NonePartner;
+
+	gSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
+	addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+
+	PlayerPetName = { EPartnerType::WolfPartner, EPartnerType::WolfPartner, EPartnerType::WolfPartner, EPartnerType::WolfPartner };
 }

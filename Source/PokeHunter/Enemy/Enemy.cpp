@@ -185,7 +185,6 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			if (playerState) {
 				playerState->damageInfo.hunterAmount += DamageAmount;
 			}
-			// hunterDamageStack->ServerGetALLDamage(hunterDamageStack, DamageAmount);
 		}
 	}
 	else {

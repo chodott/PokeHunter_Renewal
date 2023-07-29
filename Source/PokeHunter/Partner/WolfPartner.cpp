@@ -132,6 +132,17 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 
 	switch (SkillID)
 	{
+	case ESkillID::Slash:
+		if (Target)
+		{
+			TargetPos = Target->GetActorLocation();
+			CurState = EPartnerState::SlashAttack;
+			bUsingSkill = true;
+			bOrdered = true;
+			bSuccess = true;
+		}
+		break;
+		 
 	case ESkillID::IceShard:
 		if (Target)
 		{

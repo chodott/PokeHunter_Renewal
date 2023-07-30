@@ -409,6 +409,7 @@ void APartner::InteractAttack_Implementation(FVector HitDirection, float DamageA
 	if (bInvincible) return;
 
 	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
+	if (HitDirection.Z <= 0.3f) HitDirection.Z = 0.35f;
 
 	//bDamaged = true;
 	FVector TargetVec = FVector(HitDirection.X * -1, HitDirection.Y * -1, 0);

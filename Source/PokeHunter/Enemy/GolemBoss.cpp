@@ -213,7 +213,11 @@ void AGolemBoss::LaunchBombs()
 {
 	int CloseStoneNum = 0;
 	int MinDistance = 99999;
-	FVector TargetLoc = Target->GetActorLocation();
+
+	FVector TargetLoc;
+	if (nullptr == Target) TargetLoc = { 0, 0, 0 };
+	else TargetLoc = Target->GetActorLocation();
+
 	FVector GolemLoc = GetActorLocation();
 	float GolemTargetDistance = FVector::Dist2D(TargetLoc, GolemLoc);
 	int BombLength = BombArray.Num();

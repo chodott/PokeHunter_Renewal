@@ -264,6 +264,9 @@ void ABasePokeHunterGameMode::PostLogin(APlayerController* NewPlayer)
 
 	UBaseInstance* gameinstance = Cast<UBaseInstance>(NewPlayer->GetGameInstance());
 	UE_LOG(LogTemp, Warning, TEXT("[DBG] - ABasePokeHunterGameMode::PostLogin() -> gameinstance->mySkin : %d"), gameinstance->mySkin);
+	UE_LOG(LogTemp, Warning, TEXT("[DBG] - ABasePokeHunterGameMode::PostLogin() -> gameinstance->myName : %s"), *(gameinstance->MyName.ToString()));
+	playerState->MyName = gameinstance->MyName;
+	UE_LOG(LogTemp, Warning, TEXT("[DBG] - ABasePokeHunterGameMode::PostLogin() -> playerState->myName : %s"), *(playerState->MyName.ToString()));
 }
 
 void ABasePokeHunterGameMode::Logout(AController* Exiting) {

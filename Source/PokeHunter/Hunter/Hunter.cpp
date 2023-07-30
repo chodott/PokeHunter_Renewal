@@ -196,7 +196,6 @@ void AHunter::BeginPlay()
 	HunterName = gameinstance->MyName;
 	AHunterState* hunterState = Cast<AHunterState>(GetPlayerState());
 	if (hunterState) {
-		hunterState->MyName = HunterName;
 		hunterState->hpInfo.hunterHP = HP;
 	}
 }
@@ -345,6 +344,13 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		CurState = EPlayerState::Die;
 		AEnemy* DamageEnemy = Cast<AEnemy>(DamageCauser);
 		if(DamageEnemy) DamageEnemy->LeaveTarget(this);
+
+		//ResetStatus();
+		//Partner->ResetStatus();
+		//// SetActorLocationAndRotation()
+		//SetActorLocation(FVector(-2000.0f, -120.f, 1200.0f));
+		//Partner->SetActorLocation(FVector(-2000.0f, -300.f, 1200.0f));
+
 		return 0; 
 	}
 		//입력 제한 필요

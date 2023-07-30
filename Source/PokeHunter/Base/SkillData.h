@@ -72,6 +72,11 @@ public:
 		}
 	}
 
+	void ZeroCoolTime() {
+		CurTime = CoolTime;
+		bReady = true;
+	}
+
 	void UsedSkill()
 	{
 		CurTime = 0.f;
@@ -96,5 +101,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FSkillInfo SkillInfo;
 
-
+	UFUNCTION(BlueprintCallable)
+	void ZeroCoolTime() { SkillInfo.ZeroCoolTime(); }
 };

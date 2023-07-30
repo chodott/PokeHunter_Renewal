@@ -53,6 +53,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UPartnerAnimInstance* PartnerAnim;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Anim")
+	UAnimMontage* curMontage;
+	
 	FOnMontageEndDelegate OnMontageEnd;
 
 	UBaseInstance* baseinstace;
@@ -115,10 +118,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	inline EPartnerType GetType() { return Type; }
 
+	// Status
 	UFUNCTION(BlueprintCallable)
 	inline void SetHP(float ChangedHP) { HP = ChangedHP;};
 	UFUNCTION(BlueprintCallable)
 	float GetHP() { return HP; };
+	UFUNCTION(BlueprintCallable)
+		void ResetStatus(FVector startPos) {
+		StopAnimMontage(curMontage); 
+		HP = 100.0f; CurState = EPartnerState::MoveTarget;
+		TargetPos = startPos;
+		bDied = false;
+	}
 
 	UFUNCTION(BlueprintCallable)
 	bool CheckFalling();

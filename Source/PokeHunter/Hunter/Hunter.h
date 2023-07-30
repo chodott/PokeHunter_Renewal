@@ -159,6 +159,8 @@ public:
 	//Animation
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	class UHunterAnimInstance* HunterAnim;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Animation")
+	UAnimMontage* curMontage;
 
 	//Bool
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "Animation")
@@ -298,6 +300,8 @@ public:
 	float GetHP() { return HP; };
 	UFUNCTION(BlueprintCallable)
 	void SetStamina(float Stamina);
+	UFUNCTION(BlueprintCallable)
+	void ResetStatus() { StopAnimMontage(curMontage); HP = 100.0f, HunterStamina = 100.0f, CurState = EPlayerState::Idle; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party member info")
 		TMap<FName, float> PartyMemberHP;		//  = { {FName("Tester01"), 0.f}, {FName("Tester02"), 80.f}, {FName("Tester03"), 20.f}, {FName("Tester04"), 60.f} };	// <OwnerName, pet HP>

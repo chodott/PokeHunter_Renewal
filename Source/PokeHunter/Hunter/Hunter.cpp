@@ -725,41 +725,7 @@ void AHunter::LMBDown()
 				{
 					ServerSpawnItem(this, ItemClass, GetActorLocation(), FVector::ZeroVector, GetControlRotation());
 				}
-				//AItem* Item = GetWorld()->SpawnActor<AItem>(ItemClass, GetActorLocation(),FRotator::ZeroRotator);
-				//switch (Item->ItemType)
-				//{
-				//case EItemType::Bullet:
-				//	Item->Destroy();
-				//	return;
-				//	break;
-
-				//case EItemType::Potion:
-				//	ServerPlayMontage(this, FName("Drink"));
-				//	Item->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
-				//	CurItem = Item;
-				//	CurState = EPlayerState::Drink;
-				//	bUpperOnly = true;
-				//	break;
-
-				//case EItemType::Trap:
-				//	ServerPlayMontage(this, FName("Install"));
-				//	FHitResult* HitResult = new FHitResult();
-				//	FVector SpawnLoc = GetActorLocation() + GetActorForwardVector() * 200;
-				//	if (GetWorld()->LineTraceSingleByChannel(*HitResult, SpawnLoc, SpawnLoc + FVector(0, 0, -100), ECollisionChannel::ECC_Pawn))
-				//	{
-				//		Item->SetActorLocation(HitResult->Location);
-				//		CurState = EPlayerState::Install;
-				//		Item->UseItem(this);
-				//	}
-				//	else
-				//	{
-				//		//실패 처리 필요
-				//		Item->Destroy();
-				//		return;
-				//	}
-				//	break;
-				//}
-				//
+			
 			}
 
 			bCanShot = false;
@@ -999,7 +965,7 @@ void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 
 void AHunter::DrinkPotion()
 {
-	ServerSpawnEffect(HealEffect);
+	ServerSpawnEffect(HealEffect, GetActorLocation() + FVector(0,0,-66.f));
 	CurItem->UseItem(this);
 	if (CurItem != NULL) CurItem->Destroy();
 }
@@ -1344,15 +1310,15 @@ void AHunter::SetStamina(float setStamina)
 	}
 }
 
-void AHunter::ServerSpawnEffect_Implementation(class UNiagaraSystem* Niagara)
+void AHunter::ServerSpawnEffect_Implementation(class UNiagaraSystem* Niagara, const FVector& SpawnLoc)
 {
-	MultiSpawnEffect(Niagara);
+	MultiSpawnEffect(Niagara, SpawnLoc);
 }
 
 
-void AHunter::MultiSpawnEffect_Implementation(class UNiagaraSystem* Niagara)
+void AHunter::MultiSpawnEffect_Implementation(class UNiagaraSystem* Niagara, const FVector& SpawnLoc)
 {
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HealEffect, GetActorLocation());
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HealEffect, SpawnLoc);
 
 }
 

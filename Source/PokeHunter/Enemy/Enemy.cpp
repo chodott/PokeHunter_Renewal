@@ -223,13 +223,6 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		if (EnemyController) EnemyController->StopAI();
 	}
 
-	else if (GrogyDamage <= SavedDamage && CurState != EEnemyState::Grogy)
-	{
-		//±×·Î±â
-		bGrogy = true;
-		CurState = EEnemyState::Grogy;
-		ServerPlayMontage(this, FName("Grogy"));
-	}
 
 	else
 	{ 

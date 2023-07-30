@@ -526,6 +526,8 @@ void AEnemy::LaunchToTarget()
 		FVector StartPos = GetActorLocation();
 		StartPos.Z = EndPos.Z;
 		FVector LookVec = GetActorForwardVector();
+
+		EndPos = EndPos - LookVec * GetCapsuleComponent()->GetScaledCapsuleRadius();
 		float Speed = 600.f;
 
 		bool JumpResult = false;

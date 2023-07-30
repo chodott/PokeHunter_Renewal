@@ -455,8 +455,8 @@ void APartner::InteractWideAttack_Implementation(float DamageAmount)
 
 void APartner::ServerSpawnProjectile_Implementation(APartner* OwnerPartner, TSubclassOf<class APartnerProjectile> SpawnProjectileClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
 {
-	APartnerProjectile* Projectile = GetWorld()->SpawnActor<APartnerProjectile>(SpawnProjectileClass, StartLoc, Rotation);
-	Projectile->MultiLaunchBullet(OwnerPartner, StartLoc, EndLoc);
+	//APartnerProjectile* Projectile = GetWorld()->SpawnActor<APartnerProjectile>(SpawnProjectileClass, StartLoc, Rotation);
+	//Projectile->MultiLaunchBullet(OwnerPartner, StartLoc, EndLoc);
 }
 
 void APartner::ServerApplyDamage_Implementation(AActor* DamagedActor, float DamageAmount, AController* EventInstigator, AActor* DamageCauser)

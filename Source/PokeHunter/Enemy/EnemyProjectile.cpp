@@ -110,6 +110,7 @@ void AEnemyProjectile::FireInDirection(FVector Direction)
 	SetLifeSpan(TimeLimit);
 	StaticMesh->SetSimulatePhysics(true);
 	StaticMesh->AddImpulse(Velocity, FName(""), true);
+	StaticMesh->SetWorldRotation(Direction.Rotation());
 	SetActorTickEnabled(true);
 }
 

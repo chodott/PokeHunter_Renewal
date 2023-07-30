@@ -95,7 +95,7 @@ FVector AItemDropActor::CalculatePoint(float DeltaTimes)
 {
 	FVector EndPointVec = Master->GetActorLocation();
 
-	float RemainTime = TotalTime - RunningTime;
+	float RemainTime = (TotalTime - RunningTime) / TotalTime;
 
 	FVector CurPointVec = RemainTime * RemainTime * StartPointVec + 2 * RemainTime * RunningTime * TurningPointVec + RunningTime * RunningTime * EndPointVec;
 

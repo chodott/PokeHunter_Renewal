@@ -283,9 +283,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiInteractObject(AHunter* OwnerHunter);
 	UFUNCTION(NetMulticast, Reliable)
-	void ServerSpawnEffect(class UNiagaraSystem* Niagara);
+	void ServerSpawnEffect(class UNiagaraSystem* Niagara, const FVector& SpawnLoc);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiSpawnEffect(class UNiagaraSystem* Niagara);
+	void MultiSpawnEffect(class UNiagaraSystem* Niagara, const FVector& SpawnLoc);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateQuickSlot();

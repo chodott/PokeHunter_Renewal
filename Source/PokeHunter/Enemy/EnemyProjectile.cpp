@@ -52,6 +52,7 @@ void AEnemyProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!bRotating) return;
 	FVector RotVec = FVector(Roll * RotateSpeed, Pitch * RotateSpeed, 0.f);
 	StaticMesh->AddLocalRotation(RotVec.Rotation(), false);
 }

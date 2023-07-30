@@ -37,6 +37,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 		float RotateSpeed{ 500 };
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		bool bRotating{ true };
+
 public:
 	virtual void BeginPlay() override;
 

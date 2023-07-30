@@ -301,6 +301,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetStamina(float Stamina);
 	UFUNCTION(BlueprintCallable)
+	float GetStamina() { return HunterStamina; }
+	UFUNCTION(BlueprintCallable)
 	void ResetStatus() { StopAnimMontage(curMontage); HP = 100.0f, HunterStamina = 100.0f, CurState = EPlayerState::Idle; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party member info")

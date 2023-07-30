@@ -169,9 +169,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiStartPartnerInvincibility();
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void ServerApplyDamage(AActor* DamagedActor, float DamageAmount, AController* EventInstigator, AActor* DamageCauser);
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MultiApplyDamage(AActor* DamagedActor, float DamageAmount, AController* EventInstigator, AActor* DamageCauser);
 
 	UFUNCTION(Server, Reliable)

@@ -3,6 +3,7 @@
 
 #include "LongAttackEnemy.h"
 #include "EnemyProjectile.h"
+#include "PokeHunter/Base/BaseCharacter.h"
 
 void ALongAttackEnemy::Tick(float DeltaTime)
 {

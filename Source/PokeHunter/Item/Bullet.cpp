@@ -84,7 +84,6 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ServerSpawnEffect();
-	if (SoundEffect) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundEffect, StaticMesh->GetComponentLocation());
 	if (!OtherActor || OtherActor == ThisOwner) return;
 	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
 	
@@ -163,7 +162,6 @@ void ABullet::MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector Initi
 	StaticMesh->AddImpulse(Velocity, FName(""), true);
 	UE_LOG(LogTemp, Warning, TEXT("==============================================================================================="));
 }
-
 
 
 void ABullet::ServerSpawnEmitter_Implementation(UParticleSystem* SpawnParticle, const FVector& SpawnLoc)

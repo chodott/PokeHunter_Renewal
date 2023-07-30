@@ -161,8 +161,8 @@ void AHunter::BeginPlay()
 
 	for (int i = 0; i < 4; ++i) {
 		// partner wolf -> static_cast<int>(PartnerType) * 4 ==> 4
-		// HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = ESkillID::Slash;
-		HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = gameinstance->PartnerSkillArray[i];
+		HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = ESkillID::IceShard;
+		// HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = gameinstance->PartnerSkillArray[i];
 	}
 
 	for (int i = 0; i < 4; ++i)
@@ -565,10 +565,10 @@ void AHunter::SpaceDown()
 {
 	if (GetCharacterMovement()->IsFalling()) return;
 
-	if(CurState == EPlayerState::Idle)
+	if(CurState == EPlayerState::Idle && GetStamina() >= 15.f)
 	{
-
 		LastInput = GetCharacterMovement()->GetLastInputVector();
+		if (LastInput == FVector::ZeroVector) LastInput = GetActorForwardVector();
 		ServerRoll(this, LastInput);
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 		ServerPlayMontage(this, FName("Dive"));

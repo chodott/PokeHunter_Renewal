@@ -32,6 +32,8 @@ AEnemy::AEnemy()
 	GetCapsuleComponent()->SetCapsuleRadius(90.f);
 	//GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
 
+	SubSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SubSkeletalMesh"));
+	SubSkeletalMesh->SetupAttachment(GetMesh());
 
 	TeamID = FGenericTeamId(1);
 }
@@ -43,7 +45,8 @@ void AEnemy::BeginPlay()
 
 	EnemyAnim = Cast<UEnemyAnimInstance>(GetMesh()->GetAnimInstance());
 	if (EnemyAnim) EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
-
+	
+	if (SubSkeletalMesh) EnemySubAnim = Cast<UEnemyAnimInstance>(SubSkeletalMesh->GetAnimInstance());
 	BaseLocation = GetActorLocation();
 
 	BaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
@@ -295,6 +298,7 @@ void AEnemy::ServerPlayMontage_Implementation(AEnemy* Enemy, FName Section)
 void AEnemy::MultiPlayMontage_Implementation(AEnemy* Enemy, FName Section)
 {
 	EnemyAnim->PlayCombatMontage(Section, true);
+	if (EnemySubAnim) EnemySubAnim->PlayCombatMontage(Section, true);
 }
 
 void AEnemy::ServerStartBinding_Implementation()
@@ -522,6 +526,8 @@ void AEnemy::LaunchToTarget()
 		FVector StartPos = GetActorLocation();
 		StartPos.Z = EndPos.Z;
 		FVector LookVec = GetActorForwardVector();
+
+		EndPos = EndPos - LookVec * GetCapsuleComponent()->GetScaledCapsuleRadius();
 		float Speed = 600.f;
 
 		bool JumpResult = false;

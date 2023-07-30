@@ -69,7 +69,13 @@ public:
 		FVector TargetPos;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		class UEnemyAnimInstance* EnemyAnim;
+	class UEnemyAnimInstance* EnemyAnim;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class USkeletalMeshComponent* SubSkeletalMesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UEnemyAnimInstance* EnemySubAnim;
+
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
 		EEnemyState CurState {

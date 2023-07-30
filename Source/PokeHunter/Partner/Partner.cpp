@@ -202,7 +202,7 @@ void APartner::SlashMove()
 			if (bHit)
 			{
 				SetActorLocation(NewLocation);
-				ServerApplyDamage(Target, 30, GetController(), this);
+				ServerApplyDamage(Target, SlashDamage, GetController(), this);
 
 				//이펙트 출력
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SlashHitEffect, TargetLocation);

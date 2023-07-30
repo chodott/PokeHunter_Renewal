@@ -82,9 +82,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bGrabbed;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
+	float SlashDamage{ 10 };
+
 	//TeamID
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
-		FGenericTeamId TeamID;
+	FGenericTeamId TeamID;
 
 	//Effect
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effect")

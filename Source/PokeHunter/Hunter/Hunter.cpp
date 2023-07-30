@@ -161,8 +161,8 @@ void AHunter::BeginPlay()
 
 	for (int i = 0; i < 4; ++i) {
 		// partner wolf -> static_cast<int>(PartnerType) * 4 ==> 4
-		HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = ESkillID::IceShard;
-		// HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = gameinstance->PartnerSkillArray[i];
+		// HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = ESkillID::IceShard;
+		HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = gameinstance->PartnerSkillArray[i];
 	}
 
 	for (int i = 0; i < 4; ++i)

@@ -1072,8 +1072,6 @@ void AHunter::InteractGrabAttack_Implementation()
 {
 	bNoCollision = true;
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
-	FRotator TargetRot = FVector::ZeroVector.Rotation();
-	SetActorRelativeRotation(TargetRot);
 }
 
 void AHunter::InteractWideAttack_Implementation(float DamageAmount)

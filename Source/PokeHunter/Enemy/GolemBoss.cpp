@@ -478,14 +478,14 @@ void AGolemBoss::DeleteHitBox(const FName& PartName)
 
 int AGolemBoss::CheckInRange()
 {
-	if (Target)
+	/*if (Target)
 	{
 		float Distance = FVector::Dist2D(Target->GetTargetLocation(), GetActorLocation());
 		for (int i = 0; i < NormalAttackRange.Num(); ++i)
 		{
 			if (NormalAttackRange[i] >= Distance) return i;
 		}
-	}
+	}*/
 	return 0;
 }
 
@@ -500,7 +500,7 @@ int AGolemBoss::CheckPattern()
 	//		return Pattern.num;
 	//	}
 	//}
-	int PatternNum = FMath::RandRange(0, 3);
+	int PatternNum = FMath::RandRange(0,3);
 
 
 	return PatternNum;

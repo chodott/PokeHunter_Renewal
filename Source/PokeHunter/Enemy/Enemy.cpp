@@ -189,8 +189,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 				playerState->damageInfo.hunterAmount += DamageAmount;
 			}
 		}
-	}
-	else {
+
 		APartner* HitPartner = Cast<APartner>(DamageCauser);
 		if (nullptr != HitPartner) {
 			AHunterState* playerState = Cast<AHunterState>(GetPlayerState());

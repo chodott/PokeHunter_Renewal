@@ -354,13 +354,13 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		AEnemyProjectile* EnemyBullet = Cast<AEnemyProjectile>(DamageCauser);
 		if (EnemyBullet)
 		{
-			FVector DirectionVec = EnemyBullet->GetActorLocation() - GetActorLocation();
+			/*FVector DirectionVec = EnemyBullet->GetActorLocation() - GetActorLocation();
 			DirectionVec.Normalize();
 			if (DirectionVec.Z <= 0.f)
 			{
 				DirectionVec.Z *= -1;
 			}
-			LaunchCharacter(DirectionVec * 1000.f, false, false);
+			LaunchCharacter(DirectionVec * 1000.f, false, false);*/
 			ServerPlayMontage(this, FName("NormalHit"));
 		}
 	}
@@ -1072,6 +1072,8 @@ void AHunter::InteractGrabAttack_Implementation()
 {
 	bNoCollision = true;
 	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
+	FRotator TargetRot = FVector::ZeroVector.Rotation();
+	//SetActorRelativeRotation(TargetRot);
 }
 
 void AHunter::InteractWideAttack_Implementation(float DamageAmount)

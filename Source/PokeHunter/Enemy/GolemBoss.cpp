@@ -256,28 +256,18 @@ void AGolemBoss::CheckWideAttack()
 	float MinRadius = (WideAttackCnt + 1) * WideAttackGap - WideAttackRadiusGap;
 	float MaxRadius = (WideAttackCnt + 1) * WideAttackGap + WideAttackRadiusGap;
 
-	FCollisionShape CapsuleShape = FCollisionShape::MakeCapsule(MaxRadius, 1000.f);
+	//FCollisionShape CapsuleShape = FCollisionShape::MakeCapsule(MaxRadius, 1000.f);
+
 	TArray<FHitResult> HitResults;
 
-	bool bHit = GetWorld()->SweepMultiByProfile(HitResults, CenterVec, CenterVec, FQuat::Identity, FName("EnemyHitBox"), CapsuleShape);
-	if (bHit)
+	TArray<AActor*> OverlappedActors;
+	EarthquakeCollision->GetOverlappingActors(OverlappedActors, ACharacter::StaticClass());
+	for (auto* actor : OverlappedActors)
 	{
-		for (const FHitResult& HitResult : HitResults)
-		{
-			float Distance = FVector::Dist2D(HitResult.ImpactPoint, GetActorLocation());
-			if (Distance > MinRadius)
-			{
-				AActor* HitActor = HitResult.GetActor();
-				if (HitActor->Implements<UEnemyInteractInterface>())
-				{
-					IEnemyInteractInterface::Execute_InteractWideAttack(HitActor, 50.f);
-				}
-			}
-		}
+		ServerApplyDamage(actor, 10.f, nullptr, nullptr, UDamageType::StaticClass());
 	}
 
-	WideAttackCnt++;
-	if (WideAttackCnt == 3) WideAttackCnt = 0;
+
 }
 
 void AGolemBoss::InteractFire_Implementation(UPrimitiveComponent* HitComponent)
@@ -478,14 +468,17 @@ void AGolemBoss::DeleteHitBox(const FName& PartName)
 
 int AGolemBoss::CheckInRange()
 {
-	/*if (Target)
-	{
-		float Distance = FVector::Dist2D(Target->GetTargetLocation(), GetActorLocation());
-		for (int i = 0; i < NormalAttackRange.Num(); ++i)
-		{
-			if (NormalAttackRange[i] >= Distance) return i;
-		}
-	}*/
+	//if (Target)
+	//{
+	//	float Distance = FVector::Dist2D(Target->GetTargetLocation(), GetActorLocation());
+	//	for (int i = 0; i < NormalAttackRange.Num(); ++i)
+	//	{
+	//		if (NormalAttackRange[i] >= Distance) return i;
+	//	}
+	//}
+	//int PatternNum = FMath::RandRange(0, 3);
+
+	//수정필
 	return 0;
 }
 
@@ -500,7 +493,7 @@ int AGolemBoss::CheckPattern()
 	//		return Pattern.num;
 	//	}
 	//}
-	int PatternNum = FMath::RandRange(0,3);
+	int PatternNum = FMath::RandRange(0,4);
 
 
 	return PatternNum;
@@ -517,13 +510,13 @@ void AGolemBoss::Attack(int AttackPattern)
 		{
 			ServerPlayMontage(this, FName("Attack_Grab"));
 		}
-		else ServerPlayMontage(this, FName("Attack_Bind"));
+		else ServerPlayMontage(this, FName("WideAttack"));
 		break;
 	case 1:
 		//Attack Punch
 		if (bLoseLeftHand)
 		{
-			if (bLoseRightHand) ServerPlayMontage(this, FName("Attack_Bind"));
+			if (bLoseRightHand) ServerPlayMontage(this, FName("WideAttack"));
 			else ServerPlayMontage(this, FName("Attack"));
 		}
 		else ServerPlayMontage(this, FName("Attack_Punch"));
@@ -536,7 +529,7 @@ void AGolemBoss::Attack(int AttackPattern)
 	case 3:
 		if (bLoseRightHand)
 		{
-			if (bLoseLeftHand)  ServerPlayMontage(this, FName("Attack_Bind"));
+			if (bLoseLeftHand)  ServerPlayMontage(this, FName("WideAttack"));
 			else ServerPlayMontage(this, FName("Attack_Punch"));
 		}
 		else ServerPlayMontage(this, FName("Attack"));
@@ -575,9 +568,13 @@ void AGolemBoss::PatternAttack(int AttackPattern)
 	case 3:
 		ServerPlayMontage(this, FName("JumpAttack"));
 		break;
+
+	case 4:
+		LongAttack();
+		break;
 	}
 
-	PatternManageArray[AttackPattern].UseSkill(GetWorld()->GetTimeSeconds());
+	//PatternManageArray[AttackPattern].UseSkill(GetWorld()->GetTimeSeconds());
 }
 
 void AGolemBoss::Earthquake()

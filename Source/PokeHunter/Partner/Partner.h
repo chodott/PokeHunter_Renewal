@@ -178,6 +178,12 @@ public:
 	void MultiApplyDamage(AActor* DamagedActor, float DamageAmount, AController* EventInstigator, AActor* DamageCauser);
 
 	UFUNCTION(Server, Reliable)
+	void ServerStopMontage(APartner* Partner);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiStopMontage(APartner* Partner);
+
+
+	UFUNCTION(Server, Reliable)
 	void ServerSetPosition(const FVector& LocVec);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiSetPosition(const FVector& LocVec);

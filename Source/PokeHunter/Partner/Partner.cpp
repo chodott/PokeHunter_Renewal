@@ -484,3 +484,13 @@ void APartner::MultiSpawnEffect_Implementation(class UNiagaraSystem* Niagara, co
 {
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Niagara, SpawnLoc);
 }
+
+void APartner::ServerStopMontage_Implementation(APartner* Partner)
+{
+	MultiStopMontage(Partner);
+}
+
+void APartner::MultiStopMontage_Implementation(APartner* Partner)
+{
+	PartnerAnim->StopAllMontages(0.2f);
+}

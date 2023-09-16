@@ -46,64 +46,67 @@ void AWolfPartner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
-	if (bBreathe)
+	if (GetLocalRole() == ROLE_Authority)
 	{
-		BreatheRuntime += DeltaTime;
-		if (BreatheRuntime >= BreatheDamagePeriod)
+
+		if (bBreathe)
 		{
-			TArray<AActor*> OverlapActors;
-			BreathCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
-			for (auto Enemy : OverlapActors)
+			BreatheRuntime += DeltaTime;
+			if (BreatheRuntime >= BreatheDamagePeriod)
 			{
-				ServerApplyDamage(Enemy, BreathDamage, GetController(), this);
-				ServerSpawnEffect(IceHitEffect, Enemy->GetActorLocation());
-				if (Enemy->Implements<UItemInteractInterface>())
+				TArray<AActor*> OverlapActors;
+				BreathCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
+				for (auto Enemy : OverlapActors)
 				{
-					Execute_InteractIceSkill(Enemy);
+					ServerApplyDamage(Enemy, BreathDamage, GetController(), this);
+					ServerSpawnEffect(IceHitEffect, Enemy->GetActorLocation());
+					if (Enemy->Implements<UItemInteractInterface>())
+					{
+						Execute_InteractIceSkill(Enemy);
+					}
 				}
+				UE_LOG(LogTemp, Warning, TEXT("breathe: %d , cnt: %d"), bBreathe, BreatheDamageCnt);
+				BreatheRuntime = 0.f;
+				BreatheDamageCnt++;
 			}
-			BreatheRuntime = 0.f;
-			BreatheDamageCnt++;
-		}
 
-		if (BreatheDamageCnt >= BreathTime/BreatheDamagePeriod)
-		{
-			bBreathe = false;
-			BreatheDamageCnt = 0;
-			BreathCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			BreathCollision->SetVisibility(false);
-			PartnerAnim->StopAllMontages(0.2f);
-		}
-	}
-
-	if (bOnStorm)
-	{
-		StormRuntime += DeltaTime;
-		if (StormRuntime >= StormDamagePeriod)
-		{
-			TArray<AActor*> OverlapActors;
-			StormCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
-			for (auto Enemy : OverlapActors)
+			if (BreatheDamageCnt >= BreathTime / BreatheDamagePeriod)
 			{
-				ServerApplyDamage(Enemy, StormDamage, GetController(), this);
-				ServerSpawnEffect(IceHitEffect, Enemy->GetActorLocation());
-				if (Enemy->Implements<UItemInteractInterface>())
-				{
-					Execute_InteractIceSkill(Enemy);
-				}
+				bBreathe = false;
+				BreatheDamageCnt = 0;
+				BreathCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				BreathCollision->SetVisibility(false);
+				ServerStopMontage(this);
 			}
-			StormRuntime = 0.f;
-			StormDamageCnt++;
 		}
 
-		if (StormDamageCnt >= StormTime / StormDamagePeriod)
+		if (bOnStorm)
 		{
-			bOnStorm= false;
-			StormDamageCnt = 0;
-			StormCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			StormCollision->SetVisibility(false);
-			PartnerAnim->StopAllMontages(0.2f);
+			StormRuntime += DeltaTime;
+			if (StormRuntime >= StormDamagePeriod)
+			{
+				TArray<AActor*> OverlapActors;
+				StormCollision->GetOverlappingActors(OverlapActors, AEnemy::StaticClass());
+				for (auto Enemy : OverlapActors)
+				{
+					ServerApplyDamage(Enemy, StormDamage, GetController(), this);
+					ServerSpawnEffect(IceHitEffect, Enemy->GetActorLocation());
+					if (Enemy->Implements<UItemInteractInterface>())
+					{
+						Execute_InteractIceSkill(Enemy);
+					}
+				}
+				StormRuntime = 0.f;
+				StormDamageCnt++;
+			}
+
+			if (StormDamageCnt >= StormTime / StormDamagePeriod)
+			{
+				bOnStorm = false;
+				StormDamageCnt = 0;
+				StormCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				StormCollision->SetVisibility(false);
+			}
 		}
 	}
 

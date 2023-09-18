@@ -434,7 +434,11 @@ void AEnemy::ChangeTarget()
 			}
 		}
 	}
-	if (!TargetArray.IsEmpty()) Target = NULL;
+	if (TargetArray.IsEmpty()) Target = NULL;
+	else
+	{
+		Target = TargetArray[NearestTargetNum];
+	}
 }
 
 int AEnemy::CheckInRange()

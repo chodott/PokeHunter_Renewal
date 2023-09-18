@@ -25,9 +25,10 @@ void ALongAttackEnemy::LaunchProjectile()
 
 		if (ProjectileClass)
 		{
-			AEnemyProjectile* ProjectileActor =  GetWorld()->SpawnActor<AEnemyProjectile>(ProjectileClass, GetActorTransform());
-			ProjectileActor->FireInDirection(DirectionVec);
+			ServerSpawnProjectile(ProjectileClass, CurLoc, TargetLoc, DirectionVec);
 
+			//AEnemyProjectile* ProjectileActor =  GetWorld()->SpawnActor<AEnemyProjectile>(ProjectileClass, GetActorTransform());
+			//ProjectileActor->FireInDirection(DirectionVec);
 		}
 
 	}

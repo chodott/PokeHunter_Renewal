@@ -100,6 +100,20 @@ void AGolemBoss::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		if (Target != NULL && !EnemyAnim->bPlaying)
+		{
+			float CurTime = GetWorld()->GetTimeSeconds();
+			if (TargetFocusTime < CurTime - FocusStartTime)
+			{
+				ChangeTarget();
+				FocusStartTime = CurTime;
+			}
+		}
+	}
+
 }
 
 void AGolemBoss::BeginPlay()
@@ -163,6 +177,19 @@ void AGolemBoss::Die()
 		}
 		
 	}
+}
+
+void AGolemBoss::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	Super::OnMontageEnded(Montage, bInterrupted);
+
+
+}
+
+void AGolemBoss::SetTarget(AActor* NewTarget)
+{
+	Super::SetTarget(NewTarget);
+	FocusStartTime = GetWorld()->GetTimeSeconds();
 }
 
 void AGolemBoss::LongAttack()
@@ -387,7 +414,6 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	}
 
 	OnDamage.Broadcast(DamageAmount, HitLoc);
-
 	return DamageAmount;
 }
 

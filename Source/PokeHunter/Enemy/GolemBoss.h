@@ -103,12 +103,20 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
 	TArray<class ACharacter*> GrabbedTargets;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float TargetFocusTime{10.f};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float  FocusStartTime;
+
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "HitBox")
 	bool bLoseLeftHand{ false };
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "HitBox")
 	bool bLoseRightHand{ false };
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
 	bool bCanGrab;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Anim")
+	bool bPlayingAnim;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Range")
 	class UStaticMeshComponent* EarthquakeCollision;
@@ -163,6 +171,10 @@ public:
 	void DestroyPart(const FName& PartName);
 	void DeleteHitBox(const FName& PartName);
 	virtual void Die();
+
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	void SetTarget(AActor* NewTarget);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Life")
 	bool isDie = false;

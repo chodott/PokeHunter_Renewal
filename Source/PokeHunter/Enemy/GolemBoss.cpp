@@ -79,9 +79,6 @@ AGolemBoss::AGolemBoss()
 	EarthquakeCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("EarthquakeCollision"));
 	EarthquakeCollision->SetupAttachment(GetRootComponent());
 	EarthquakeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-
-
 }
 
 void AGolemBoss::Tick(float DeltaTime)
@@ -533,6 +530,8 @@ void AGolemBoss::Attack(int AttackPattern)
 {
 	//LongAttack();
 
+	AttackPattern = FMath::RandRange(0, 4);
+
 	switch (AttackPattern)
 	{
 	case 0:
@@ -564,12 +563,12 @@ void AGolemBoss::Attack(int AttackPattern)
 		}
 		else ServerPlayMontage(this, FName("Attack"));
 		break;
-	case 4:
+	case 5:
 		ServerPlayMontage(this, FName("Block"));
 		Block();
 		break;
 
-	case 5:
+	case 4:
 		WideAttack();
 		break;
 	}

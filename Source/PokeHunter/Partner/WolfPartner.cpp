@@ -46,7 +46,7 @@ void AWolfPartner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (GetLocalRole() == ROLE_Authority)
+	//if (GetLocalRole() == ROLE_Authority)
 	{
 
 		if (bBreathe)
@@ -131,6 +131,10 @@ void AWolfPartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AWolfPartner, bBreathe);
+	DOREPLIFETIME(AWolfPartner, BreatheDamageCnt);
+	DOREPLIFETIME(AWolfPartner, BreatheRuntime);
+	DOREPLIFETIME(AWolfPartner, StormDamageCnt);
+	DOREPLIFETIME(AWolfPartner, StormRuntime);
 	//DOREPLIFETIME(AWolfPartner, BreatheLimitTime);
 	DOREPLIFETIME(AWolfPartner, bOnStorm);
 	//DOREPLIFETIME(AWolfPartner, StormLimitTime);
@@ -195,6 +199,8 @@ void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
 void AWolfPartner::CancelOrder()
 {
 	Super::CancelOrder();
+	IceBreatheEffect->DeactivateImmediate();
+	BreatheDamageCnt = 0;
 	ResetBreathe();
 }
 
@@ -212,12 +218,14 @@ void AWolfPartner::IceBreathe()
 void AWolfPartner::ResetBreathe()
 {
 	//¼öÁ¤ÇÊ
-	IceBreatheEffect->Deactivate();
+	IceBreatheEffect->DeactivateImmediate();
+	BreatheDamageCnt = 0;
 }
 
 void AWolfPartner::ActivateBreathe()
 {
 	bBreathe = true;
+	BreatheRuntime = 0;
 	BreathCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	IceBreatheEffect->Activate(true);
 }
@@ -245,6 +253,8 @@ void AWolfPartner::ActivateStorm()
 {
 	StormCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	bOnStorm = true;
+	StormDamageCnt = 0;
+	StormRuntime = 0;
 	IceStormEffect->Activate(true);
 }
 

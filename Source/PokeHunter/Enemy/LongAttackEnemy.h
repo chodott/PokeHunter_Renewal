@@ -17,6 +17,8 @@ class POKEHUNTER_API ALongAttackEnemy : public AEnemy
 
 
 public:
+	ALongAttackEnemy();
+
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION(BlueprintCallable)
 	void LaunchProjectile();

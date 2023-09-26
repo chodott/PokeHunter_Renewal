@@ -409,6 +409,14 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ResultUIDamage")
 		FName HunterName;
+
+	UFUNCTION(Server, Reliable, Category = "ResultUIDamage")
+		void ServerGetALLNames(FName newHunterName);
+	UFUNCTION(NetMulticast, Reliable, Category = "ResultUIDamage")
+		void MulticastGetALLNames(FName newName);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ResultUIDamage")
+		TArray<FName> huntersName;
+
 	UFUNCTION(Server, Reliable, Category = "ResultUIDamage")
 		void ServerGetALLDamage(AHunter* hunter, int amountDamage);
 	UFUNCTION(NetMulticast, Reliable, Category = "ResultUIDamage")

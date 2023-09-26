@@ -5,11 +5,19 @@
 #include "EnemyProjectile.h"
 #include "PokeHunter/Base/BaseCharacter.h"
 
+ALongAttackEnemy::ALongAttackEnemy()
+{
+	// GetCapsuleComponent()->SetCapsuleRadius(90.f);
+	// GetCapsuleComponent()->SetGenerateOverlapEvents(true);
+
+
+}
+
 void ALongAttackEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
+	UpdateOverlaps(true);
 }
 
 void ALongAttackEnemy::LaunchProjectile()
@@ -25,9 +33,10 @@ void ALongAttackEnemy::LaunchProjectile()
 
 		if (ProjectileClass)
 		{
-			AEnemyProjectile* ProjectileActor =  GetWorld()->SpawnActor<AEnemyProjectile>(ProjectileClass, GetActorTransform());
-			ProjectileActor->FireInDirection(DirectionVec);
+			ServerSpawnProjectile(ProjectileClass, CurLoc, TargetLoc, DirectionVec);
 
+			//AEnemyProjectile* ProjectileActor =  GetWorld()->SpawnActor<AEnemyProjectile>(ProjectileClass, GetActorTransform());
+			//ProjectileActor->FireInDirection(DirectionVec);
 		}
 
 	}

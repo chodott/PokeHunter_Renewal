@@ -79,9 +79,6 @@ AGolemBoss::AGolemBoss()
 	EarthquakeCollision = CreateDefaultSubobject<UStaticMeshComponent>(FName("EarthquakeCollision"));
 	EarthquakeCollision->SetupAttachment(GetRootComponent());
 	EarthquakeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-
-
 }
 
 void AGolemBoss::Tick(float DeltaTime)
@@ -100,6 +97,20 @@ void AGolemBoss::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		if (Target != NULL && !EnemyAnim->bPlaying)
+		{
+			float CurTime = GetWorld()->GetTimeSeconds();
+			if (TargetFocusTime < CurTime - FocusStartTime)
+			{
+				ChangeTarget();
+				FocusStartTime = CurTime;
+			}
+		}
+	}
+
 }
 
 void AGolemBoss::BeginPlay()
@@ -163,6 +174,19 @@ void AGolemBoss::Die()
 		}
 		
 	}
+}
+
+void AGolemBoss::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	Super::OnMontageEnded(Montage, bInterrupted);
+
+
+}
+
+void AGolemBoss::SetTarget(AActor* NewTarget)
+{
+	Super::SetTarget(NewTarget);
+	FocusStartTime = GetWorld()->GetTimeSeconds();
 }
 
 void AGolemBoss::LongAttack()
@@ -387,7 +411,6 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	}
 
 	OnDamage.Broadcast(DamageAmount, HitLoc);
-
 	return DamageAmount;
 }
 
@@ -507,6 +530,8 @@ void AGolemBoss::Attack(int AttackPattern)
 {
 	//LongAttack();
 
+	AttackPattern = FMath::RandRange(0, 4);
+
 	switch (AttackPattern)
 	{
 	case 0:
@@ -538,12 +563,12 @@ void AGolemBoss::Attack(int AttackPattern)
 		}
 		else ServerPlayMontage(this, FName("Attack"));
 		break;
-	case 4:
+	case 5:
 		ServerPlayMontage(this, FName("Block"));
 		Block();
 		break;
 
-	case 5:
+	case 4:
 		WideAttack();
 		break;
 	}

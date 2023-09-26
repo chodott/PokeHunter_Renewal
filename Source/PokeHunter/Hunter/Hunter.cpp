@@ -190,14 +190,40 @@ void AHunter::BeginPlay()
 		}
 	}
 
-	MaterialIndex = gameinstance->mySkin;
-	ServerChangeMaterialIndex(MaterialIndex);
+	if (false == HasAuthority()) {
+		HunterName = gameinstance->MyName;
+		MaterialIndex = gameinstance->mySkin;
+		ServerChangeMaterialIndex(MaterialIndex);
+	}
 
-	HunterName = gameinstance->MyName;
-	AHunterState* hunterState = Cast<AHunterState>(GetPlayerState());
+	if (GetWorld()->GetMapName() == "MyHome") {
+		MaterialIndex = gameinstance->mySkin;
+		FSoftObjectPath MaterialPath{};
+		switch (MaterialIndex)
+		{
+		case 1:
+			MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
+			break;
+		case 2:
+			MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter2");
+			break;
+		default:
+			MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
+			break;
+		}
+		Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
+		GetMesh()->SetMaterial(0, Material);
+	}
+
+	/*AHunterState* hunterState = Cast<AHunterState>(GetPlayerState());
 	if (hunterState) {
 		hunterState->hpInfo.hunterHP = HP;
-	}
+
+		if (false == HasAuthority()) {
+			hunterState->MyName = gameinstance->MyName;
+			ServerGetALLNames(gameinstance->MyName);
+		}
+	}*/
 }
 
 // Called every frame
@@ -1400,4 +1426,14 @@ void AHunter::MulticastGetALLDamage_Implementation(FName name, int amountDamage)
 			break;
 		}
 	}
+}
+
+void AHunter::ServerGetALLNames_Implementation(FName newHunterName)
+{
+	MulticastGetALLNames(newHunterName);
+}
+
+void AHunter::MulticastGetALLNames_Implementation(FName newName)
+{
+	huntersName.AddUnique(newName);
 }

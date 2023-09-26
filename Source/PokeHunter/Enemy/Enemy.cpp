@@ -43,6 +43,8 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UpdateOverlaps(true);
+
 	EnemyAnim = Cast<UEnemyAnimInstance>(GetMesh()->GetAnimInstance());
 	if (EnemyAnim) EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
 	
@@ -434,7 +436,11 @@ void AEnemy::ChangeTarget()
 			}
 		}
 	}
-	if (!TargetArray.IsEmpty()) Target = NULL;
+	if (TargetArray.IsEmpty()) Target = NULL;
+	else
+	{
+		Target = TargetArray[NearestTargetNum];
+	}
 }
 
 int AEnemy::CheckInRange()

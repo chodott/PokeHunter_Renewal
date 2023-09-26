@@ -12,6 +12,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
 
+#include "PokeHunter/Enemy/LongAttackEnemy.h"
+
 AWolfPartner::AWolfPartner()
 {
 	PrimaryActorTick.bCanEverTick = true;

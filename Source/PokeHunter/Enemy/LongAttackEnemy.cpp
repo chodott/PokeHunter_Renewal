@@ -7,14 +7,17 @@
 
 ALongAttackEnemy::ALongAttackEnemy()
 {
-	
+	// GetCapsuleComponent()->SetCapsuleRadius(90.f);
+	// GetCapsuleComponent()->SetGenerateOverlapEvents(true);
+
+
 }
 
 void ALongAttackEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
+	UpdateOverlaps(true);
 }
 
 void ALongAttackEnemy::LaunchProjectile()

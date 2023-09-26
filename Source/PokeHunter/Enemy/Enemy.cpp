@@ -43,6 +43,8 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UpdateOverlaps(true);
+
 	EnemyAnim = Cast<UEnemyAnimInstance>(GetMesh()->GetAnimInstance());
 	if (EnemyAnim) EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnMontageEnded);
 	

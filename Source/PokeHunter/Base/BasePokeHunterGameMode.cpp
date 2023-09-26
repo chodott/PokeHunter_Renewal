@@ -251,8 +251,6 @@ void ABasePokeHunterGameMode::PreLogin(const FString& Options, const FString& Ad
 		ErrorMessage = "Unauthorized";
 	}
 #endif
-	UBaseInstance* gameinstance = Cast<UBaseInstance>(GetGameInstance());
-	UE_LOG(LogTemp, Warning, TEXT("[DBG] - ABasePokeHunterGameMode::PreLogin() -> gameinstance->mySkin : %d"), gameinstance->mySkin);
 }
 
 void ABasePokeHunterGameMode::PostLogin(APlayerController* NewPlayer)
@@ -261,12 +259,6 @@ void ABasePokeHunterGameMode::PostLogin(APlayerController* NewPlayer)
 
 	auto playerState = Cast<AHunterState>(NewPlayer->PlayerState);
 	playerState->InitPlayerData();
-
-	UBaseInstance* gameinstance = Cast<UBaseInstance>(NewPlayer->GetGameInstance());
-	UE_LOG(LogTemp, Warning, TEXT("[DBG] - ABasePokeHunterGameMode::PostLogin() -> gameinstance->mySkin : %d"), gameinstance->mySkin);
-	UE_LOG(LogTemp, Warning, TEXT("[DBG] - ABasePokeHunterGameMode::PostLogin() -> gameinstance->myName : %s"), *(gameinstance->MyName.ToString()));
-	playerState->MyName = gameinstance->MyName;
-	UE_LOG(LogTemp, Warning, TEXT("[DBG] - ABasePokeHunterGameMode::PostLogin() -> playerState->myName : %s"), *(playerState->MyName.ToString()));
 }
 
 void ABasePokeHunterGameMode::Logout(AController* Exiting) {
@@ -338,10 +330,6 @@ FString ABasePokeHunterGameMode::InitNewPlayer(APlayerController* NewPlayerContr
 		}
 	}
 #endif
-
-	UBaseInstance* gameinstance = Cast<UBaseInstance>(NewPlayerController->GetGameInstance());
-	UE_LOG(LogTemp, Warning, TEXT("[DBG] - ABasePokeHunterGameMode::PostLogin() -> gameinstance->mySkin : %d"), gameinstance->mySkin);
-
 	return InitializedString;
 }
 

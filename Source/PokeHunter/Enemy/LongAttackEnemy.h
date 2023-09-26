@@ -15,7 +15,6 @@ class POKEHUNTER_API ALongAttackEnemy : public AEnemy
 	GENERATED_BODY()
 	
 
-
 public:
 	ALongAttackEnemy();
 

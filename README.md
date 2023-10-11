@@ -6,15 +6,12 @@
 Unreal Engine을 사용한 협동 슈팅 게임 개발<br/><br/>
 
 ## 플레이 화면
-[![Video Label](http://img.youtube.com/vi/ZS4TtX3LjT4/0.jpg)](https://youtu.be/ZS4TtX3LjT4)
+[![Video Label](http://img.youtube.com/vi/ZS4TtX3LjT4/0.jpg)](https://youtu.be/ZS4TtX3LjT4)<br/>
+(클릭하면 유튜브가 재생됩니다.)
 
 ## 개발 환경
 
 IDE: `Visual Studio 2022`<br/>
 Game Engine: `Unreal Engine 5.1.1`<br/>
-Language: `UE5 C++`<br/>
+Language: `UE5 C++`, `UE5 Blueprint`<br/>
 AWS: `GameLift`, `Lambda`, `DynamoDB`<br/>
-
-## 정보
-
-Mgcllee - mgcllee@gmail.com

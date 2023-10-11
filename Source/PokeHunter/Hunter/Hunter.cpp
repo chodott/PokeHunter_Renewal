@@ -60,10 +60,14 @@ AHunter::AHunter()
 	ArmLengthTo = 200.f;
 	ArmSpeed = 20.f;
 	CameraZoomTo = 100.f;
-
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	//Using Controller Rotation
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
 
 	//Collision
 	if (GetLocalRole() == ROLE_Authority)
@@ -71,23 +75,6 @@ AHunter::AHunter()
 		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHunter::OnOverlapBegin);
 		GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
 	}
-	
-	// Particle System
-	Heal_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("HealParticle"));
-	Heal_Effect->SetupAttachment(GetRootComponent());
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> TempHealEffectClass(TEXT("/Game/Hunter/HealEffect/P_Heal_Circle.P_Heal_Circle"));
-	if (TempHealEffectClass.Succeeded())
-	{
-		Heal_Effect->SetTemplate(TempHealEffectClass.Object);
-		float characterFoot = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-		Heal_Effect->SetRelativeLocation(FVector(0, 0, -characterFoot));
-		Heal_Effect->Deactivate();
-	}
-
-	//Using Controller Rotation
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationRoll = false;
 
 	// Character Rotation Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -134,13 +121,9 @@ void AHunter::BeginPlay()
 	//Animation
 	HunterAnim = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
 
-	//카메라 래깅 관련
-	// Controller->bFindCameraComponentWhenViewTarget = true;
-
 	//UI
 	MainUI = CreateWidget(GetWorld(), MainUIClass, TEXT("MainUI"));
 	MainUI->AddToViewport();
-	// PauseUI = CreateWidget(GetWorld(), PauseUIClass, TEXT("PauseUI"));
 
 	//Timeline
 	DiveInterpCallback.BindUFunction(this, FName("DiveInterpReturn"));
@@ -160,8 +143,6 @@ void AHunter::BeginPlay()
 	}
 
 	for (int i = 0; i < 4; ++i) {
-		// partner wolf -> static_cast<int>(PartnerType) * 4 ==> 4
-		// HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = ESkillID::IceShard;
 		HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = gameinstance->PartnerSkillArray[i];
 	}
 
@@ -192,14 +173,12 @@ void AHunter::BeginPlay()
 
 	if (false == HasAuthority()) {
 		HunterName = gameinstance->MyName;
-		MaterialIndex = gameinstance->mySkin;
-		ServerChangeMaterialIndex(MaterialIndex);
+		ServerChangeMaterialIndex(gameinstance->mySkin);
 	}
 
 	if (GetWorld()->GetMapName() == "MyHome") {
-		MaterialIndex = gameinstance->mySkin;
 		FSoftObjectPath MaterialPath{};
-		switch (MaterialIndex)
+		switch (gameinstance->mySkin)
 		{
 		case 1:
 			MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
@@ -214,16 +193,6 @@ void AHunter::BeginPlay()
 		Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
 		GetMesh()->SetMaterial(0, Material);
 	}
-
-	/*AHunterState* hunterState = Cast<AHunterState>(GetPlayerState());
-	if (hunterState) {
-		hunterState->hpInfo.hunterHP = HP;
-
-		if (false == HasAuthority()) {
-			hunterState->MyName = gameinstance->MyName;
-			ServerGetALLNames(gameinstance->MyName);
-		}
-	}*/
 }
 
 // Called every frame
@@ -328,12 +297,6 @@ void AHunter::Tick(float DeltaTime)
 	if (false == Inventory->InfoArray.IsEmpty()) {
 		gameinstance->InfoArray = Inventory->InfoArray;
 	}
-
-	/*AHunterState* hunterState = Cast<AHunterState>(GetPlayerState());
-	if (hunterState) {
-		hunterState->hpInfo.hunterHP = HP;
-	}*/
-	// ServerHunterHP(gameinstance->MyName, HP);
 }
 
 void AHunter::PostInitializeComponents()
@@ -342,7 +305,6 @@ void AHunter::PostInitializeComponents()
 
 	auto AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->OnMontageEnded.AddDynamic(this, &AHunter::OnMontageEnded);
-
 }
 
 void AHunter::PossessedBy(AController* NewController)
@@ -360,7 +322,6 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	if (Bullet) return 0.f;
 
 	HP -= DamageAmount;
-	// ServerHunterHP(gameinstance->MyName, HP);
 
 	if (GetHP() <= 0)
 	{ //죽었을 때
@@ -371,12 +332,6 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		AEnemy* DamageEnemy = Cast<AEnemy>(DamageCauser);
 		if(DamageEnemy) DamageEnemy->LeaveTarget(this);
 
-		//ResetStatus();
-		//Partner->ResetStatus();
-		//// SetActorLocationAndRotation()
-		//SetActorLocation(FVector(-2000.0f, -120.f, 1200.0f));
-		//Partner->SetActorLocation(FVector(-2000.0f, -300.f, 1200.0f));
-
 		return 0; 
 	}
 		//입력 제한 필요
@@ -386,13 +341,6 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		AEnemyProjectile* EnemyBullet = Cast<AEnemyProjectile>(DamageCauser);
 		if (EnemyBullet)
 		{
-			/*FVector DirectionVec = EnemyBullet->GetActorLocation() - GetActorLocation();
-			DirectionVec.Normalize();
-			if (DirectionVec.Z <= 0.f)
-			{
-				DirectionVec.Z *= -1;
-			}
-			LaunchCharacter(DirectionVec * 1000.f, false, false);*/
 			ServerPlayMontage(this, FName("NormalHit"));
 		}
 	}
@@ -402,7 +350,6 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		CurState = EPlayerState::Hit;
 	}
 	
-	
 	//HunterAnim->StopAllMontages(1.0f);
 	StartInvincibility();
 	SetInstallMode();
@@ -410,7 +357,7 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	return DamageAmount;
 }
 
-FGenericTeamId AHunter::GetGenericTeamId()const
+FGenericTeamId AHunter::GetGenericTeamId() const
 {
 	return TeamID;
 }
@@ -419,15 +366,12 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-
-	
 	DOREPLIFETIME(AHunter, HunterStamina);
 	DOREPLIFETIME(AHunter, CurState);
 	DOREPLIFETIME(AHunter, Partner);
 	DOREPLIFETIME(AHunter, InteractingActor);
 	DOREPLIFETIME(AHunter, bUpperOnly);
 	DOREPLIFETIME(AHunter, bShiftDown);
-	DOREPLIFETIME(AHunter, MaterialIndex);
 	DOREPLIFETIME(AHunter, Material);
 	DOREPLIFETIME(AHunter, DamageList);
 }
@@ -627,20 +571,17 @@ void AHunter::MoveForward(float Val)
 		FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
 		TraceParams.AddIgnoredActor(this);
 		GetWorld()->LineTraceSingleByProfile(HitResult, GetActorLocation(), EndLocation, FName("Player"), TraceParams);
-		//GetWorld()->SweepSingleByProfile(HitResult, GetActorLocation(), EndLocation, FQuat::Identity, FName("Player"), GetCapsuleComponent()->GetCollisionShape(), TraceParams);
 		if (HitResult.bBlockingHit)
 		{
-			//DrawDebugLine(GetWorld(), GetActorLocation(), EndLocation, FColor::Red,false, 10.f, 0U , 3.f);
 			return;
 		}
 		
 		bDamaged = false;
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-
-		//���� ����
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		 AddMovementInput(Direction, Val);
+
+		AddMovementInput(Direction, Val);
 	}
 }
 
@@ -652,9 +593,8 @@ void AHunter::MoveRight(float Val)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-
-		//���� ����
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
 		AddMovementInput(Direction, Val);
 	}
 }
@@ -695,8 +635,9 @@ void AHunter::LMBDown()
 	{
 		FHitResult HitResult;
 		APlayerController* PlayerController = Cast<APlayerController>(GetController());
+		
 		PlayerController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, 0, HitResult);
-		//HitResult.Location;
+
 		if (HitResult.bBlockingHit)
 		{
 			ServerSetPartnerPosition(Partner, HitResult.Location);
@@ -726,15 +667,6 @@ void AHunter::LMBDown()
 				FCollisionQueryParams BulletTraceParams(FName("Visibility"), true, this);
 				if(GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
 				{
-					//Debug LineTrace
-					/*DrawDebugLine(
-						GetWorld(),
-						StartTrace,
-						HitResult->Location,
-						FColor(255, 0, 0),
-						false, 3, 0,
-						12.333
-					);*/
 					EndTrace = HitResult->Location;
 				}
 				else
@@ -763,7 +695,7 @@ void AHunter::LMBDown()
 			bCanShot = false;
 			StartShotTime = GetWorld()->GetTimeSeconds();
 
-			//인벤토리 처리
+			// Set inventory item
 			bool bEmpty = 0;
 			int SameItemCnt = 0;
 			QuickSlotArray[CurQuickKey].cnt--;
@@ -781,6 +713,7 @@ void AHunter::LMBDown()
 					else break;
 				}
 			}
+
 			if (bEmpty && SameItemCnt == 1)
 			{
 				QuickSlotArray[CurQuickKey].ItemID = FName("None");
@@ -789,7 +722,6 @@ void AHunter::LMBDown()
 			UpdateQuickSlot();
 		}
 	}
-	
 }
 
 void AHunter::RMBDown()
@@ -851,8 +783,10 @@ void AHunter::EKeyDown()
 		TargetVector.Z = 0;
 		TargetVector.Normalize();
 		HunterForwardVector.Z = 0;
+		
 		FVector cross = FVector::CrossProduct(HunterForwardVector, TargetVector);
 		float sign = FMath::Sign(cross.Z);
+
 		if (Cast<AItemDropActor>(InteractingActor))
 		{
 			bUpperOnly = true;
@@ -868,7 +802,6 @@ void AHunter::EKeyDown()
 			ServerInteractObject(InteractingActor, this);
 
 		}
-
 		else
 		{
 			//npc
@@ -1242,9 +1175,6 @@ void AHunter::ServerSpawnPartner_Implementation(AHunter* OwnerHunter, TSubclassO
 	OwnerHunter->Partner = NewPartner;
 	NewPartner->Hunter = OwnerHunter;
 	NewPartner->CurState = EPartnerState::MoveTarget;
-	//NewPartner->MultiSetHunter(OwnerHunter);
-	//MultiSetPartner(NewPartner);
-
 }
 
 void AHunter::MultiSetPartner_Implementation (APartner* NewPartner)
@@ -1279,8 +1209,6 @@ void AHunter::ServerSpawnBullet_Implementation(AHunter* OwnerHunter, TSubclassOf
 
 void AHunter::ServerSpawnItem_Implementation(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("spawn item"));
-
 	AItem* SpawnedItem = GetWorld()->SpawnActor<AItem>(SpawnItemClass, StartLoc, FRotator::ZeroRotator);
 	switch (SpawnedItem->ItemType)
 	{
@@ -1354,43 +1282,8 @@ void AHunter::MultiSpawnEffect_Implementation(class UNiagaraSystem* Niagara, con
 
 }
 
-void AHunter::OnRep_Material()
-{
-	FSoftObjectPath MaterialPath{};
-	switch (MaterialIndex)
-	{
-	case 1:
-		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
-		break;
-	case 2:
-		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter2");
-		break;
-	default:
-		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
-		break;
-	}
-	Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
-	GetMesh()->SetMaterial(0, Material);
-}
-
 void AHunter::ServerChangeMaterialIndex_Implementation(int32 NewMaterialIndex)
 {
-	FSoftObjectPath MaterialPath{};
-	switch (NewMaterialIndex)
-	{
-	case 1:
-		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
-		break;
-	case 2:
-		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter2");
-		break;
-	default:
-		MaterialPath = TEXT("/Game/Hunter/Materials/M_Hunter");
-		break;
-	}
-	Material = Cast<UMaterialInterface>(MaterialPath.TryLoad());
-	GetMesh()->SetMaterial(0, Material);
-
 	MulticastChangeMaterialIndex(NewMaterialIndex);
 }
 

@@ -425,14 +425,8 @@ public:
 		TArray<FPartyInfo> DamageList;
 
 protected:
-	UPROPERTY(Replicated)
-		int32 MaterialIndex;
-
-	UPROPERTY(ReplicatedUsing = OnRep_Material)
+	UPROPERTY()
 		UMaterialInterface* Material;
-
-	UFUNCTION()
-		void OnRep_Material();
 
 public:	// Particle System
 	UPROPERTY(EditDefaultsOnly, Category = "Particle")

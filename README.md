@@ -8,12 +8,6 @@ Unreal Engine을 사용한 협동 슈팅 게임 개발<br/><br/>
 ## 플레이 화면
 [![Video Label](http://img.youtube.com/vi/ZS4TtX3LjT4/0.jpg)](https://youtu.be/ZS4TtX3LjT4)
 
-## 사용 예제
-
-스크린 샷과 코드 예제를 통해 사용 방법을 자세히 설명합니다.
-
-_더 많은 예제와 사용법은 [Wiki][wiki]를 참고하세요._
-
 ## 개발 환경
 
 IDE: `Visual Studio 2022`<br/>

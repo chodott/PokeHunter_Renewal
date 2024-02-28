@@ -72,18 +72,6 @@ AHunter::AHunter()
 		GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHunter::OnOverlapEnd);
 	}
 	
-	// Particle System
-	Heal_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("HealParticle"));
-	Heal_Effect->SetupAttachment(GetRootComponent());
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> TempHealEffectClass(TEXT("/Game/Hunter/HealEffect/P_Heal_Circle.P_Heal_Circle"));
-	if (TempHealEffectClass.Succeeded())
-	{
-		Heal_Effect->SetTemplate(TempHealEffectClass.Object);
-		float characterFoot = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-		Heal_Effect->SetRelativeLocation(FVector(0, 0, -characterFoot));
-		Heal_Effect->Deactivate();
-	}
-
 	//Using Controller Rotation
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
@@ -233,8 +221,9 @@ void AHunter::Tick(float DeltaTime)
 
 	DiveTimeline.TickTimeline(DeltaTime);
 
+	//set CameraBoomLength
 	if (CurState == EPlayerState::Zoom)
-	{
+	{	
 		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, ArmLengthTo, DeltaTime, ArmSpeed);
 		CameraBoom->SetRelativeLocation(FVector(0, FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, CameraZoomTo, DeltaTime, ArmSpeed), 0));
 	}
@@ -247,83 +236,10 @@ void AHunter::Tick(float DeltaTime)
 	}
 
 	//Stamina
-	if (GetVelocity().Length() > 600.f)
-	{
-		if (CurState == EPlayerState::Dive) return;
+	ReduceStamina(DeltaTime);
 
-		if (HunterStamina > 0) HunterStamina -= DeltaTime * StaminaPerSecondAmount;
-		else
-		{
-			SetStamina(0);
-			GetCharacterMovement()->MaxWalkSpeed = 500.f;
-		}
-	}
-	else
-	{
-		SetStamina(HunterStamina + DeltaTime * StaminaPerSecondAmount);
-		if(HunterStamina >= 100) SetStamina(100);
-
-	}
-
-
-	//Invincible
-	if (bInvincible)
-	{
-		float ElapsedTime = GetWorld()->TimeSeconds - StartInvincibleTime;
-		float TimeLeft = InvincibleTime - ElapsedTime;
-		if (TimeLeft <= 0.0f)
-		{
-			bInvincible = false;
-		}
-	}
-
-	//HealPerSecond
-	if (GetHP() < 100.f)
-	{
-		float ElapsedTime = GetWorld()->TimeSeconds;
-		int CurSecond = FMath::FloorToInt(ElapsedTime);
-		if (CurSecond == SaveSecond)
-		{
-
-		}
-		else
-		{
-			SaveSecond = CurSecond;
-			float NewHP = GetHP() + HealPerSecondAmount;
-			if (NewHP > 100.f) NewHP = 100.f;
-			SetHP(NewHP);
-		}
-	}
-
-	//Reload
-	if (!bCanShot)
-	{
-		float ElapsedTime = GetWorld()->TimeSeconds - StartShotTime;
-		float TimeLeft = ReloadTime - ElapsedTime;
-		if (TimeLeft <= 0.0f)
-		{
-			bCanShot = true;
-		}
-	}
-
-	//SkillReload
-	for (auto& SkillInfo : SkillInfoArray)
-	{
-		SkillInfo.CheckTime(DeltaTime);
-	}
-	UpdateSkillSlots();
-
-	//bFalling
-	if (bNoCollision)
-	{
-		float ElapsedTime = GetWorld()->TimeSeconds - StartNoCollisionTime;
-		float TimeLeft = NoCollisionTime - ElapsedTime;
-		if (TimeLeft <= 0.0f)
-		{
-			bNoCollision = false;
-			SetActorEnableCollision(true);
-		}
-	}
+	HealPerSecond(DeltaTime);
+	Reload(DeltaTime);
 
 	if (false == Inventory->InfoArray.IsEmpty()) {
 		gameinstance->InfoArray = Inventory->InfoArray;
@@ -371,12 +287,6 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		AEnemy* DamageEnemy = Cast<AEnemy>(DamageCauser);
 		if(DamageEnemy) DamageEnemy->LeaveTarget(this);
 
-		//ResetStatus();
-		//Partner->ResetStatus();
-		//// SetActorLocationAndRotation()
-		//SetActorLocation(FVector(-2000.0f, -120.f, 1200.0f));
-		//Partner->SetActorLocation(FVector(-2000.0f, -300.f, 1200.0f));
-
 		return 0; 
 	}
 		//입력 제한 필요
@@ -386,13 +296,6 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 		AEnemyProjectile* EnemyBullet = Cast<AEnemyProjectile>(DamageCauser);
 		if (EnemyBullet)
 		{
-			/*FVector DirectionVec = EnemyBullet->GetActorLocation() - GetActorLocation();
-			DirectionVec.Normalize();
-			if (DirectionVec.Z <= 0.f)
-			{
-				DirectionVec.Z *= -1;
-			}
-			LaunchCharacter(DirectionVec * 1000.f, false, false);*/
 			ServerPlayMontage(this, FName("NormalHit"));
 		}
 	}
@@ -419,8 +322,6 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-
-	
 	DOREPLIFETIME(AHunter, HunterStamina);
 	DOREPLIFETIME(AHunter, CurState);
 	DOREPLIFETIME(AHunter, Partner);
@@ -483,9 +384,7 @@ void AHunter::MultiZoom_Implementation(AHunter* Hunter, bool bZoom)
 			bUseControllerRotationYaw = true;
 			//bUseControllerRotationPitch = true;
 			GetCharacterMovement()->bOrientRotationToMovement = false;
-
-			GetCharacterMovement()->MaxWalkSpeed = 300.f;
-
+			GetCharacterMovement()->MaxWalkSpeed = ZoomSpeed;
 		}
 	}
 	else
@@ -558,13 +457,8 @@ void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveForward", this, &AHunter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AHunter::MoveRight);
 
-	//PlayerInputComponent->BindAxis("Turn", this, &AHunter::AddControllerYawInput);		// X
-	//PlayerInputComponent->BindAxis("LookUp", this, &AHunter::AddControllerPitchInput);	// Y
-
 	PlayerInputComponent->BindAxis("Turn", this, &AHunter::Turn);		// X
 	PlayerInputComponent->BindAxis("LookUp", this, &AHunter::LookUp);	// Y
-
-	//PlayerInputComponent->BindAxis("MouseWheel", this, &AHunter::WheelInput);
 
 	PlayerInputComponent->BindAction("SpaceBar", IE_Pressed, this, &AHunter::SpaceDown);
 	PlayerInputComponent->BindAction("LShift", IE_Pressed, this, &AHunter::LShiftDown);
@@ -627,7 +521,7 @@ void AHunter::MoveForward(float Val)
 		FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
 		TraceParams.AddIgnoredActor(this);
 		GetWorld()->LineTraceSingleByProfile(HitResult, GetActorLocation(), EndLocation, FName("Player"), TraceParams);
-		//GetWorld()->SweepSingleByProfile(HitResult, GetActorLocation(), EndLocation, FQuat::Identity, FName("Player"), GetCapsuleComponent()->GetCollisionShape(), TraceParams);
+		
 		if (HitResult.bBlockingHit)
 		{
 			//DrawDebugLine(GetWorld(), GetActorLocation(), EndLocation, FColor::Red,false, 10.f, 0U , 3.f);
@@ -637,8 +531,6 @@ void AHunter::MoveForward(float Val)
 		bDamaged = false;
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-
-		//���� ����
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		 AddMovementInput(Direction, Val);
 	}
@@ -652,8 +544,6 @@ void AHunter::MoveRight(float Val)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-
-		//���� ����
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		AddMovementInput(Direction, Val);
 	}
@@ -676,14 +566,12 @@ void AHunter::LookUp(float NewAxisValue)
 void AHunter::LShiftDown()
 {
 	if (bBound) return;
-	//bShiftDown = true;
 	ServerSprint(this, true);
 }
 
 void AHunter::LShiftUp()
 {
 	if (CurState == EPlayerState::Zoom) return;
-	//bShiftDown = false;
 	ServerSprint(this, false);
 }
 
@@ -761,7 +649,6 @@ void AHunter::LMBDown()
 			}
 
 			bCanShot = false;
-			StartShotTime = GetWorld()->GetTimeSeconds();
 
 			//인벤토리 처리
 			bool bEmpty = 0;
@@ -795,7 +682,7 @@ void AHunter::LMBDown()
 void AHunter::RMBDown()
 {
 	if (bBound) return;
-	bUpperOnly = true;
+	//bUpperOnly = true;
 	ServerZoom(this,true);
 }
 
@@ -845,6 +732,7 @@ void AHunter::EKeyDown()
 	if (InteractingActor)
 	{
 		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
+		
 		//Left Right Check
 		FVector TargetVector = (InteractingActor->GetActorLocation() - GetActorLocation());
 		FVector HunterForwardVector = GetActorForwardVector();
@@ -873,7 +761,7 @@ void AHunter::EKeyDown()
 		{
 			//npc
 			InteractingActor->Interact_Implementation(this);
-			ServerSprint(this, false);
+			//ServerSprint(this, false);
 		}
 
 		return;
@@ -915,7 +803,6 @@ void AHunter::CtrlUp()
 
 void AHunter::Use1Skill()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Skill1"));
 	if (Partner)
 	{
 		if (SkillInfoArray[0].CheckReady())
@@ -929,7 +816,6 @@ void AHunter::Use1Skill()
 
 void AHunter::Use2Skill()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Skill2"));
 	if (Partner)
 	{
 		if (SkillInfoArray[1].CheckReady())
@@ -943,7 +829,6 @@ void AHunter::Use2Skill()
 
 void AHunter::Use3Skill()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Skill3"));
 	if (Partner)
 	{
 		if (SkillInfoArray[2].CheckReady())
@@ -957,7 +842,6 @@ void AHunter::Use3Skill()
 
 void AHunter::Use4Skill()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Skill4"));
 	if (Partner)
 	{
 		if (SkillInfoArray[3].CheckReady())
@@ -1095,7 +979,6 @@ void AHunter::InteractAttack_Implementation(FVector HitDirection, float DamageAm
 	CurState = EPlayerState::Knockback;
 	
 	LaunchCharacter(HitDirection * 1000.f,false,false);
-	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	bNoCollision = true;
 	SetActorEnableCollision(false);
 }
@@ -1103,7 +986,6 @@ void AHunter::InteractAttack_Implementation(FVector HitDirection, float DamageAm
 void AHunter::InteractGrabAttack_Implementation()
 {
 	bNoCollision = true;
-	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	FRotator TargetRot = FVector::ZeroVector.Rotation();
 	//SetActorRelativeRotation(TargetRot);
 }
@@ -1119,7 +1001,6 @@ void AHunter::InteractWideAttack_Implementation(float DamageAmount)
 
 	CurState = EPlayerState::Knockback;
 	LaunchCharacter(FVector(0,0,1000), false, false);
-	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	bNoCollision = true;
 	SetActorEnableCollision(false);
 }
@@ -1129,7 +1010,6 @@ void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)
 	for (int i = 0; i < 4; ++i)
 	{
 		HunterInfo.PartnerSkillArray[4 * SkillListNum + i] = SkillArray[i];
-		// HunterInfo.PartnerSkillArray[4 * SkillListNum + i] = ESkillID::Slash;
 		gameinstance->PartnerSkillArray[i] = SkillArray[i];
 	}
 }
@@ -1197,7 +1077,6 @@ void AHunter::ServerStartInvincibility_Implementation()
 void AHunter::MultiStartInvincibility_Implementation()
 {
 	bInvincible = true;
-	StartInvincibleTime = GetWorld()->TimeSeconds;
 }
 
 void AHunter::StartInvincibility()
@@ -1340,6 +1219,63 @@ void AHunter::SetStamina(float setStamina)
 	{
 		HunterStamina = setStamina;
 	}
+}
+
+void AHunter::ReduceStamina(float DeltaTime)
+{
+	if (GetVelocity().Length() > WalkSpeed)
+	{
+		if (CurState == EPlayerState::Dive) return;
+
+		if (HunterStamina > 0) HunterStamina -= DeltaTime * StaminaPerSecondAmount;
+		else
+		{
+			SetStamina(0);
+			GetCharacterMovement()->MaxWalkSpeed = 500.f;
+		}
+	}
+	else
+	{
+		SetStamina(HunterStamina + DeltaTime * StaminaPerSecondAmount);
+		if (HunterStamina >= 100) SetStamina(100);
+
+	}
+}
+
+void AHunter::HealPerSecond(float DeltaTime)
+{
+	if (GetHP() < MAX_HP)
+	{
+		HealPeriod -= DeltaTime;
+		if (HealPeriod <= 0)
+		{
+			HealPeriod = 1.f;
+			float NewHP = GetHP() + HealPerSecondAmount;
+			if (NewHP > MAX_HP) NewHP = MAX_HP;
+			SetHP(NewHP);
+		}
+	}
+}
+
+void AHunter::Reload(float DeltaTime)
+{
+	//Item
+	if (!bCanShot)
+	{
+		CurReloadTime += DeltaTime;
+		if (ReloadTime <= CurReloadTime)
+		{
+			CurReloadTime = 0.f;
+			bCanShot = true;
+		}
+	}
+
+	//Skill
+	for (auto& SkillInfo : SkillInfoArray)
+	{
+		SkillInfo.CheckTime(DeltaTime);
+	}
+	UpdateSkillSlots();
 }
 
 void AHunter::ServerSpawnEffect_Implementation(class UNiagaraSystem* Niagara, const FVector& SpawnLoc)

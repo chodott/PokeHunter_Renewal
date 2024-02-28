@@ -42,27 +42,6 @@ void APartner::BeginPlay()
 void APartner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (bInvincible)
-	{
-		float ElapsedTime = GetWorld()->TimeSeconds - StartInvincibleTime;
-		float TimeLeft = InvincibleTime - ElapsedTime;
-		if (TimeLeft <= 0.0f)
-		{
-			bInvincible = false;
-		}
-	}
-
-	if (bNoCollision)
-	{
-		float ElapsedTime = GetWorld()->TimeSeconds - StartNoCollisionTime;
-		float TimeLeft = NoCollisionTime - ElapsedTime;
-		if (TimeLeft <= 0.0f)
-		{
-			bNoCollision = false;
-			SetActorEnableCollision(true);
-		}
-	}
 }
 
 // Called to bind functionality to input
@@ -369,7 +348,6 @@ void APartner::ServerStartPartnerInvincibility_Implementation()
 void APartner::MultiStartPartnerInvincibility_Implementation()
 {
 	bInvincible = true;
-	StartInvincibleTime = GetWorld()->TimeSeconds;
 }
 
 void APartner::MultiUseNormalSkill_Implementation(ESkillID SkillID)
@@ -418,7 +396,6 @@ void APartner::InteractAttack_Implementation(FVector HitDirection, float DamageA
 	TargetRot.Pitch = 0;
 	SetActorRelativeRotation(TargetRot);
 	LaunchCharacter(HitDirection * 1000.f, false, false);
-	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	bNoCollision = true;
 	SetActorEnableCollision(false);
 }
@@ -435,7 +412,6 @@ void APartner::InteractEarthquake_Implementation()
 void APartner::InteractGrabAttack_Implementation()
 {
 	bNoCollision = true;
-	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 }
 
 void APartner::InteractWideAttack_Implementation(float DamageAmount)
@@ -448,7 +424,6 @@ void APartner::InteractWideAttack_Implementation(float DamageAmount)
 	if (bInvincible) return;
 
 	LaunchCharacter(FVector(0, 0, 1000), false, false);
-	StartNoCollisionTime = GetWorld()->GetTimeSeconds();
 	bNoCollision = true;
 	SetActorEnableCollision(false);
 }

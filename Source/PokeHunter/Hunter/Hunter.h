@@ -93,7 +93,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
 	float SprintSpeed{ 700.f };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
-	float WalkSpeed{ 500.f };
+	float WalkSpeed{500.f};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
+	float ZoomSpeed{ 300.f };
 	
 	//
 	UPROPERTY(VisibleAnywhere, Replicated,  BlueprintReadOnly, Category = "Interaction")
@@ -179,7 +181,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float ReloadTime{};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
-	float StartShotTime;
+	float CurReloadTime{};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bCanShot;
 	
@@ -188,7 +190,7 @@ public:
 	float StaminaPerSecondAmount;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float StaminaDecreaseAmount;
-	int SaveSecond;
+	float HealPeriod{1.f};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bGrabbed;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
@@ -303,7 +305,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetStamina() { return HunterStamina; }
 	UFUNCTION(BlueprintCallable)
-	void ResetStatus() { StopAnimMontage(curMontage); HP = 100.0f, HunterStamina = 100.0f, CurState = EPlayerState::Idle; }
+	void ResetStatus() { StopAnimMontage(curMontage); HP = MAX_HP, HunterStamina = 100.0f, CurState = EPlayerState::Idle; }
+	void ReduceStamina(float DeltaTime);
+	void HealPerSecond(float DeltaTime);
+	void Reload(float DeltaTime);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Party member info")
 		TMap<FName, float> PartyMemberHP;		//  = { {FName("Tester01"), 0.f}, {FName("Tester02"), 80.f}, {FName("Tester03"), 20.f}, {FName("Tester04"), 60.f} };	// <OwnerName, pet HP>
@@ -434,10 +439,6 @@ protected:
 	UFUNCTION()
 		void OnRep_Material();
 
-public:	// Particle System
-	UPROPERTY(EditDefaultsOnly, Category = "Particle")
-		UParticleSystemComponent* Heal_Effect = nullptr;
-
 private:
 	// Character Movement Input
 	void MoveForward(float Val);
@@ -445,3 +446,4 @@ private:
 	void LookUp(float NewAxisValue);
 	void Turn(float NewAxisValue);
 };
+

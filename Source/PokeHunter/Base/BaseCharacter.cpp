@@ -24,6 +24,27 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Invincible
+	if (bInvincible)
+	{
+		CurInvincibleTime += DeltaTime;
+		if(InvincibleTime <= CurInvincibleTime)
+		{
+			CurInvincibleTime = 0.f;
+			bInvincible = false;
+		}
+	}
+
+	if (bNoCollision)
+	{
+		CurNoCollisionTime += DeltaTime;
+		if (NoCollisionTime <=CurNoCollisionTime)
+		{
+			CurNoCollisionTime = 0.f;
+			bNoCollision = false;
+			SetActorEnableCollision(true);
+		}
+	}
 }
 
 // Called to bind functionality to input

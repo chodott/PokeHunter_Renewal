@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
+#define MAX_HP 100.f
+
 UCLASS()
 class POKEHUNTER_API ABaseCharacter : public ACharacter
 {
@@ -24,7 +26,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float InvincibleTime{ 1.f };
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle")
-	float StartInvincibleTime;
+	float CurInvincibleTime;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float HealPerSecondAmount;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
@@ -34,7 +36,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	float NoCollisionTime{ 0.5f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battle")
-	float StartNoCollisionTime;
+	float CurNoCollisionTime;
 
 protected:
 	// Called when the game starts or when spawned

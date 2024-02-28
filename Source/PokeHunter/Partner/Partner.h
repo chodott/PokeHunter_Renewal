@@ -42,7 +42,7 @@ class POKEHUNTER_API APartner : public ABaseCharacter, public IGenericTeamAgentI
 
 public:
 	UPROPERTY(EditAnywhere)
-		EPartnerType Type = EPartnerType::NonePartner;
+	EPartnerType Type = EPartnerType::NonePartner;
 
 	// Sets default values for this character's properties
 	APartner();
@@ -129,7 +129,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void ResetStatus(FVector startPos) {
 		StopAnimMontage(curMontage); 
-		HP = 100.0f; CurState = EPartnerState::MoveTarget;
+		HP = MAX_HP; CurState = EPartnerState::MoveTarget;
 		TargetPos = startPos;
 		bDied = false;
 	}

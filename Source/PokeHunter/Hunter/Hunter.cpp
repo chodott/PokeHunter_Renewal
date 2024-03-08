@@ -651,29 +651,23 @@ void AHunter::LMBDown()
 			bCanShot = false;
 
 			//인벤토리 처리
-			bool bEmpty = 0;
-			int SameItemCnt = 0;
-			QuickSlotArray[CurQuickKey].cnt--;
-			for (auto & Info : Inventory->InfoArray)
-			{
+			FItemCnter& ItemCnter = QuickSlotArray[CurQuickKey];
+			ItemCnter.cnt -= 1;
+
+			for (auto& Info : Inventory->InfoArray)
+			{	//퀵슬롯 
 				if (Info.ItemID == ItemID)
 				{
-					SameItemCnt++;
 					Info.cnt -= 1;
-					if (Info.cnt == 0)
-					{
-						bEmpty = true;
-						Info.ItemID = FName("None");
-					}
-					else break;
+					Info.ItemID = (Info.cnt == 0) ? FName("None") : Info.ItemID;
+					break;
 				}
 			}
-			if (bEmpty && SameItemCnt == 1)
-			{
-				QuickSlotArray[CurQuickKey].ItemID = FName("None");
-				QuickSlotArray[CurQuickKey].cnt = 0;
-			}
-			UpdateQuickSlot(QuickSlotArray[CurQuickKey], CurQuickKey);
+
+			//인벤토리 내 아이템 모두 사용 시 퀵슬롯 데이터 기본값 초기화
+			ItemCnter.ItemID = (ItemCnter.cnt == 0) ? FName("None") : ItemCnter.ItemID;
+
+			UpdateQuickSlot(ItemCnter, CurQuickKey);
 		}
 	}
 	

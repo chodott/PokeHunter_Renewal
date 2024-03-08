@@ -36,7 +36,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 		FName Name {};
 
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 		float CoolTime{};
 
@@ -78,8 +77,7 @@ public:
 
 	//HitBox
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
-		TArray<FHitBoxInfo> HitBoxArray;
-	// TMap<FName, class UHitBoxComponent*> HitBoxMap;
+	TArray<FHitBoxInfo> HitBoxArray;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* HeadHitBox;
@@ -176,10 +174,7 @@ public:
 
 	void SetTarget(AActor* NewTarget);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Life")
-	bool isDie = false;
 	//BTTask
-
 	virtual int CheckInRange();
 	virtual int CheckPattern();
 
@@ -208,7 +203,6 @@ public:
 
 	//ItemInteractInterface
 	virtual void InteractFire_Implementation(UPrimitiveComponent* HitComponent);
-
 
 	//Replication
 	void MultiApplyPointDamage_Implementation(AActor* OtherActor, float DamageAmount, FVector HitDirection, AActor* DamageCauser, const FHitResult& SweepResult);

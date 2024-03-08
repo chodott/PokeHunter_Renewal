@@ -290,7 +290,9 @@ public:
 	void MultiSpawnEffect(class UNiagaraSystem* Niagara, const FVector& SpawnLoc);
 
 	UFUNCTION(BlueprintNativeEvent)
-	void UpdateQuickSlot();
+	void UpdateQuickSlot(const FItemCnter& info, int index);
+	UFUNCTION(BlueprintNativeEvent)
+	void UpdateQuickSlots();
 
 	UFUNCTION(BlueprintCallable)
 	void DrinkPotion();

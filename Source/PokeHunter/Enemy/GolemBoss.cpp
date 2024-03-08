@@ -116,8 +116,6 @@ void AGolemBoss::Tick(float DeltaTime)
 void AGolemBoss::BeginPlay()
 {
 	Super::BeginPlay();
-
-	isDie = false;
 }
 
 void AGolemBoss::PostInitializeComponents()
@@ -385,7 +383,6 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	}
 	else
 	{
-		//�Ϲ� ������ ó��
 		HP -= DamageAmount;
 		HitLoc = GetActorLocation();
 	}
@@ -402,11 +399,10 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 				Bomb->StaticMesh->SetSimulatePhysics(true);
 			}
 		}
-		//Die();
 	}
 
 	if (bReflecting)
-	{	//�ݰ� ���� ������ ����
+	{
 		ReflectDamgeAmount += DamageAmount;
 	}
 

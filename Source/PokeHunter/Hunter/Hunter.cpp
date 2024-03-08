@@ -673,7 +673,7 @@ void AHunter::LMBDown()
 				QuickSlotArray[CurQuickKey].ItemID = FName("None");
 				QuickSlotArray[CurQuickKey].cnt = 0;
 			}
-			UpdateQuickSlot();
+			UpdateQuickSlot(QuickSlotArray[CurQuickKey], CurQuickKey);
 		}
 	}
 	
@@ -1204,9 +1204,14 @@ void AHunter::ServerShotBullet_Implementation(ABullet* Bullet, AHunter* OwnerHun
 	Bullet->MultiLaunchBullet(OwnerHunter, InitialPos, EndPos);
 }
 
-void AHunter::UpdateQuickSlot_Implementation()
+void AHunter::UpdateQuickSlot_Implementation(const FItemCnter& info, int index)
 {
 }
+
+void AHunter::UpdateQuickSlots_Implementation()
+{
+}
+
 
 void AHunter::ServerCancelOrder_Implementation(APartner* MyPartner)
 {

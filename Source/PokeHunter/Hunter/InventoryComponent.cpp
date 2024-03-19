@@ -208,12 +208,14 @@ int UInventoryComponent::GetItemCnt(FName id)
 	return cnt;
 }
 
-bool UInventoryComponent::CreateItem(const FItemInfo& ItemInfo, TArray<FItemCnter>& ItemArray)
+bool UInventoryComponent::CreateItem(const FItemInfo& ItemInfo)
 {
 	TMap<FName, TArray<int>> IndexMap;
-	for (int i = 0; i < ItemArray.Num(); ++i)
+	for (int i = 0; i < InfoArray.Num(); ++i)
 	{
-		IndexMap[ItemArray[i].ItemID].Add(i);
+		FName ItemName = InfoArray[i].ItemID;
+		if (IndexMap.Find(ItemName) == nullptr) IndexMap.Add(ItemName, { i });
+		else IndexMap[ItemName].Emplace(i);
 	}
 
 	for (int i = 0; i < ItemInfo.OfferingItemID.Num(); ++i)
@@ -223,7 +225,7 @@ bool UInventoryComponent::CreateItem(const FItemInfo& ItemInfo, TArray<FItemCnte
 		int CurCnt = 0;
 		for (int Index : IndexMap[CreateItemID])
 		{
-			CurCnt += ItemArray[Index].cnt;
+			CurCnt += InfoArray[Index].cnt;
 		}
 
 		if (CurCnt < NeedItemCnt)
@@ -239,7 +241,7 @@ bool UInventoryComponent::CreateItem(const FItemInfo& ItemInfo, TArray<FItemCnte
 		int NeedItemCnt = ItemInfo.OfferingItemCnt[i];
 		for (int Index : IndexMap[CreateItemID])
 		{
-			FItemCnter& ItemCnter = ItemArray[Index];
+			FItemCnter& ItemCnter = InfoArray[Index];
 			if (NeedItemCnt > ItemCnter.cnt)
 			{
 				NeedItemCnt -= ItemCnter.cnt;

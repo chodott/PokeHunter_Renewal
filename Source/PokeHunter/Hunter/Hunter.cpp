@@ -638,7 +638,6 @@ void AHunter::LMBDown()
 			{
 				if (ItemClass->IsChildOf(APotion::StaticClass()))
 				{
-					bUpperOnly = true;
 					ServerUsePotion(this, ItemClass);
 				}
 				else
@@ -1115,9 +1114,6 @@ void AHunter::ServerSpawnPartner_Implementation(AHunter* OwnerHunter, TSubclassO
 	OwnerHunter->Partner = NewPartner;
 	NewPartner->Hunter = OwnerHunter;
 	NewPartner->CurState = EPartnerState::MoveTarget;
-	//NewPartner->MultiSetHunter(OwnerHunter);
-	//MultiSetPartner(NewPartner);
-
 }
 
 void AHunter::MultiSetPartner_Implementation (APartner* NewPartner)

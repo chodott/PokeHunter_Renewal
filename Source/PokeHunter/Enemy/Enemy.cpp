@@ -171,19 +171,18 @@ FGenericTeamId AEnemy::GetGenericTeamId() const
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (HP <= 0 || CurState == EEnemyState::Die) return 0;
-	if (bWeaken)
-	{
-		DamageAmount *= 2;
-		bWeaken = false;
-	}
-	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	HP -= DamageAmount;
-	SavedDamage += DamageAmount;
+	
+	//if (bWeaken)
+	//{	//무력화
+	//	DamageAmount *= 2;
+	//	bWeaken = false;
+	//}
 
 	//Item Hit && HitLocation
 	AItem* HitItem = Cast<AItem>(DamageCauser);
 
-	if (nullptr != HitItem) {
+	if (nullptr != HitItem) 
+	{
 		AHunter* hunterDamageStack = Cast<AHunter>(HitItem->ThisOwner);
 		if (hunterDamageStack) {
 			AHunterState* playerState = Cast<AHunterState>(hunterDamageStack->GetPlayerState());
@@ -200,6 +199,10 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			}
 		}
 	}
+
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	HP -= DamageAmount;
+	SavedDamage += DamageAmount;
 	
 	FVector HitLoc;
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
@@ -217,40 +220,37 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	if (HP <= 0)
 	{
 		//사망 애니메이션
-		CurState = EEnemyState::Die;
 		bDied = true;
 		ServerPlayMontage(this, FName("Die"));
 		auto* EnemyController = Cast<AEnemyController>(GetController());
 		if (EnemyController) EnemyController->StopAI();
 	}
 
-
 	else
-	{ 
-	//피격 애니메이션 처리
-	if (HitItem)
-	{
-		CurState = EEnemyState::Hit;
-		AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner);
-		if (Hunter)
+	{	//피격 애니메이션 처리
+		if (HitItem)
 		{
-			Hunter->SetPartnerTarget(this);
+			AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner);
+			if (Hunter)
+			{	//펫의 적 인식
+				Hunter->SetPartnerTarget(this);
+			}
+			if (Target == NULL)
+			{	//적의 타겟 설정
+				Target = Hunter;
+			}
 		}
+		ServerPlayMontage(this, FName("Hit"));
 
-		if (Target == NULL)
-		{
-			Target = Hunter;
-		}
-	}
-
-		if (bGrogy)
-		{
-			//그로기 시 애니메이션 생략
-		}
-		else
-		{
-			ServerPlayMontage(this, FName("Hit"));
-		}
+		//그로기 반영 x
+			//if (bGrogy)
+			//{
+			//	//그로기 시 애니메이션 생략
+			//}
+			//else
+			//{
+			//	ServerPlayMontage(this, FName("Hit"));
+			//}
 	}
 
 	//Damage and UI

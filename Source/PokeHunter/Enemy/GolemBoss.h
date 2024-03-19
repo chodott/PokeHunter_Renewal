@@ -196,6 +196,9 @@ public:
 	void LaunchBombs();
 
 	UFUNCTION(BlueprintCallable)
+		void DropBombs();
+
+	UFUNCTION(BlueprintCallable)
 	void SpawnCupcake();
 
 	UFUNCTION(BlueprintCallable)

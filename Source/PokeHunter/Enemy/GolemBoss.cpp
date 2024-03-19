@@ -177,8 +177,6 @@ void AGolemBoss::Die()
 void AGolemBoss::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	Super::OnMontageEnded(Montage, bInterrupted);
-
-
 }
 
 void AGolemBoss::SetTarget(AActor* NewTarget)
@@ -193,7 +191,6 @@ void AGolemBoss::LongAttack()
 	{
 		CurState = EEnemyState::LongAttack;
 		ServerPlayMontage(this, FName("Throw"));
-		
 	}
 	TargetPos = Target->GetActorLocation();
 }
@@ -263,6 +260,17 @@ void AGolemBoss::LaunchBombs()
 	BombArray.Reset();
 }
 
+void AGolemBoss::DropBombs()
+{
+	if (!BombArray.IsEmpty())
+	{
+		for (auto& Bomb : BombArray)
+		{
+			Bomb->StaticMesh->SetSimulatePhysics(true);
+		}
+	}
+}
+
 void AGolemBoss::SpawnCupcake()
 {
 	FVector SpawnLoc = Target->GetActorLocation();
@@ -328,77 +336,50 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 {
 	if (HP <= 0) return 0;
 	APawn::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
 	FVector HitLoc;
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{	//Point Damage
-
 		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
 		HitLoc = PointDamageEvent.HitInfo.Location;
 		UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(PointDamageEvent.HitInfo.GetComponent());
-		if (HitBox)
+		if (HitBox == NULL) return 0;
+		if (HitBox->TakeDamage(DamageAmount))
 		{
-			if (HitBox->TakeDamage(DamageAmount))
+			FName PartName = HitBox->GetAttachSocketName();
+			DestroyPart(PartName);
+			HitBox->ServerDestroyPart();
+			FString StringPartName = PartName.ToString();
+			if (StringPartName.Contains("Left"))
 			{
-				FName PartName = HitBox->GetAttachSocketName();
-				DestroyPart(PartName);
-				HitBox->ServerDestroyPart();
-				FString StringPartName = PartName.ToString();
-				if (StringPartName.Contains("Left"))
-				{
-					ServerPlayMontage(this, FName("LeftDestroy"));
-					CurState = EEnemyState::LeftDestroy;
-					if (!BombArray.IsEmpty())
-					{
-						for (auto& Bomb : BombArray)
-						{
-							Bomb->StaticMesh->SetSimulatePhysics(true);
-						}
-					}
-				}
-				else if(StringPartName.Contains("Right"))
-				{
-					ServerPlayMontage(this, FName("RightDestroy"));
-					CurState = EEnemyState::LeftDestroy;
-					if (!BombArray.IsEmpty())
-					{
-						for (auto& Bomb : BombArray)
-						{
-							Bomb->StaticMesh->SetSimulatePhysics(true);
-						}
-					}
-				}
+				ServerPlayMontage(this, FName("LeftDestroy"));
+				CurState = EEnemyState::LeftDestroy;
+				DropBombs();
+			}
+			else if(StringPartName.Contains("Right"))
+			{
+				ServerPlayMontage(this, FName("RightDestroy"));
+				CurState = EEnemyState::RightDestroy;
 			}
 		}
-
 		AItem* HitItem = Cast<AItem>(DamageCauser);
 		if (!HitItem) return 0;
 		if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
 		{
 			Hunter->SetPartnerTarget(this);
 		}
-
-
-		HP -= DamageAmount;
 	}
 	else
 	{
-		HP -= DamageAmount;
 		HitLoc = GetActorLocation();
 	}
+	HP -= DamageAmount;
 
 	if (HP <= 0)
 	{
 		ServerPlayMontage(this, FName("Die"));
 		bDied = true;
 		SetActorTickEnabled(false);
-		if (!BombArray.IsEmpty())
-		{
-			for (auto& Bomb : BombArray)
-			{
-				Bomb->StaticMesh->SetSimulatePhysics(true);
-			}
-		}
+		DropBombs();
 	}
 
 	if (bReflecting)

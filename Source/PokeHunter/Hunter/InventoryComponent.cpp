@@ -4,6 +4,7 @@
 #include "InventoryComponent.h"
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Npc//NpcStorage.h"
+#include "Chaos/Pair.h"
 #include "Hunter.h"
 
 // Sets default values for this component's properties
@@ -55,7 +56,6 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 		{
 			if (InfoArray[i].ItemID == ItemName) 
 			{
-				//Add ItemCnt Update need
 				InfoArray[i].cnt += ItemCnt;
 
 				/*if (FarmingArray[i].ItemID == FName("None")) {
@@ -173,9 +173,10 @@ void UInventoryComponent::ChangeSlot(AActor* Storage, FName TargetName, int Targ
 			{
 				StorageNpc->Storage->InfoArray[TargetIndex] = InfoArray[GoalIndex];
 				InfoArray[GoalIndex] = temp;
-				UE_LOG(LogTemp, Warning, TEXT("\n\n[StorageNpc info]\nName: %s\nCnt: %d\n\n"), *temp.ItemID.ToString(), temp.cnt);
+				//Log Print
+				/*UE_LOG(LogTemp, Warning, TEXT("\n\n[StorageNpc info]\nName: %s\nCnt: %d\n\n"), *temp.ItemID.ToString(), temp.cnt);
 				UE_LOG(LogTemp, Warning, TEXT("\n\n[InfoArray info]\nName: %s\nCnt: %d\n\n"), *InfoArray[GoalIndex].ItemID.ToString(), InfoArray[GoalIndex].cnt);
-				UE_LOG(LogTemp, Warning, TEXT("\n\n[Index]\nTargetIndex: %d\nGoalIndex: %d\n\n"), TargetIndex, GoalIndex);
+				UE_LOG(LogTemp, Warning, TEXT("\n\n[Index]\nTargetIndex: %d\nGoalIndex: %d\n\n"), TargetIndex, GoalIndex);*/
 			}
 			else
 			{
@@ -205,6 +206,53 @@ int UInventoryComponent::GetItemCnt(FName id)
 		}
 	}
 	return cnt;
+}
+
+bool UInventoryComponent::CreateItem(const FItemInfo& ItemInfo, TArray<FItemCnter>& ItemArray)
+{
+	TMap<FName, TArray<int>> IndexMap;
+	for (int i = 0; i < ItemArray.Num(); ++i)
+	{
+		IndexMap[ItemArray[i].ItemID].Add(i);
+	}
+
+	for (int i = 0; i < ItemInfo.OfferingItemID.Num(); ++i)
+	{	//필요한 아이템 수 체크
+		FName CreateItemID = ItemInfo.OfferingItemID[i];
+		int NeedItemCnt = ItemInfo.OfferingItemCnt[i];
+		int CurCnt = 0;
+		for (int Index : IndexMap[CreateItemID])
+		{
+			CurCnt += ItemArray[Index].cnt;
+		}
+
+		if (CurCnt < NeedItemCnt)
+		{
+			return false;
+		}
+	}
+
+	//개수 처리
+	for (int i = 0; i < ItemInfo.OfferingItemID.Num(); ++i)
+	{
+		FName CreateItemID = ItemInfo.OfferingItemID[i];
+		int NeedItemCnt = ItemInfo.OfferingItemCnt[i];
+		for (int Index : IndexMap[CreateItemID])
+		{
+			FItemCnter& ItemCnter = ItemArray[Index];
+			if (NeedItemCnt > ItemCnter.cnt)
+			{
+				NeedItemCnt -= ItemCnter.cnt;
+				ItemCnter.cnt = 0;
+			}
+			else
+			{
+				ItemCnter.cnt -= NeedItemCnt;
+				NeedItemCnt = 0;
+			}
+		}
+	}
+	return true;
 }
 
 

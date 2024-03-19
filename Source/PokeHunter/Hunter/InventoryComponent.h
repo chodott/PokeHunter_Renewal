@@ -49,5 +49,7 @@ public:
 	void SwapSlot(int TargetIndex, int GoalIndex);
 	UFUNCTION(BlueprintCallable)
 	int GetItemCnt(FName id);
+	UFUNCTION(BlueprintCallable)
+	bool CreateItem(const FItemInfo& ItemInfo, UPARAM(ref) TArray<FItemCnter>& ItemArray);
 	
 };

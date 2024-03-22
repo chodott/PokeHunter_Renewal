@@ -69,90 +69,92 @@ class POKEHUNTER_API AHunter : public ABaseCharacter, public IGenericTeamAgentIn
 	GENERATED_BODY()
 
 public:
-
 	//Camera Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	class UCameraComponent* FollowCamera;
+
 	//Inventory Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
 	class UInventoryComponent* Inventory{};
-
-	//
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Inventory")
+	int Capacity{ 24 };
 
 	//HunterInfo
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Status")
-	FHunterInfo HunterInfo;
+		FHunterInfo HunterInfo;
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite, Category = "Status")
-	float HunterStamina{ 100 };
+		float HunterStamina{ 100 };
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
-	float DiveSpeed{ 1000.f };
+		float DiveSpeed{ 1000.f };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
-	float SprintSpeed{ 700.f };
+		float SprintSpeed{ 700.f };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
-	float WalkSpeed{500.f};
+		float WalkSpeed{ 500.f };
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Status")
-	float ZoomSpeed{ 300.f };
-	
+		float ZoomSpeed{ 300.f };
+
 	//
-	UPROPERTY(VisibleAnywhere, Replicated,  BlueprintReadOnly, Category = "Interaction")
-	class AInteractActor* InteractingActor;
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "Interaction")
+		class AInteractActor* InteractingActor;
 
 	//QuickSlot
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuickSlot")
-	TArray<FItemCnter> QuickSlotArray;
+		TArray<FItemCnter> QuickSlotArray;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuickSlot")
-	int CurQuickKey{};
+		int CurQuickKey{};
 
 	//Item
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
-	class AItem* CurItem;
+		class AItem* CurItem;
 
 	//UI
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
-	TSubclassOf <UUserWidget> MainUIClass;
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "UI")
-	class UUserWidget* MainUI;
+		TSubclassOf <UUserWidget> MainUIClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+		class UUserWidget* MainUI;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-	TSubclassOf <UUserWidget> StorageUIClass;
+		TSubclassOf <UUserWidget> StorageUIClass;
 	class UUserWidget* StorageUI;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-	TSubclassOf <UUserWidget> PauseUIClass;
+		TSubclassOf <UUserWidget> PauseUIClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
-	class UUserWidget* PauseUI;
+		class UUserWidget* PauseUI;
 
 	//Partner
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner")
-	EPartnerType PartnerType {EPartnerType::WolfPartner};
+		EPartnerType PartnerType {
+		EPartnerType::WolfPartner
+	};
 	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Partner")
-	class APartner* Partner{};
+		class APartner* Partner{};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Partner")
-	TArray<FSkillInfo> SkillInfoArray;
+		TArray<FSkillInfo> SkillInfoArray;
 
 	//Delegate
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, BlueprintReadWrite)
-	FDynamicDeleParam FMouseWheelDelegate;
+		FDynamicDeleParam FMouseWheelDelegate;
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable)
-	FDynamicDele FIKeyDelegate;
+		FDynamicDele FIKeyDelegate;
 
 	//Timeline
 	FTimeline DiveTimeline;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Timeline")
-	UCurveFloat* DiveCurve;
+		UCurveFloat* DiveCurve;
 	FOnTimelineFloat DiveInterpCallback;
 	float LastSpeed;
 	FVector LastInput;
 
 	//Camera Variable
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	float ArmLengthTo;
+	float ArmLengthTo {200.f};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	float CameraZoomTo;
+	float CameraZoomTo{ 100.f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	float ArmSpeed;
+	float ArmSpeed{ 20.f};
 
 	//PlayerState
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly, Category = "Animation")
@@ -226,24 +228,24 @@ public:
 	//Replicated
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 	UFUNCTION(Server, Reliable)
-	void ServerPlayMontage (AHunter* Hunter, FName Session);
+	void ServerPlayMontage (FName Session);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiPlayMontage(AHunter* Hunter, FName Session);
+	void MultiPlayMontage(FName Session);
 
 	UFUNCTION(Server, Reliable)
-	void ServerSprint(AHunter* Hunter, bool bSprinting);
+	void ServerSprint( bool bSprinting);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiSprint(AHunter* Hunter, bool bSprinting);
+	void MultiSprint(bool bSprinting);
 
 	UFUNCTION(Server, Reliable)
-	void ServerRoll(AHunter* Hunter, const FVector& LastInputVec);
+	void ServerRoll(const FVector& LastInputVec);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiRoll(AHunter* Hunter, const FVector& LastInputVec);
+	void MultiRoll(const FVector& LastInputVec);
 
 	UFUNCTION(Server, Reliable)
-	void ServerZoom(AHunter* Hunter, bool bZoom);
+	void ServerZoom(bool bZoom);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiZoom(AHunter* Hunter, bool bZoom);
+	void MultiZoom(bool bZoom);
 
 	UFUNCTION(Server, Reliable)
 	void ServerStartInvincibility();
@@ -255,7 +257,7 @@ public:
 
 	//Partner RPC
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnPartner(AHunter* OwnerHunter, TSubclassOf <APartner> SpawnPartnerClass, const FVector& SpawnLoc);
+	void ServerSpawnPartner(TSubclassOf <APartner> SpawnPartnerClass, const FVector& SpawnLoc);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiSetPartner(APartner* NewPartner);
 	UFUNCTION(Server, Reliable)
@@ -271,19 +273,17 @@ public:
 
 	//Use Item RPC
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnItem(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
+	void ServerSpawnItem(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnBullet(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
+	void ServerSpawnBullet(TSubclassOf<AItem> SpawnItemClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
 	UFUNCTION(Server, Reliable)
-	void ServerShotBullet(ABullet* Bullet, AHunter* OwnerHunter, FVector InitialPos, FVector EndPos);
-	UFUNCTION(Server, Reliable)
-	void	ServerUsePotion(AHunter* OwnerHunter, TSubclassOf<AItem> SpawnItemClass);
+	void	ServerUsePotion(TSubclassOf<AItem> SpawnItemClass);
 	UFUNCTION(NetMulticast, Reliable)
 	void	MultiUsePotion(APotion* Potion);
 	UFUNCTION(Server, Reliable)
-	void ServerInteractObject(AInteractActor* TargetActor, AHunter* OwnerHunter);
+	void ServerInteractObject(AInteractActor* TargetActor);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiInteractObject(AHunter* OwnerHunter);
+	void MultiInteractObject();
 	UFUNCTION(NetMulticast, Reliable)
 	void ServerSpawnEffect(class UNiagaraSystem* Niagara, const FVector& SpawnLoc);
 	UFUNCTION(NetMulticast, Reliable)

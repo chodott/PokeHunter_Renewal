@@ -9,7 +9,7 @@ AGolemPartner::AGolemPartner()
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
-void AGolemPartner::UseSpecialSkill(ESkillID SkillID)
+void AGolemPartner::UseSkill(ESkillID SkillID)
 {
 	bOrdered = true;
 	TargetPos = Target->GetActorLocation();

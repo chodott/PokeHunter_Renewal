@@ -5,7 +5,6 @@
 #include "PokeHunter/Item/Item.h"
 #include "PokeHunter/Npc//NpcStorage.h"
 #include "Chaos/Pair.h"
-#include "Hunter.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()

@@ -19,7 +19,7 @@ class POKEHUNTER_API AGolemPartner : public APartner
 	TSubclassOf<class APartnerProjectile> IceShardClass;
 	
 public:
-	virtual void UseSpecialSkill(ESkillID SkillID);
+	virtual void UseSkill(ESkillID SkillID);
 	void UseMeteor();
 	void ThrowRock();
 

@@ -137,12 +137,10 @@ void AWolfPartner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(AWolfPartner, BreatheRuntime);
 	DOREPLIFETIME(AWolfPartner, StormDamageCnt);
 	DOREPLIFETIME(AWolfPartner, StormRuntime);
-	//DOREPLIFETIME(AWolfPartner, BreatheLimitTime);
 	DOREPLIFETIME(AWolfPartner, bOnStorm);
-	//DOREPLIFETIME(AWolfPartner, StormLimitTime);
 }
 
-void AWolfPartner::UseSpecialSkill(ESkillID SkillID)
+void AWolfPartner::UseSkill(ESkillID SkillID)
 {
 	if (bUsingSkill) return;
 	bool bSuccess = false;
@@ -240,10 +238,6 @@ void AWolfPartner::MakeIceShard()
 	FRotator Rotation = DirectionVec.Rotation();
 
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), IceHornEffect, InitialPos);
-
-	//FQuat TargetRotation = FQuat::FindBetweenNormals(GetActorForwardVector(), DirectionVec);
-	//FRotator Rotation = TargetRotation.Rotator();
-	ServerSpawnProjectile(this, IceShardClass, InitialPos, EndPos, Rotation);
 }
 
 void AWolfPartner::MakeStorm()

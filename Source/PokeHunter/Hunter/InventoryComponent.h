@@ -24,9 +24,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FItemCnter> FarmingArray;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class AHunter* Hunter;
-
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int capacity = 24;
 

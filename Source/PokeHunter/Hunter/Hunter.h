@@ -6,11 +6,8 @@
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/FloatingPawnMovement.h"
-#include "GenericTeamAgentInterface.h"
 #include "PokeHunter/Item/ItemData.h"
 #include "PokeHunter/Base/SkillData.h"
-#include "PokeHunter/Base/ItemInteractInterface.h"
-#include "PokeHunter/Base/EnemyInteractInterface.h"
 #include "PokeHunter/Base/BaseInstance.h"
 #include "PokeHunter/Base/BaseCharacter.h"
 #include "Hunter.generated.h"
@@ -18,6 +15,9 @@
 //Dynamic 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDynamicDele);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicDeleParam, float, val);
+
+#define NUMOFSKILLS 4
+#define NUMOFPARTNERS 3
 
 // Particle
 class UParticleSystemComponent;
@@ -64,7 +64,7 @@ public:
 };
 
 UCLASS()
-class POKEHUNTER_API AHunter : public ABaseCharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface
+class POKEHUNTER_API AHunter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -149,6 +149,8 @@ public:
 	FVector LastInput;
 
 	//Camera Variable
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+	float DefaultArmLength{ 500.f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	float ArmLengthTo {200.f};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
@@ -195,8 +197,6 @@ public:
 	float HealPeriod{1.f};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
 	bool bGrabbed;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Battle")
-	bool bBound;
 
 	//Effect
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effect")
@@ -227,10 +227,8 @@ public:
 
 	//Replicated
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
-	UFUNCTION(Server, Reliable)
-	void ServerPlayMontage (FName Session);
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiPlayMontage(FName Session);
+
+	virtual void MultiPlayMontage_Implementation(FName Session);
 
 	UFUNCTION(Server, Reliable)
 	void ServerSprint( bool bSprinting);
@@ -247,10 +245,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiZoom(bool bZoom);
 
-	UFUNCTION(Server, Reliable)
-	void ServerStartInvincibility();
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiStartInvincibility();
+	
 	UFUNCTION(BlueprintCallable)
 	void StartInvincibility();
 	void SetInstallMode();
@@ -259,17 +254,13 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnPartner(TSubclassOf <APartner> SpawnPartnerClass, const FVector& SpawnLoc);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiSetPartner(APartner* NewPartner);
-	UFUNCTION(Server, Reliable)
-	void ServerSetPartnerPosition(APartner* MyPartner, const FVector& LocVec);
+	void ServerSetPartnerPosition(const FVector& LocVec);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiSetPartnerPosition(const FVector& LocVec);
 	UFUNCTION(Server, Reliable)
-	void ServerUsePartnerNormalSkill(APartner* MyPartner, ESkillID SkillID);
+	void ServerUsePartnerSkill(ESkillID SkillID);
 	UFUNCTION(Server, Reliable)
-	void ServerUsePartnerSpecialSkill(APartner* MyPartner, ESkillID SkillID);
-	UFUNCTION(Server, Reliable)
-	void ServerCancelOrder(APartner* MyPartner);
+	void ServerCancelOrder();
 
 	//Use Item RPC
 	UFUNCTION(Server, Reliable)
@@ -284,10 +275,6 @@ public:
 	void ServerInteractObject(AInteractActor* TargetActor);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiInteractObject();
-	UFUNCTION(NetMulticast, Reliable)
-	void ServerSpawnEffect(class UNiagaraSystem* Niagara, const FVector& SpawnLoc);
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiSpawnEffect(class UNiagaraSystem* Niagara, const FVector& SpawnLoc);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateQuickSlot(const FItemCnter& info, int index);
@@ -298,10 +285,6 @@ public:
 	void DrinkPotion();
 
 	//Status
-	UFUNCTION(BlueprintCallable)
-	void SetHP(float setHP) { HP = setHP; }
-	UFUNCTION(BlueprintCallable)
-	float GetHP() { return HP; };
 	UFUNCTION(BlueprintCallable)
 	void SetStamina(float Stamina);
 	UFUNCTION(BlueprintCallable)
@@ -326,10 +309,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable, Category = "Party member info")
 		void MultiPetHP(FName PlayerName, float NewHP);
 
-	UFUNCTION(Server, Reliable)
-	void ServerSetMaxSpeed(AHunter* OwnerHunter, float NewSpeed);
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiSetMaxSpeed(AHunter* OwnerHunter, float NewSpeed);
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -378,7 +357,6 @@ public:
 	void SetPartnerTarget(ACharacter* setTarget);
 	void SetPartner(class APartner* SelectedPartner);
 	bool SuccessUseSkill(ESkillID SkillID);
-	bool CheckUseSkill(ESkillID SkillID);
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateSkillSlots();
 
@@ -389,24 +367,12 @@ public:
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	//Animation Function
-	UFUNCTION()
-	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 
 	//Timeline Function
 	UFUNCTION()
 	void DiveInterpReturn(float Value);
 	void SetDiveCurveTime(float length);
-
-	//ItemInterface Function
-	virtual void InteractHealArea_Implementation();
-	virtual void OutHealArea_Implementation();
-	virtual void InteractPotion_Implementation(float HealAmount);
-
-	//EnemyInterface Function
-	virtual void InteractEarthquake_Implementation();
-	virtual void InteractAttack_Implementation(FVector HitDirection, float Damage);
-	virtual void InteractGrabAttack_Implementation();
-	virtual void InteractWideAttack_Implementation(float Damage);
 
 	//Hunter New Material
 	UFUNCTION(Server, Reliable, Category = "Material")

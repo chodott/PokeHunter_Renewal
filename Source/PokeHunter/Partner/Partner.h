@@ -4,11 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "GenericTeamAgentInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "PokeHunter/Base/SkillData.h"
-#include "PokeHunter/Base/ItemInteractInterface.h"
-#include "PokeHunter/Base/EnemyInteractInterface.h"
 #include "PokeHunter/Base/PartnerSkillInterface.h"
 #include "PokeHunter/Base/BaseInstance.h"
 #include "PokeHunter/Base/BaseCharacter.h"
@@ -36,7 +33,7 @@ enum class EPartnerState : uint8
 };
 
 UCLASS()
-class POKEHUNTER_API APartner : public ABaseCharacter, public IGenericTeamAgentInterface, public IItemInteractInterface, public IEnemyInteractInterface , public IPartnerSkillInterface
+class POKEHUNTER_API APartner : public ABaseCharacter , public IPartnerSkillInterface
 {
 	GENERATED_BODY()
 
@@ -112,20 +109,10 @@ public:
 	//Perception
 	FGenericTeamId GetGenericTeamId()const override;
 
-	//Animation
-	UFUNCTION(Server, Reliable)
-	void ServerPlayMontage(FName Section);
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiPlayMontage(FName Section);
-
 	UFUNCTION(BlueprintCallable)
 	inline EPartnerType GetType() { return Type; }
 
 	// Status
-	UFUNCTION(BlueprintCallable)
-	inline void SetHP(float ChangedHP) { HP = ChangedHP;};
-	UFUNCTION(BlueprintCallable)
-	float GetHP() { return HP; };
 	UFUNCTION(BlueprintCallable)
 		void ResetStatus(FVector startPos) {
 		StopAnimMontage(curMontage); 
@@ -137,70 +124,36 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool CheckFalling();
 
-	UFUNCTION()
-	virtual void Attack();
 	virtual void SlashAttack();
 	UFUNCTION(BlueprintCallable)
 	virtual void SlashMove();
 	virtual void Howling();
 	virtual void StopSkill();
-	virtual void UseNormalSkill(ESkillID SkillID);
-	virtual void UseSpecialSkill(ESkillID SkillID);
+	virtual void UseSkill(ESkillID SkillID);
 	virtual void CancelOrder();
 	void SetTarget(ACharacter* setTarget);
 	void FollowHunter(class AHunter* Hunter);
 
-	//AnimationFunction
-	UFUNCTION()
-	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-
-	//EnemyInterface
-	virtual void InteractAttack_Implementation(FVector HitDirection, float Damage);
-	virtual void InteractEarthquake_Implementation();
-	virtual void InteractGrabAttack_Implementation();
-	virtual void InteractWideAttack_Implementation(float Damage);
-
-	//ItemInteractInterface
-	virtual void InteractPotion_Implementation(float HealAmount);
-	virtual void InteractHealArea_Implementation();
-	virtual void OutHealArea_Implementation();
-
+	virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 
 	//Replication
-	UFUNCTION(Server, Reliable)
-	void ServerStartPartnerInvincibility();
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiStartPartnerInvincibility();
-
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void ServerApplyDamage(AActor* DamagedActor, float DamageAmount, AController* EventInstigator, AActor* DamageCauser);
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MultiApplyDamage(AActor* DamagedActor, float DamageAmount, AController* EventInstigator, AActor* DamageCauser);
 
+	virtual void MultiPlayMontage_Implementation(FName Section) ;
 	UFUNCTION(Server, Reliable)
 	void ServerStopMontage(APartner* Partner);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiStopMontage(APartner* Partner);
 
-
-	UFUNCTION(Server, Reliable)
-	void ServerSetPosition(const FVector& LocVec);
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiSetPosition(const FVector& LocVec);
+	void SetPosition(const FVector& LocVec);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiSetHunter(class AHunter* OwnerHunter);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiUseNormalSkill(ESkillID SkillID);
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiUseSpecialSkill(ESkillID SkillID);
+	void MultiUseSkill(ESkillID SkillID);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCancelOrder();
-
-	UFUNCTION(Server, Reliable)
-	void ServerSpawnProjectile(APartner* OwnerPartner, TSubclassOf<class APartnerProjectile> SpawnProjectileClass, FVector StartLoc, FVector EndLoc, FRotator Rotation);
-	UFUNCTION(Server, Reliable)
-	void ServerSpawnEffect(class UNiagaraSystem* Niagara, const FVector& SpawnLoc);
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiSpawnEffect(class UNiagaraSystem* Niagara, const FVector& SpawnLoc);
 
 };

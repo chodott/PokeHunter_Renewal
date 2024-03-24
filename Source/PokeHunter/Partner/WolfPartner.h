@@ -77,8 +77,7 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
 
-	//void ApplyDamage();
-	virtual void UseSpecialSkill(ESkillID SkillID);
+	virtual void UseSkill(ESkillID SkillID);
 	virtual void CancelOrder();
 	void LaunchIceShard();
 	UFUNCTION(BlueprintCallable)

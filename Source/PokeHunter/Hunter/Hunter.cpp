@@ -8,7 +8,6 @@
 #include "InventoryComponent.h"
 #include "HunterAnimInstance.h"
 #include "Net/UnrealNetwork.h"
-#include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
@@ -54,7 +53,7 @@ AHunter::AHunter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetOffset = FVector(0, 0, GetDefaultHalfHeight());
-	CameraBoom->TargetArmLength = 500.f;
+	CameraBoom->TargetArmLength = DefaultArmLength;
 	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->bEnableCameraLag = true;
 
@@ -80,7 +79,6 @@ AHunter::AHunter()
 	//Inventory
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	Inventory->capacity = Capacity;
-	Inventory->Hunter = this;
 
 	//Set Quickslot Default
 	for (int i = 0; i < 10; ++i)
@@ -89,12 +87,12 @@ AHunter::AHunter()
 	}
 
 	//Set PartnerSkill Default
-	for (int i = 0; i < 12; ++i)
+	for (int i = 0; i < NUMOFSKILLS * NUMOFPARTNERS; ++i)
 	{
 		HunterInfo.PartnerSkillArray.AddDefaulted();
 	}
 
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < NUMOFSKILLS; ++i)
 	{
 		SkillInfoArray.AddDefaulted();
 	}
@@ -145,15 +143,15 @@ void AHunter::BeginPlay()
 
 	for (int i = 0; i < 4; ++i) 
 	{
-		HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i] = gameinstance->PartnerSkillArray[i];
+		HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * NUMOFSKILLS + i] = gameinstance->PartnerSkillArray[i];
 	}
 
 	for (int i = 0; i < 4; ++i)
 	{
-		ESkillID SkillID = HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i];
+		ESkillID SkillID = HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * NUMOFSKILLS + i];
 		if (SkillID != ESkillID::None)
 		{
-			SkillInfoArray[i] = DatabaseActor->FindSkill(HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + i]);
+			SkillInfoArray[i] = DatabaseActor->FindSkill(HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * NUMOFSKILLS + i]);
 		}
 	}
 
@@ -224,7 +222,7 @@ void AHunter::Tick(float DeltaTime)
 	}
 	else
 	{
-		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, 500.f, DeltaTime, ArmSpeed);
+		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, DefaultArmLength, DeltaTime, ArmSpeed);
 		float temp = FMath::FInterpTo(CameraBoom->GetRelativeLocation().Y, 0.f, DeltaTime, ArmSpeed);
 		CameraBoom->SetRelativeLocation(FVector(0.f, temp, 0.f));
 	}
@@ -257,8 +255,7 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (bInvincible || CurState == EPlayerState::Die) return 0;
-
+	if (bInvincible || CurState == EPlayerState::Die) return 0.f;
 
 	if (DamageCauser != NULL && DamageCauser->IsA(ABullet::StaticClass()))
 	{	//플레이어 공격 데미지 x
@@ -280,19 +277,6 @@ float AHunter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 	
 	ServerPlayMontage(FName("NormalHit"));
 	CurState = EPlayerState::Hit;
-
-	/*if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
-	{
-		FPointDamageEvent& PointDamageEvent = (FPointDamageEvent&)DamageEvent;
-		AEnemyProjectile* EnemyBullet = Cast<AEnemyProjectile>(DamageCauser);
-		if (EnemyBullet)
-		{
-			ServerPlayMontage(this, FName("NormalHit"));
-		}
-	}
-	else
-	{	
-	}*/
 	
 	StartInvincibility();
 	SetInstallMode();
@@ -322,16 +306,11 @@ void AHunter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 
 void AHunter::MultiSprint_Implementation(bool bSprinting)
 {
-	bShiftDown = false;
-	if (bSprinting && CurState == EPlayerState::Idle)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-		bShiftDown = bSprinting;
-	}
-	else if (!bSprinting && CurState == EPlayerState::Idle)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	}
+	bShiftDown = bSprinting;
+	if (CurState != EPlayerState::Idle) return;
+
+	float speed = (bShiftDown == true) ? SprintSpeed : WalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = speed;
 }
 
 void AHunter::ServerSprint_Implementation(bool bSprinting)
@@ -342,12 +321,6 @@ void AHunter::ServerSprint_Implementation(bool bSprinting)
 void AHunter::MultiPlayMontage_Implementation( FName Session)
 {
 	HunterAnim->PlayCombatMontage(Session);
-}
-
-void AHunter::ServerPlayMontage_Implementation(FName Session)
-{
-	MultiPlayMontage(Session);
-	
 }
 
 void AHunter::ServerZoom_Implementation(bool bZoom)
@@ -364,21 +337,18 @@ void AHunter::MultiZoom_Implementation(bool bZoom)
 {
 	if (bZoom)
 	{
-		if (CurState == EPlayerState::Idle && !GetCharacterMovement()->IsFalling())
-		{
-			CurState = EPlayerState::Zoom;
-			bUseControllerRotationYaw = true;
-			//bUseControllerRotationPitch = true;
-			GetCharacterMovement()->bOrientRotationToMovement = false;
-			GetCharacterMovement()->MaxWalkSpeed = ZoomSpeed;
-		}
+		if (CurState != EPlayerState::Idle || GetCharacterMovement()->IsFalling()) return;
+
+		CurState = EPlayerState::Zoom;
+		bUseControllerRotationYaw = true;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+		GetCharacterMovement()->MaxWalkSpeed = ZoomSpeed;
 	}
 	else
 	{
-		if (CurState == EPlayerState::Zoom)
-		{
-			SetInstallMode();
-		}
+		if (CurState != EPlayerState::Zoom) return;
+		
+		SetInstallMode();
 	}
 }
 
@@ -425,16 +395,6 @@ void AHunter::MultiPetHP_Implementation(FName PlayerName, float NewHP)
 	}
 }
 
-void AHunter::ServerSetMaxSpeed_Implementation(AHunter* OwnerHunter, float NewSpeed)
-{
-	MultiSetMaxSpeed(OwnerHunter, NewSpeed);
-}
-
-void AHunter::MultiSetMaxSpeed_Implementation(AHunter* OwnerHunter, float NewSpeed)
-{
-	OwnerHunter->GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
-}
-
 // Called to bind functionality to input
 void AHunter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -476,8 +436,6 @@ void AHunter::SpaceDown()
 		LastInput = GetCharacterMovement()->GetLastInputVector();
 		if (LastInput == FVector::ZeroVector) LastInput = GetActorForwardVector();
 		ServerRoll(LastInput);
-		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-		ServerPlayMontage( FName("Dive"));
 	
 		ServerStartInvincibility();
 		DiveTimeline.PlayFromStart();
@@ -495,11 +453,13 @@ void AHunter::MultiRoll_Implementation(const FVector& LastInputVec)
 	CurState = EPlayerState::Dive;
 	GetCharacterMovement()->Velocity = LastInputVec * DiveSpeed;
 	GetCharacterMovement()->MaxWalkSpeed = DiveSpeed;
+	MultiPlayMontage(FName("Dive"));
 }
 
 void AHunter::MoveForward(float Val)
 {
-	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install || bGrabbed) return;
+	if (CurState != EPlayerState::Zoom || CurState != EPlayerState::Idle ||
+		bGrabbed) return;
 	if (Val != 0.0f)
 	{
 		FHitResult HitResult;
@@ -507,12 +467,6 @@ void AHunter::MoveForward(float Val)
 		FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
 		TraceParams.AddIgnoredActor(this);
 		GetWorld()->LineTraceSingleByProfile(HitResult, GetActorLocation(), EndLocation, FName("Player"), TraceParams);
-		
-		if (HitResult.bBlockingHit)
-		{
-			//DrawDebugLine(GetWorld(), GetActorLocation(), EndLocation, FColor::Red,false, 10.f, 0U , 3.f);
-			return;
-		}
 		
 		bDamaged = false;
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -524,7 +478,8 @@ void AHunter::MoveForward(float Val)
 
 void AHunter::MoveRight(float Val)
 {
-	if (CurState == EPlayerState::Dive || CurState == EPlayerState::Install || bGrabbed) return;
+	if (CurState != EPlayerState::Zoom	||CurState != EPlayerState::Idle || 
+		bGrabbed) return;
 	
 	if (Val != 0.0f)
 	{
@@ -538,20 +493,17 @@ void AHunter::MoveRight(float Val)
 void AHunter::Turn(float NewAxisValue)
 {
 	if (bPartnerMode) return;
-
 	AddControllerYawInput(NewAxisValue);
 }
 
 void AHunter::LookUp(float NewAxisValue)
 {
 	if (bPartnerMode) return;
-
 	AddControllerPitchInput(NewAxisValue);
 }
 
 void AHunter::LShiftDown()
 {
-	if (bBound) return;
 	ServerSprint(true);
 }
 
@@ -563,7 +515,7 @@ void AHunter::LShiftUp()
 
 void AHunter::LMBDown()
 {
-	if (CurState == EPlayerState::Dive || bBound) return;
+	if (CurState == EPlayerState::Dive) return;
 
 	if (bPartnerMode)
 	{
@@ -573,7 +525,7 @@ void AHunter::LMBDown()
 		//HitResult.Location;
 		if (HitResult.bBlockingHit)
 		{
-			ServerSetPartnerPosition(Partner, HitResult.Location);
+			ServerSetPartnerPosition(HitResult.Location);
 		}
 		return;
 	}
@@ -582,85 +534,80 @@ void AHunter::LMBDown()
 	{
 		FName ItemID = QuickSlotArray[CurQuickKey].ItemID;
 		ADatabaseActor* DatabaseActor = Cast<ADatabaseActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ADatabaseActor::StaticClass()));
-		if (DatabaseActor)
-		{
-			TSubclassOf<AItem> ItemClass = DatabaseActor->FindItem(ItemID)->ItemInfo.ItemClass;
-			if (ItemClass == NULL) return; 
-			auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-			
-			//ZoomMode
-			if (!bCanShot) return;
-			if (CurState == EPlayerState::Zoom)
-			{
-				bool bIsBullet = ItemClass->IsChildOf(ABullet::StaticClass());
-				if (!bIsBullet) return;
-				FVector StartTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 150.f;
-				FVector EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
-				FHitResult* HitResult = new FHitResult();
-				FCollisionQueryParams BulletTraceParams(FName("Visibility"), true, this);
-				if(GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
-				{
-					//Debug LineTrace
-					/*DrawDebugLine(
-						GetWorld(),
-						StartTrace,
-						HitResult->Location,
-						FColor(255, 0, 0),
-						false, 3, 0,
-						12.333
-					);*/
-					EndTrace = HitResult->Location;
-				}
-				else
-				{
-					EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
-				}
-				StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle")) + GetActorForwardVector() * 100.f;
+		if (DatabaseActor == NULL) return;
 
-				ServerSpawnBullet(ItemClass, StartTrace, EndTrace, GetControlRotation());
+		TSubclassOf<AItem> ItemClass = DatabaseActor->FindItem(ItemID)->ItemInfo.ItemClass;
+		if (ItemClass == NULL) return; 
+			
+		//ZoomMode
+		if (!bCanShot) return;
+		if (CurState == EPlayerState::Zoom)
+		{
+			bool bIsBullet = ItemClass->IsChildOf(ABullet::StaticClass());
+			if (!bIsBullet) return;
+			FVector StartTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 150.f;
+			FVector EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
+			FHitResult* HitResult = new FHitResult();
+			FCollisionQueryParams BulletTraceParams(FName("Visibility"), true, this);
+			if(GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
+			{
+				//Debug LineTrace
+				/*DrawDebugLine(
+					GetWorld(),
+					StartTrace,
+					HitResult->Location,
+					FColor(255, 0, 0),
+					false, 3, 0,
+					12.333
+				);*/
+				EndTrace = HitResult->Location;
 			}
-			//NormalMode
 			else
 			{
-				if (ItemClass->IsChildOf(APotion::StaticClass()))
-				{
-					ServerUsePotion(ItemClass);
-				}
-				else
-				{
-					ServerSpawnItem(ItemClass, GetActorLocation(), FVector::ZeroVector, GetControlRotation());
-				}
-			
+				EndTrace = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * 3000.f;
 			}
 
-			bCanShot = false;
+			StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle")) + GetActorForwardVector() * 100.f;
 
-			//인벤토리 처리
-			FItemCnter& ItemCnter = QuickSlotArray[CurQuickKey];
-			ItemCnter.cnt -= 1;
-
-			for (auto& Info : Inventory->InfoArray)
-			{	//퀵슬롯 
-				if (Info.ItemID == ItemID)
-				{
-					Info.cnt -= 1;
-					Info.ItemID = (Info.cnt == 0) ? FName("None") : Info.ItemID;
-					break;
-				}
-			}
-
-			//인벤토리 내 아이템 모두 사용 시 퀵슬롯 데이터 기본값 초기화
-			ItemCnter.ItemID = (ItemCnter.cnt == 0) ? FName("None") : ItemCnter.ItemID;
-
-			UpdateQuickSlot(ItemCnter, CurQuickKey);
+			ServerSpawnBullet(ItemClass, StartTrace, EndTrace, GetControlRotation());
 		}
+		
+		//NormalMode
+		else
+		{
+			if (ItemClass->IsChildOf(APotion::StaticClass()))
+			{
+				ServerUsePotion(ItemClass);
+			}
+			else
+			{
+				ServerSpawnItem(ItemClass, GetActorLocation(), FVector::ZeroVector, GetControlRotation());
+			}
+		}
+
+		bCanShot = false;
+
+		//인벤토리 처리
+		FItemCnter& ItemCnter = QuickSlotArray[CurQuickKey];
+		ItemCnter.cnt -= 1;
+
+		for (auto& Info : Inventory->InfoArray)
+		{	//퀵슬롯 
+			if (Info.ItemID == ItemID)
+			{
+				Info.cnt -= 1;
+				Info.ItemID = (Info.cnt == 0) ? FName("None") : Info.ItemID;
+				break;
+			}
+		}
+		//인벤토리 내 아이템 모두 사용 시 퀵슬롯 데이터 기본값 초기화
+		ItemCnter.ItemID = (ItemCnter.cnt == 0) ? FName("None") : ItemCnter.ItemID;
+		UpdateQuickSlot(ItemCnter, CurQuickKey);
 	}
-	
 }
 
 void AHunter::RMBDown()
 {
-	if (bBound) return;
 	ServerZoom(true);
 }
 
@@ -705,12 +652,10 @@ void AHunter::OpenInventory()
 
 void AHunter::EKeyDown()
 {
-	if (CurState == EPlayerState::Zoom || CurState == EPlayerState::Dive) return;
+	if (CurState != EPlayerState::Idle) return;
 
 	if (InteractingActor)
 	{
-		auto AnimInstance = Cast<UHunterAnimInstance>(GetMesh()->GetAnimInstance());
-		
 		//Left Right Check
 		FVector TargetVector = (InteractingActor->GetActorLocation() - GetActorLocation());
 		FVector HunterForwardVector = GetActorForwardVector();
@@ -719,9 +664,8 @@ void AHunter::EKeyDown()
 		HunterForwardVector.Z = 0;
 		FVector cross = FVector::CrossProduct(HunterForwardVector, TargetVector);
 		float sign = FMath::Sign(cross.Z);
-		if (Cast<AItemDropActor>(InteractingActor))
+		if (InteractingActor->IsA(AItemDropActor::StaticClass()))
 		{
-			bUpperOnly = true;
 			if (sign <= 0)
 			{
 				ServerPlayMontage(FName("PickUp"));
@@ -730,28 +674,22 @@ void AHunter::EKeyDown()
 			{
 				ServerPlayMontage( FName("PickUp"));
 			}
-			
 			ServerInteractObject(InteractingActor);
-
 		}
 
 		else
-		{
-			//npc
+		{	//npc
 			InteractingActor->Interact_Implementation(this);
-			//ServerSprint(this, false);
 		}
-
 		return;
 	}
 }
 
 void AHunter::RKeyDown()
 {
-	if (Partner)
-	{
-		ServerCancelOrder(Partner);
-	}
+	if (Partner == NULL) return;
+	
+	ServerCancelOrder();
 }
 
 void AHunter::ESCKeyDown()
@@ -781,84 +719,75 @@ void AHunter::CtrlUp()
 
 void AHunter::Use1Skill()
 {
-	if (Partner)
+	if (Partner == NULL) return;
+
+	if (SkillInfoArray[0].CheckReady())
 	{
-		if (SkillInfoArray[0].CheckReady())
-		{
-			bUpperOnly = true;
-			ServerPlayMontage(FName("Order"));
-			ServerUsePartnerSpecialSkill(Partner, SkillInfoArray[0].ID);
-		}
+		bUpperOnly = true;
+		ServerPlayMontage(FName("Order"));
+		ServerUsePartnerSkill(SkillInfoArray[0].ID);
 	}
 }
 
 void AHunter::Use2Skill()
 {
-	if (Partner)
+	if (Partner == NULL) return;
+
+	if (SkillInfoArray[1].CheckReady())
 	{
-		if (SkillInfoArray[1].CheckReady())
-		{
-			bUpperOnly = true;
-			ServerPlayMontage( FName("Order"));
-			ServerUsePartnerSpecialSkill(Partner, SkillInfoArray[1].ID);
-		}
+		bUpperOnly = true;
+		ServerPlayMontage( FName("Order"));
+		ServerUsePartnerSkill(SkillInfoArray[1].ID);
 	}
 }
 
 void AHunter::Use3Skill()
 {
-	if (Partner)
+	if (Partner == NULL) return;
+
+	if (SkillInfoArray[2].CheckReady())
 	{
-		if (SkillInfoArray[2].CheckReady())
-		{
-			bUpperOnly = true;
-			ServerPlayMontage(FName("Order"));
-			ServerUsePartnerSpecialSkill(Partner, SkillInfoArray[2].ID);
-		}
+		bUpperOnly = true;
+		ServerPlayMontage(FName("Order"));
+		ServerUsePartnerSkill(SkillInfoArray[2].ID);
 	}
 }
 
 void AHunter::Use4Skill()
 {
-	if (Partner)
+	if (Partner == NULL) return;
+
+	if (SkillInfoArray[3].CheckReady())
 	{
-		if (SkillInfoArray[3].CheckReady())
-		{
-			bUpperOnly = true;
-			ServerPlayMontage(FName("Order"));
-			ServerUsePartnerSpecialSkill(Partner, SkillInfoArray[3].ID);
-		}
+		bUpperOnly = true;
+		ServerPlayMontage(FName("Order"));
+		ServerUsePartnerSkill(SkillInfoArray[3].ID);
 	}
 }
 
 void AHunter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (CurState == EPlayerState::Dive) 
+	switch (CurState)
 	{
-		UnCrouch();
-		bInvincible = false;
-		CurState = EPlayerState::Idle;
-		//set rpc movement speed
-		if (bShiftDown) ServerSetMaxSpeed(this, SprintSpeed);
-		else ServerSetMaxSpeed(this, WalkSpeed);
+		case EPlayerState::Dive:
+			UnCrouch();
+			bInvincible = false;
+			CurState = EPlayerState::Idle;
+			ServerSprint(bShiftDown);
+
+		case EPlayerState::Install:
+		case EPlayerState::Drink:
+			CurState = EPlayerState::Idle;
 	}
-	else if (CurState == EPlayerState::Install)
-	{
-		CurState = EPlayerState::Idle;
-	}
-	else if (CurState == EPlayerState::Drink)
-	{
-		
-		CurState = EPlayerState::Idle;
-	}
+
 	if(!bInterrupted)
 	{
-		if (bUpperOnly) bUpperOnly = false;
+		 bUpperOnly = false;
 	}
 }
 
 void AHunter::DrinkPotion()
-{
+{	//Anmation Notify Function
 	ServerSpawnEffect(HealEffect, GetActorLocation() + FVector(0,0,-66.f));
 	CurItem->UseItem(this);
 	if (CurItem != NULL) CurItem->Destroy();
@@ -866,12 +795,11 @@ void AHunter::DrinkPotion()
 
 void AHunter::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (InteractingActor == nullptr)
+	if (InteractingActor != nullptr) return;
+	
+	if (OtherActor->Implements<UInteractInterface>())
 	{
-		if (OtherActor->Implements<UInteractInterface>())
-		{
-			InteractingActor = Cast<AInteractActor>(OtherActor);
-		}
+		InteractingActor = Cast<AInteractActor>(OtherActor);
 	}
 }
 
@@ -886,17 +814,16 @@ void AHunter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AAct
 		else return;
 	}
 
-	if (InteractingActor == nullptr)
+	if (InteractingActor != NULL) return;
+
+	TArray<AActor*> OverlappedActors;
+	GetCapsuleComponent()->GetOverlappingActors(OverlappedActors);
+	for (int32 i = 0; i < OverlappedActors.Num(); ++i)
 	{
-		TArray<AActor*> OverlappedActors;
-		GetCapsuleComponent()->GetOverlappingActors(OverlappedActors);
-		for (int32 i = 0; i < OverlappedActors.Num(); ++i)
+		if (OverlappedActors[i]->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
 		{
-			if (OverlappedActors[i]->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
-			{
-				InteractingActor = Cast<AInteractActor>(OverlappedActors[i]);
-				break;
-			}
+			InteractingActor = Cast<AInteractActor>(OverlappedActors[i]);
+			break;
 		}
 	}
 }
@@ -911,100 +838,26 @@ void AHunter::SetDiveCurveTime(float length)
 	DiveTimeline.SetPlayRate(length);
 }
 
-void AHunter::InteractHealArea_Implementation()
-{
-	HealPerSecondAmount = 10.f;
-}
-
-void AHunter::OutHealArea_Implementation()
-{
-	HealPerSecondAmount = 1.f;
-}
-
-void AHunter::InteractPotion_Implementation(float HealAmount)
-{
-	SetHP(GetHP() + HealAmount);
-}
-
-void AHunter::InteractEarthquake_Implementation()
-{
-	if (GetCharacterMovement()->IsFalling()) return;
-
-	if (bInvincible) return;
-
-	SetStamina(HunterStamina - 30.f);
-
-	LaunchCharacter(FVector(0, 0, 1000), false, false);
-}
-
-void AHunter::InteractAttack_Implementation(FVector HitDirection, float DamageAmount)
-{
-	if (DamageAmount <= 0.f || bDamaged)
-	{
-		return;
-	}
-
-	if (bInvincible) return;
-
-	if (HitDirection.Z < 0.f) HitDirection.Z *= -1;
-	if (HitDirection.Z <= 0.3f) HitDirection.Z = 0.35f;
-
-	//bDamaged = true;
-	FVector TargetVec = FVector(HitDirection.X * -1, HitDirection.Y * -1, 0);
-	FRotator TargetRot = TargetVec.Rotation();
-	TargetRot.Pitch = 0;
-	SetActorRelativeRotation(TargetRot);
-	CurState = EPlayerState::Knockback;
-	
-	LaunchCharacter(HitDirection * 1000.f,false,false);
-	bNoCollision = true;
-	SetActorEnableCollision(false);
-}
-
-void AHunter::InteractGrabAttack_Implementation()
-{
-	bNoCollision = true;
-	FRotator TargetRot = FVector::ZeroVector.Rotation();
-	//SetActorRelativeRotation(TargetRot);
-}
-
-void AHunter::InteractWideAttack_Implementation(float DamageAmount)
-{
-	if (DamageAmount <= 0.f || bDamaged)
-	{
-		return;
-	}
-
-	if (bInvincible) return;
-
-	CurState = EPlayerState::Knockback;
-	LaunchCharacter(FVector(0,0,1000), false, false);
-	bNoCollision = true;
-	SetActorEnableCollision(false);
-}
 
 void AHunter::SetPartnerSkill(TArray<ESkillID> SkillArray, int SkillListNum)
 {
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < NUMOFSKILLS; ++i)
 	{
-		HunterInfo.PartnerSkillArray[4 * SkillListNum + i] = SkillArray[i];
+		HunterInfo.PartnerSkillArray[NUMOFSKILLS * SkillListNum + i] = SkillArray[i];
 		gameinstance->PartnerSkillArray[i] = SkillArray[i];
 	}
 }
 
 void AHunter::SetPartnerTarget(ACharacter* setTarget)
 {
-	if (Partner != NULL)
-	{
-		Partner->SetTarget(setTarget);
-	}
-	
+	if (Partner == NULL) return;
+
+	Partner->SetTarget(setTarget);
 }
 
 void AHunter::SetPartner(APartner* SelectedPartner)
 {
 	Partner = SelectedPartner;
-	//gameinstance->myPartner = EPartnerType::WolfPartner;
 }
 
 bool AHunter::SuccessUseSkill(ESkillID SkillID)
@@ -1020,41 +873,8 @@ bool AHunter::SuccessUseSkill(ESkillID SkillID)
 	return true;
 }
 
-bool AHunter::CheckUseSkill(ESkillID SkillID)
-{
-	for (auto& SkillInfo : SkillInfoArray)
-	{
-		if (SkillInfo.ID == SkillID)
-		{
-			bool bCanUse = SkillInfo.CheckReady();
-			if (bCanUse)
-			{
-				bUpperOnly = true;
-				ServerPlayMontage(FName("Order"));
-				ServerUsePartnerNormalSkill(Partner, HunterInfo.PartnerSkillArray[static_cast<int>(PartnerType) * 4 + 0]);
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-	return false;
-}
-
 void AHunter::UpdateSkillSlots_Implementation()
 {
-}
-
-void AHunter::ServerStartInvincibility_Implementation()
-{
-	MultiStartInvincibility();
-}
-
-void AHunter::MultiStartInvincibility_Implementation()
-{
-	bInvincible = true;
 }
 
 void AHunter::StartInvincibility()
@@ -1068,28 +888,23 @@ void AHunter::SetInstallMode()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	Cast<UCharacterMovementComponent>(GetCharacterMovement())->MaxWalkSpeed = WalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	if (CurState == EPlayerState::Zoom)
 	{
-		//SetActorRelativeRotation(FRotator(0, GetControlRotation().Yaw, GetControlRotation().Roll));
 		HunterAnim->StopAllMontages(0.2f);
 	}
 	
-	//shot or zoom start shut down/ BlendTime Option
-	
 	CurState = EPlayerState::Idle;
-	
 }
 
-void AHunter::ServerSetPartnerPosition_Implementation(APartner* MyPartner, const FVector& LocVec)
+void AHunter::ServerSetPartnerPosition_Implementation(const FVector& LocVec)
 {
 	MultiSetPartnerPosition(LocVec);
 }
 
 void AHunter::MultiSetPartnerPosition_Implementation(const FVector& LocVec)
 {
-	Partner->TargetPos = LocVec;
-	Partner->bOrdered = true;
+	Partner->SetPosition(LocVec);
 }
 
 
@@ -1099,11 +914,6 @@ void AHunter::ServerSpawnPartner_Implementation(TSubclassOf<APartner> SpawnPartn
 	Partner = NewPartner;
 	NewPartner->Hunter = this;
 	NewPartner->CurState = EPartnerState::MoveTarget;
-}
-
-void AHunter::MultiSetPartner_Implementation (APartner* NewPartner)
-{
-	SetPartner(NewPartner);
 }
 
 void AHunter::ServerUsePotion_Implementation(TSubclassOf<AItem> SpawnItemClass)
@@ -1162,14 +972,9 @@ void AHunter::ServerSpawnItem_Implementation(TSubclassOf<AItem> SpawnItemClass, 
 	}
 }
 
-void AHunter::ServerUsePartnerNormalSkill_Implementation(APartner* MyPartner,ESkillID SkillID)
+void AHunter::ServerUsePartnerSkill_Implementation(ESkillID SkillID)
 {
-	MyPartner->MultiUseNormalSkill(SkillID);
-}
-
-void AHunter::ServerUsePartnerSpecialSkill_Implementation(APartner* MyPartner, ESkillID SkillID)
-{
-	MyPartner->MultiUseSpecialSkill(SkillID);
+	Partner->MultiUseSkill(SkillID);
 }
 
 void AHunter::UpdateQuickSlot_Implementation(const FItemCnter& info, int index)
@@ -1181,9 +986,9 @@ void AHunter::UpdateQuickSlots_Implementation()
 }
 
 
-void AHunter::ServerCancelOrder_Implementation(APartner* MyPartner)
+void AHunter::ServerCancelOrder_Implementation()
 {
-	MyPartner->MultiCancelOrder();
+	Partner->MultiCancelOrder();
 }
 
 void AHunter::SetStamina(float setStamina)
@@ -1249,18 +1054,6 @@ void AHunter::Reload(float DeltaTime)
 		SkillInfo.CheckTime(DeltaTime);
 	}
 	UpdateSkillSlots();
-}
-
-void AHunter::ServerSpawnEffect_Implementation(class UNiagaraSystem* Niagara, const FVector& SpawnLoc)
-{
-	MultiSpawnEffect(Niagara, SpawnLoc);
-}
-
-
-void AHunter::MultiSpawnEffect_Implementation(class UNiagaraSystem* Niagara, const FVector& SpawnLoc)
-{
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HealEffect, SpawnLoc);
-
 }
 
 void AHunter::OnRep_Material()

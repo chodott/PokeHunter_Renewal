@@ -100,57 +100,13 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 	return false;
 }
 
-void UInventoryComponent::ChangeSlot(AActor* Storage, FName TargetName, int TargetIndex, FName GoalName, int GoalIndex)
+
+void UInventoryComponent::ChangeSlot(UInventoryComponent* otherInventory, int thisIndex, int otherIndex)
 {
-	ANpcStorage* StorageNpc;
 	FItemCnter temp;
-	if (TargetName == "Inventory")
-	{
-		temp = InfoArray[TargetIndex];
-		if (GoalName == "Inventory")
-		{
-			InfoArray[TargetIndex] = InfoArray[GoalIndex];
-			InfoArray[GoalIndex] = temp;
-		}
-		else 
-		{
-			StorageNpc = Cast<ANpcStorage>(Storage);
-			if (StorageNpc)
-			{
-				InfoArray[TargetIndex] = StorageNpc->Storage->InfoArray[GoalIndex];
-				StorageNpc->Storage->InfoArray[GoalIndex] = temp;
-			}
-		}
-	}
-
-	else if (TargetName == "Storage")
-	{
-		StorageNpc = Cast<ANpcStorage>(Storage);
-
-		if (StorageNpc)
-		{
-			temp = StorageNpc->Storage->InfoArray[TargetIndex];
-
-			if (GoalName == "Inventory")
-			{
-				StorageNpc->Storage->InfoArray[TargetIndex] = InfoArray[GoalIndex];
-				InfoArray[GoalIndex] = temp;
-			}
-			else
-			{
-				StorageNpc->Storage->InfoArray[TargetIndex] = StorageNpc->Storage->InfoArray[GoalIndex];
-				StorageNpc->Storage->InfoArray[GoalIndex] = temp;
-			}
-		}
-	}
-
-}
-
-void UInventoryComponent::SwapSlot(int TargetIndex, int GoalIndex)
-{
-	FItemCnter Temp = InfoArray[TargetIndex];
-	InfoArray[TargetIndex] = InfoArray[GoalIndex];
-	InfoArray[GoalIndex] = Temp;
+	temp = InfoArray[thisIndex];
+	InfoArray[thisIndex] = otherInventory->InfoArray[otherIndex];
+	otherInventory->InfoArray[otherIndex] = temp;
 }
 
 int UInventoryComponent::GetItemCnt(FName id)

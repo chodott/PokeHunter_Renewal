@@ -39,9 +39,7 @@ public:
 	bool AddItemData(FItemCnter ItemCnter);
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeSlot(AActor* Storage, FName TargetName, int TargetIndex, FName GoalName, int GoalIndex);
-	UFUNCTION(BlueprintCallable)
-	void SwapSlot(int TargetIndex, int GoalIndex);
+	void ChangeSlot(UInventoryComponent* otherInventory, int thisIndex, int otherIndex);
 	UFUNCTION(BlueprintCallable)
 	int GetItemCnt(FName id);
 	UFUNCTION(BlueprintCallable)

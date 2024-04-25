@@ -66,7 +66,6 @@ FSkillInfo ADatabaseActor::FindSkill(ESkillID SkillID)
 		{
 			return Skill;
 		}
-	
 	}
 
 	FSkillInfo info;

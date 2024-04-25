@@ -45,8 +45,6 @@ AEnemyController::AEnemyController()
 void AEnemyController::BeginPlay()
 {
 	Super::BeginPlay();
-
-
 }
 
 void AEnemyController::OnPossess(APawn* pawn)
@@ -61,6 +59,8 @@ void AEnemyController::OnPossess(APawn* pawn)
 void AEnemyController::OnPerception(AActor* Actor, FAIStimulus Stimulus)
 {
 	IGenericTeamAgentInterface* TeamAgent = Cast<IGenericTeamAgentInterface>(Actor);
+	//if (TeamAgent == NULL) return;
+
 	switch (Stimulus.Type)
 	{
 	case 0:
@@ -69,6 +69,7 @@ void AEnemyController::OnPerception(AActor* Actor, FAIStimulus Stimulus)
 			Enemy->SeeNewTarget(Actor);
 		}
 		break;
+
 	case 1:
 		FVector SoundLoc = Stimulus.StimulusLocation;
 		Enemy->HearSound(SoundLoc, Actor);
@@ -89,7 +90,6 @@ bool AEnemyController::FindAgroActor()
 			Enemy->bWaitingAgro = false;
 			Enemy->CurState = EEnemyState::Roar;
 			return true;
-
 		}
 	}
 	return false;

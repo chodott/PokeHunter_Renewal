@@ -57,11 +57,6 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 			{
 				InfoArray[i].cnt += ItemCnt;
 
-				/*if (FarmingArray[i].ItemID == FName("None")) {
-					FarmingArray[i].ItemID = InfoArray[i].ItemID;
-				}
-				FarmingArray[i].cnt += ItemCnt;*/
-
 				for (auto& item : FarmingArray) {
 					if (item.ItemID == ItemName) {
 						item.cnt += ItemCnt;
@@ -105,38 +100,6 @@ bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
 	return false;
 }
 
-// 사용처 없음
-bool UInventoryComponent::AddItemInfo(FName ItemID, int Cnt)
-{
-	int NullNum = -1;
-	for (int i = 0; i < capacity; ++i)
-	{
-		if (NullNum == -1 && InfoArray[i].ItemID.IsNone()) NullNum = i;
-		else if (!InfoArray[i].ItemID.IsNone())
-		{
-			if (InfoArray[i].ItemID == ItemID)
-			{
-				InfoArray[i].cnt += Cnt;
-				// FarmingArray[i].cnt += Cnt;
-				return true;
-			}
-		}
-	}
-
-	if (NullNum != -1)
-	{
-		InfoArray[NullNum].ItemID = ItemID;
-		InfoArray[NullNum].cnt = Cnt;
-
-		// FarmingArray[NullNum].ItemID = ItemID;
-		// FarmingArray[NullNum].cnt = Cnt;
-		return true;
-	}
-
-	return false;
-}
-
-
 void UInventoryComponent::ChangeSlot(AActor* Storage, FName TargetName, int TargetIndex, FName GoalName, int GoalIndex)
 {
 	ANpcStorage* StorageNpc;
@@ -172,10 +135,6 @@ void UInventoryComponent::ChangeSlot(AActor* Storage, FName TargetName, int Targ
 			{
 				StorageNpc->Storage->InfoArray[TargetIndex] = InfoArray[GoalIndex];
 				InfoArray[GoalIndex] = temp;
-				//Log Print
-				/*UE_LOG(LogTemp, Warning, TEXT("\n\n[StorageNpc info]\nName: %s\nCnt: %d\n\n"), *temp.ItemID.ToString(), temp.cnt);
-				UE_LOG(LogTemp, Warning, TEXT("\n\n[InfoArray info]\nName: %s\nCnt: %d\n\n"), *InfoArray[GoalIndex].ItemID.ToString(), InfoArray[GoalIndex].cnt);
-				UE_LOG(LogTemp, Warning, TEXT("\n\n[Index]\nTargetIndex: %d\nGoalIndex: %d\n\n"), TargetIndex, GoalIndex);*/
 			}
 			else
 			{

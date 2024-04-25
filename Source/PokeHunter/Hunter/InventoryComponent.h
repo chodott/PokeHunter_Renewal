@@ -35,10 +35,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION()
-	bool AddItemData(FItemCnter ItemCnter);
 	UFUNCTION(BlueprintCallable)
-	bool AddItemInfo(FName ItemID, int Cnt);
+	bool AddItemData(FItemCnter ItemCnter);
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeSlot(AActor* Storage, FName TargetName, int TargetIndex, FName GoalName, int GoalIndex);

@@ -172,12 +172,6 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 {
 	if (HP <= 0 || CurState == EEnemyState::Die) return 0;
 	
-	//if (bWeaken)
-	//{	//무력화
-	//	DamageAmount *= 2;
-	//	bWeaken = false;
-	//}
-
 	//Item Hit && HitLocation
 	AItem* HitItem = Cast<AItem>(DamageCauser);
 
@@ -241,16 +235,6 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			}
 		}
 		ServerPlayMontage(this, FName("Hit"));
-
-		//그로기 반영 x
-			//if (bGrogy)
-			//{
-			//	//그로기 시 애니메이션 생략
-			//}
-			//else
-			//{
-			//	ServerPlayMontage(this, FName("Hit"));
-			//}
 	}
 
 	//Damage and UI
@@ -531,7 +515,6 @@ void AEnemy::LaunchToTarget()
 		bool JumpResult = false;
 		while (!JumpResult)
 		{
-			//개선 필요
 			JumpResult = UGameplayStatics::SuggestProjectileVelocity(this, Velocity, StartPos, EndPos,
 				Speed, false, 0.f, GetWorld()->GetGravityZ(), ESuggestProjVelocityTraceOption::DoNotTrace);
 			Speed += 100.f;
@@ -554,7 +537,6 @@ void AEnemy::Reflect()
 	IgnoreActors.Add(this);
 	UGameplayStatics::ApplyRadialDamage(GetWorld(), ReflectDamgeAmount, ExplosionLocation, DamageRadius, UDamageType::StaticClass(), IgnoreActors, GetController(), false);
 
-	UE_LOG(LogTemp, Warning, TEXT("%f"), ReflectDamgeAmount);
 
 	bReflecting = false;
 	ReflectDamgeAmount = 0.f;

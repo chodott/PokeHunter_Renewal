@@ -458,8 +458,8 @@ void AHunter::MultiRoll_Implementation(const FVector& LastInputVec)
 
 void AHunter::MoveForward(float Val)
 {
-	if (CurState != EPlayerState::Zoom || CurState != EPlayerState::Idle ||
-		bGrabbed) return;
+	if ((CurState != EPlayerState::Zoom && CurState != EPlayerState::Idle) 
+		||bGrabbed) return;
 	if (Val != 0.0f)
 	{
 		FHitResult HitResult;
@@ -478,8 +478,8 @@ void AHunter::MoveForward(float Val)
 
 void AHunter::MoveRight(float Val)
 {
-	if (CurState != EPlayerState::Zoom	||CurState != EPlayerState::Idle || 
-		bGrabbed) return;
+	if ((CurState != EPlayerState::Zoom && CurState != EPlayerState::Idle) 
+		|| bGrabbed) return;
 	
 	if (Val != 0.0f)
 	{
@@ -897,16 +897,6 @@ void AHunter::SetInstallMode()
 	CurState = EPlayerState::Idle;
 }
 
-void AHunter::ServerSetPartnerPosition_Implementation(const FVector& LocVec)
-{
-	MultiSetPartnerPosition(LocVec);
-}
-
-void AHunter::MultiSetPartnerPosition_Implementation(const FVector& LocVec)
-{
-	Partner->SetPosition(LocVec);
-}
-
 
 void AHunter::ServerSpawnPartner_Implementation(TSubclassOf<APartner> SpawnPartnerClass, const FVector& SpawnLoc)
 {
@@ -970,6 +960,11 @@ void AHunter::ServerSpawnItem_Implementation(TSubclassOf<AItem> SpawnItemClass, 
 		}
 		break;
 	}
+}
+
+void AHunter::ServerSetPartnerPosition_Implementation(const FVector& LocVec)
+{
+	Partner->MultiSetPosition(LocVec);
 }
 
 void AHunter::ServerUsePartnerSkill_Implementation(ESkillID SkillID)

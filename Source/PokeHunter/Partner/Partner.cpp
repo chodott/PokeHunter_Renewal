@@ -223,6 +223,11 @@ void APartner::MultiSetHunter_Implementation(class AHunter* OwnerHunter)
 	FollowHunter(OwnerHunter);
 }
 
+void APartner::MultiSetPosition_Implementation(const FVector& LocVec)
+{
+	SetPosition(LocVec);
+}
+
 void APartner::SetPosition(const FVector& LocVec)
 {
 	TargetPos = LocVec;

@@ -57,7 +57,7 @@ public:
 
 	UBaseInstance* baseinstace;
 
-	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintReadOnly)
 	FVector TargetPos;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	FVector LookTargetVec;
@@ -133,6 +133,7 @@ public:
 	virtual void CancelOrder();
 	void SetTarget(ACharacter* setTarget);
 	void FollowHunter(class AHunter* Hunter);
+	void SetPosition(const FVector& LocVec);
 
 	virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 
@@ -147,8 +148,8 @@ public:
 	void ServerStopMontage(APartner* Partner);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiStopMontage(APartner* Partner);
-
-	void SetPosition(const FVector& LocVec);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiSetPosition(const FVector& LocVec);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiSetHunter(class AHunter* OwnerHunter);
 	UFUNCTION(NetMulticast, Reliable)

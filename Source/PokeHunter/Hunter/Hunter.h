@@ -253,10 +253,8 @@ public:
 	//Partner RPC
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnPartner(TSubclassOf <APartner> SpawnPartnerClass, const FVector& SpawnLoc);
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(Server, Reliable)
 	void ServerSetPartnerPosition(const FVector& LocVec);
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiSetPartnerPosition(const FVector& LocVec);
 	UFUNCTION(Server, Reliable)
 	void ServerUsePartnerSkill(ESkillID SkillID);
 	UFUNCTION(Server, Reliable)

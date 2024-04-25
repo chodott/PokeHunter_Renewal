@@ -22,7 +22,6 @@ APartnerController::APartnerController()
 		BTPartner = BTObject.Object;
 	}
 	
-	
 }
 
 void APartnerController::OnPossess(APawn* pawn)

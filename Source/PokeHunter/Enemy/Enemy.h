@@ -8,6 +8,7 @@
 #include "PokeHunter/Base/PartnerSkillInterface.h"
 #include "PokeHunter/Base/ItemInteractInterface.h"
 #include "PokeHunter/Base/EnemyInteractInterface.h"
+#include "PokeHunter/Base/BaseCharacter.h"
 #include "Enemy.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnMontageEndDelegate);

@@ -51,16 +51,8 @@ void AItemDropActor::Tick(float DeltaTime)
 				DropItemArray[RandIndex].cnt += 1;
 			}
 
-			for (int i = 0; i < DropItemArray.Num(); ++i)
-			{
-				bool bAddSuccess = Master->Inventory->AddItemData(DropItemArray[i]);
-				if (!bAddSuccess)
-				{
-					return;
-				}
-
-			}
-			//획득 처리 모션 추가 필요
+			Master->TakeItem(DropItemArray);
+			
 			ServerDestroy();
 			return;
 		}

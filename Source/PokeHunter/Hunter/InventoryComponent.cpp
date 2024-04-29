@@ -32,72 +32,46 @@ void UInventoryComponent::BeginPlay()
 
 	for (int i = ArrayLength; i < capacity; i++)
 	{
-		//아이템 struct
 		InfoArray.AddDefaulted();
-		FarmingArray.AddDefaulted();
 	}
 
 }
 
-bool UInventoryComponent::AddItemData(FItemCnter ItemCnter)
+bool UInventoryComponent::AddItemData(TArray<FItemCnter>& ItemCnterArray)
 {
-	int NullNum = -1;
-	FName ItemName = ItemCnter.ItemID;
-	int ItemCnt = ItemCnter.cnt;
+	TMap<FName, TArray<int>> IndexMap;
+	bool bInventoryFull = false;
+	bool bAddAllItem = true;
+	IndexMap.Add("None", {});
 
 	for (int i = 0; i < capacity; ++i)
 	{
-		if (NullNum == -1 && InfoArray[i].ItemID == FName("None")) 
-		{
-			NullNum = i;
-		}
-		else if (InfoArray[i].ItemID != FName("None"))
-		{
-			if (InfoArray[i].ItemID == ItemName) 
-			{
-				InfoArray[i].cnt += ItemCnt;
-
-				for (auto& item : FarmingArray) {
-					if (item.ItemID == ItemName) {
-						item.cnt += ItemCnt;
-						return true;
-					}
-				}
-				for (auto& item : FarmingArray) {
-					if (item.ItemID == FName("None")) {
-						item = ItemCnter;
-						return true;
-					}
-				}
-
-				return true;
-			}
-		}
+		FName& ItemName = InfoArray[i].ItemID;
+		if (IndexMap.Find(ItemName) == nullptr) IndexMap.Add(ItemName, { i });
+		else IndexMap[ItemName].Emplace(i);
 	}
+	bInventoryFull = IndexMap["None"].IsEmpty();
 
-	if (NullNum != -1)
+	for (auto& Item : ItemCnterArray)
 	{
-		//Find Object Need
-		InfoArray[NullNum].ItemID = ItemName;
-		InfoArray[NullNum].cnt += ItemCnt;
-
-		for (auto& item : FarmingArray) {
-			if (item.ItemID == ItemName) {
-				item.cnt += ItemCnt;
-				return true;
+		FName& ItemName = Item.ItemID;
+		if (IndexMap.Contains(ItemName) == false)
+		{
+			if (bInventoryFull)
+			{
+				bAddAllItem = false;
+				continue;
 			}
+			int index = IndexMap["None"][0];
+			InfoArray[index] = Item;
 		}
-		for (auto& item : FarmingArray) {
-			if (item.ItemID == FName("None")) {
-				item = ItemCnter;
-				return true;
-			}
+		else
+		{
+			int index = IndexMap[ItemName][0];
+			InfoArray[index].cnt += Item.cnt;
 		}
-
-		return true;
 	}
-
-	return false;
+	return bAddAllItem;
 }
 
 

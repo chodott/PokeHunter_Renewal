@@ -21,9 +21,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FItemCnter> InfoArray;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FItemCnter> FarmingArray;
-
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int capacity = 24;
 
@@ -36,8 +33,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	bool AddItemData(FItemCnter ItemCnter);
-
+	bool AddItemData(UPARAM(ref) TArray<FItemCnter>& ItemCnterArray);
 	UFUNCTION(BlueprintCallable)
 	void ChangeSlot(UInventoryComponent* otherInventory, int thisIndex, int otherIndex);
 	UFUNCTION(BlueprintCallable)

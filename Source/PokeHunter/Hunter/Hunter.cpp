@@ -1134,3 +1134,8 @@ void AHunter::MulticastGetALLNames_Implementation(FName newName)
 {
 	huntersName.AddUnique(newName);
 }
+
+void AHunter::TakeItem(TArray<FItemCnter>& ItemCnterArray)
+{
+	Inventory->AddItemData(ItemCnterArray);
+}

@@ -273,6 +273,8 @@ public:
 	void ServerInteractObject(AInteractActor* TargetActor);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiInteractObject();
+	UFUNCTION(BlueprintCallable)
+	void TakeItem(UPARAM(ref) TArray<FItemCnter>& ItemCnterArray);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateQuickSlot(const FItemCnter& info, int index);

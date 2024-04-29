@@ -15,15 +15,13 @@ APotion::APotion()
 
 }
 
-void APotion::UseItem_Implementation(APawn* ItemOwner)
+void APotion::UseItem_Implementation(AHunter* ItemOwner)
 {
-	AHunter* Hunter = Cast<AHunter>(ItemOwner);
-	if (Hunter) Hunter->HP += HealAmount;
-	
+	ItemOwner->HP += HealAmount;	
 }
 
 
-void APotion::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
+void APotion::UseItem(AHunter* ItemOwner, FVector InitialPos, FVector EndPos)
 {
 	StaticMesh->SetSimulatePhysics(true);
 	StaticMesh->SetEnableGravity(true);
@@ -45,7 +43,7 @@ void APotion::MultiAttachPotion_Implementation(AHunter* ItemOwner)
 	AttachToComponent(ItemOwner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("PotionSocket"));
 }
 
-void APotion::MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector InitialPos, FVector EndPos)
+void APotion::MultiLaunchBullet_Implementation(AHunter* BulletOwner, FVector InitialPos, FVector EndPos)
 {
 	StaticMesh->SetSimulatePhysics(true);
 	StaticMesh->SetEnableGravity(true);

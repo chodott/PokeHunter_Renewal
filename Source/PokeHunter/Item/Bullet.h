@@ -50,11 +50,11 @@ public:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	virtual void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos);
+	virtual void UseItem(AHunter* ItemOwner, FVector InitialPos, FVector EndPos);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiLaunchBullet(APawn* BulletOwner, FVector InitialPos, FVector EndPos);
-	virtual void MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector InitialPos, FVector EndPos);
+	void MultiLaunchBullet(AHunter* BulletOwner, FVector InitialPos, FVector EndPos);
+	virtual void MultiLaunchBullet_Implementation(AHunter* BulletOwner, FVector InitialPos, FVector EndPos);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnHitNotEnemy(const FVector& HitVec);

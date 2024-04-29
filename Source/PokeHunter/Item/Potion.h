@@ -24,11 +24,11 @@ public:
 
 public:
 
-	void UseItem_Implementation(APawn* ItemOwner)override;
-	void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)override;
+	void UseItem_Implementation(class AHunter* ItemOwner)override;
+	void UseItem(class AHunter* ItemOwner, FVector InitialPos, FVector EndPos)override;
 	void ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherComponent);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiAttachPotion(class AHunter* ItemOwner);
-	virtual void MultiLaunchBullet_Implementation(APawn* BulletOwner, FVector InitialPos, FVector EndPos) override;
+	virtual void MultiLaunchBullet_Implementation(class AHunter* BulletOwner, FVector InitialPos, FVector EndPos) override;
 };

@@ -38,14 +38,19 @@ void AItem::Tick(float DeltaTime)
 
 }
 
-void AItem::UseItem_Implementation(APawn* ItemOwner)
+void AItem::UseItem_Implementation(AHunter* ItemOwner)
 {
 
 }
 
-void AItem::UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos)
+void AItem::UseItem(AHunter* ItemOwner, FVector InitialPos, FVector EndPos)
 {
 
+}
+
+void AItem::AnnounceTarget(ACharacter* target)
+{
+	ThisOwner->SetPartnerTarget(target);
 }
 
 void AItem::MultiDestroy_Implementation()

@@ -28,7 +28,7 @@ public:
 	USceneComponent* SceneRootComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class APawn* ThisOwner;
+	class AHunter* ThisOwner;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh")
 	class UStaticMeshComponent* StaticMesh;
@@ -43,11 +43,12 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION(BlueprintNativeEvent)
-	void UseItem(APawn* ItemOwner);
-	virtual void UseItem_Implementation(APawn* ItemOwner);
-	virtual void UseItem(APawn* ItemOwner, FVector InitialPos, FVector EndPos);
+	void UseItem(class AHunter* ItemOwner);
+	virtual void UseItem_Implementation(class AHunter* ItemOwner);
+	virtual void UseItem(class AHunter* ItemOwner, FVector InitialPos, FVector EndPos);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ApplyAbillity(AActor* OtherActor, UPrimitiveComponent* OtherComponent);
+	void AnnounceTarget(class ACharacter* target);
 
 
 	//Replicate

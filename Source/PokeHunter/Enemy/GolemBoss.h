@@ -127,8 +127,6 @@ public:
 	//Normal Attack
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
 	TArray<float> NormalAttackRange;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
-	TArray<FPatternInfo> PatternManageArray;
 
 	//Cupcake Attack
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Battle")
@@ -170,6 +168,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void DestroyPart(const FName& PartName);
 	void DeleteHitBox(const FName& PartName);
+	void DestroyLeftArm();
+	void DestroyRightArm();
+	void fallDown();
 	virtual void Die();
 
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
@@ -198,7 +199,7 @@ public:
 	void LaunchBombs();
 
 	UFUNCTION(BlueprintCallable)
-		void DropBombs();
+	void DropBombs();
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnCupcake();

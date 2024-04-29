@@ -43,7 +43,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
 
 	UHitBoxComponent();
-	bool TakeDamage(float DamageAmount);
+	void TakeDamage(float DamageAmount);
 	bool CheckBurning(float DeltaTime);
 
 	void SetChild(class UHitBoxComponent* ChildBox);
@@ -51,10 +51,9 @@ public:
 
 	//Replication
 	UFUNCTION(Server, Reliable)
-	void ServerDestroyPart();
+	void ServerDestroyPart(class AGolemBoss* Golem);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiDestroyPart();
-	void DestroyPart();
+	void MultiDestroyPart(class AGolemBoss* Golem);
 	void DestroyPart(class AGolemBoss* Golem);
 
 };

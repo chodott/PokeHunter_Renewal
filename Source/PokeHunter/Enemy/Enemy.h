@@ -186,10 +186,10 @@ public:
 	//Replication
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
 
-	UFUNCTION(Server, Reliable)
-	void ServerPlayMontage(AEnemy* Enemy, FName Section);
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerPlayMontage(FName Section);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiPlayMontage(AEnemy* Enemy, FName Section);
+	void MultiPlayMontage(FName Section);
 	UFUNCTION(Server, Reliable)
 	void ServerStartBinding();
 	UFUNCTION(NetMulticast, Reliable)

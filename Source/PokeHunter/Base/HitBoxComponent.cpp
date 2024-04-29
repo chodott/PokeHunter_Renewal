@@ -21,17 +21,26 @@ void UHitBoxComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 }
 
 
-bool UHitBoxComponent::TakeDamage(float DamageAmount)
+void UHitBoxComponent::TakeDamage(float DamageAmount)
 {
-	if (bDestroyed) return false;
+	if (bDestroyed) return;
 	PartHP -= DamageAmount;
 	if (PartHP <= 0)
 	{
 		bDestroyed = true;
-		return true;
+		AGolemBoss* Golem = Cast<AGolemBoss>(GetOwner());
+		//BlueprintNative Event È£Ãâ
+		ServerDestroyPart(Golem);
+		FString partName = GetAttachSocketName().ToString();
+		if (partName.Contains("Left"))
+		{	//¿ÞÆÈ ºÎÀ§ ÆÄ±«
+			Golem->DestroyLeftArm();
+		}
+		else
+		{	//¿À¸¥ÆÈ ºÎÀ§ÆÄ±«
+			Golem->DestroyRightArm();
+		}
 	}
-	
-	return false;
 }
 
 bool UHitBoxComponent::CheckBurning(float DeltaTime)
@@ -66,41 +75,14 @@ void UHitBoxComponent::SetChild(UHitBoxComponent* ChildBox )
 	ChildHitbox = ChildBox;
 }
 
-void UHitBoxComponent::ServerDestroyPart_Implementation()
+void UHitBoxComponent::ServerDestroyPart_Implementation(AGolemBoss* Golem)
 {
-	MultiDestroyPart();
+	MultiDestroyPart(Golem);
 }
 
-void UHitBoxComponent::MultiDestroyPart_Implementation()
+void UHitBoxComponent::MultiDestroyPart_Implementation(AGolemBoss* Golem)
 {
-	AGolemBoss* Golem = Cast<AGolemBoss>(GetOwner());
-	if (Golem)
-	{
-		if (ChildHitbox)
-		{
-			ChildHitbox->DestroyPart(Golem);
-		}
-
-		Golem->DeleteHitBox(GetAttachSocketName());
-
-		DestroyComponent();
-	}
-}
-
-void UHitBoxComponent::DestroyPart()
-{
-	AGolemBoss* Golem = Cast<AGolemBoss>(GetOwner());
-	if (Golem)
-	{
-		if (ChildHitbox)
-		{
-			ChildHitbox->DestroyPart(Golem);
-		}
-
-		Golem->DeleteHitBox(GetAttachSocketName());
-
-		DestroyComponent();
-	}
+	DestroyPart(Golem);
 }
 
 void UHitBoxComponent::DestroyPart(AGolemBoss* Golem)
@@ -109,7 +91,8 @@ void UHitBoxComponent::DestroyPart(AGolemBoss* Golem)
 	{
 		ChildHitbox->DestroyPart(Golem);
 	}
-	Golem->DeleteHitBox(GetAttachSocketName());
 
+	Golem->DeleteHitBox(GetAttachSocketName());
+	Golem->DestroyPart(GetAttachSocketName());
 	DestroyComponent();
 }

@@ -215,7 +215,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	{
 		//사망 애니메이션
 		bDied = true;
-		ServerPlayMontage(this, FName("Die"));
+		ServerPlayMontage(FName("Die"));
 		auto* EnemyController = Cast<AEnemyController>(GetController());
 		if (EnemyController) EnemyController->StopAI();
 	}
@@ -234,7 +234,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 				Target = Hunter;
 			}
 		}
-		ServerPlayMontage(this, FName("Hit"));
+		ServerPlayMontage(FName("Hit"));
 	}
 
 	//Damage and UI
@@ -267,13 +267,13 @@ void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 	DOREPLIFETIME(AEnemy, bWeaken);
 }
 
-void AEnemy::ServerPlayMontage_Implementation(AEnemy* Enemy, FName Section)
+void AEnemy::ServerPlayMontage_Implementation(FName Section)
 {
-	MultiPlayMontage(this, Section);
+	MultiPlayMontage(Section);
 }
 
 
-void AEnemy::MultiPlayMontage_Implementation(AEnemy* Enemy, FName Section)
+void AEnemy::MultiPlayMontage_Implementation(FName Section)
 {
 	EnemyAnim->PlayCombatMontage(Section, true);
 	if (EnemySubAnim) EnemySubAnim->PlayCombatMontage(Section, true);
@@ -442,7 +442,7 @@ void AEnemy::Attack(int AttackPattern)
 	if (Target != NULL)
 	{
 		CurState = EEnemyState::NormalAttack;
-		ServerPlayMontage(this, FName("Attack"));
+		ServerPlayMontage( FName("Attack"));
 	}
 }
 
@@ -462,39 +462,36 @@ void AEnemy::LongAttack()
 void AEnemy::Roar()
 {
 	if (EnemyAnim == NULL) return;
-	ServerPlayMontage(this, FName("Roar"));
-	//EnemyAnim->PlayCombatMontage(TEXT("Roar"));
+	ServerPlayMontage(FName("Roar"));
 }
 
 void AEnemy::Patrol()
 {
 	if (EnemyAnim == NULL) return;
-	ServerPlayMontage(this, FName("Patrol"));
-	//EnemyAnim->PlayCombatMontage(TEXT("Patrol"));
+	ServerPlayMontage(FName("Patrol"));
 }
 
 void AEnemy::JumpAttack()
 {
 	CurState = EEnemyState::JumpAttack;
-	//ServerPlayMontage(this, FName("Attack_Jump"));
 }
 
 void AEnemy::ChargeAttack()
 {
 	CurState = EEnemyState::ChargeAttack;
-	ServerPlayMontage(this, FName("ChargeAttack"));
+	ServerPlayMontage(FName("ChargeAttack"));
 }
 
 
 void AEnemy::RushAttack()
 {
-	ServerPlayMontage(this, FName("Slide_Start"));
+	ServerPlayMontage(FName("Slide_Start"));
 	CurState = EEnemyState::RushAttack;
 }
 
 void AEnemy::WideAttack()
 {
-	ServerPlayMontage(this, FName("WideAttack"));
+	ServerPlayMontage( FName("WideAttack"));
 	CurState = EEnemyState::WideAttack;
 
 }

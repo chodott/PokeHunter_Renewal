@@ -95,20 +95,6 @@ void AGolemBoss::Tick(float DeltaTime)
 		}
 	}
 
-
-	/*for (auto& Hitbox : HitBoxArray)
-	{
-		if (Hitbox.HitBoxComponent)
-		{
-			if (Hitbox.HitBoxComponent->CheckBurning(DeltaTime))
-			{
-				float DamageAmount = 1;
-				HP -= DamageAmount;
-				OnDamage.Broadcast(DamageAmount, Hitbox.HitBoxComponent->GetComponentLocation());
-			}
-		}
-	}*/
-
 	if (GetLocalRole() == ROLE_Authority)
 	{
 		if (Target != NULL && !EnemyAnim->bPlaying)
@@ -133,20 +119,6 @@ void AGolemBoss::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	/*HitBoxArray.Reserve(9);
-
-	HitBoxArray.Add(FHitBoxInfo(FName("HeadSocket"), HeadHitBox));
-	HitBoxArray.Add(FHitBoxInfo(FName("Body"), BodyHitBox));
-	HitBoxArray.Add(FHitBoxInfo(FName("RightHand"), RightHandHitBox));
-			
-	HitBoxArray.Add(FHitBoxInfo(FName("RightArm"), RightArmHitBox));
-	HitBoxArray.Add(FHitBoxInfo(FName("RightShoulder"), RightShoulderHitBox));
-	HitBoxArray.Add(FHitBoxInfo(FName("LeftHand"), LeftHandHitBox));
-				
-	HitBoxArray.Add(FHitBoxInfo(FName("LeftArm"), LeftArmHitBox));
-	HitBoxArray.Add(FHitBoxInfo(FName("RightLeg"), RightLegHitBox));
-	HitBoxArray.Add(FHitBoxInfo(FName("LeftLeg"), LeftLegHitBox));*/
-
 	HitBoxMap.Add("HeadSocket", HeadHitBox);
 	HitBoxMap.Add("Body", BodyHitBox);
 	HitBoxMap.Add("RightHand", RightHandHitBox);
@@ -162,8 +134,6 @@ void AGolemBoss::PostInitializeComponents()
 		auto& HitBoxComponent = HitBox.Value;
 		HitBoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
 		HitBoxComponent->BurningTime = BurningTime;
-		//Hitbox.HitBoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AGolemBoss::OnOverlapBegin);
-		//Hitbox.HitBoxComponent->BurningTime = BurningTime;
 	}
 }
 
@@ -213,7 +183,7 @@ void AGolemBoss::LongAttack()
 	if (EnemyAnim)
 	{
 		CurState = EEnemyState::LongAttack;
-		ServerPlayMontage(this, FName("Throw"));
+		ServerPlayMontage(FName("Throw"));
 	}
 	TargetPos = Target->GetActorLocation();
 }
@@ -358,60 +328,32 @@ void AGolemBoss::MultiApplyPointDamage_Implementation(AActor* OtherActor, float 
 float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (HP <= 0) return 0;
-
 	APawn::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	FVector HitLoc;
+	FVector HitLoc;	//데미지 출력 위치
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
-	{	//Point Damage
+	{	//탄환 데미지
 		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
 		HitLoc = PointDamageEvent.HitInfo.Location;
+
+		//부위 별 히트박스 데미지 적용
 		UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(PointDamageEvent.HitInfo.GetComponent());
-		if (HitBox == NULL) return 0;
-		if (HitBox->TakeDamage(DamageAmount))
-		{
-			FName PartName = HitBox->GetAttachSocketName();
-			DestroyPart(PartName);
-			HitBox->ServerDestroyPart();
-			FString StringPartName = PartName.ToString();
-			if (StringPartName.Contains("Left"))
-			{
-				ServerPlayMontage(this, FName("LeftDestroy"));
-				CurState = EEnemyState::LeftDestroy;
-				DropBombs();
-			}
-			else if(StringPartName.Contains("Right"))
-			{
-				ServerPlayMontage(this, FName("RightDestroy"));
-				CurState = EEnemyState::RightDestroy;
-			}
-		}
+		HitBox->TakeDamage(DamageAmount);
 		AItem* HitItem = Cast<AItem>(DamageCauser);
 		if (!HitItem) return 0;
-		if (AHunter* Hunter = Cast<AHunter>(HitItem->ThisOwner))
-		{
-			Hunter->SetPartnerTarget(this);
-		}
+		HitItem->AnnounceTarget(this);
+
 	}
 	else
-	{
+	{	//부위 타격이 아닐 때 데미지 출력 위치
 		HitLoc = GetActorLocation();
 	}
 	HP -= DamageAmount;
-
-	if (HP <= 0)
-	{
-		ServerPlayMontage(this, FName("Die"));
-		bDied = true;
-		SetActorTickEnabled(false);
-		DropBombs();
-	}
-
-	if (bReflecting)
-	{
-		ReflectDamgeAmount += DamageAmount;
-	}
-
+	//반사 공격 데미지 축적
+	if (bReflecting) ReflectDamgeAmount += DamageAmount;
+	//Die
+	if (HP <= 0) fallDown();
+	//데미지 출력 이벤트 호출
 	OnDamage.Broadcast(DamageAmount, HitLoc);
 	return DamageAmount;
 }
@@ -447,30 +389,6 @@ void AGolemBoss::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	}
 }
 
-//void AGolemBoss::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
-//{
-//	UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(HitComponent);
-//	if (HitBox)
-//	{
-//		if (bCanGrab)
-//		{
-//			FName PartName = HitBox->GetAttachSocketName();
-//			if (PartName == FName("LeftHand") || PartName == FName("RightHand"))
-//			{
-//				ACharacter* GrabbedCharacter = Cast<ACharacter>(OtherActor);
-//				if (GrabbedCharacter)
-//				{
-//					OtherActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GrabSocket"));
-//					GrabbedCharacter->SetActorEnableCollision(false);
-//					GrabbedTarget = GrabbedCharacter;
-//				}
-//				return;
-//			}
-//		}
-//
-//		ServerApplyDamage()
-//}
-
 void AGolemBoss::DestroyPart_Implementation(const FName& PartName)
 {
 
@@ -478,23 +396,29 @@ void AGolemBoss::DestroyPart_Implementation(const FName& PartName)
 
 void AGolemBoss::DeleteHitBox(const FName& PartName)
 {
-	// Delete Hit Box를 제거함.
-	//오류 계속 발생하면 제거 필요
-	int TargetIndex = -1;
 	HitBoxMap.Remove(PartName);
+}
 
-	/*for (int i = 0; i < HitBoxArray.Num(); ++i)
-	{
-		if (HitBoxArray[i].HitBoxName == PartName)
-		{
-			TargetIndex = i;
-			break;
-		}
-	}
+void AGolemBoss::DestroyLeftArm()
+{
+	ServerPlayMontage(FName("LeftDestroy"));
+	CurState = EEnemyState::LeftDestroy;
+	DropBombs();
+}
 
+void AGolemBoss::DestroyRightArm()
+{
+	ServerPlayMontage(FName("RightDestroy"));
+	CurState = EEnemyState::RightDestroy;
+	DropBombs();
+}
 
-	if(TargetIndex >= 0) HitBoxArray.RemoveAt(TargetIndex);*/
-
+void AGolemBoss::fallDown()
+{
+	ServerPlayMontage(FName("Die"));
+	bDied = true;
+	SetActorTickEnabled(false);
+	DropBombs();
 }
 
 int AGolemBoss::CheckInRange()
@@ -517,13 +441,6 @@ int AGolemBoss::CheckPattern()
 {
 	float CurTime = GetWorld()->GetTimeSeconds();
 
-	//for (auto& Pattern : PatternManageArray){
-	//	Pattern.CheckReady(CurTime);
-	//	if (Pattern.GetReady())
-	//	{
-	//		return Pattern.num;
-	//	}
-	//}
 	int PatternNum = FMath::RandRange(0,4);
 
 
@@ -532,8 +449,6 @@ int AGolemBoss::CheckPattern()
 
 void AGolemBoss::Attack(int AttackPattern)
 {
-	//LongAttack();
-
 	AttackPattern = FMath::RandRange(0, 4);
 
 	switch (AttackPattern)
@@ -541,34 +456,33 @@ void AGolemBoss::Attack(int AttackPattern)
 	case 0:
 		if (!bLoseLeftHand && !bLoseRightHand)
 		{
-			ServerPlayMontage(this, FName("Attack_Grab"));
+			ServerPlayMontage(FName("Attack_Grab"));
 		}
-		else ServerPlayMontage(this, FName("WideAttack"));
+		else ServerPlayMontage(FName("WideAttack"));
 		break;
 	case 1:
-		//Attack Punch
 		if (bLoseLeftHand)
 		{
-			if (bLoseRightHand) ServerPlayMontage(this, FName("WideAttack"));
-			else ServerPlayMontage(this, FName("Attack"));
+			if (bLoseRightHand) ServerPlayMontage(FName("WideAttack"));
+			else ServerPlayMontage( FName("Attack"));
 		}
-		else ServerPlayMontage(this, FName("Attack_Punch"));
+		else ServerPlayMontage( FName("Attack_Punch"));
 		break;
 
 	case 2:
-		ServerPlayMontage(this, FName("Attack"));
+		ServerPlayMontage( FName("Attack"));
 		break;
 
 	case 3:
 		if (bLoseRightHand)
 		{
-			if (bLoseLeftHand)  ServerPlayMontage(this, FName("WideAttack"));
-			else ServerPlayMontage(this, FName("Attack_Punch"));
+			if (bLoseLeftHand)  ServerPlayMontage(FName("WideAttack"));
+			else ServerPlayMontage(FName("Attack_Punch"));
 		}
-		else ServerPlayMontage(this, FName("Attack"));
+		else ServerPlayMontage(FName("Attack"));
 		break;
 	case 5:
-		ServerPlayMontage(this, FName("Block"));
+		ServerPlayMontage(FName("Block"));
 		Block();
 		break;
 
@@ -585,29 +499,27 @@ void AGolemBoss::PatternAttack(int AttackPattern)
 	{
 
 	case 0:
-		if (!bLoseLeftHand) ServerPlayMontage(this, FName("Throw"));
-		else ServerPlayMontage(this, FName("ChargeAttack"));
+		if (!bLoseLeftHand) ServerPlayMontage(FName("Throw"));
+		else ServerPlayMontage(FName("ChargeAttack"));
 
-		ServerPlayMontage(this, FName("ChargeAttack"));
+		ServerPlayMontage(FName("ChargeAttack"));
 		break;
 	case 1:
-		ServerPlayMontage(this, FName("WideAttack"));
+		ServerPlayMontage(FName("WideAttack"));
 		break;
 
 	case 2:
-		ServerPlayMontage(this, FName("ChargeAttack"));
+		ServerPlayMontage(FName("ChargeAttack"));
 		break;
 
 	case 3:
-		ServerPlayMontage(this, FName("JumpAttack"));
+		ServerPlayMontage(FName("JumpAttack"));
 		break;
 
 	case 4:
 		LongAttack();
 		break;
 	}
-
-	//PatternManageArray[AttackPattern].UseSkill(GetWorld()->GetTimeSeconds());
 }
 
 void AGolemBoss::Earthquake()
@@ -624,10 +536,7 @@ void AGolemBoss::Earthquake()
 		for (auto OverlapActor : OverlapActors)
 		{
 			IEnemyInteractInterface* ApplyActor = Cast<IEnemyInteractInterface>(OverlapActor);
-			if (ApplyActor)
-			{
-				Execute_InteractEarthquake(OverlapActor);
-
-			}
+			if (ApplyActor == NULL) continue;
+			Execute_InteractEarthquake(OverlapActor);
 		}
 }

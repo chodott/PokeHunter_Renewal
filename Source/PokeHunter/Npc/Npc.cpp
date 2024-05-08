@@ -53,9 +53,10 @@ void ANpc::Interact_Implementation(AHunter* Hunter)
 {
 	Master = Hunter;
 	if (bActive)
-	{
+	{	
 		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(Hunter, 1.0f);
 		Master->StorageUI->RemoveFromParent();
+		//창고가 보이도록 캐릭터 투명화
 		Master->GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Opacity"), 1);
 		UGameplayStatics::PlaySound2D(GetWorld(), EndSound);
 	}
@@ -63,6 +64,8 @@ void ANpc::Interact_Implementation(AHunter* Hunter)
 	{
 		Cast<APlayerController>(Master->GetController())->SetViewTargetWithBlend(this, 1.0f);	
 		UGameplayStatics::PlaySound2D(GetWorld(), InteractSound);
+		Master->GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Opacity"), 0);
+
 	}
 	Master->DisableInput(Cast<APlayerController>(Master->Controller));
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &ANpc::OpenUI, 1.0f, false, 1.0f);
@@ -81,7 +84,6 @@ void ANpc::OpenUI()
 		Master->StorageUI = CreateWidget(Cast<APlayerController>(Master->Controller), UIClass);
 		Master->StorageUI-> AddToViewport();
 		bActive = true;
-		Master->GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Opacity"), 0);
 	}
 	Master->EnableInput(Cast<APlayerController>(Master->Controller));
 

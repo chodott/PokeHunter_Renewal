@@ -33,7 +33,6 @@ ABullet::ABullet()
 	
 	if (GetLocalRole() == ROLE_Authority)
 	{
-		//StaticMesh->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
 		StaticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnOverlapBegin);
 	}
 
@@ -59,47 +58,21 @@ void ABullet::Tick(float DeltaTime)
 	StaticMesh->AddLocalRotation(RotVec.Rotation(), false);
 }
 
-void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
-{
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, StaticMesh->GetComponentLocation(), GetActorRotation());
-
-	if(SoundEffect) UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundEffect, StaticMesh->GetComponentLocation());
-	if (!OtherActor) return;
-	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
-	if(OtherComponent->IsA<UHitBoxComponent>())
-	UE_LOG(LogTemp, Warning, TEXT("HitBox Hit"), );
-	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), Hit, ThisOwner->GetController(), this, UDamageType::StaticClass());
-	if (OtherActor->Implements<UItemInteractInterface>())
-	{
-		ApplyAbillity(OtherActor, OtherComponent);
-	}
-	else OnHitNotEnemy(Hit.Location);
-
-	if (!bAttached)
-	{
-		ServerDestroy();
-	}
-}
-
-void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComponent, 
+													int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ServerSpawnEffect();
-	if (!OtherActor || OtherActor == ThisOwner) return;
-	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetActorForwardVector(), Hit, NULL, this, UDamageType::StaticClass());
+	//발사한 본인과의 충돌 무시
+	if (OtherActor == ThisOwner) return;
 	
-	const FHitResult HitInfo = FHitResult(OtherActor, OtherComponent, StaticMesh->GetComponentLocation(), FVector(0, 0, 0));
+	const FHitResult HitInfo = FHitResult(OtherActor, OtherComponent, StaticMesh->GetComponentLocation(),FVector::ZeroVector);
 	if (OtherActor->Implements<UItemInteractInterface>())
-	{
+	{	
 		ApplyAbillity(OtherActor, OtherComponent);
 	}
-	else OnHitNotEnemy(HitInfo.Location);
 	
 	ServerApplyDamage(OtherActor, Damage, GetActorForwardVector(), HitInfo, ThisOwner->GetController(), this, UDamageType::StaticClass());
-	if (!bAttached)
-	{
-		ServerDestroy();
-	}
-
+	ServerDestroy();
 }
 
 
@@ -109,19 +82,11 @@ void ABullet::UseItem(AHunter* ItemOwner, FVector InitialPos, FVector EndPos)
 
 	UGameplayStatics::SuggestProjectileVelocity(this, Velocity, InitialPos, EndPos, 
 	ProjectileMovement->InitialSpeed, false, 0.f, GetWorld()->GetGravityZ(),ESuggestProjVelocityTraceOption::DoNotTrace);
-	//UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, Velocity, InitialPos, EndPos, GetWorld()->GetGravityZ(), 1.f);
 	ThisOwner = ItemOwner;
 	ProjectileMovement->Velocity = Velocity;
 	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
 	SetLifeSpan(TimeLimit);
 
-	//��� ����� ��
-	/*FPredictProjectilePathParams predictParams(20.0f, InitialPos, Velocity, 15.0f);   
-	predictParams.DrawDebugTime = 15.0f;    
-	predictParams.DrawDebugType = EDrawDebugTrace::Type::ForDuration; 
-	predictParams.OverrideGravityZ = GetWorld()->GetGravity3Z();
-	FPredictProjectilePathResult result;
-	UGameplayStatics::PredictProjectilePath(this, predictParams, result);*/
 	ProjectileMovement->UpdateComponentVelocity();
 	StaticMesh->AddImpulse(Velocity, FName(""),true);
 }

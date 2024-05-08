@@ -153,7 +153,6 @@ void AWolfPartner::UseSkill(ESkillID SkillID)
 			TargetPos = Target->GetActorLocation();
 			CurState = EPartnerState::SlashAttack;
 			bUsingSkill = true;
-			bOrdered = true;
 			bSuccess = true;
 		}
 		break;
@@ -164,7 +163,6 @@ void AWolfPartner::UseSkill(ESkillID SkillID)
 			TargetPos = Target->GetActorLocation();
 			CurState = EPartnerState::IceShard;
 			bUsingSkill = true;
-			bOrdered = true;
 			bSuccess = true;
 		}
 		break;
@@ -172,7 +170,6 @@ void AWolfPartner::UseSkill(ESkillID SkillID)
 	case ESkillID::IceStorm:
 		CurState = EPartnerState::MakingStorm;
 		bUsingSkill = true;
-		bOrdered = true;
 		bSuccess = true;
 		break;
 
@@ -182,7 +179,6 @@ void AWolfPartner::UseSkill(ESkillID SkillID)
 			TargetPos = Target->GetActorLocation();
 			CurState = EPartnerState::IceBreath;
 			bUsingSkill = true;
-			bOrdered = true;
 			bSuccess = true;
 		}
 		break;
@@ -192,6 +188,7 @@ void AWolfPartner::UseSkill(ESkillID SkillID)
 
 	if (bSuccess)
 	{
+		bOrdered = true;
 		Hunter->SuccessUseSkill(SkillID);
 	}
 }

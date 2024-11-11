@@ -11,8 +11,6 @@ APotion::APotion()
 	StaticMesh->SetEnableGravity(false);
 	ProjectileMovement->ProjectileGravityScale = 0.f;
 	ProjectileMovement->Deactivate();
-	
-
 }
 
 void APotion::UseItem_Implementation(AHunter* ItemOwner)

@@ -18,7 +18,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HitBox")
 	class UHitBoxComponent* ChildHitbox;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Replicated, Category = "Part")
 	float PartHP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")

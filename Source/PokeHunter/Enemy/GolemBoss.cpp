@@ -336,13 +336,13 @@ float AGolemBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		const FPointDamageEvent& PointDamageEvent = static_cast<const FPointDamageEvent&>(DamageEvent);
 		HitLoc = PointDamageEvent.HitInfo.Location;
 
-		//부위 별 히트박스 데미지 적용
-		UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(PointDamageEvent.HitInfo.GetComponent());
-		HitBox->TakeDamage(DamageAmount);
 		AItem* HitItem = Cast<AItem>(DamageCauser);
 		if (!HitItem) return 0;
 		HitItem->AnnounceTarget(this);
 
+		//부위 별 히트박스 데미지 적용
+		UHitBoxComponent* HitBox = Cast<UHitBoxComponent>(PointDamageEvent.HitInfo.GetComponent());
+		HitBox->TakeDamage(DamageAmount);
 	}
 	else
 	{	//부위 타격이 아닐 때 데미지 출력 위치

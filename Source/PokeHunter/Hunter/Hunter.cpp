@@ -522,6 +522,7 @@ void AHunter::LMBDown()
 		FHitResult HitResult;
 		APlayerController* PlayerController = Cast<APlayerController>(GetController());
 		PlayerController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, 0, HitResult);
+
 		//HitResult.Location;
 		if (HitResult.bBlockingHit)
 		{
@@ -551,15 +552,6 @@ void AHunter::LMBDown()
 			FCollisionQueryParams BulletTraceParams(FName("Visibility"), true, this);
 			if(GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, BulletTraceParams))
 			{
-				//Debug LineTrace
-				/*DrawDebugLine(
-					GetWorld(),
-					StartTrace,
-					HitResult->Location,
-					FColor(255, 0, 0),
-					false, 3, 0,
-					12.333
-				);*/
 				EndTrace = HitResult->Location;
 			}
 			else
@@ -568,7 +560,6 @@ void AHunter::LMBDown()
 			}
 
 			StartTrace = GetMesh()->GetSocketLocation(FName("Muzzle")) + GetActorForwardVector() * 100.f;
-
 			ServerSpawnBullet(ItemClass, StartTrace, EndTrace, GetControlRotation());
 		}
 		
@@ -672,7 +663,7 @@ void AHunter::EKeyDown()
 			}
 			else
 			{
-				ServerPlayMontage( FName("PickUp"));
+				ServerPlayMontage(FName("PickUp"));
 			}
 			ServerInteractObject(InteractingActor);
 		}
@@ -937,28 +928,26 @@ void AHunter::ServerSpawnItem_Implementation(TSubclassOf<AItem> SpawnItemClass, 
 	switch (SpawnedItem->ItemType)
 	{
 	case EItemType::Bullet:
-		SpawnedItem->Destroy();
 		break;
 	case EItemType::Potion:
 		MultiPlayMontage(FName("Drink"));
-
 		break;
-	case EItemType::Trap:
-		MultiPlayMontage( FName("Install"));
-		FHitResult* HitResult = new FHitResult();
-		FVector SpawnLoc = StartLoc + GetActorForwardVector() * 200;
-		if (GetWorld()->LineTraceSingleByChannel(*HitResult, SpawnLoc, SpawnLoc + FVector(0, 0, -100), ECollisionChannel::ECC_Pawn))
-		{
-			SpawnedItem->SetActorLocation(HitResult->Location);
-			CurState = EPlayerState::Install;
-			SpawnedItem->UseItem(this);
-		}
-		else
-		{
-			//실패 처리 필요
-			SpawnedItem->Destroy();
-		}
-		break;
+	//case EItemType::Trap:
+	//	MultiPlayMontage( FName("Install"));
+	//	FHitResult* HitResult = new FHitResult();
+	//	FVector SpawnLoc = StartLoc + GetActorForwardVector() * 200;
+	//	if (GetWorld()->LineTraceSingleByChannel(*HitResult, SpawnLoc, SpawnLoc + FVector(0, 0, -100), ECollisionChannel::ECC_Pawn))
+	//	{
+	//		SpawnedItem->SetActorLocation(HitResult->Location);
+	//		CurState = EPlayerState::Install;
+	//		SpawnedItem->UseItem(this);
+	//	}
+	//	else
+	//	{
+	//		//실패 처리 필요
+	//		SpawnedItem->Destroy();
+	//	}
+	//	break;
 	}
 }
 

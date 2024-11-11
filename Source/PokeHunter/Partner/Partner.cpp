@@ -162,7 +162,6 @@ void APartner::SlashMove()
 		{
 			SetActorLocation(EndLocation);
 			ServerPlayMontage(FName("SlashAttack"));
-
 		}
 	}
 }

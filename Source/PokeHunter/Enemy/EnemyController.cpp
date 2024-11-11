@@ -59,12 +59,12 @@ void AEnemyController::OnPossess(APawn* pawn)
 void AEnemyController::OnPerception(AActor* Actor, FAIStimulus Stimulus)
 {
 	IGenericTeamAgentInterface* TeamAgent = Cast<IGenericTeamAgentInterface>(Actor);
-	//if (TeamAgent == NULL) return;
+	if (TeamAgent == NULL) return;
 
 	switch (Stimulus.Type)
 	{
 	case 0:
-		if (TeamAgent && TeamAgent->GetGenericTeamId() != Enemy->GetGenericTeamId())
+		if (TeamAgent->GetGenericTeamId() != Enemy->GetGenericTeamId())
 		{
 			Enemy->SeeNewTarget(Actor);
 		}

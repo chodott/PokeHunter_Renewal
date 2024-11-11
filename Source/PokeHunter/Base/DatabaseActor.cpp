@@ -44,18 +44,10 @@ void ADatabaseActor::Tick(float DeltaTime)
 
 UItemData* ADatabaseActor::FindItem(FName ItemID)
 {
-	if (ItemID == "None")							return nullptr;
-	if (ItemDataClassMap.IsEmpty())					return nullptr;
-	if (ItemDataObjectMap.IsEmpty())				return nullptr;
-	if (0 == ItemDataClassMap.Num())				return nullptr;
-	if (0 == ItemDataObjectMap.Num())				return nullptr;
-	if (nullptr == ItemDataClassMap.Find(ItemID))	return nullptr;
-	if (nullptr == ItemDataObjectMap.Find(ItemID))	return nullptr;
-
+	if (ItemID == "None") return NULL;
 	UItemData* ItemData = *ItemDataObjectMap.Find(ItemID);
-
-	if (ItemData != nullptr)						return ItemData;
-	else											return nullptr;
+	if (ItemData != NULL)	return ItemData;
+	else	return NULL;
 }
 
 FSkillInfo ADatabaseActor::FindSkill(ESkillID SkillID)

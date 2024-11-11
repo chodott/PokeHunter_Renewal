@@ -17,12 +17,10 @@ EBTNodeResult::Type UBTTask_EnemyAttack::ExecuteTask(UBehaviorTreeComponent& Own
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 	Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	UEnemyAnimInstance* EnemyAnim = Enemy->EnemyAnim;
-	if (Enemy == NULL)return EBTNodeResult::Failed;
-	if(Enemy->CurState == EEnemyState::NormalAttack) return EBTNodeResult::Failed;
+	if (Enemy == NULL) return EBTNodeResult::Failed;
 	int PatternNum = OwnerComp.GetBlackboardComponent()->GetValueAsInt(FName("AttackPattern"));
 	Enemy->Attack(PatternNum);
 	bPlaying = true;
-
 	Enemy->OnMontageEnd.AddLambda([this]()->void
 		{
 			bPlaying = false;
@@ -38,7 +36,6 @@ void UBTTask_EnemyAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 	{
 		Enemy->CurState = EEnemyState::Chase;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-		
 	}
 }
 

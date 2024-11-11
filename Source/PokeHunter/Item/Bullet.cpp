@@ -61,11 +61,12 @@ void ABullet::Tick(float DeltaTime)
 void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComponent, 
 													int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ServerSpawnEffect();
 	//발사한 본인과의 충돌 무시
 	if (OtherActor == ThisOwner) return;
-	
-	const FHitResult HitInfo = FHitResult(OtherActor, OtherComponent, StaticMesh->GetComponentLocation(),FVector::ZeroVector);
+
+	ServerSpawnEffect();
+	//HitNormal은 TakeDamage함수 내에서 필요X -> zerovector로 설정
+	const FHitResult HitInfo = FHitResult(OtherActor, OtherComponent, StaticMesh->GetComponentLocation(), FVector::ZeroVector);
 	if (OtherActor->Implements<UItemInteractInterface>())
 	{	
 		ApplyAbillity(OtherActor, OtherComponent);

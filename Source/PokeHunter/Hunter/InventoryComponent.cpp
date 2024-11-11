@@ -122,7 +122,7 @@ bool UInventoryComponent::CreateItem(const FItemInfo& ItemInfo)
 		}
 	}
 
-	//개수 처리
+	//사용된 아이템 개수 처리
 	for (int i = 0; i < ItemInfo.OfferingItemID.Num(); ++i)
 	{
 		FName CreateItemID = ItemInfo.OfferingItemID[i];
